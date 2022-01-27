@@ -8,8 +8,8 @@ import {
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
 import * as strings from 'AppraisalsWebPartStrings';
-import Appraisals from './components/Appraisals';
-import { IAppraisalsProps } from './components/IAppraisalsProps';
+import Appraisals from './components/periods/Appraisals';
+import { IAppraisalsProps } from './components/periods/IAppraisalsProps';
 
 export interface IAppraisalsWebPartProps {
     description: string;
