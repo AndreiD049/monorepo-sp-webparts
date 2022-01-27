@@ -1,0 +1,9 @@
+node_modules
+config
+.vscode
+dist
+lib
+release
+teams
+temp
+

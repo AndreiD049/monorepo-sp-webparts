@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "appraisals-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/appraisals/AppraisalsWebPart.js",
+          "manifest": "./src/webparts/appraisals/AppraisalsWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "AppraisalsWebPartStrings": "lib/webparts/appraisals/loc/{locale}.js"
+  }
+}
