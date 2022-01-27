@@ -8,8 +8,9 @@ import {
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
 import * as strings from 'AppraisalsWebPartStrings';
-import Appraisals from './components/periods/Appraisals';
 import { IAppraisalsProps } from './components/periods/IAppraisalsProps';
+import { sp } from '@pnp/sp/presets/all';
+import Root from './components/Root';
 
 export interface IAppraisalsWebPartProps {
     description: string;
@@ -18,11 +19,17 @@ export interface IAppraisalsWebPartProps {
 export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisalsWebPartProps> {
     public render(): void {
         const element: React.ReactElement<IAppraisalsProps> =
-            React.createElement(Appraisals, {
+            React.createElement(Root, {
                 description: this.properties.description,
             });
 
         ReactDom.render(element, this.domElement);
+    }
+
+    protected async onInit(): Promise<void> {
+        await super.onInit();
+
+        sp.setup(this.context);
     }
 
     protected onDispose(): void {
