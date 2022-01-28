@@ -68,6 +68,7 @@ const AppraisalPeriods: FC = () => {
             }),
         [periods]
     );
+
     /* New period panel state */
     const [newPanel, setNewPanel] = React.useState<boolean>(false);
 

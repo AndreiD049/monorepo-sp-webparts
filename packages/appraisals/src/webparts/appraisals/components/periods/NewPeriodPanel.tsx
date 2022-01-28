@@ -5,6 +5,7 @@ import {
     Stack,
     PrimaryButton,
     DefaultButton,
+    getTheme,
 } from 'office-ui-fabric-react';
 
 export interface INewPeriodPanelProps {
@@ -12,13 +13,22 @@ export interface INewPeriodPanelProps {
     setOpen: (val: boolean) => void;
 }
 
+const theme = getTheme();
+
 const NewPeriodPanel: React.FC<INewPeriodPanelProps> = (props) => {
     const handleDismiss = () => props.setOpen(false);
 
     const footer = () => (
         <Stack horizontal horizontalAlign="start">
-            <PrimaryButton text="Create" />
-            <DefaultButton text="Cancel" onClick={handleDismiss} />
+            <PrimaryButton
+                style={{ marginLeft: theme.spacing.m }}
+                text="Create"
+            />
+            <DefaultButton
+                style={{ marginLeft: theme.spacing.s1 }}
+                text="Cancel"
+                onClick={handleDismiss}
+            />
         </Stack>
     );
 
