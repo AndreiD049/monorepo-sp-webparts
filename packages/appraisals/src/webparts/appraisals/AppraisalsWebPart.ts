@@ -18,10 +18,11 @@ export interface IAppraisalsWebPartProps {
 
 export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisalsWebPartProps> {
     public render(): void {
+        /* Register live reload for Sharepoint Online */
+        this.registerLiveReload();
+
         const element: React.ReactElement<IAppraisalsProps> =
-            React.createElement(Root, {
-                description: this.properties.description,
-            });
+            React.createElement(Root);
 
         ReactDom.render(element, this.domElement);
     }
@@ -29,7 +30,12 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
     protected async onInit(): Promise<void> {
         await super.onInit();
 
-        sp.setup(this.context);
+        sp.setup({
+            spfxContext: this.context,
+            defaultCachingStore: 'session',
+            defaultCachingTimeoutSeconds: 600,
+            globalCacheDisable: false,
+        });
     }
 
     protected onDispose(): void {
@@ -38,6 +44,20 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
 
     protected get dataVersion(): Version {
         return Version.parse('1.0');
+    }
+
+    private registerLiveReload() {
+      if (this.context.manifest["loaderConfig"]["internalModuleBaseUrls"][0]
+                           .indexOf("https://localhost:4321") !== -1) {
+
+        // create a new <script> element
+        let script = document.createElement('script');
+        // assign the src attribute to the livereload serve
+        script.src = "//localhost:35729/livereload.js?snipver=1";
+        // add script to the head section of the page
+        document.head.appendChild(script);
+
+      }
     }
 
     protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {

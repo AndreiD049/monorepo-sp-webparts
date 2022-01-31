@@ -1,7 +1,9 @@
+export type PeriodStatus = "Open" | "Finished";
+
 export default interface IPeriod {
-    ID: number;
+    ID: string;
     Title: string;
-    Status: string;
+    Status: PeriodStatus;
     Created: string;
     Author: {
         Title: string;

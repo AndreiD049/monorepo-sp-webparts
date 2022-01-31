@@ -11,12 +11,15 @@ import {
     DetailsListLayoutMode,
     Selection,
     getTheme,
+    SelectionMode,
 } from 'office-ui-fabric-react';
 import IPeriod from '../../dal/IPeriod';
 import { getPeriods } from '../../dal/Periods';
 import constants from '../../utils/constants';
 import NewPeriodPanel from './NewPeriodPanel';
 import { useHistory } from 'react-router-dom';
+import useForceUpdate from '../../utils/forceUpdate';
+import UserContext, { IUserContext } from '../../utils/UserContext';
 
 const theme = getTheme();
 const pillStyles: (item: IPeriod) => React.CSSProperties = (item) => ({
@@ -37,12 +40,13 @@ const pillStyles: (item: IPeriod) => React.CSSProperties = (item) => ({
 
 /* Element showing all appraisal periods */
 const AppraisalPeriods: FC = () => {
+    const context = React.useContext<IUserContext>(UserContext);
     const history = useHistory();
+    const forceUpdate = useForceUpdate();
     const [searchValue, setSearchValue] = React.useState<string>('');
     const [periods, setPeriods] = React.useState<IPeriod[]>([]);
     /* Items to be shown on the table  */
     const filteredPeriods = React.useMemo(() => {
-        console.log(!searchValue);
         if (!searchValue) {
             return periods;
         } else {
@@ -114,16 +118,18 @@ const AppraisalPeriods: FC = () => {
     /* Load initial data */
     React.useEffect(() => {
         async function run() {
-            const result = await getPeriods();
-            setPeriods(result);
+            if (context) {
+                const result = await getPeriods();
+                setPeriods(result);
+            }
         }
 
         run();
-    }, []);
+    }, [forceUpdate, context]);
 
     const handleOpenItem = (item: IPeriod) => {
         const url = new URL(window.location.href);
-        url.searchParams.set(constants.periodId, item.ID.toString());
+        url.searchParams.set(constants.periodId, item.ID);
         history.push(url.pathname + url.search);
     };
 
@@ -190,10 +196,11 @@ const AppraisalPeriods: FC = () => {
                         columns={columns}
                         items={filteredPeriods}
                         layoutMode={DetailsListLayoutMode.justified}
+                        selectionMode={SelectionMode.single}
                     />
                 </main>
             </Stack>
-            <NewPeriodPanel isOpen={newPanel} setOpen={setNewPanel} />
+            <NewPeriodPanel isOpen={newPanel} setOpen={setNewPanel} update={forceUpdate} />
         </>
     );
 };

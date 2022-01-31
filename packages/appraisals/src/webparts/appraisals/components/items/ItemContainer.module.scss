@@ -1,0 +1,30 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    background-color: "[theme: themeLight, default: #fbf4f4]";
+}
+
+.actionButton {
+    background-color:  "[theme: themeLighter, default: #fbf4f4]";
+}
+
+.buttonLeft {
+    & [data-element='input'] {
+        order: 1;
+    }
+    & [data-element='button'] {
+        order: 0;
+    }
+}
+
+.peoplePicker {
+    & [class*='ms-SelectionZone'] {
+        display: flex;
+        justify-content: center;
+        margin-top: .7em;
+    }
+
+    & [class*='ms-PickerItem-removeButton'] {
+        display: none;
+    }
+}
