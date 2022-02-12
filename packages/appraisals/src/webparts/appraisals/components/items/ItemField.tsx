@@ -34,7 +34,7 @@ const ItemField: FC<IItemFieldProps> = (props) => {
         <Stack
             horizontal
             horizontalAlign="stretch"
-            verticalAlign="center"
+            verticalAlign="stretch"
             styles={{
                 root: {
                     marginTop: theme.spacing.s1,
@@ -69,8 +69,9 @@ const ItemField: FC<IItemFieldProps> = (props) => {
                                 display: 'none',
                             },
                             root: {
+                                height: '100%',
                                 borderRadius: 0,
-                            }
+                            },
                         }}
                         menuProps={{
                             isBeakVisible: false,

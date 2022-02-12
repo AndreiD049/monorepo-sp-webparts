@@ -1,4 +1,4 @@
-import { getTheme, Stack } from 'office-ui-fabric-react';
+import { getTheme, Stack, StackItem, themeRulesStandardCreator } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { FC } from 'react';
 import IItem from '../../dal/IItem';
@@ -48,25 +48,24 @@ const SwotItems: FC<IGoalItemsProps> = (props) => {
     }, [props.user, props.period]);
 
     return (
-        <Stack verticalAlign="stretch" style={{ marginTop: theme.spacing.l1 }}>
-            <Stack
-                horizontal
-                horizontalAlign="center"
-                verticalAlign="stretch"
-                wrap
-            >
-                {/* Strength */}
-                <div
-                    style={{
-                        minWidth: 400,
-                        marginRight: theme.spacing.s2,
-                        marginBottom: theme.spacing.s2,
-                    }}
-                >
+        <Stack verticalAlign="center" horizontalAlign="center">
+            <span className={styles.container} style={{
+                boxShadow: theme.effects.elevation4,
+                padding: '0 1em'
+            }}>
+                <div style={{
+                    display: "flex",
+                    flexFlow: "row wrap",
+                }}>
+                    {/* Strength */}
                     <ItemContainer
-                        className={styles.buttonLeft}
+                        className={`${styles.buttonLeft} ${styles.itemsGroup} ${styles.simple}`}
                         items={strengthItems}
-                        minItems={Math.max(strengthItems.length + 1, weaknessItems.length + 1, 5)}
+                        minItems={Math.max(
+                            strengthItems.length + 1,
+                            weaknessItems.length + 1,
+                            5
+                        )}
                         status="NA"
                         title="Strength"
                         itemType="Strength"
@@ -74,18 +73,15 @@ const SwotItems: FC<IGoalItemsProps> = (props) => {
                         userId={props.user?.Id}
                         setItems={setItems}
                     />
-                </div>
-                {/* Weakness */}
-                <div
-                    style={{
-                        minWidth: 400,
-                        marginLeft: theme.spacing.s2,
-                        marginBottom: theme.spacing.s2,
-                    }}
-                >
+                    {/* Weakness */}
                     <ItemContainer
+                        className={`${styles.itemsGroup} ${styles.simple}`}
                         items={weaknessItems}
-                        minItems={Math.max(strengthItems.length + 1, weaknessItems.length + 1, 5)}
+                        minItems={Math.max(
+                            strengthItems.length + 1,
+                            weaknessItems.length + 1,
+                            5
+                        )}
                         status="NA"
                         title="Weakness"
                         itemType="Weakness"
@@ -94,25 +90,19 @@ const SwotItems: FC<IGoalItemsProps> = (props) => {
                         setItems={setItems}
                     />
                 </div>
-            </Stack>
-            <Stack
-                horizontal
-                horizontalAlign="center"
-                verticalAlign="stretch"
-                wrap
-            >
-                {/* Opportunity */}
-                <div
-                    style={{
-                        minWidth: 400,
-                        marginRight: theme.spacing.s2,
-                        marginTop: theme.spacing.s2,
-                    }}
-                >
+                <div style={{
+                    display: "flex",
+                    flexFlow: "row wrap",
+                }}>
+                    {/* Opportunity */}
                     <ItemContainer
-                        className={styles.buttonLeft}
+                        className={`${styles.buttonLeft} ${styles.itemsGroup} ${styles.simple} ${styles.bottom}`}
                         items={opportunityItems}
-                        minItems={Math.max(opportunityItems.length + 1, threatItems.length + 1, 5)}
+                        minItems={Math.max(
+                            opportunityItems.length + 1,
+                            threatItems.length + 1,
+                            5
+                        )}
                         status="NA"
                         title="Opportunity"
                         itemType="Opportunity"
@@ -120,18 +110,15 @@ const SwotItems: FC<IGoalItemsProps> = (props) => {
                         userId={props.user?.Id}
                         setItems={setItems}
                     />
-                </div>
-                {/* Threats */}
-                <div
-                    style={{
-                        minWidth: 400,
-                        marginLeft: theme.spacing.s2,
-                        marginTop: theme.spacing.s2,
-                    }}
-                >
+                    {/* Threats */}
                     <ItemContainer
+                        className={`${styles.itemsGroup} ${styles.simple} ${styles.bottom}`}
                         items={threatItems}
-                        minItems={Math.max(opportunityItems.length + 1, threatItems.length + 1, 5)}
+                        minItems={Math.max(
+                            opportunityItems.length + 1,
+                            threatItems.length + 1,
+                            5
+                        )}
                         status="NA"
                         title="Threat"
                         itemType="Threat"
@@ -140,7 +127,7 @@ const SwotItems: FC<IGoalItemsProps> = (props) => {
                         setItems={setItems}
                     />
                 </div>
-            </Stack>
+            </span>
         </Stack>
     );
 };

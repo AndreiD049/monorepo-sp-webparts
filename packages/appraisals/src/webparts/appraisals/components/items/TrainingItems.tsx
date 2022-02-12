@@ -47,48 +47,34 @@ const TrainingItems: FC<IGoalItemsProps> = (props) => {
     }, [props.user, props.period]);
 
     return (
-        <Stack
-            horizontal
-            horizontalAlign="space-evenly"
-            verticalAlign="stretch"
-            wrap
-        >
+        <span className={styles.container} style={{
+            padding: '0 1em',
+            display: 'flex',
+            flexFlow: 'row wrap',
+        }}>
             {/* Achieved */}
-            <div
-                style={{
-                    margin: '1em 3em',
-                    minWidth: 400,
-                }}
-            >
-                <ItemContainer
-                    className={styles.buttonLeft}
-                    items={achieved}
-                    minItems={3}
-                    status="Achieved"
-                    itemType="Training"
-                    periodId={props.period?.ID}
-                    userId={props.user?.Id}
-                    setItems={setItems}
-                />
-            </div>
+            <ItemContainer
+                className={`${styles.buttonLeft} ${styles.itemsGroup} ${styles.simple}`}
+                items={achieved}
+                minItems={3}
+                status="Achieved"
+                itemType="Training"
+                periodId={props.period?.ID}
+                userId={props.user?.Id}
+                setItems={setItems}
+            />
             {/* Planned */}
-            <div
-                style={{
-                    margin: '1em 3em',
-                    minWidth: 400,
-                }}
-            >
-                <ItemContainer
-                    items={planned}
-                    minItems={3}
-                    status="Planned"
-                    itemType="Training"
-                    periodId={props.period?.ID}
-                    userId={props.user?.Id}
-                    setItems={setItems}
-                />
-            </div>
-        </Stack>
+            <ItemContainer
+                className={`${styles.itemsGroup} ${styles.simple}`}
+                items={planned}
+                minItems={3}
+                status="Planned"
+                itemType="Training"
+                periodId={props.period?.ID}
+                userId={props.user?.Id}
+                setItems={setItems}
+            />
+        </span>
     );
 };
 

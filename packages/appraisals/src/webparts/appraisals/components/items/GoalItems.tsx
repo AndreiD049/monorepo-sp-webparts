@@ -47,21 +47,14 @@ const GoalItems: FC<IGoalItemsProps> = (props) => {
     }, [props.user, props.period]);
 
     return (
-        <Stack
-            horizontal
-            horizontalAlign="space-evenly"
-            verticalAlign="stretch"
-            wrap
-        >
-            {/* Achieved */}
-            <div
-                style={{
-                    margin: '1em 3em',
-                    minWidth: 400,
-                }}
-            >
+        <span className={styles.container} style={{
+            padding: '0 1em',
+            display: 'flex',
+            flexFlow: 'row wrap',
+        }}>
+                {/* Achieved */}
                 <ItemContainer
-                    className={styles.buttonLeft}
+                    className={`${styles.buttonLeft} ${styles.itemsGroup} ${styles.simple}`}
                     items={achieved}
                     minItems={5}
                     status="Achieved"
@@ -70,15 +63,9 @@ const GoalItems: FC<IGoalItemsProps> = (props) => {
                     userId={props.user?.Id}
                     setItems={setItems}
                 />
-            </div>
-            {/* Planned */}
-            <div
-                style={{
-                    margin: '1em 3em',
-                    minWidth: 400,
-                }}
-            >
+                {/* Planned */}
                 <ItemContainer
+                    className={`${styles.itemsGroup} ${styles.simple}`}
                     items={planned}
                     minItems={5}
                     status="Planned"
@@ -87,8 +74,7 @@ const GoalItems: FC<IGoalItemsProps> = (props) => {
                     userId={props.user?.Id}
                     setItems={setItems}
                 />
-            </div>
-        </Stack>
+        </span>
     );
 };
 

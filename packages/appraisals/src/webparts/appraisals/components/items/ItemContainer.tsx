@@ -55,7 +55,7 @@ const ItemContainer: FC<IItemContainerProps> = (props) => {
             ItemStatus: props.status,
             ItemType: props.itemType,
             PlannedInId: props.periodId,
-            AchievedInId: props.status === 'Achieved' ? props.periodId : null,
+            AchievedInId: props.status === 'Achieved' || props.status === 'NA' ? props.periodId : null,
             UserId: props.userId,
         });
         props.setItems((old) => [...old, result]);
@@ -143,23 +143,18 @@ const ItemContainer: FC<IItemContainerProps> = (props) => {
 
     return (
         <div
-            className={`${styles.container} ${props.className}`}
+            className={props.className}
             style={{
                 paddingTop: theme.spacing.s1,
                 paddingBottom: theme.spacing.l1,
                 paddingLeft: theme.spacing.s1,
                 paddingRight: theme.spacing.s1,
-                boxShadow: theme.effects.elevation4,
             }}
         >
             <Text
                 variant='mediumPlus'
                 block
-                styles={{
-                    root: {
-                        textAlign: 'center',
-                    },
-                }}
+                className={styles.title}
             >
                 {props.title ?? props.status}
             </Text>

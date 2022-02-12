@@ -2,12 +2,14 @@
 
 .container {
     background-color: "[theme: themeLight, default: #fbf4f4]";
+    box-shadow: $ms-depth-shadow-4;
 }
 
 .actionButton {
     background-color:  "[theme: themeLighter, default: #fbf4f4]";
 }
 
+/* Style for appraisal items where button should be on the left */
 .buttonLeft {
     & [data-element='input'] {
         order: 1;
@@ -26,5 +28,32 @@
 
     & [class*='ms-PickerItem-removeButton'] {
         display: none;
+    }
+}
+
+/*
+Style for appraisal item goups, like goals or traini
+It shoule be a little far away from each other
+*/
+.itemsGroup {
+    min-width: 400px;
+
+    &.simple {
+        &:first-child {
+            margin-right: 2em;
+        }
+
+        &:last-child {
+            margin-left: 2em;
+        }
+    }
+
+    &.bottom {
+        margin-top: 1em;
+    }
+
+    .title {
+        text-align: center;
+        color: "[theme: neutralPrimary, default: #333333]";
     }
 }

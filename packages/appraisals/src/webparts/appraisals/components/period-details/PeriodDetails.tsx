@@ -15,6 +15,7 @@ import GoalItems from '../items/GoalItems';
 import PeoplePicker from '../items/PeoplePicker';
 import SwotItems from '../items/SwotItems';
 import TrainingItems from '../items/TrainingItems';
+import styles from './PeriodDetails.module.scss';
 
 export interface IPeriodDetailsProps {
     ID: string;
@@ -81,22 +82,24 @@ const PeriodDetails = (props: IPeriodDetailsProps) => {
                     setSelected={setCurrentUser}
                 />
             </StackItem>
-            <StackItem style={{ marginTop: theme.spacing.l1 }}>
-                <Separator styles={{ root: { width: '90vw' } }}>
-                    Goals
+            <Stack verticalAlign="center" horizontalAlign="center" style={{ marginTop: theme.spacing.l1 }}>
+                <Separator className={styles.itemDetailsSeparator}>
+                    <Text variant="mediumPlus">Goals</Text>
                 </Separator>
                 <GoalItems user={currentUser} period={period} />
-            </StackItem>
+            </Stack>
             {/* My goals */}
-            <StackItem>
-                <Separator styles={{ root: { width: '90vw' } }}>
-                    Trainings
+            <Stack verticalAlign="center" horizontalAlign="center" style={{ marginTop: theme.spacing.l1 }}>
+                <Separator className={styles.itemDetailsSeparator}>
+                    <Text variant="mediumPlus">Trainings</Text>
                 </Separator>
                 <TrainingItems user={currentUser} period={period} />
-            </StackItem>
+            </Stack>
             {/* Trainings requested by me of my TL */}
             <StackItem>
-                <Separator styles={{ root: { width: '90vw' } }}>SWOT</Separator>
+                <Separator className={styles.itemDetailsSeparator}>
+                    <Text variant="mediumPlus">SWOT</Text>
+                </Separator>
                 <SwotItems user={currentUser} period={period} />
             </StackItem>
             {/* My self-evaluation */}

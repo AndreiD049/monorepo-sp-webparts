@@ -29,3 +29,10 @@ export async function getPeriod(id: string): Promise<IPeriod> {
 export async function createPeriod(period: Partial<IPeriod>) {
     return sp.web.lists.getByTitle(LIST_NAME).items.add(period);
 }
+
+export async function finishPeriod(periodId: string) {
+    const period = await getPeriod(periodId);
+    if (period.Status === 'Finished') {
+        return;
+    }
+}
