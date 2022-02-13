@@ -24,11 +24,11 @@ const Feedback: React.FC<IFeedbackProps> = (props) => {
     React.useEffect(() => {
         async function run() {
             if (props.period && props.user) {
-                const item = (
+                const itemResult = (
                     await getItems('Feedback', props.period.ID, props.user.Id)
                 )[0];
-                setOriginalItem(item ?? emptyItem('Feedback'));
-                setItem(item ?? emptyItem('Feedback'));
+                setOriginalItem(itemResult ?? emptyItem('Feedback'));
+                setItem(itemResult ?? emptyItem('Feedback'));
             }
         }
         run();
