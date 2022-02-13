@@ -3,9 +3,16 @@ interface IPeriodLookup {
     Title: string;
 }
 
-export type ItemType = "Goal" | "Training" | "Strength" | "Weakness" | "Opportunity" | "Threat" | "Feedback";
+export type ItemType =
+    | 'Goal'
+    | 'Training'
+    | 'Strength'
+    | 'Weakness'
+    | 'Opportunity'
+    | 'Threat'
+    | 'Feedback';
 
-export type ItemStatus = "Planned" | "Achieved" | "NA";
+export type ItemStatus = 'Planned' | 'Achieved' | 'NA';
 
 export default interface IItem {
     Id: string;

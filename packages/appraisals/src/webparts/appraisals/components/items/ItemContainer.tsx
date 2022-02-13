@@ -3,16 +3,18 @@ import * as React from 'react';
 import { FC } from 'react';
 import IItem, { ItemStatus, ItemType } from '../../dal/IItem';
 import ItemField from './ItemField';
-import styles from './ItemContainer.module.scss';
-import {
-    createItem,
-    deleteItem,
-    IUpdateItem,
-    updateItem,
-} from '../../dal/Items';
+import styles from './AppraisalItems.module.scss';
+import { IUpdateItem, updateItem } from '../../dal/Items';
 import IPeriod from '../../dal/IPeriod';
+import {
+    emptyItem,
+    handleDelete,
+    handleItemUpdate,
+    setItemAction,
+} from './utils';
 
-export interface IItemContainerProps extends React.HtmlHTMLAttributes<HTMLElement> {
+export interface IItemContainerProps
+    extends React.HtmlHTMLAttributes<HTMLElement> {
     minItems: number;
     items: IItem[];
     status: ItemStatus;
@@ -22,18 +24,6 @@ export interface IItemContainerProps extends React.HtmlHTMLAttributes<HTMLElemen
     userId: string;
     setItems: (f: (prev: IItem[]) => IItem[]) => void;
 }
-
-const emptyItem = (itype: ItemType): IItem => ({
-    AchievedIn: null,
-    Id: '',
-    ItemStatus: 'NA',
-    Content: '',
-    ItemType: itype,
-    PlannedIn: null,
-    User: null,
-});
-
-const isEmpty = (item: IItem) => item.Id === '';
 
 const theme = getTheme();
 
@@ -50,42 +40,40 @@ const ItemContainer: FC<IItemContainerProps> = (props) => {
         return result;
     }, [props.items]);
 
-    const handleCreate = async (item: Partial<IItem>) => {
-        const result = await createItem({
-            Content: item.Content,
-            ItemStatus: props.status,
-            ItemType: props.itemType,
-            PlannedInId: props.period.ID,
-            AchievedInId: props.status === 'Achieved' || props.status === 'NA' ? props.period.ID : null,
-            UserId: props.userId,
-        });
-        props.setItems((old) => [...old, result]);
-    };
-
-    const handleUpdate = async (id: string, item: Partial<IItem>) => {
-        const result = await updateItem(id, item);
-        props.setItems((prev) => prev.map((i) => (i.Id === id ? result : i)));
-    };
-
-    const handleDelete = async (id: string) => {
-        await deleteItem(id);
-        props.setItems((prev) => prev.filter((item) => item.Id !== id));
+    const setItemsHandler = (actionObject: setItemAction) => {
+        switch (actionObject.action) {
+            case 'create':
+                props.setItems((old) => [...old, actionObject.item]);
+                break;
+            case 'update':
+                props.setItems((prev) =>
+                    prev.map((i) =>
+                        i.Id === actionObject.id ? actionObject.item : i
+                    )
+                );
+                break;
+            case 'delete':
+                props.setItems((prev) =>
+                    prev.filter((item) => item.Id !== actionObject.id)
+                );
+                break;
+            default:
+                throw new Error(
+                    'Unknown action received - ' + actionObject.action
+                );
+        }
     };
 
     const handleValueUpdate = (item: IItem) => async (value: string) => {
-        /* Handle creation of new items */
-        if (isEmpty(item) && value !== '') {
-            handleCreate({
-                ...item,
-                Content: value,
-            });
-        } else if (!isEmpty(item) && value !== '' && item.Content !== value) {
-            handleUpdate(item.Id, {
-                Content: value,
-            });
-        } else if (!isEmpty(item) && value === '') {
-            handleDelete(item.Id);
-        }
+        handleItemUpdate(
+            item,
+            value,
+            props.status,
+            props.itemType,
+            props.period.ID,
+            props.userId,
+            setItemsHandler
+        );
     };
 
     const handleMove = React.useCallback(
@@ -119,7 +107,7 @@ const ItemContainer: FC<IItemContainerProps> = (props) => {
                         iconName: 'Delete',
                     },
                     text: 'Delete',
-                    onClick: handleDelete.bind({}, item.Id),
+                    onClick: handleDelete.bind({}, item.Id, setItemsHandler),
                 },
             ];
             if (props.status !== 'NA') {
@@ -152,11 +140,7 @@ const ItemContainer: FC<IItemContainerProps> = (props) => {
                 paddingRight: theme.spacing.s1,
             }}
         >
-            <Text
-                variant='mediumPlus'
-                block
-                className={styles.title}
-            >
+            <Text variant="mediumPlus" block className={styles.title}>
                 {props.title ?? props.status}
             </Text>
             {props.items.map((item) => (

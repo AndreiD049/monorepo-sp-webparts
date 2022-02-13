@@ -6,7 +6,7 @@ import IPeriod from '../../dal/IPeriod';
 import { getItems } from '../../dal/Items';
 import { IUser } from '../../dal/IUser';
 import ItemContainer from './ItemContainer';
-import styles from './ItemContainer.module.scss';
+import styles from './AppraisalItems.module.scss';
 
 export interface IGoalItemsProps {
     user: IUser;
@@ -49,11 +49,14 @@ const TrainingItems: FC<IGoalItemsProps> = (props) => {
     if (!props.period) return null;
 
     return (
-        <span className={styles.container} style={{
-            padding: '0 1em',
-            display: 'flex',
-            flexFlow: 'row wrap',
-        }}>
+        <span
+            className={styles.container}
+            style={{
+                padding: '0 1em',
+                display: 'flex',
+                flexFlow: 'row wrap',
+            }}
+        >
             {/* Achieved */}
             <ItemContainer
                 className={`${styles.buttonLeft} ${styles.itemsGroup} ${styles.simple}`}

@@ -11,6 +11,7 @@ import { getPeriod } from '../../dal/Periods';
 import { getCurrentUser } from '../../dal/Users';
 import useForceUpdate from '../../utils/forceUpdate';
 import UserContext from '../../utils/UserContext';
+import Feedback from '../items/Feedback';
 import GoalItems from '../items/GoalItems';
 import PeoplePicker from '../items/PeoplePicker';
 import SwotItems from '../items/SwotItems';
@@ -82,14 +83,22 @@ const PeriodDetails = (props: IPeriodDetailsProps) => {
                     setSelected={setCurrentUser}
                 />
             </StackItem>
-            <Stack verticalAlign="center" horizontalAlign="center" style={{ marginTop: theme.spacing.l1 }}>
+            <Stack
+                verticalAlign="center"
+                horizontalAlign="center"
+                style={{ marginTop: theme.spacing.l1 }}
+            >
                 <Separator className={styles.itemDetailsSeparator}>
                     <Text variant="mediumPlus">Goals</Text>
                 </Separator>
                 <GoalItems user={currentUser} period={period} />
             </Stack>
             {/* My goals */}
-            <Stack verticalAlign="center" horizontalAlign="center" style={{ marginTop: theme.spacing.l1 }}>
+            <Stack
+                verticalAlign="center"
+                horizontalAlign="center"
+                style={{ marginTop: theme.spacing.l1 }}
+            >
                 <Separator className={styles.itemDetailsSeparator}>
                     <Text variant="mediumPlus">Trainings</Text>
                 </Separator>
@@ -103,6 +112,12 @@ const PeriodDetails = (props: IPeriodDetailsProps) => {
                 <SwotItems user={currentUser} period={period} />
             </StackItem>
             {/* My self-evaluation */}
+            <StackItem>
+                <Separator className={styles.itemDetailsSeparator}>
+                    <Text variant="mediumPlus">Feedback</Text>
+                </Separator>
+                <Feedback user={currentUser} period={period} />
+            </StackItem>
         </Stack>
     );
 };

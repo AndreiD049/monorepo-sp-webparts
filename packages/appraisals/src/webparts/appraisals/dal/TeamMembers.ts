@@ -51,7 +51,11 @@ export async function getTeamMembers(): Promise<IUser[]> {
     const groups = items[0].TeamMembers.filter(
         (tm) => tm.ContentTypeId.indexOf(GROUP_CONTENTTYPE_PREFIX) === 0
     );
-    const groupUsers = flatten(await Promise.all(groups.map(async (gr) => await getGroupUsers(gr.Id))));
-    const calls = await Promise.all(users.map(async (user) => getUserById(user.Id)));
+    const groupUsers = flatten(
+        await Promise.all(groups.map(async (gr) => await getGroupUsers(gr.Id)))
+    );
+    const calls = await Promise.all(
+        users.map(async (user) => getUserById(user.Id))
+    );
     return Promise.resolve(uniqBy(calls.concat(groupUsers), (x) => x.Id));
 }

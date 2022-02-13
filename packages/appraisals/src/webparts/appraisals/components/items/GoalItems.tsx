@@ -6,7 +6,7 @@ import IPeriod from '../../dal/IPeriod';
 import { getItems } from '../../dal/Items';
 import { IUser } from '../../dal/IUser';
 import ItemContainer from './ItemContainer';
-import styles from './ItemContainer.module.scss';
+import styles from './AppraisalItems.module.scss';
 
 export interface IGoalItemsProps {
     user: IUser;
@@ -49,33 +49,36 @@ const GoalItems: FC<IGoalItemsProps> = (props) => {
     if (!props.period) return null;
 
     return (
-        <span className={styles.container} style={{
-            padding: '0 1em',
-            display: 'flex',
-            flexFlow: 'row wrap',
-        }}>
-                {/* Achieved */}
-                <ItemContainer
-                    className={`${styles.buttonLeft} ${styles.itemsGroup} ${styles.simple}`}
-                    items={achieved}
-                    minItems={5}
-                    status="Achieved"
-                    itemType="Goal"
-                    period={props.period}
-                    userId={props.user?.Id}
-                    setItems={setItems}
-                />
-                {/* Planned */}
-                <ItemContainer
-                    className={`${styles.itemsGroup} ${styles.simple}`}
-                    items={planned}
-                    minItems={5}
-                    status="Planned"
-                    itemType="Goal"
-                    period={props.period}
-                    userId={props.user?.Id}
-                    setItems={setItems}
-                />
+        <span
+            className={styles.container}
+            style={{
+                padding: '0 1em',
+                display: 'flex',
+                flexFlow: 'row wrap',
+            }}
+        >
+            {/* Achieved */}
+            <ItemContainer
+                className={`${styles.buttonLeft} ${styles.itemsGroup} ${styles.simple}`}
+                items={achieved}
+                minItems={5}
+                status="Achieved"
+                itemType="Goal"
+                period={props.period}
+                userId={props.user?.Id}
+                setItems={setItems}
+            />
+            {/* Planned */}
+            <ItemContainer
+                className={`${styles.itemsGroup} ${styles.simple}`}
+                items={planned}
+                minItems={5}
+                status="Planned"
+                itemType="Goal"
+                period={props.period}
+                userId={props.user?.Id}
+                setItems={setItems}
+            />
         </span>
     );
 };

@@ -1,4 +1,9 @@
-import { getTheme, Stack, StackItem, themeRulesStandardCreator } from 'office-ui-fabric-react';
+import {
+    getTheme,
+    Stack,
+    StackItem,
+    themeRulesStandardCreator,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
 import { FC } from 'react';
 import IItem from '../../dal/IItem';
@@ -6,7 +11,7 @@ import IPeriod from '../../dal/IPeriod';
 import { getSwotItems } from '../../dal/Items';
 import { IUser } from '../../dal/IUser';
 import ItemContainer from './ItemContainer';
-import styles from './ItemContainer.module.scss';
+import styles from './AppraisalItems.module.scss';
 
 export interface IGoalItemsProps {
     user: IUser;
@@ -51,14 +56,19 @@ const SwotItems: FC<IGoalItemsProps> = (props) => {
 
     return (
         <Stack verticalAlign="center" horizontalAlign="center">
-            <span className={styles.container} style={{
-                boxShadow: theme.effects.elevation4,
-                padding: '0 1em'
-            }}>
-                <div style={{
-                    display: "flex",
-                    flexFlow: "row wrap",
-                }}>
+            <span
+                className={styles.container}
+                style={{
+                    boxShadow: theme.effects.elevation4,
+                    padding: '0 1em',
+                }}
+            >
+                <div
+                    style={{
+                        display: 'flex',
+                        flexFlow: 'row wrap',
+                    }}
+                >
                     {/* Strength */}
                     <ItemContainer
                         className={`${styles.buttonLeft} ${styles.itemsGroup} ${styles.simple}`}
@@ -92,10 +102,12 @@ const SwotItems: FC<IGoalItemsProps> = (props) => {
                         setItems={setItems}
                     />
                 </div>
-                <div style={{
-                    display: "flex",
-                    flexFlow: "row wrap",
-                }}>
+                <div
+                    style={{
+                        display: 'flex',
+                        flexFlow: 'row wrap',
+                    }}
+                >
                     {/* Opportunity */}
                     <ItemContainer
                         className={`${styles.buttonLeft} ${styles.itemsGroup} ${styles.simple} ${styles.bottom}`}

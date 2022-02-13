@@ -26,7 +26,7 @@ const NewPeriodPanel: React.FC<INewPeriodPanelProps> = (props) => {
     const handleCreate = async () => {
         const newPeriod: Partial<IPeriod> = {
             Title: title,
-            Status: "Open",
+            Status: 'Open',
         };
         await createPeriod(newPeriod);
         setTitle('');

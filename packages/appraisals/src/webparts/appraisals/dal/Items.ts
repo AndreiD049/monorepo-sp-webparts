@@ -60,7 +60,8 @@ export async function getSwotItems(
         .get();
 }
 
-export interface ICreateItem extends Omit<IItem, "User" | "PlannedIn" | "AchievedIn" | "Id"> {
+export interface ICreateItem
+    extends Omit<IItem, 'User' | 'PlannedIn' | 'AchievedIn' | 'Id'> {
     UserId: string;
     PlannedInId: string;
     AchievedInId: string;
@@ -71,19 +72,36 @@ export interface ICreateItem extends Omit<IItem, "User" | "PlannedIn" | "Achieve
  */
 export async function createItem(item: ICreateItem): Promise<IItem> {
     const created = await sp.web.lists.getByTitle(LIST_NAME).items.add(item);
-    return created.item.select(...SELECT).expand(...EXPAND).get();
+    return created.item
+        .select(...SELECT)
+        .expand(...EXPAND)
+        .get();
 }
 
-export type IUpdateItem = Partial<{AchievedInId: string} & Pick<IItem, "Content" | "ItemStatus">>;
+export type IUpdateItem = Partial<
+    { AchievedInId: string } & Pick<IItem, 'Content' | 'ItemStatus'>
+>;
 
 /**
  * Update an item, only Content, AchievedInId or ItemStatus Properties can be updated
  */
-export async function updateItem(id: string, update: IUpdateItem): Promise<IItem> {
-    const result = await sp.web.lists.getByTitle(LIST_NAME).items.getById(+id).update(update);
-    return result.item.select(...SELECT).expand(...EXPAND).get();
+export async function updateItem(
+    id: string,
+    update: IUpdateItem
+): Promise<IItem> {
+    const result = await sp.web.lists
+        .getByTitle(LIST_NAME)
+        .items.getById(+id)
+        .update(update);
+    return result.item
+        .select(...SELECT)
+        .expand(...EXPAND)
+        .get();
 }
 
 export async function deleteItem(id: string): Promise<void> {
-    return sp.web.lists.getByTitle(LIST_NAME).items.getById(+id).delete();
+    return sp.web.lists
+        .getByTitle(LIST_NAME)
+        .items.getById(+id)
+        .delete();
 }

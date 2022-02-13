@@ -126,7 +126,9 @@ const AppraisalPeriods: FC = () => {
                 const result = await getPeriods();
                 setPeriods(result);
                 /** Can current user finish periods? */
-                setCanFinish(await canCurrentUser('finish', context.permissions));
+                setCanFinish(
+                    await canCurrentUser('finish', context.permissions)
+                );
             }
         }
 
@@ -177,8 +179,13 @@ const AppraisalPeriods: FC = () => {
                             {
                                 key: 'finish',
                                 text: 'Finish',
-                                onClick: canFinish && Boolean(selectedItem) && handleFinishPeriod(selectedItem.ID),
-                                disabled: canFinish ? !Boolean(selectedItem) : true,
+                                onClick:
+                                    canFinish &&
+                                    Boolean(selectedItem) &&
+                                    handleFinishPeriod(selectedItem.ID),
+                                disabled: canFinish
+                                    ? !Boolean(selectedItem)
+                                    : true,
                                 iconProps: {
                                     iconName: 'LockSolid',
                                 },
@@ -212,7 +219,11 @@ const AppraisalPeriods: FC = () => {
                     />
                 </main>
             </Stack>
-            <NewPeriodPanel isOpen={newPanel} setOpen={setNewPanel} update={forceUpdate} />
+            <NewPeriodPanel
+                isOpen={newPanel}
+                setOpen={setNewPanel}
+                update={forceUpdate}
+            />
         </>
     );
 };

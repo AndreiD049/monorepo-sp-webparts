@@ -14,7 +14,7 @@ export interface IRootProps {
     permissions: IUserGroupPermissions;
 }
 
-const Root : React.FC<IRootProps> = (props) => {
+const Root: React.FC<IRootProps> = (props) => {
     const [ctx, setCtx] = React.useState<IUserContext>({
         siteInfo: null,
         teamUsers: [],

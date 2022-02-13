@@ -8,7 +8,9 @@ import * as strings from 'AppraisalsWebPartStrings';
 import { IAppraisalsProps } from './components/periods/IAppraisalsProps';
 import { sp } from '@pnp/sp/presets/all';
 import Root, { IRootProps } from './components/Root';
-import AccessControl, { IUserGroupPermissions } from 'property-pane-access-control';
+import AccessControl, {
+    IUserGroupPermissions,
+} from 'property-pane-access-control';
 
 export interface IAppraisalsWebPartProps {
     permissions: IUserGroupPermissions;
@@ -16,10 +18,12 @@ export interface IAppraisalsWebPartProps {
 
 export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisalsWebPartProps> {
     public render(): void {
-        const element: React.ReactElement<IRootProps> =
-            React.createElement(Root, {
-                permissions: this.properties.permissions
-            });
+        const element: React.ReactElement<IRootProps> = React.createElement(
+            Root,
+            {
+                permissions: this.properties.permissions,
+            }
+        );
 
         ReactDom.render(element, this.domElement);
     }
@@ -58,7 +62,8 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
                                     key: 'test',
                                     permissions: ['lock', 'finish'],
                                     context: this.context,
-                                    selectedUserGroups: this.properties.permissions,
+                                    selectedUserGroups:
+                                        this.properties.permissions,
                                 }),
                             ],
                         },

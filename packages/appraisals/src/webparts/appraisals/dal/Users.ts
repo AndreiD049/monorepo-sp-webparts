@@ -9,5 +9,8 @@ export async function getCurrentUser(): Promise<IUser> {
 }
 
 export async function getUserById(id: string): Promise<IUser> {
-    return sp.web.siteUsers.getById(+id).usingCaching().get();
+    return sp.web.siteUsers
+        .getById(+id)
+        .usingCaching()
+        .get();
 }

@@ -1,4 +1,4 @@
-export type PeriodStatus = "Open" | "Finished";
+export type PeriodStatus = 'Open' | 'Finished';
 
 export default interface IPeriod {
     ID: string;

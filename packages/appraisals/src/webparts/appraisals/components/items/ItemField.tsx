@@ -9,7 +9,7 @@ import {
 import * as React from 'react';
 import { FC } from 'react';
 import IItem, { ItemStatus } from '../../dal/IItem';
-import styles from './ItemContainer.module.scss';
+import styles from './AppraisalItems.module.scss';
 
 const LENGTH_TRESHOLD = 50;
 export interface IItemFieldProps {
@@ -58,6 +58,7 @@ const ItemField: FC<IItemFieldProps> = (props) => {
                     value={value}
                     onChange={(_e: any, newVal: string) => setValue(newVal)}
                     onBlur={!props.disabled && handleBlur}
+                    autoComplete="off"
                 />
             </StackItem>
             {props.actions && !props.disabled ? (

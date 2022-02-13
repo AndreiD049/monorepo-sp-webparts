@@ -1,12 +1,23 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
 
-.container {
-    background-color: "[theme: themeLight, default: #fbf4f4]";
+%baseContainer {
+    background-color: '[theme: themeLight, default: #fbf4f4]';
     box-shadow: $ms-depth-shadow-4;
 }
 
+.container {
+    @extend %baseContainer;
+}
+
+.feedbackContainer {
+    @extend %baseContainer;
+    padding: 1em;
+    min-width: 900px;
+    max-width: 1000px;
+}
+
 .actionButton {
-    background-color:  "[theme: themeLighter, default: #fbf4f4]";
+    background-color: '[theme: themeLighter, default: #fbf4f4]';
 }
 
 /* Style for appraisal items where button should be on the left */
@@ -23,7 +34,7 @@
     & [class*='ms-SelectionZone'] {
         display: flex;
         justify-content: center;
-        margin-top: .7em;
+        margin-top: 0.7em;
     }
 
     & [class*='ms-PickerItem-removeButton'] {
@@ -54,6 +65,6 @@ It shoule be a little far away from each other
 
     .title {
         text-align: center;
-        color: "[theme: neutralPrimary, default: #333333]";
+        color: '[theme: neutralPrimary, default: #333333]';
     }
 }

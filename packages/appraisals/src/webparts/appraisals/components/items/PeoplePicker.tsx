@@ -5,7 +5,7 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { IUser } from '../../dal/IUser';
-import styles from './ItemContainer.module.scss';
+import styles from './AppraisalItems.module.scss';
 
 export interface IPeoplePickerProps {
     people: IUser[];
