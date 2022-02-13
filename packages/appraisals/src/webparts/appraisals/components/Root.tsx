@@ -8,13 +8,19 @@ import { getSiteInfo } from '../dal/Site';
 import { getCurrentUser } from '../dal/Users';
 import { getUserGroups } from '../dal/Groups';
 import { getTeamMembers } from '../dal/TeamMembers';
+import { IUserGroupPermissions } from 'property-pane-access-control';
 
-const Root = () => {
+export interface IRootProps {
+    permissions: IUserGroupPermissions;
+}
+
+const Root : React.FC<IRootProps> = (props) => {
     const [ctx, setCtx] = React.useState<IUserContext>({
         siteInfo: null,
         teamUsers: [],
         userGroups: [],
         userInfo: null,
+        permissions: {},
     });
 
     React.useEffect(() => {
@@ -25,11 +31,12 @@ const Root = () => {
                 userInfo: current,
                 userGroups: await getUserGroups(),
                 teamUsers: await getTeamMembers(),
+                permissions: props.permissions,
             };
             setCtx(result);
         }
         run();
-    }, []);
+    }, [props.permissions]);
 
     return (
         <UserContext.Provider value={ctx}>

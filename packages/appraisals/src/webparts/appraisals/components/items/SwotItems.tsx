@@ -47,6 +47,8 @@ const SwotItems: FC<IGoalItemsProps> = (props) => {
         run();
     }, [props.user, props.period]);
 
+    if (!props.period) return null;
+
     return (
         <Stack verticalAlign="center" horizontalAlign="center">
             <span className={styles.container} style={{
@@ -69,7 +71,7 @@ const SwotItems: FC<IGoalItemsProps> = (props) => {
                         status="NA"
                         title="Strength"
                         itemType="Strength"
-                        periodId={props.period?.ID}
+                        period={props.period}
                         userId={props.user?.Id}
                         setItems={setItems}
                     />
@@ -85,7 +87,7 @@ const SwotItems: FC<IGoalItemsProps> = (props) => {
                         status="NA"
                         title="Weakness"
                         itemType="Weakness"
-                        periodId={props.period?.ID}
+                        period={props.period}
                         userId={props.user?.Id}
                         setItems={setItems}
                     />
@@ -106,7 +108,7 @@ const SwotItems: FC<IGoalItemsProps> = (props) => {
                         status="NA"
                         title="Opportunity"
                         itemType="Opportunity"
-                        periodId={props.period?.ID}
+                        period={props.period}
                         userId={props.user?.Id}
                         setItems={setItems}
                     />
@@ -122,7 +124,7 @@ const SwotItems: FC<IGoalItemsProps> = (props) => {
                         status="NA"
                         title="Threat"
                         itemType="Threat"
-                        periodId={props.period?.ID}
+                        period={props.period}
                         userId={props.user?.Id}
                         setItems={setItems}
                     />

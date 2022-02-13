@@ -46,6 +46,8 @@ const TrainingItems: FC<IGoalItemsProps> = (props) => {
         run();
     }, [props.user, props.period]);
 
+    if (!props.period) return null;
+
     return (
         <span className={styles.container} style={{
             padding: '0 1em',
@@ -59,7 +61,7 @@ const TrainingItems: FC<IGoalItemsProps> = (props) => {
                 minItems={3}
                 status="Achieved"
                 itemType="Training"
-                periodId={props.period?.ID}
+                period={props.period}
                 userId={props.user?.Id}
                 setItems={setItems}
             />
@@ -70,7 +72,7 @@ const TrainingItems: FC<IGoalItemsProps> = (props) => {
                 minItems={3}
                 status="Planned"
                 itemType="Training"
-                periodId={props.period?.ID}
+                period={props.period}
                 userId={props.user?.Id}
                 setItems={setItems}
             />

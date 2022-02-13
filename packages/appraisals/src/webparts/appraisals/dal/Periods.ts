@@ -35,4 +35,13 @@ export async function finishPeriod(periodId: string) {
     if (period.Status === 'Finished') {
         return;
     }
+    const update: Partial<IPeriod> = {
+        Status: 'Finished'
+    };
+    const updated = await sp.web.lists
+        .getByTitle(LIST_NAME)
+        .items
+        .getById(+periodId)
+        .update(update);
+    return updated.item.get();
 }

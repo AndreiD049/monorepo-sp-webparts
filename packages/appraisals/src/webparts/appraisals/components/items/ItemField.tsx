@@ -16,6 +16,7 @@ export interface IItemFieldProps {
     item: IItem;
     handleBlur?: (value: string) => void;
     handleUpdateStatus?: (value: ItemStatus) => void;
+    disabled: boolean;
     actions?: IContextualMenuItem[];
 }
 
@@ -53,12 +54,13 @@ const ItemField: FC<IItemFieldProps> = (props) => {
                     resizable={false}
                     autoAdjustHeight
                     borderless
+                    disabled={props.disabled}
                     value={value}
                     onChange={(_e: any, newVal: string) => setValue(newVal)}
-                    onBlur={handleBlur}
+                    onBlur={!props.disabled && handleBlur}
                 />
             </StackItem>
-            {props.actions ? (
+            {props.actions && !props.disabled ? (
                 <StackItem data-element="button">
                     <IconButton
                         tabIndex={-1}

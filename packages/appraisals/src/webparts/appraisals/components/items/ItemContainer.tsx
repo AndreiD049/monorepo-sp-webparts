@@ -10,6 +10,7 @@ import {
     IUpdateItem,
     updateItem,
 } from '../../dal/Items';
+import IPeriod from '../../dal/IPeriod';
 
 export interface IItemContainerProps extends React.HtmlHTMLAttributes<HTMLElement> {
     minItems: number;
@@ -17,7 +18,7 @@ export interface IItemContainerProps extends React.HtmlHTMLAttributes<HTMLElemen
     status: ItemStatus;
     itemType: ItemType;
     title?: string;
-    periodId: string;
+    period: IPeriod;
     userId: string;
     setItems: (f: (prev: IItem[]) => IItem[]) => void;
 }
@@ -54,8 +55,8 @@ const ItemContainer: FC<IItemContainerProps> = (props) => {
             Content: item.Content,
             ItemStatus: props.status,
             ItemType: props.itemType,
-            PlannedInId: props.periodId,
-            AchievedInId: props.status === 'Achieved' || props.status === 'NA' ? props.periodId : null,
+            PlannedInId: props.period.ID,
+            AchievedInId: props.status === 'Achieved' || props.status === 'NA' ? props.period.ID : null,
             UserId: props.userId,
         });
         props.setItems((old) => [...old, result]);
@@ -90,14 +91,14 @@ const ItemContainer: FC<IItemContainerProps> = (props) => {
     const handleMove = React.useCallback(
         async (i: IItem) => {
             /* If there is no periodId, do nothing */
-            if (!props.periodId) return null;
+            if (!props.period.ID) return null;
 
             const update: IUpdateItem = {};
             if (props.status === 'Achieved') {
                 update.AchievedInId = null;
                 update.ItemStatus = 'Planned';
             } else {
-                update.AchievedInId = props.periodId;
+                update.AchievedInId = props.period.ID;
                 update.ItemStatus = 'Achieved';
             }
             const result = await updateItem(i.Id, update);
@@ -105,7 +106,7 @@ const ItemContainer: FC<IItemContainerProps> = (props) => {
                 prev.map((itemOld) => (itemOld.Id === i.Id ? result : itemOld))
             );
         },
-        [props.periodId]
+        [props.period.ID]
     );
 
     /* Actions that can be performed on items */
@@ -138,7 +139,7 @@ const ItemContainer: FC<IItemContainerProps> = (props) => {
             }
             return result;
         },
-        [props.status, props.periodId]
+        [props.status, props.period.ID]
     );
 
     return (
@@ -162,6 +163,7 @@ const ItemContainer: FC<IItemContainerProps> = (props) => {
                 <ItemField
                     key={item.Id}
                     item={item}
+                    disabled={props.period.Status === 'Finished'}
                     handleBlur={handleValueUpdate(item)}
                     actions={actions(item)}
                 />
@@ -170,6 +172,7 @@ const ItemContainer: FC<IItemContainerProps> = (props) => {
                 <ItemField
                     key={`empty--${props.items.length + idx}`}
                     item={item}
+                    disabled={props.period.Status === 'Finished'}
                     handleBlur={handleValueUpdate(item)}
                     actions={actions(item).map((a) => ({
                         ...a,

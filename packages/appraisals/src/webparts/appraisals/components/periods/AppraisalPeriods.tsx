@@ -14,12 +14,13 @@ import {
     SelectionMode,
 } from 'office-ui-fabric-react';
 import IPeriod from '../../dal/IPeriod';
-import { getPeriods } from '../../dal/Periods';
+import { finishPeriod, getPeriods } from '../../dal/Periods';
 import constants from '../../utils/constants';
 import NewPeriodPanel from './NewPeriodPanel';
 import { useHistory } from 'react-router-dom';
 import useForceUpdate from '../../utils/forceUpdate';
 import UserContext, { IUserContext } from '../../utils/UserContext';
+import { canCurrentUser } from 'property-pane-access-control';
 
 const theme = getTheme();
 const pillStyles: (item: IPeriod) => React.CSSProperties = (item) => ({
@@ -55,6 +56,9 @@ const AppraisalPeriods: FC = () => {
             );
         }
     }, [searchValue, periods]);
+
+    /* Can current user finish periods */
+    const [canFinish, setCanFinish] = React.useState(false);
 
     /* Selection */
     const [selectedItem, setSelectedItem] = React.useState<IPeriod>(null);
@@ -121,6 +125,7 @@ const AppraisalPeriods: FC = () => {
             if (context) {
                 const result = await getPeriods();
                 setPeriods(result);
+                setCanFinish(await canCurrentUser('finish', context.permissions));
             }
         }
 
@@ -131,6 +136,12 @@ const AppraisalPeriods: FC = () => {
         const url = new URL(window.location.href);
         url.searchParams.set(constants.periodId, item.ID);
         history.push(url.pathname + url.search);
+    };
+
+    const handleFinishPeriod = (id: string) => async () => {
+        console.log(id);
+        await finishPeriod(id);
+        forceUpdate();
     };
 
     return (
@@ -165,8 +176,8 @@ const AppraisalPeriods: FC = () => {
                             {
                                 key: 'finish',
                                 text: 'Finish',
-                                onClick: () => alert('finishing'),
-                                disabled: !Boolean(selectedItem),
+                                onClick: canFinish && Boolean(selectedItem) && handleFinishPeriod(selectedItem.ID),
+                                disabled: canFinish ? !Boolean(selectedItem) : true,
                                 iconProps: {
                                     iconName: 'LockSolid',
                                 },

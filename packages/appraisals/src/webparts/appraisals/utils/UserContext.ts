@@ -1,4 +1,5 @@
 import { IContextInfo } from "@pnp/sp/sites";
+import { IUserGroupPermissions } from "property-pane-access-control";
 import * as React from "react";
 import { IUserGroup } from "../dal/Groups";
 import { IUser } from "../dal/IUser";
@@ -8,6 +9,7 @@ export interface IUserContext {
     userInfo: IUser;
     userGroups: IUserGroup[];
     teamUsers: any[];
+    permissions: IUserGroupPermissions;
 }
 
 const UserContext = React.createContext<IUserContext>({
@@ -15,6 +17,7 @@ const UserContext = React.createContext<IUserContext>({
     userInfo: null,
     userGroups: [],
     teamUsers: [],
+    permissions: {},
 });
 
 export default UserContext;

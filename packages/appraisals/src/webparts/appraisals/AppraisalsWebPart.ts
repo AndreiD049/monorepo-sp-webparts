@@ -7,7 +7,7 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import * as strings from 'AppraisalsWebPartStrings';
 import { IAppraisalsProps } from './components/periods/IAppraisalsProps';
 import { sp } from '@pnp/sp/presets/all';
-import Root from './components/Root';
+import Root, { IRootProps } from './components/Root';
 import AccessControl, { IUserGroupPermissions } from 'property-pane-access-control';
 
 export interface IAppraisalsWebPartProps {
@@ -16,8 +16,10 @@ export interface IAppraisalsWebPartProps {
 
 export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisalsWebPartProps> {
     public render(): void {
-        const element: React.ReactElement<IAppraisalsProps> =
-            React.createElement(Root);
+        const element: React.ReactElement<IRootProps> =
+            React.createElement(Root, {
+                permissions: this.properties.permissions
+            });
 
         ReactDom.render(element, this.domElement);
     }
