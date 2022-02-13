@@ -125,6 +125,7 @@ const AppraisalPeriods: FC = () => {
             if (context) {
                 const result = await getPeriods();
                 setPeriods(result);
+                /** Can current user finish periods? */
                 setCanFinish(await canCurrentUser('finish', context.permissions));
             }
         }

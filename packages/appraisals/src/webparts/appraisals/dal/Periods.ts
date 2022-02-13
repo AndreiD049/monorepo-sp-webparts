@@ -22,7 +22,6 @@ export async function getPeriod(id: string): Promise<IPeriod> {
         .items.getById(+id)
         .select(...SELECT)
         .expand(...EXPAND)
-        .usingCaching()
         .get();
 }
 
