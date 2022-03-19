@@ -1,0 +1,25 @@
+{
+  "name": "sp-preset",
+  "version": "1.0.0",
+  "description": "Convenient preset that make @pnp/sp version 3 usage more convenient",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/AndreiD049/sp-preset.git"
+  },
+  "keywords": [
+    "sharepoint",
+    "pnp",
+    "sp",
+    "rest"
+  ],
+  "author": "Andrei Dimitrascu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AndreiD049/sp-preset/issues"
+  },
+  "homepage": "https://github.com/AndreiD049/sp-preset#readme"
+}
