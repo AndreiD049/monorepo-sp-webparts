@@ -55,11 +55,9 @@ export const setupSP = (opts: ISetup): void => {
             options.sp[key] = usingDefault(spfi(options.tennants[key]));
         }
     }
-    console.log(options.sp);
 };
 
 export const getSP = (key?: string): SPFI => {
-    console.log('getSP', key);
     checkSetupDone();
     if (!key) {
         key = 'Default';
@@ -69,14 +67,12 @@ export const getSP = (key?: string): SPFI => {
 };
 
 export const getNewSP = (key?: string): SPFI => {
-    console.log('getNewSP', key);
     checkSetupDone();
     if (!key) {
         return usingDefault(spfi());
     }
     if (options!.context === null) throw Error('Setup was not called');
     if (!(key in options!.tennants)) throw Error(`No '${key}' in tennants. Check your setup or key. Avilable options are: ${Object.keys(options!.tennants).join(', ')}`);
-    console.log(usingDefault(spfi(options!.tennants[key])));
     return usingDefault(spfi(options!.tennants[key]));
 }
 
