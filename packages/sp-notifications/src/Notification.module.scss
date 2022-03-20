@@ -1,0 +1,20 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+@include ms-motion-keyframes;
+
+.container {
+    position: absolute;
+    bottom: 2em;
+    right: 2em;
+    overflow: hidden;
+}
+
+.notificationWrapper {
+    & > * + * {
+        margin-top: .5em;
+    }
+}
+
+.notification {
+    @include ms-motion-slideUpIn;
+    max-width: 600px;
+}
