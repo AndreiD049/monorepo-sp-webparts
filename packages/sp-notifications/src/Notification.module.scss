@@ -3,7 +3,7 @@
 
 .container {
     position: absolute;
-    bottom: 2em;
+    bottom: 4em;
     right: 2em;
     overflow: hidden;
 }
@@ -17,4 +17,5 @@
 .notification {
     @include ms-motion-slideUpIn;
     max-width: 600px;
+    min-width: 400px;
 }
