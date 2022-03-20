@@ -48,4 +48,4 @@ import { SPnotify } from 'sp-notifications';
 </button>
 ```
 
-<img src="./assets/sample.gif">
+<img src="https://github.com/AndreiD049/sp-react-notifications/blob/main/assets/sample.gif?raw=true">
