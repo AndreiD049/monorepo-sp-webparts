@@ -13,7 +13,7 @@ Project is supposed to be used within [Sharepoint Framework](https://docs.micros
 
 * react & react-dom ^16.13.1
 * office-ui-fabric-react ^7.174.1
-* @microsoft/sp-core-library ^1.12.1
+* uuid
 
 # Usage
 

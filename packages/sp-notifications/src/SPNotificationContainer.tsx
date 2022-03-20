@@ -1,4 +1,4 @@
-import { Guid } from "@microsoft/sp-core-library";
+import {v4 as uuidv4} from 'uuid';
 import { MessageBarType, Stylesheet } from "office-ui-fabric-react";
 import * as React from "react";
 import { useEffect } from "react";
@@ -32,7 +32,7 @@ export default function SPNotificationContainer() {
       container.addEventListener(
         EVENT_NAME,
         (evt: CustomEvent<INotificationOptions>) => {
-          const id = Guid.newGuid().toString();
+          const id: string = uuidv4();
           setNotifications((prev) => ({
             ...prev,
             [id]: evt.detail,
