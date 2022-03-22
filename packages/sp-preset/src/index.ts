@@ -93,3 +93,63 @@ function checkSetupDone() {
         throw new Error('Setup was not done or done inproperly.');
     }
 }
+
+//Export usual stuff from sp
+export {
+    SPFI,
+} from '@pnp/sp';
+
+export {
+    ISiteUserInfo,
+    ISiteUser,
+    ISiteUsers,
+    IUserUpdateResult,
+} from '@pnp/sp/site-users/types';
+
+export {
+    DateTimeFieldFriendlyFormatType,
+    DateTimeFieldFormatType,
+    CalendarType,
+    ChoiceFieldFormatType,
+    IField,
+    IFieldAddResult,
+    IFieldInfo,
+    IFieldUpdateResult,
+    IFields,
+    IFieldCreationProperties,
+} from '@pnp/sp/fields';
+
+export {
+    IWeb,
+    Web,
+    IWebs,
+    Webs,
+} from "@pnp/sp/webs";
+
+export {
+    ILists,
+    List,
+    IList,
+    Lists,
+    IListAddResult,
+    IListUpdateResult,
+} from "@pnp/sp/lists";
+
+export {
+    IItems,
+    IItem,
+    Item,
+    Items,
+    IItemAddResult,
+    IItemUpdateResult,
+} from "@pnp/sp/items";
+
+export {
+    Caching,
+    InjectHeaders,
+} from '@pnp/queryable';
+
+export {
+    getHashCode,
+    getGUID,
+} from '@pnp/core';

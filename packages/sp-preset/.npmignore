@@ -105,3 +105,13 @@ typings/
 stats.html
 
 .size-snapshot.json
+
+tsconfig.json
+
+src/
+
+LICENSE
+
+package-lock.json
+
+rollup.config.js
