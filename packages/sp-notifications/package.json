@@ -1,6 +1,6 @@
 {
   "name": "sp-react-notifications",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "Toast notification for sharepoint webparts using office-ui-fabric-react",
   "main": "./dist/index.js",
   "type": "module",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "office-ui-fabric-react": "^7.174.1",
-    "sp-preset": "^1.0.8",
+    "sp-preset": "^1.0.9",
     "uuid": "^8.3.2"
   },
   "peerDependencies": {
