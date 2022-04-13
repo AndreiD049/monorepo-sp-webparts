@@ -1,6 +1,6 @@
 {
   "name": "tasks",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": true,
   "main": "lib/index.js",
   "scripts": {
@@ -27,7 +27,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "16.13.1",
     "react-visibility-hook": "^1.0.0",
-    "sp-preset": "^1.0.12",
+    "sp-preset": "^1.0.13",
     "use-web-storage-api": "^1.0.3"
   },
   "devDependencies": {
@@ -46,7 +46,7 @@
     "jest": "^27.5.1",
     "jest-environment-jsdom": "^27.5.1",
     "luxon": "^2.3.1",
-    "sp-react-notifications": "^1.0.20",
+    "sp-react-notifications": "^1.0.21",
     "spfx-fast-serve-helpers": "~1.13.0",
     "ts-jest": "^27.1.4"
   }
