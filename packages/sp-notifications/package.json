@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "office-ui-fabric-react": "^7.174.1",
+    "sp-preset": "^1.0.7",
     "uuid": "^8.3.2"
   },
   "peerDependencies": {
