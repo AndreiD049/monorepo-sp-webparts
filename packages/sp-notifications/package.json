@@ -1,6 +1,6 @@
 {
   "name": "sp-react-notifications",
-  "version": "1.0.22",
+  "version": "1.0.20",
   "description": "Toast notification for sharepoint webparts using office-ui-fabric-react",
   "main": "./dist/index.js",
   "type": "module",
@@ -49,5 +49,6 @@
     "toast"
   ],
   "author": "Dimitrascu Andrei",
-  "license": "MIT"
+  "license": "MIT",
+  "gitHead": "0ebe8a3b821e8d869508fde1ffd8c3e7fd804028"
 }

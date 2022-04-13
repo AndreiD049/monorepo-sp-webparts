@@ -27,7 +27,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "16.13.1",
     "react-visibility-hook": "^1.0.0",
-    "sp-preset": "^1.0.10",
+    "sp-preset": "^1.0.12",
     "use-web-storage-api": "^1.0.3"
   },
   "devDependencies": {
@@ -46,7 +46,7 @@
     "jest": "^27.5.1",
     "jest-environment-jsdom": "^27.5.1",
     "luxon": "^2.3.1",
-    "sp-react-notifications": "^1.0.22",
+    "sp-react-notifications": "^1.0.20",
     "spfx-fast-serve-helpers": "~1.13.0",
     "ts-jest": "^27.1.4"
   }
