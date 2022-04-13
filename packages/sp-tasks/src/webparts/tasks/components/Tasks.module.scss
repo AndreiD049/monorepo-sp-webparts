@@ -1,0 +1,66 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.tasks {
+    min-height: 500px;
+    padding-bottom: 5em;
+
+    :global(.pending) {
+        background-color: lighten($color: $ms-color-yellow, $amount: 40);
+    }
+
+    :global(.finished) {
+        background-color: lighten($color: $ms-color-green, $amount: 65);
+    }
+
+    :global(.cancelled) {
+        background-color: lighten($color: $ms-color-red, $amount: 45);
+    }
+
+    .commandbar {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .selector {
+        padding: 1em 0;
+    }
+    
+    .userSelector {
+        margin-bottom: 2em;
+    }
+
+    .container {
+        display: flex;
+        flex-flow: row wrap;
+        gap: 1em;
+        justify-content: space-evenly;
+        align-items: flex-start;
+    }
+    
+    .taskContainer {
+        color: $ms-color-neutralPrimary;
+        display: flex;
+        flex-flow: column;
+        min-width: 333px;
+        align-items: stretch;
+        padding: 1em;
+        border-left-color: '[theme: themePrimary, default: #0078d7]';
+        background-color: '[theme: neutralLighterAlt, default: #fbf4f4]';
+        align-self: stretch;
+
+        & > * + * {
+            margin-top: 0.7em;
+        }
+    }
+
+    .noTasks {
+        height: 6em;
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
+        justify-content: center;
+        color: '[theme: neutralSecondaryAlt, default: #fbf4f4]';
+    }
+}
