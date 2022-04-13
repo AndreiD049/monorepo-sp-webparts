@@ -28,6 +28,7 @@
     "react-dom": "16.13.1",
     "react-visibility-hook": "^1.0.0",
     "sp-preset": "^1.0.13",
+    "sp-react-notifications": "^1.0.21",
     "use-web-storage-api": "^1.0.3"
   },
   "devDependencies": {
