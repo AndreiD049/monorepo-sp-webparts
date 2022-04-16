@@ -16,10 +16,6 @@ type TennantsType = {
     [name: string]: string;
 };
 
-type SPDict = {
-    [name: string]: SPFI;
-};
-
 interface ISetup {
     context: any;
     tennants?: TennantsType;
@@ -33,7 +29,6 @@ interface ISetup {
 interface ISPOptions extends ISetup {
     tennants: TennantsType;
     controller?: any;
-    sp: SPDict;
 }
 
 
@@ -41,7 +36,6 @@ export const setupSP = (opts: ISetup): void => {
     options = {
         tennants: {},
         ...opts,
-        sp: {},
     };
     if (options.useRPM) {
         options.controller = RPMController(
@@ -51,24 +45,9 @@ export const setupSP = (opts: ISetup): void => {
             options.rpmAlerting
         );
     }
-    options.sp['Default'] = usingDefault(spfi());
-    if (options.tennants) {
-        for (const key of Object.keys(options.tennants)) {
-            options.sp[key] = usingDefault(spfi(options.tennants[key]));
-        }
-    }
 };
 
 export const getSP = (key?: string): SPFI => {
-    checkSetupDone();
-    if (!key) {
-        key = 'Default';
-    }
-    // We already checked that options is not null
-    return options!.sp[key];
-};
-
-export const getNewSP = (key?: string): SPFI => {
     checkSetupDone();
     if (!key) {
         return usingDefault(spfi());
