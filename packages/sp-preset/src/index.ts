@@ -136,6 +136,14 @@ export {
 } from '@pnp/queryable';
 
 export {
+    IGroupAddResult,
+    ISiteGroup,
+    ISiteGroupInfo,
+    ISiteGroups,
+    IGroupUpdateResult
+} from '@pnp/sp/site-groups';
+
+export {
     getHashCode,
     getGUID,
 } from '@pnp/core';
