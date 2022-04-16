@@ -1,8 +1,5 @@
 import IItem, { ItemType } from './IItem';
-import { sp } from '@pnp/sp';
-import '@pnp/sp/webs';
-import '@pnp/sp/lists';
-import '@pnp/sp/items';
+import { getSP, getNewSP } from 'sp-preset';
 
 const LIST_NAME = 'Appraisal items';
 const SELECT = [
@@ -18,6 +15,7 @@ const SELECT = [
 ];
 const EXPAND = ['User', 'PlannedIn', 'AchievedIn'];
 
+
 /**
  *  Get items of a certain type for a user/period
  */
@@ -26,6 +24,7 @@ export async function getItems(
     periodId: string,
     userId: string
 ): Promise<IItem[]> {
+    const sp = getNewSP();
     return sp.web.lists
         .getByTitle(LIST_NAME)
         .items.filter(
@@ -35,8 +34,7 @@ export async function getItems(
              ((AchievedInId ge ${periodId}) or (AchievedInId eq null))`
         )
         .select(...SELECT)
-        .expand(...EXPAND)
-        .get();
+        .expand(...EXPAND)();
 }
 
 /**
@@ -46,6 +44,7 @@ export async function getSwotItems(
     periodId: string,
     userId: string
 ): Promise<IItem[]> {
+    const sp = getNewSP();
     return sp.web.lists
         .getByTitle(LIST_NAME)
         .items.filter(
@@ -56,8 +55,7 @@ export async function getSwotItems(
              ((AchievedInId ge ${periodId}) or (AchievedInId eq null))`
         )
         .select(...SELECT)
-        .expand(...EXPAND)
-        .get();
+        .expand(...EXPAND)();
 }
 
 export interface ICreateItem
@@ -71,11 +69,11 @@ export interface ICreateItem
  * Create appraisal item for a given user/period
  */
 export async function createItem(item: ICreateItem): Promise<IItem> {
+    const sp = getNewSP();
     const created = await sp.web.lists.getByTitle(LIST_NAME).items.add(item);
     return created.item
         .select(...SELECT)
-        .expand(...EXPAND)
-        .get();
+        .expand(...EXPAND)();
 }
 
 export type IUpdateItem = Partial<
@@ -89,17 +87,18 @@ export async function updateItem(
     id: string,
     update: IUpdateItem
 ): Promise<IItem> {
+    const sp = getNewSP();
     const result = await sp.web.lists
         .getByTitle(LIST_NAME)
         .items.getById(+id)
         .update(update);
     return result.item
         .select(...SELECT)
-        .expand(...EXPAND)
-        .get();
+        .expand(...EXPAND)();
 }
 
 export async function deleteItem(id: string): Promise<void> {
+    const sp = getNewSP();
     return sp.web.lists
         .getByTitle(LIST_NAME)
         .items.getById(+id)

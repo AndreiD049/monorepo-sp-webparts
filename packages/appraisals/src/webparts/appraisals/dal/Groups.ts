@@ -1,6 +1,4 @@
-import { sp } from '@pnp/sp';
-import '@pnp/sp/webs';
-import '@pnp/sp/site-users/web';
+import { Caching, getNewSP } from 'sp-preset';
 import { IUser } from './IUser';
 
 export interface IUserGroup {
@@ -11,12 +9,15 @@ export interface IUserGroup {
 }
 
 export async function getUserGroups(): Promise<IUserGroup[]> {
-    return sp.web.currentUser.groups.usingCaching().get();
+    // Caching
+    const sp = getNewSP();
+    return sp.web.currentUser.groups();
 }
 
 export async function getGroupUsers(id: string): Promise<IUser[]> {
+    // Caching
+    const sp = getNewSP();
     return sp.web.siteGroups
         .getById(+id)
-        .users.usingCaching()
-        .get();
+        .users();
 }

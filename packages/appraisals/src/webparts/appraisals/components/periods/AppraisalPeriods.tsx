@@ -14,7 +14,6 @@ import {
     SelectionMode,
 } from 'office-ui-fabric-react';
 import IPeriod from '../../dal/IPeriod';
-import { finishPeriod, getPeriods } from '../../dal/Periods';
 import constants from '../../utils/constants';
 import NewPeriodPanel from './NewPeriodPanel';
 import { useHistory } from 'react-router-dom';
@@ -122,8 +121,10 @@ const AppraisalPeriods: FC = () => {
     /* Load initial data */
     React.useEffect(() => {
         async function run() {
-            if (context) {
-                const result = await getPeriods();
+            console.log('running');
+            if (context.PeriodService) {
+                const result = await context.PeriodService.getPeriods();
+                console.log('res', result);
                 setPeriods(result);
                 /** Can current user finish periods? */
                 setCanFinish(
@@ -143,7 +144,7 @@ const AppraisalPeriods: FC = () => {
 
     const handleFinishPeriod = (id: string) => async () => {
         console.log(id);
-        await finishPeriod(id);
+        await context.PeriodService.finishPeriod(id);
         forceUpdate();
     };
 

@@ -1,13 +1,10 @@
-import { SPFI } from '@pnp/sp';
-import { IList } from '@pnp/sp/lists';
 import ITaskLog from '../models/ITaskLog';
 import { ITasksWebPartProps } from '../TasksWebPart';
 import UserService from './users';
 import { DateTime } from 'luxon';
 import ITask from '../models/ITask';
-import { IItemAddResult, IItems } from '@pnp/sp/items';
 import { processChangeResult } from '../utils/utils';
-import { getSP } from 'sp-preset';
+import { getSP, SPFI, IList, IItemAddResult, IItems } from 'sp-preset';
 
 const LOG_SELECT = [
     'ID',

@@ -1,9 +1,4 @@
-import { Caching } from '@pnp/queryable';
-import { SPFI } from '@pnp/sp';
-import { IItems } from '@pnp/sp/items';
-import { IList } from '@pnp/sp/lists';
-import { getHashCode } from '@pnp/core';
-import { getNewSP } from 'sp-preset';
+import { getNewSP, SPFI, IList, IItems, Caching, getHashCode } from 'sp-preset';
 import ITask from '../models/ITask';
 import { ITasksWebPartProps } from '../TasksWebPart';
 import { processChangeResult } from '../utils/utils';

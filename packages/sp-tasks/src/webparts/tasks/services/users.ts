@@ -1,8 +1,4 @@
-import { Caching } from '@pnp/queryable';
-import { SPFI } from '@pnp/sp';
-import { ISiteUserInfo } from '@pnp/sp/site-users/types';
-import { getNewSP } from 'sp-preset';
-import { HOUR } from '../utils/constants';
+import { getNewSP, SPFI, Caching, ISiteUserInfo } from 'sp-preset';
 
 export default class UserService {
     sp: SPFI;

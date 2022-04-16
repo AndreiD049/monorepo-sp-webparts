@@ -79,7 +79,7 @@ export default class TasksWebPart extends BaseClientSideWebPart<ITasksWebPartPro
                 Users: userWebUrl,
             },
             useRPM: true,
-            rpmTreshold: 800,
+            rpmTreshold: 600,
             rpmTracing: false,
             rpmAlerting: true,
             additionalTimelinePipes: [

@@ -1,16 +1,14 @@
-import { sp } from '@pnp/sp';
-import '@pnp/sp/webs';
-import '@pnp/sp/site-users/web';
-import '@pnp/sp/site-groups';
+import { Caching, getNewSP } from 'sp-preset';
 import { IUser } from './IUser';
 
 export async function getCurrentUser(): Promise<IUser> {
+    // Caching
+    const sp = getNewSP();
     return sp.web.currentUser();
 }
 
 export async function getUserById(id: string): Promise<IUser> {
-    return sp.web.siteUsers
-        .getById(+id)
-        .usingCaching()
-        .get();
+    // Caching
+    const sp = getNewSP();
+    return sp.web.siteUsers.getById(+id)();
 }

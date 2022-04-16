@@ -9,6 +9,7 @@ import { getCurrentUser } from '../dal/Users';
 import { getUserGroups } from '../dal/Groups';
 import { getTeamMembers } from '../dal/TeamMembers';
 import { IUserGroupPermissions } from 'property-pane-access-control';
+import PeriodService from '../dal/Periods';
 
 export interface IRootProps {
     permissions: IUserGroupPermissions;
@@ -21,6 +22,7 @@ const Root: React.FC<IRootProps> = (props) => {
         userGroups: [],
         userInfo: null,
         permissions: {},
+        PeriodService: null,
     });
 
     React.useEffect(() => {
@@ -32,6 +34,7 @@ const Root: React.FC<IRootProps> = (props) => {
                 userGroups: await getUserGroups(),
                 teamUsers: await getTeamMembers(),
                 permissions: props.permissions,
+                PeriodService: new PeriodService(),
             };
             setCtx(result);
         }

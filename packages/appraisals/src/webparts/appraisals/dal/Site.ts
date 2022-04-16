@@ -1,7 +1,7 @@
-import { sp } from '@pnp/sp';
-import '@pnp/sp/sites';
-import { IContextInfo } from '@pnp/sp/sites';
+import { Caching, getNewSP, IContextInfo } from "sp-preset";
 
 export async function getSiteInfo(): Promise<IContextInfo> {
-    return await sp.site.usingCaching().getContextInfo();
+    // Caching
+    const sp = getNewSP();
+    return await sp.site.getContextInfo();
 }

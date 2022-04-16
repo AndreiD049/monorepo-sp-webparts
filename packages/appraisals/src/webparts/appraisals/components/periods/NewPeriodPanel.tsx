@@ -8,7 +8,7 @@ import {
     getTheme,
 } from 'office-ui-fabric-react';
 import IPeriod from '../../dal/IPeriod';
-import { createPeriod } from '../../dal/Periods';
+import UserContext from '../../utils/UserContext';
 
 export interface INewPeriodPanelProps {
     isOpen: boolean;
@@ -20,6 +20,7 @@ const theme = getTheme();
 
 const NewPeriodPanel: React.FC<INewPeriodPanelProps> = (props) => {
     const handleDismiss = () => props.setOpen(false);
+    const ctx = React.useContext(UserContext);
     const [title, setTitle] = React.useState<string>('');
 
     /* When pressign 'Create', create the period via API */
@@ -28,7 +29,7 @@ const NewPeriodPanel: React.FC<INewPeriodPanelProps> = (props) => {
             Title: title,
             Status: 'Open',
         };
-        await createPeriod(newPeriod);
+        await ctx.PeriodService.createPeriod(newPeriod);
         setTitle('');
         handleDismiss();
         props.update();

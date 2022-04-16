@@ -1,15 +1,13 @@
-import { sp } from '@pnp/sp';
-import '@pnp/sp/webs';
-import '@pnp/sp/lists';
-import '@pnp/sp/items';
 import { getCurrentUser, getUserById } from './Users';
 import { getGroupUsers } from './Groups';
 import { flatten, uniqBy } from '@microsoft/sp-lodash-subset';
 import { IUser } from './IUser';
+import { Caching, getNewSP } from 'sp-preset';
 
 const LIST_TITLE = 'TeamLeaders';
 const GROUP_CONTENTTYPE_PREFIX = '0x010B';
 const USER_CONTENTTYPE_PREFIX = '0x010A';
+
 
 export interface ITeamMember {
     UserId: string;
@@ -25,6 +23,8 @@ export interface ITeamMember {
  * From list 'TeamLeaders'
  */
 export async function getTeamMembers(): Promise<IUser[]> {
+    // Caching
+    const sp = getNewSP();
     const currentUser = await getCurrentUser();
     const items: ITeamMember[] = await sp.web.lists
         .getByTitle(LIST_TITLE)
@@ -35,9 +35,7 @@ export async function getTeamMembers(): Promise<IUser[]> {
             'TeamMembers/Title',
             'TeamMembers/ContentTypeId'
         )
-        .expand('TeamMembers')
-        .usingCaching()
-        .get();
+        .expand('TeamMembers')();
     /*
      * if there are no users, means you are not allowed to see any other
      * users appraisals except your own

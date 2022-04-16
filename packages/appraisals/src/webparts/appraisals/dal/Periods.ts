@@ -1,45 +1,50 @@
 import IPeriod from './IPeriod';
-import { sp } from '@pnp/sp';
-import '@pnp/sp/webs';
-import '@pnp/sp/lists';
-import '@pnp/sp/items';
+import { getNewSP, getSP, SPFI } from 'sp-preset';
 
 const LIST_NAME = 'AppraisalPeriods';
 const SELECT = ['ID', 'Title', 'Status', 'Created', 'Author/Title'];
 const EXPAND = ['Author'];
 
-export async function getPeriods(): Promise<IPeriod[]> {
-    return sp.web.lists
-        .getByTitle(LIST_NAME)
-        .items.select(...SELECT)
-        .expand(...EXPAND)
-        .get();
-}
 
-export async function getPeriod(id: string): Promise<IPeriod> {
-    return sp.web.lists
-        .getByTitle(LIST_NAME)
-        .items.getById(+id)
-        .select(...SELECT)
-        .expand(...EXPAND)
-        .get();
-}
+export default class PeriodService {
+    private sp: SPFI;
 
-export async function createPeriod(period: Partial<IPeriod>) {
-    return sp.web.lists.getByTitle(LIST_NAME).items.add(period);
-}
-
-export async function finishPeriod(periodId: string) {
-    const period = await getPeriod(periodId);
-    if (period.Status === 'Finished') {
-        return;
+    constructor() {
+        this.sp = getSP('Default');
     }
-    const update: Partial<IPeriod> = {
-        Status: 'Finished',
-    };
-    const updated = await sp.web.lists
-        .getByTitle(LIST_NAME)
-        .items.getById(+periodId)
-        .update(update);
-    return updated.item.get();
+    
+    async getPeriods(): Promise<IPeriod[]> {
+        return this.sp.web.lists
+            .getByTitle(LIST_NAME)
+            .items.select(...SELECT)
+            .expand(...EXPAND)();
+    }
+    async getPeriod(id: string): Promise<IPeriod> {
+        return this.sp.web.lists
+            .getByTitle(LIST_NAME)
+            .items.getById(+id)
+            .select(...SELECT)
+            .expand(...EXPAND)();
+    }
+    
+    async createPeriod(period: Partial<IPeriod>) {
+        return this.sp.web.lists.getByTitle(LIST_NAME).items.add(period);
+    }
+    
+    async finishPeriod(periodId: string) {
+        const period = await this.getPeriod(periodId);
+        if (period.Status === 'Finished') {
+            return;
+        }
+        const update: Partial<IPeriod> = {
+            Status: 'Finished',
+        };
+        const updated = await this.sp.web.lists
+            .getByTitle(LIST_NAME)
+            .items.getById(+periodId)
+            .update(update);
+        return updated.item();
+    }
 }
+
+

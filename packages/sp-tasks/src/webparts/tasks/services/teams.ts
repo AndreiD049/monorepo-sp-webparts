@@ -1,8 +1,4 @@
-import { Caching } from '@pnp/queryable';
-import { SPFI } from '@pnp/sp';
-import { IItems } from '@pnp/sp/items';
-import { IList } from '@pnp/sp/lists';
-import { getSP } from 'sp-preset';
+import { getSP, SPFI, IItems, IList, Caching } from 'sp-preset';
 import { convertToUser, IUser } from '../models/IUser';
 import { HOUR } from '../utils/constants';
 import UserService from './users';
