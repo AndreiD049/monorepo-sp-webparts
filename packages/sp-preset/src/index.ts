@@ -10,68 +10,47 @@ import '@pnp/sp/site-groups';
 import '@pnp/sp/sites';
 import RPMController from './controller';
 
-var options: ISPOptions | null = null;
-
 type TennantsType = {
     [name: string]: string;
 };
 
-interface ISetup {
-    context: any;
-    tennants?: TennantsType;
-    useRPM?: boolean;
-    rpmTreshold?: number;
-    rpmTracing?: boolean;
-    rpmAlerting?: boolean;
-    additionalTimelinePipes?: TimelinePipe[]
-};
+export default class SPBuilder {
+    private tennants: TennantsType = {};
+    private timelinePipes: TimelinePipe[] = [];
 
-interface ISPOptions extends ISetup {
-    tennants: TennantsType;
-    controller?: any;
-}
+    constructor(private context: any) { }
 
-
-export const setupSP = (opts: ISetup): void => {
-    options = {
-        tennants: {},
-        ...opts,
-    };
-    if (options.useRPM) {
-        options.controller = RPMController(
-            options.rpmTreshold || 1000, 
-            options.context, 
-            options.rpmTracing, 
-            options.rpmAlerting
-        );
+    withRPM(treshlod: number = 600, rpmTracing: boolean = false, rpmAlerting: boolean = true) {
+        this.timelinePipes.push(RPMController(
+            treshlod,
+            this.context,
+            rpmTracing,
+            rpmAlerting
+        ));
+        return this;
     }
-};
 
-export const getSP = (key?: string): SPFI => {
-    checkSetupDone();
-    if (!key) {
-        return usingDefault(spfi());
+    withAdditionalTimelines(timelines: TimelinePipe[]) {
+        this.timelinePipes = [...this.timelinePipes, ...timelines]
+        return this;
     }
-    if (options!.context === null) throw Error('Setup was not called');
-    if (!(key in options!.tennants)) throw Error(`No '${key}' in tennants. Check your setup or key. Avilable options are: ${Object.keys(options!.tennants).join(', ')}`);
-    return usingDefault(spfi(options!.tennants[key]));
-}
 
-function usingDefault(sp: SPFI): SPFI {
-    checkSetupDone();
-    let result = sp.using(SPFx(options!.context));
-    if (options?.useRPM) {
-        result = result.using(options.controller);
+    withTennants(tennants: TennantsType) {
+        this.tennants = tennants;
+        return this;
     }
-    if (options!.additionalTimelinePipes?.length) {
-        options!.additionalTimelinePipes.forEach((timeline) => result = result.using(timeline));
-    }
-    return result;
-}
 
-function checkSetupDone() {
-    if (options === null || !options.context) {
-        throw new Error('Setup was not done or done inproperly.');
+    getSP(key?: string) {
+        if (!key) {
+            return this.usingDefault(spfi());
+        }
+        return this.usingDefault(spfi(this.tennants[key]));
+    }
+
+    private usingDefault(sp: SPFI) {
+        let result = sp;
+        this.timelinePipes.forEach((pipe) => result = result.using(pipe));
+        return result;
     }
 }
 
