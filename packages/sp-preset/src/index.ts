@@ -7,6 +7,7 @@ import '@pnp/sp/batching';
 import '@pnp/sp/fields';
 import '@pnp/sp/site-users/web';
 import '@pnp/sp/site-groups';
+import '@pnp/sp/sites';
 import RPMController from './controller';
 
 var options: ISPOptions | null = null;
@@ -99,6 +100,11 @@ function checkSetupDone() {
 export {
     SPFI,
 } from '@pnp/sp';
+
+export { 
+    IContextInfo, 
+    ISite 
+} from '@pnp/sp/sites';
 
 export {
     ISiteUserInfo,
