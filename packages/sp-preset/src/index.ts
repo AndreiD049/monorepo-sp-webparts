@@ -6,6 +6,7 @@ import '@pnp/sp/items';
 import '@pnp/sp/batching';
 import '@pnp/sp/fields';
 import '@pnp/sp/site-users/web';
+import '@pnp/sp/site-groups';
 import RPMController from './controller';
 
 var options: ISPOptions | null = null;
