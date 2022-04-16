@@ -20,7 +20,7 @@
         "react": "16.13.1",
         "react-dom": "16.13.1",
         "react-router-dom": "^5.3.0",
-        "sp-preset": "^1.0.17"
+        "sp-preset": "^1.0.18"
     },
     "devDependencies": {
         "@microsoft/rush-stack-compiler-4.2": "^0.1.2",

@@ -1,33 +1,30 @@
-import { getSP, Caching, getHashCode } from 'sp-preset';
+import { getSP, Caching, getHashCode, SPFI } from 'sp-preset';
 
-export async function getSiteGroups() {
-  let sp = getSP().using(Caching({
-    keyFactory: (url: string) => `pac-${getHashCode(url)}`,
-    store: 'session',
-  }));
-  return sp.web.siteGroups.select('Id', 'Title')()
-}
+export default class SiteService {
+    private sp: SPFI;
 
-export async function getSiteUsers() {
-  let sp = getSP().using(Caching({
-    keyFactory: (url: string) => `pac-${getHashCode(url)}`,
-    store: 'session',
-  }));
-  return sp.web.siteUsers.select('Id', 'Title')();
-}
+    constructor() {
+        this.sp = getSP().using(
+            Caching({
+                keyFactory: (url: string) => `pac-${getHashCode(url)}`,
+                store: 'session',
+            })
+        );
+    }
 
-export async function getCurrentUser() {
-  let sp = getSP().using(Caching({
-    keyFactory: (url: string) => `pac-${getHashCode(url)}`,
-    store: 'session',
-  }));
-  return sp.web.currentUser.select('Id', 'Title')();
-}
+    async getSiteGroups() {
+        return this.sp.web.siteGroups.select('Id', 'Title')();
+    }
 
-export async function getCurrentUserGroups() {
-  let sp = getSP().using(Caching({
-    keyFactory: (url: string) => `pac-${getHashCode(url)}`,
-    store: 'session',
-  }));
-  return sp.web.currentUser.groups.select('Id', 'Title')()
+    async getSiteUsers() {
+        return this.sp.web.siteUsers.select('Id', 'Title')();
+    }
+
+    async getCurrentUser() {
+        return this.sp.web.currentUser.select('Id', 'Title')();
+    }
+
+    async getCurrentUserGroups() {
+        return this.sp.web.currentUser.groups.select('Id', 'Title')();
+    }
 }

@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { FC } from 'react';
 import { IAccessControlProps } from './IAccessControlProps';
-import { getSiteGroups, getSiteUsers } from '../dal/site';
+import SiteService from '../dal/site';
 import PermissionField from './PermissionField';
 import { IPersonaProps } from 'office-ui-fabric-react';
 
@@ -27,6 +27,7 @@ export interface IUserGroupPermissions {
 }
 
 const AccessControl: FC<IAccessControlProps> = (props) => {
+  const siteService = new SiteService();
   const [groups, setGroups] = React.useState<IUserGroupInfo[]>([]);
   const [users, setUsers] = React.useState<IUserGroupInfo[]>([]);
   const [permissions, setPermissions] =
@@ -49,9 +50,9 @@ const AccessControl: FC<IAccessControlProps> = (props) => {
 
   React.useEffect(() => {
     async function run() {
-      const g = await getSiteGroups();
+      const g = await siteService.getSiteGroups();
       setGroups(g);
-      const u = await getSiteUsers();
+      const u = await siteService.getSiteUsers();
       setUsers(u);
     }
     run();
