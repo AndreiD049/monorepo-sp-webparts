@@ -1,6 +1,6 @@
 {
   "name": "sp-preset",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Convenient preset that make @pnp/sp version 3 usage more convenient",
   "main": "./dist/index.js",
   "scripts": {
@@ -23,7 +23,7 @@
     "url": "https://github.com/AndreiD049/sp-preset/issues"
   },
   "homepage": "https://github.com/AndreiD049/sp-preset#readme",
-  "peerDependencies": {
+  "dependencies": {
     "@pnp/core": "^3.1.0",
     "@pnp/queryable": "^3.1.0",
     "@pnp/sp": "^3.1.0"
