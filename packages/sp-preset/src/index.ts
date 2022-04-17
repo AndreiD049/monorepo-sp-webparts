@@ -48,7 +48,7 @@ export default class SPBuilder {
     }
 
     private usingDefault(sp: SPFI) {
-        let result = sp;
+        let result = sp.using(SPFx(this.context));
         this.timelinePipes.forEach((pipe) => result = result.using(pipe));
         return result;
     }

@@ -5,6 +5,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "rollup -c --environment BUILD:production",
+    "dev": "rollup -c --watch",
     "deploy": "npm run build & npm publish"
   },
   "repository": {
