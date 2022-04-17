@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { WeekDay } from "../models/ITask";
-import { getNthWorkday, getNumberOfWorkdaysInMonth, getWeekDaySet } from "./utils";
+import { getNthWorkday, getNumberOfWorkdaysInMonth, getWeekDaySet, isCurrentWorkday } from "./utils";
 
 test('Able to get number of workdays in month', () => {
     const dt = DateTime.fromISO('2022-03-22');
@@ -83,4 +83,56 @@ test('Get weekday set missing day', () => {
         WeekDay.Sun,
     ]);
     expect(set.has(3)).toBeFalsy();
+});
+
+test('today date is current workday', () => {
+    expect(isCurrentWorkday(DateTime.now())).toBe(true);
+})
+
+test('today before 06 AM is current workday', () => {
+    const dt = DateTime.now().set({
+        hour: 5,
+    });
+    expect(isCurrentWorkday(dt)).toBe(true);
+})
+
+test('tomorrow is not current workday', () => {
+    const dt = DateTime.now().plus({ 'day': 1 });
+    expect(isCurrentWorkday(dt)).toBe(false);
+});
+
+test('yesterday is current workday if today is before 06:00', () => {
+    const dt = DateTime.now().minus({ day: 1 });
+    jest.spyOn(DateTime, 'now').mockReturnValueOnce(DateTime.now().set({ hour: 5 }));
+    expect(isCurrentWorkday(dt)).toBe(true);
+});
+
+test('yesterday is not current workday if it\'s past 06:00', () => {
+    const dt = DateTime.now().minus({ day: 1 });
+    jest.spyOn(DateTime, 'now').mockReturnValueOnce(DateTime.now().set({ hour: 9 }));
+    expect(isCurrentWorkday(dt)).toBe(false);
+});
+
+test('2 days before is not current workday if it\'s before 06:00', () => {
+    const dt = DateTime.now().minus({ day: 2 });
+    jest.spyOn(DateTime, 'now').mockReturnValueOnce(DateTime.now().set({ hour: 4 }));
+    expect(isCurrentWorkday(dt)).toBe(false);
+});
+
+test('tomorrow is not current workday if it\'s before 06:00', () => {
+    const dt = DateTime.now().plus({ day: 1 });
+    jest.spyOn(DateTime, 'now').mockReturnValueOnce(DateTime.now().set({ hour: 5 }));
+    expect(isCurrentWorkday(dt)).toBe(false);
+});
+
+test('future daye is not current workday if it\'s before 06:00', () => {
+    const dt = DateTime.now().plus({ day: 3 });
+    jest.spyOn(DateTime, 'now').mockReturnValueOnce(DateTime.now().set({ hour: 5 }));
+    expect(isCurrentWorkday(dt)).toBe(false);
+});
+
+test('future daye is not current workday if it\'s past 06:00', () => {
+    const dt = DateTime.now().plus({ day: 3 });
+    jest.spyOn(DateTime, 'now').mockReturnValueOnce(DateTime.now().set({ hour: 9 }));
+    expect(isCurrentWorkday(dt)).toBe(false);
 });

@@ -3,7 +3,7 @@ import TasksWebPart, { ITasksWebPartProps } from '../TasksWebPart';
 import UserService from './users';
 import { DateTime } from 'luxon';
 import ITask from '../models/ITask';
-import { processChangeResult } from '../utils/utils';
+import { isCurrentWorkday, processChangeResult } from '../utils/utils';
 import { SPFI, IList, IItemAddResult, IItems } from 'sp-preset';
 
 const LOG_SELECT = [
@@ -200,8 +200,8 @@ export default class TaskLogsService {
      * @returns the filter to be applied on the list of task logs
      */
     private getTaskLogFilter(userId: number, dt: DateTime) {
-        const isToday = dt.hasSame(DateTime.now(), 'day');
-        if (isToday) {
+        const currentWorkday = isCurrentWorkday(dt);
+        if (currentWorkday) {
             return `(Date eq '${dt.toISODate()}') and ((UserId eq ${userId}) or (OriginalUserId eq ${userId})) or (Completed eq false)`;
         } else {
             return `(Date eq '${dt.toISODate()}') and ((UserId eq ${userId}) or (OriginalUserId eq ${userId}))`;

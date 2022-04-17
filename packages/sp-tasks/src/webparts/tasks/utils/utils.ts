@@ -1,5 +1,6 @@
 import { cloneDeep } from '@microsoft/sp-lodash-subset';
-import { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
+import { DialogType } from 'office-ui-fabric-react';
 import ITask, { WeekDay, WeekDayMap } from '../models/ITask';
 import ITaskLog from '../models/ITaskLog';
 import { IUser } from '../models/IUser';
@@ -175,4 +176,23 @@ export function getNthWorkday(dt: DateTime): number {
 
 export function getWeekDaySet(daysList: WeekDay[]): Set<number> {
     return new Set(daysList.map(d => WeekDayMap[d]));
+}
+
+/**
+ * Checks whether a given date is in current workday.
+ * Current workday is the period of time since 00:00 to 06:00 next calendar day.
+ * If dt is today, return true
+ * If dt is yesterday, check whether current local hours:
+ *  before 06:00 - return true
+ *  after 06:00 - return false
+ * @param date Date to check
+ */
+export function isCurrentWorkday(dt: DateTime) {
+    const today = DateTime.now();
+    if (dt.hasSame(today, 'day')) return true;
+    if (dt < today) {
+        const interval = Interval.fromDateTimes(dt, today);
+        if (interval.length('day') < 1 && today.hour < 6) return true;
+    }
+    return false;
 }

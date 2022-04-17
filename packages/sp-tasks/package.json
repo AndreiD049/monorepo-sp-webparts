@@ -4,7 +4,7 @@
   "private": true,
   "main": "lib/index.js",
   "scripts": {
-    "build": "gulp bundle --ship && gulp package-solution --ship",
+    "build": "npm i && gulp bundle --ship && gulp package-solution --ship",
     "clean": "gulp clean",
     "test": "jest",
     "serve": "gulp bundle --custom-serve --max_old_space_size=4096 && fast-serve"
