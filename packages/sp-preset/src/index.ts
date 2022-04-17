@@ -8,6 +8,7 @@ import '@pnp/sp/fields';
 import '@pnp/sp/site-users/web';
 import '@pnp/sp/site-groups';
 import '@pnp/sp/sites';
+import "@pnp/sp/folders";
 import RPMController from './controller';
 
 type TennantsType = {
@@ -63,6 +64,16 @@ export {
     IContextInfo, 
     ISite 
 } from '@pnp/sp/sites';
+
+export {
+    IFolder,
+    IFolderAddResult,
+    IFolderDeleteParams,
+    IFolderInfo,
+    IFolderParentInfos,
+    IFolderUpdateResult,
+    IFolders,
+} from '@pnp/sp/folders';
 
 export {
     ISiteUserInfo,
