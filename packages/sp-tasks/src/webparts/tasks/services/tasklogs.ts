@@ -1,10 +1,10 @@
 import ITaskLog from '../models/ITaskLog';
-import { ITasksWebPartProps } from '../TasksWebPart';
+import TasksWebPart, { ITasksWebPartProps } from '../TasksWebPart';
 import UserService from './users';
 import { DateTime } from 'luxon';
 import ITask from '../models/ITask';
 import { processChangeResult } from '../utils/utils';
-import { getSP, SPFI, IList, IItemAddResult, IItems } from 'sp-preset';
+import { SPFI, IList, IItemAddResult, IItems } from 'sp-preset';
 
 const LOG_SELECT = [
     'ID',
@@ -37,8 +37,8 @@ export default class TaskLogsService {
     lastToken: string;
 
     constructor(props: ITasksWebPartProps) {
-        this.sp = getSP('Data');
-        this.rootSP = getSP();
+        this.sp = TasksWebPart.SPBuilder.getSP('Data');
+        this.rootSP = TasksWebPart.SPBuilder.getSP();
         this.list = this.sp.web.lists.getByTitle(props.taskLogsListTitle);
         this.listName = props.taskLogsListTitle;
         this.userService = new UserService();

@@ -1,16 +1,13 @@
 import {
     ChoiceFieldFormatType,
     DateTimeFieldFormatType,
-    DateTimeFieldFriendlyFormatType,
-    FieldTypes,
-} from '@pnp/sp/fields';
+} from 'sp-preset';
 import { MessageBarType } from 'office-ui-fabric-react';
-import { getSP } from 'sp-preset';
 import { SPnotify } from 'sp-react-notifications';
-import { ITasksWebPartProps } from '../TasksWebPart';
+import TasksWebPart, { ITasksWebPartProps } from '../TasksWebPart';
 
 export const setupLists = async (properties: ITasksWebPartProps) => {
-    const sp = getSP('Data');
+    const sp = TasksWebPart.SPBuilder.getSP('Data');
 
     // make sure 'Task' list exists
     const taskExists = await sp.web.lists.ensure(properties.tasksListTitle);

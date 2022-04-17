@@ -1,8 +1,9 @@
-import { getCurrentUser, getUserById } from './Users';
-import { getGroupUsers } from './Groups';
 import { flatten, uniqBy } from '@microsoft/sp-lodash-subset';
 import { IUser } from './IUser';
-import { Caching, getNewSP } from 'sp-preset';
+import { Caching } from 'sp-preset';
+import GroupService from './Groups';
+import UserService from './Users';
+import AppraisalsWebPart from '../AppraisalsWebPart';
 
 const LIST_TITLE = 'TeamLeaders';
 const GROUP_CONTENTTYPE_PREFIX = '0x010B';
@@ -23,9 +24,10 @@ export interface ITeamMember {
  * From list 'TeamLeaders'
  */
 export async function getTeamMembers(): Promise<IUser[]> {
-    // Caching
-    const sp = getNewSP();
-    const currentUser = await getCurrentUser();
+    const groupService = new GroupService();
+    const userService = new UserService();
+    const sp = AppraisalsWebPart.SPBuilder.getSP().using(Caching());
+    const currentUser = await userService.getCurrentUser();
     const items: ITeamMember[] = await sp.web.lists
         .getByTitle(LIST_TITLE)
         .items.filter(`UserId eq ${currentUser.Id}`)
@@ -50,10 +52,10 @@ export async function getTeamMembers(): Promise<IUser[]> {
         (tm) => tm.ContentTypeId.indexOf(GROUP_CONTENTTYPE_PREFIX) === 0
     );
     const groupUsers = flatten(
-        await Promise.all(groups.map(async (gr) => await getGroupUsers(gr.Id)))
+        await Promise.all(groups.map(async (gr) => await groupService.getGroupUsers(gr.Id)))
     );
     const calls = await Promise.all(
-        users.map(async (user) => getUserById(user.Id))
+        users.map(async (user) => userService.getUserById(user.Id))
     );
     return Promise.resolve(uniqBy(calls.concat(groupUsers), (x) => x.Id));
 }

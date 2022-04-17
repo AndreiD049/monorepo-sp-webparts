@@ -1,14 +1,20 @@
-import { Caching, getNewSP } from 'sp-preset';
+import { Caching, SPFI } from 'sp-preset';
+import AppraisalsWebPart from '../AppraisalsWebPart';
 import { IUser } from './IUser';
 
-export async function getCurrentUser(): Promise<IUser> {
-    // Caching
-    const sp = getNewSP();
-    return sp.web.currentUser();
-}
 
-export async function getUserById(id: string): Promise<IUser> {
-    // Caching
-    const sp = getNewSP();
-    return sp.web.siteUsers.getById(+id)();
+export default class UserService {
+    private sp: SPFI;
+
+    constructor() {
+        this.sp = AppraisalsWebPart.SPBuilder.getSP().using(Caching());
+    }
+    
+    async getCurrentUser(): Promise<IUser> {
+        return this.sp.web.currentUser();
+    }
+    
+    async getUserById(id: string): Promise<IUser> {
+        return this.sp.web.siteUsers.getById(+id)();
+    }
 }

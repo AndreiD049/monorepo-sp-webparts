@@ -1,12 +1,11 @@
-import { Stack } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { FC } from 'react';
 import IItem from '../../dal/IItem';
 import IPeriod from '../../dal/IPeriod';
-import { getItems } from '../../dal/Items';
 import { IUser } from '../../dal/IUser';
 import ItemContainer from './ItemContainer';
 import styles from './AppraisalItems.module.scss';
+import UserContext from '../../utils/UserContext';
 
 export interface IGoalItemsProps {
     user: IUser;
@@ -14,6 +13,7 @@ export interface IGoalItemsProps {
 }
 
 const TrainingItems: FC<IGoalItemsProps> = (props) => {
+    const { ItemService } = React.useContext(UserContext);
     const [items, setItems] = React.useState<IItem[]>([]);
 
     const achieved = React.useMemo(() => {
@@ -35,7 +35,7 @@ const TrainingItems: FC<IGoalItemsProps> = (props) => {
     React.useEffect(() => {
         async function run() {
             if (props.user && props.period) {
-                const result = await getItems(
+                const result = await ItemService.getItems(
                     'Training',
                     props.period.ID,
                     props.user?.Id

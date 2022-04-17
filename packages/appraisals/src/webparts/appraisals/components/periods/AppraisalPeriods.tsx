@@ -20,6 +20,7 @@ import { useHistory } from 'react-router-dom';
 import useForceUpdate from '../../utils/forceUpdate';
 import UserContext, { IUserContext } from '../../utils/UserContext';
 import { canCurrentUser } from 'property-pane-access-control';
+import AppraisalsWebPart from '../../AppraisalsWebPart';
 
 const theme = getTheme();
 const pillStyles: (item: IPeriod) => React.CSSProperties = (item) => ({
@@ -121,10 +122,8 @@ const AppraisalPeriods: FC = () => {
     /* Load initial data */
     React.useEffect(() => {
         async function run() {
-            console.log('running');
-            if (context.PeriodService) {
+            if (context) {
                 const result = await context.PeriodService.getPeriods();
-                console.log('res', result);
                 setPeriods(result);
                 /** Can current user finish periods? */
                 setCanFinish(
@@ -143,7 +142,6 @@ const AppraisalPeriods: FC = () => {
     };
 
     const handleFinishPeriod = (id: string) => async () => {
-        console.log(id);
         await context.PeriodService.finishPeriod(id);
         forceUpdate();
     };

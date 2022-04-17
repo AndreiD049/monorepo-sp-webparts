@@ -1,10 +1,12 @@
-import { getSP, Caching, getHashCode, SPFI } from 'sp-preset';
+import SPBuilder, { Caching, getHashCode, SPFI } from 'sp-preset';
 
 export default class SiteService {
+    private builder: SPBuilder;
     private sp: SPFI;
 
-    constructor() {
-        this.sp = getSP().using(
+    constructor(builder: SPBuilder) {
+        this.builder = builder;
+        this.sp = builder.getSP().using(
             Caching({
                 keyFactory: (url: string) => `pac-${getHashCode(url)}`,
                 store: 'session',

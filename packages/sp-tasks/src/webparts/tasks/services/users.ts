@@ -1,11 +1,12 @@
-import { getNewSP, SPFI, Caching, ISiteUserInfo } from 'sp-preset';
+import { SPFI, Caching, ISiteUserInfo } from 'sp-preset';
+import TasksWebPart from '../TasksWebPart';
 
 export default class UserService {
     sp: SPFI;
     usersSP: SPFI;
 
     constructor() {
-        this.sp = getNewSP().using(Caching());
+        this.sp = TasksWebPart.SPBuilder.getSP().using(Caching());
     }
 
     async getSiteUsers() {

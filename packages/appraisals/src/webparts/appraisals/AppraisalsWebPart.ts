@@ -3,12 +3,13 @@ import * as ReactDom from 'react-dom';
 import { Version } from '@microsoft/sp-core-library';
 import { IPropertyPaneConfiguration } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import { InjectHeaders, setupSP } from 'sp-preset';
+import SPBuilder, { InjectHeaders } from 'sp-preset';
 
 import * as strings from 'AppraisalsWebPartStrings';
 import Root, { IRootProps } from './components/Root';
 import AccessControl, {
     IUserGroupPermissions,
+    setupAccessControl,
 } from 'property-pane-access-control';
 
 export interface IAppraisalsWebPartProps {
@@ -16,6 +17,7 @@ export interface IAppraisalsWebPartProps {
 }
 
 export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisalsWebPartProps> {
+    static SPBuilder: SPBuilder;
     public render(): void {
         const element: React.ReactElement<IRootProps> = React.createElement(
             Root,
@@ -30,18 +32,15 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
     protected async onInit(): Promise<void> {
         await super.onInit();
 
-        setupSP({
-            context: this.context,
-            useRPM: false,
-            rpmTreshold: 600,
-            rpmTracing: false,
-            rpmAlerting: true,
-            additionalTimelinePipes: [
+        setupAccessControl(this.context);
+
+        AppraisalsWebPart.SPBuilder = new SPBuilder(this.context)
+            .withRPM()
+            .withAdditionalTimelines([
                 InjectHeaders({
-                    "Accept": "application/json;odata=nometadata"
+                    Accept: 'application/json;odata=nometadata',
                 }),
-            ],
-        })
+            ]);
     }
 
     protected onDispose(): void {
@@ -63,13 +62,13 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
                         {
                             groupName: strings.BasicGroupName,
                             groupFields: [
-                                // AccessControl('permissions', {
-                                //     key: 'test',
-                                //     permissions: ['lock', 'finish'],
-                                //     context: this.context,
-                                //     selectedUserGroups:
-                                //         this.properties.permissions,
-                                // }),
+                                AccessControl('permissions', {
+                                    key: 'test',
+                                    permissions: ['lock', 'finish'],
+                                    context: this.context,
+                                    selectedUserGroups:
+                                        this.properties.permissions,
+                                }),
                             ],
                         },
                     ],

@@ -1,4 +1,5 @@
-import { Caching, getNewSP } from 'sp-preset';
+import { Caching, SPFI } from 'sp-preset';
+import AppraisalsWebPart from '../AppraisalsWebPart';
 import { IUser } from './IUser';
 
 export interface IUserGroup {
@@ -8,16 +9,20 @@ export interface IUserGroup {
     Title: string;
 }
 
-export async function getUserGroups(): Promise<IUserGroup[]> {
-    // Caching
-    const sp = getNewSP();
-    return sp.web.currentUser.groups();
+export default class GroupService {
+    private sp: SPFI;
+
+    constructor() {
+        this.sp = AppraisalsWebPart.SPBuilder.getSP().using(Caching());
+    }
+    async getUserGroups(): Promise<IUserGroup[]> {
+        return this.sp.web.currentUser.groups();
+    }
+    
+    async getGroupUsers(id: string): Promise<IUser[]> {
+        return this.sp.web.siteGroups
+            .getById(+id)
+            .users();
+    }
 }
 
-export async function getGroupUsers(id: string): Promise<IUser[]> {
-    // Caching
-    const sp = getNewSP();
-    return sp.web.siteGroups
-        .getById(+id)
-        .users();
-}

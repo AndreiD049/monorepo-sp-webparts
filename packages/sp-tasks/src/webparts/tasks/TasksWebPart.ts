@@ -18,11 +18,8 @@ import TaskLogsService from './services/tasklogs';
 import UserService from './services/users';
 import TeamService from './services/teams';
 import { ACCESS_EDIT_OTHERS, USER_WEB_RE } from './utils/constants';
-import { setupSP } from 'sp-preset';
+import SPBuilder, { InjectHeaders } from 'sp-preset';
 import PropertyPaneAccessControl, { canCurrentUser, IUserGroupPermissions, setupAccessControl } from 'property-pane-access-control';
-import { InjectHeaders } from '@pnp/queryable';
-import { MessageBarType } from 'office-ui-fabric-react';
-import { useVisibility } from 'react-visibility-hook';
 
 export interface ITasksWebPartProps {
     dataSourceRoot: string;
@@ -37,6 +34,8 @@ export interface ITasksWebPartProps {
 }
 
 export default class TasksWebPart extends BaseClientSideWebPart<ITasksWebPartProps> {
+    static SPBuilder: SPBuilder;
+
     public async render(): Promise<void> {
         let userServeice = new UserService();
         const teamService = new TeamService(
@@ -72,22 +71,17 @@ export default class TasksWebPart extends BaseClientSideWebPart<ITasksWebPartPro
 
         setupAccessControl(this.context);
 
-        setupSP({
-            context: this.context,
-            tennants: {
+        TasksWebPart.SPBuilder = new SPBuilder(this.context)
+            .withRPM(600)
+            .withTennants({
                 Data: this.properties.dataSourceRoot,
                 Users: userWebUrl,
-            },
-            useRPM: true,
-            rpmTreshold: 600,
-            rpmTracing: false,
-            rpmAlerting: true,
-            additionalTimelinePipes: [
+            })
+            .withAdditionalTimelines([
                 InjectHeaders({
                     "Accept": "application/json;odata=nometadata"
                 }),
-            ],
-        });
+            ]);
     }
 
     protected onDispose(): void {

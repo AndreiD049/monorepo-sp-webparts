@@ -4,15 +4,16 @@ import {
 } from '@microsoft/sp-property-pane';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { setupSP } from 'sp-preset';
+import SPBuilder from 'sp-preset';
 import AccessControl, { IUserGroupPermissions } from './AccessControl';
 import { IAccessControlProps } from './IAccessControlProps';
 import { IPropertyPaneAccessControlInternalProps } from './IPropertyPaneAccessControlInternalProps';
 import { IPropertyPaneAccessControlProps } from './IPropertyPaneAccessControlProps';
 
-class PropertyPaneAccessControlBuilder
+export default class PropertyPaneAccessControlBuilder
     implements IPropertyPaneField<IPropertyPaneAccessControlProps>
 {
+    public static SPBuilder: SPBuilder;
     public type = PropertyPaneFieldType.Custom;
     public targetProperty: string;
     public properties: IPropertyPaneAccessControlInternalProps;
@@ -27,7 +28,8 @@ class PropertyPaneAccessControlBuilder
         targetProperty: string,
         properties: IPropertyPaneAccessControlProps
     ) {
-        setupSP(properties.context);
+        PropertyPaneAccessControlBuilder.SPBuilder = new SPBuilder(properties.context);
+        
         this.targetProperty = targetProperty;
         this.properties = {
             key: properties.key,

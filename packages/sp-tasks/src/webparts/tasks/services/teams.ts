@@ -1,5 +1,6 @@
-import { getSP, SPFI, IItems, IList, Caching } from 'sp-preset';
+import { SPFI, IItems, IList, Caching } from 'sp-preset';
 import { convertToUser, IUser } from '../models/IUser';
+import TasksWebPart from '../TasksWebPart';
 import { HOUR } from '../utils/constants';
 import UserService from './users';
 
@@ -19,7 +20,7 @@ export default class TeamService {
         private roleCol: string
     ) {
         this.userService = new UserService();
-        this.usersSP = getSP('Users').using(
+        this.usersSP = TasksWebPart.SPBuilder.getSP('Users').using(
             Caching({
                 expireFunc: (_url: string) =>
                     new Date(new Date().getTime() + HOUR),

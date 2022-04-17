@@ -1,6 +1,5 @@
-import { ISiteUserInfo } from '@pnp/sp/site-users/types';
+import { ISiteUserInfo } from 'sp-preset';
 import * as React from 'react';
-import { IVisibilityState } from 'react-visibility-hook';
 import { IUser } from '../models/IUser';
 import TaskLogsService from '../services/tasklogs';
 import TaskService from '../services/tasks';

@@ -1,9 +1,11 @@
 import { IUserGroupPermissions } from 'property-pane-access-control';
 import * as React from 'react';
 import { IContextInfo } from 'sp-preset';
-import { IUserGroup } from '../dal/Groups';
+import GroupService, { IUserGroup } from '../dal/Groups';
+import ItemService from '../dal/Items';
 import { IUser } from '../dal/IUser';
 import PeriodService from '../dal/Periods';
+import UserService from '../dal/Users';
 
 export interface IUserContext {
     siteInfo: IContextInfo;
@@ -12,6 +14,9 @@ export interface IUserContext {
     teamUsers: any[];
     permissions: IUserGroupPermissions;
     PeriodService: PeriodService;
+    GroupService: GroupService;
+    ItemService: ItemService;
+    UserService: UserService;
 }
 
 const UserContext = React.createContext<IUserContext>({
@@ -21,6 +26,9 @@ const UserContext = React.createContext<IUserContext>({
     teamUsers: [],
     permissions: {},
     PeriodService: null,
+    GroupService: null,
+    ItemService: null,
+    UserService: null,
 });
 
 export default UserContext;

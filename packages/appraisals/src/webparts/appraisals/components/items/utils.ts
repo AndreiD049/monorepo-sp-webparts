@@ -1,6 +1,5 @@
-import { format } from 'office-ui-fabric-react';
 import IItem, { ItemStatus, ItemType } from '../../dal/IItem';
-import { createItem, deleteItem, updateItem } from '../../dal/Items';
+import ItemService from '../../dal/Items';
 const isEmpty = (item: IItem) => item.Id === '';
 
 export type setItemAction = {
@@ -8,6 +7,7 @@ export type setItemAction = {
     item?: IItem;
     id: string;
 };
+
 
 const handleCreate = async (
     item: Partial<IItem>,
@@ -17,7 +17,8 @@ const handleCreate = async (
     userId: string,
     setItems: (action: setItemAction) => any
 ) => {
-    const result = await createItem({
+    const itemService = new ItemService();
+    const result = await itemService.createItem({
         Content: item.Content,
         ItemStatus: status,
         ItemType: itemType,
@@ -38,7 +39,8 @@ const handleUpdate = async (
     item: Partial<IItem>,
     setItems: (old: any) => any
 ) => {
-    const result = await updateItem(id, item);
+    const itemService = new ItemService();
+    const result = await itemService.updateItem(id, item);
     setItems({
         action: 'update',
         item: result,
@@ -47,7 +49,8 @@ const handleUpdate = async (
 };
 
 const handleDelete = async (id: string, setItems: (old: any) => any) => {
-    await deleteItem(id);
+    const itemService = new ItemService();
+    await itemService.deleteItem(id);
     setItems({
         action: 'delete',
         id: id,

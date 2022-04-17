@@ -1,6 +1,6 @@
-import { getNewSP, SPFI, IList, IItems, Caching, getHashCode } from 'sp-preset';
+import { SPFI, IList, IItems, Caching, getHashCode } from 'sp-preset';
 import ITask from '../models/ITask';
-import { ITasksWebPartProps } from '../TasksWebPart';
+import TasksWebPart, { ITasksWebPartProps } from '../TasksWebPart';
 import { processChangeResult } from '../utils/utils';
 import UserService from './users';
 
@@ -30,7 +30,7 @@ class TaskService {
 
 
     constructor(public props: ITasksWebPartProps) {
-        this.sp = getNewSP('Data').using(Caching({
+        this.sp = TasksWebPart.SPBuilder.getSP('Data').using(Caching({
             keyFactory: (url) => this.id + getHashCode(url),
         }));
         this.list = this.sp.web.lists.getByTitle(props.tasksListTitle);

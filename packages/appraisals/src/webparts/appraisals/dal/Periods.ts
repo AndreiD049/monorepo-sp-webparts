@@ -1,5 +1,6 @@
 import IPeriod from './IPeriod';
-import { getNewSP, getSP, SPFI } from 'sp-preset';
+import { SPFI } from 'sp-preset';
+import AppraisalsWebPart from '../AppraisalsWebPart';
 
 const LIST_NAME = 'AppraisalPeriods';
 const SELECT = ['ID', 'Title', 'Status', 'Created', 'Author/Title'];
@@ -10,7 +11,7 @@ export default class PeriodService {
     private sp: SPFI;
 
     constructor() {
-        this.sp = getSP('Default');
+        this.sp = AppraisalsWebPart.SPBuilder.getSP();
     }
     
     async getPeriods(): Promise<IPeriod[]> {

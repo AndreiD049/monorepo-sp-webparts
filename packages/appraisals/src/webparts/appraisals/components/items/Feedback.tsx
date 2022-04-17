@@ -3,8 +3,8 @@ import { TextField } from 'office-ui-fabric-react';
 import * as React from 'react';
 import IItem from '../../dal/IItem';
 import IPeriod from '../../dal/IPeriod';
-import { getItems } from '../../dal/Items';
 import { IUser } from '../../dal/IUser';
+import UserContext from '../../utils/UserContext';
 import styles from './AppraisalItems.module.scss';
 import { emptyItem, handleItemUpdate, setItemAction } from './utils';
 
@@ -14,6 +14,7 @@ export interface IFeedbackProps {
 }
 
 const Feedback: React.FC<IFeedbackProps> = (props) => {
+    const { ItemService } = React.useContext(UserContext);
     const [originalItem, setOriginalItem] = React.useState<IItem>(null);
     const [item, setItem] = React.useState<IItem>(null);
     const disabled = React.useMemo(
@@ -25,7 +26,7 @@ const Feedback: React.FC<IFeedbackProps> = (props) => {
         async function run() {
             if (props.period && props.user) {
                 const itemResult = (
-                    await getItems('Feedback', props.period.ID, props.user.Id)
+                    await ItemService.getItems('Feedback', props.period.ID, props.user.Id)
                 )[0];
                 setOriginalItem(itemResult ?? emptyItem('Feedback'));
                 setItem(itemResult ?? emptyItem('Feedback'));

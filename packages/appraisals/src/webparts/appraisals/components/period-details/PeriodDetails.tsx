@@ -7,7 +7,6 @@ import { Separator, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import IPeriod from '../../dal/IPeriod';
 import { IUser } from '../../dal/IUser';
-import { getCurrentUser } from '../../dal/Users';
 import useForceUpdate from '../../utils/forceUpdate';
 import UserContext from '../../utils/UserContext';
 import Feedback from '../items/Feedback';
@@ -46,7 +45,7 @@ const PeriodDetails = (props: IPeriodDetailsProps) => {
 
     React.useEffect(() => {
         async function run() {
-            setCurrentUser(await getCurrentUser());
+            setCurrentUser(await context.UserService.getCurrentUser());
         }
         run();
     }, []);

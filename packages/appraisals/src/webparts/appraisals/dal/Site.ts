@@ -1,7 +1,7 @@
-import { Caching, getNewSP, IContextInfo } from "sp-preset";
+import { Caching, IContextInfo } from "sp-preset";
+import AppraisalsWebPart from "../AppraisalsWebPart";
 
 export async function getSiteInfo(): Promise<IContextInfo> {
-    // Caching
-    const sp = getNewSP();
+    const sp = AppraisalsWebPart.SPBuilder.getSP().using(Caching());
     return await sp.site.getContextInfo();
 }

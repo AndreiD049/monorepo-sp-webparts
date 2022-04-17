@@ -4,7 +4,6 @@ import { FC } from 'react';
 import IItem, { ItemStatus, ItemType } from '../../dal/IItem';
 import ItemField from './ItemField';
 import styles from './AppraisalItems.module.scss';
-import { IUpdateItem, updateItem } from '../../dal/Items';
 import IPeriod from '../../dal/IPeriod';
 import {
     emptyItem,
@@ -12,6 +11,8 @@ import {
     handleItemUpdate,
     setItemAction,
 } from './utils';
+import UserContext from '../../utils/UserContext';
+import { IUpdateItem } from '../../dal/Items';
 
 export interface IItemContainerProps
     extends React.HtmlHTMLAttributes<HTMLElement> {
@@ -28,6 +29,7 @@ export interface IItemContainerProps
 const theme = getTheme();
 
 const ItemContainer: FC<IItemContainerProps> = (props) => {
+    const { ItemService } = React.useContext(UserContext);
     const emptySlots = React.useMemo(() => {
         return Math.max(props.minItems - props.items.length, 1);
     }, [props.items]);
@@ -89,7 +91,7 @@ const ItemContainer: FC<IItemContainerProps> = (props) => {
                 update.AchievedInId = props.period.ID;
                 update.ItemStatus = 'Achieved';
             }
-            const result = await updateItem(i.Id, update);
+            const result = await ItemService.updateItem(i.Id, update);
             props.setItems((prev) =>
                 prev.map((itemOld) => (itemOld.Id === i.Id ? result : itemOld))
             );

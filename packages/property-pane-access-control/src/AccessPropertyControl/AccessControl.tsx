@@ -8,6 +8,7 @@ import { IAccessControlProps } from './IAccessControlProps';
 import SiteService from '../dal/site';
 import PermissionField from './PermissionField';
 import { IPersonaProps } from 'office-ui-fabric-react';
+import PropertyPaneAccessControlBuilder, { PropertyPaneAccessControl } from './PropertyPaneAccessControl';
 
 export interface IUserGroupInfo {
   Id: number;
@@ -27,7 +28,7 @@ export interface IUserGroupPermissions {
 }
 
 const AccessControl: FC<IAccessControlProps> = (props) => {
-  const siteService = new SiteService();
+  const siteService = new SiteService(PropertyPaneAccessControlBuilder.SPBuilder);
   const [groups, setGroups] = React.useState<IUserGroupInfo[]>([]);
   const [users, setUsers] = React.useState<IUserGroupInfo[]>([]);
   const [permissions, setPermissions] =

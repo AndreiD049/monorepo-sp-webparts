@@ -5,11 +5,12 @@ import AppraisalPeriods from './periods/AppraisalPeriods';
 import PeriodDetails from './period-details/PeriodDetails';
 import UserContext, { IUserContext } from '../utils/UserContext';
 import { getSiteInfo } from '../dal/Site';
-import { getCurrentUser } from '../dal/Users';
-import { getUserGroups } from '../dal/Groups';
+import UserService from '../dal/Users';
 import { getTeamMembers } from '../dal/TeamMembers';
 import { IUserGroupPermissions } from 'property-pane-access-control';
 import PeriodService from '../dal/Periods';
+import GroupService from '../dal/Groups';
+import ItemService from '../dal/Items';
 
 export interface IRootProps {
     permissions: IUserGroupPermissions;
@@ -22,19 +23,22 @@ const Root: React.FC<IRootProps> = (props) => {
         userGroups: [],
         userInfo: null,
         permissions: {},
-        PeriodService: null,
+        PeriodService: new PeriodService(),
+        GroupService: new GroupService(),
+        ItemService: new ItemService(),
+        UserService: new UserService(),
     });
 
     React.useEffect(() => {
         async function run() {
-            const current = await getCurrentUser();
+            const current = await ctx.UserService.getCurrentUser();
             const result: IUserContext = {
+                ...ctx,
                 siteInfo: await getSiteInfo(),
                 userInfo: current,
-                userGroups: await getUserGroups(),
+                userGroups: await ctx.GroupService.getUserGroups(),
                 teamUsers: await getTeamMembers(),
                 permissions: props.permissions,
-                PeriodService: new PeriodService(),
             };
             setCtx(result);
         }

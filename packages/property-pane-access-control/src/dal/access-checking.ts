@@ -1,10 +1,11 @@
 import { IUserGroupPermissions } from "..";
-import { setupSP } from "sp-preset";
+import SPBuilder from "sp-preset";
 import SiteService from "./site";
 
-let siteService: SiteService = null;
+var builder: SPBuilder = null;
 
 export async function canCurrentUser(action: string, permissions: IUserGroupPermissions) {
+    const siteService = new SiteService(builder);
     const currentUser = await siteService.getCurrentUser();
     // fail fast
     if (!permissions || !permissions[action]) return false;
@@ -19,13 +20,6 @@ export async function canCurrentUser(action: string, permissions: IUserGroupPerm
 }
 
 export function setupAccessControl(context: any) {
-    siteService = new SiteService();
-
-    setupSP({
-        context: context,
-        rpmAlerting: false,
-        rpmTracing: false,
-        rpmTreshold: 1000,
-        useRPM: true
-    });
+    builder = new SPBuilder(context)
+        .withRPM(200);
 }
