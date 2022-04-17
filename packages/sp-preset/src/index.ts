@@ -9,6 +9,10 @@ import '@pnp/sp/site-users/web';
 import '@pnp/sp/site-groups';
 import '@pnp/sp/sites';
 import "@pnp/sp/folders";
+import "@pnp/sp/security";
+import "@pnp/sp/security/item";
+import "@pnp/sp/security/list";
+import "@pnp/sp/security/web";
 import RPMController from './controller';
 
 type TennantsType = {
@@ -64,6 +68,19 @@ export {
     IContextInfo, 
     ISite 
 } from '@pnp/sp/sites';
+
+export {
+    IBasePermissions,
+    IRoleAssignment,
+    PermissionKind,
+    IRoleAssignmentInfo,
+    IRoleAssignments,
+    IRoleDefinitions,
+    IRoleDefinitionUpdateResult,
+    IRoleDefinitionInfo,
+    IRoleDefinition,
+    IRoleDefinitionAddResult,
+} from '@pnp/sp/security';
 
 export {
     IFolder,
