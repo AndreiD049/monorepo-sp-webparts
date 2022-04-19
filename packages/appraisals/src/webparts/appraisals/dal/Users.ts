@@ -17,4 +17,8 @@ export default class UserService {
     async getUserById(id: string): Promise<IUser> {
         return this.sp.web.siteUsers.getById(+id)();
     }
+
+    async getSiteUsers() {
+        return this.sp.web.siteUsers();
+    }
 }

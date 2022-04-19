@@ -7,7 +7,7 @@ import UserContext, { IUserContext } from '../utils/UserContext';
 import { getSiteInfo } from '../dal/Site';
 import UserService from '../dal/Users';
 import { getTeamMembers } from '../dal/TeamMembers';
-import { IUserGroupPermissions } from 'property-pane-access-control';
+import { canCurrentUser, IUserGroupPermissions } from 'property-pane-access-control';
 import PeriodService from '../dal/Periods';
 import GroupService from '../dal/Groups';
 import ItemService from '../dal/Items';
@@ -27,6 +27,9 @@ const Root: React.FC<IRootProps> = (props) => {
         GroupService: new GroupService(),
         ItemService: new ItemService(),
         UserService: new UserService(),
+        canFinish: false,
+        canLock: false,
+        canManageFolders: false,
     });
 
     React.useEffect(() => {
@@ -39,6 +42,9 @@ const Root: React.FC<IRootProps> = (props) => {
                 userGroups: await ctx.GroupService.getUserGroups(),
                 teamUsers: await getTeamMembers(),
                 permissions: props.permissions,
+                canFinish: await canCurrentUser('finish', props.permissions),
+                canLock: await canCurrentUser('lock', props.permissions),
+                canManageFolders: await canCurrentUser('manage-folders', props.permissions),
             };
             setCtx(result);
         }
@@ -55,9 +61,7 @@ const Root: React.FC<IRootProps> = (props) => {
                                 location.search
                             );
                             /* If periodId query parameter is set, render appraisals periods list */
-                            if (!searchParams.get(constants.periodId)) {
-                                return <AppraisalPeriods />;
-                            } else {
+                            if (searchParams.get(constants.periodId)) {
                                 /* Else render details of current periodId from query params */
                                 return (
                                     <PeriodDetails
@@ -65,7 +69,9 @@ const Root: React.FC<IRootProps> = (props) => {
                                             constants.periodId
                                         )}
                                     />
-                                );
+                                    );
+                            } else {
+                                return <AppraisalPeriods />;
                             }
                         }}
                     />

@@ -1,8 +1,8 @@
 import IItem, { ItemType } from './IItem';
-import { SPFI } from 'sp-preset';
+import { IList, SPFI } from 'sp-preset';
 import AppraisalsWebPart from '../AppraisalsWebPart';
 
-const LIST_NAME = 'Appraisal items';
+export const LIST_NAME = 'Appraisal items';
 const SELECT = [
     'Id',
     'Content',
@@ -29,9 +29,11 @@ export type IUpdateItem = Partial<
 
 export default class ItemService {
     private sp: SPFI;
+    private list: IList;
 
     constructor() {
         this.sp = AppraisalsWebPart.SPBuilder.getSP();
+        this.list = this.sp.web.lists.getByTitle(LIST_NAME);
     }
 
     /**
@@ -42,8 +44,7 @@ export default class ItemService {
         periodId: string,
         userId: string
     ): Promise<IItem[]> {
-        return this.sp.web.lists
-            .getByTitle(LIST_NAME)
+        return this.list
             .items.filter(
                 `(UserId eq '${userId}') and
              (ItemType eq '${itemType}') and
@@ -59,8 +60,7 @@ export default class ItemService {
      */
     async getSwotItems(periodId: string, userId: string): Promise<IItem[]> {
         const sp = AppraisalsWebPart.SPBuilder.getSP();
-        return this.sp.web.lists
-            .getByTitle(LIST_NAME)
+        return this.list
             .items.filter(
                 `(UserId eq '${userId}') and
              (ItemStatus eq 'NA') and
@@ -76,9 +76,7 @@ export default class ItemService {
      * Create appraisal item for a given user/period
      */
     async createItem(item: ICreateItem): Promise<IItem> {
-        const created = await this.sp.web.lists
-            .getByTitle(LIST_NAME)
-            .items.add(item);
+        const created = await this.list.items.add(item);
         return created.item.select(...SELECT).expand(...EXPAND)();
     }
 
@@ -86,17 +84,19 @@ export default class ItemService {
      * Update an item, only Content, AchievedInId or ItemStatus Properties can be updated
      */
     async updateItem(id: string, update: IUpdateItem): Promise<IItem> {
-        const result = await this.sp.web.lists
-            .getByTitle(LIST_NAME)
+        const result = await this.list
             .items.getById(+id)
             .update(update);
         return result.item.select(...SELECT).expand(...EXPAND)();
     }
 
     async deleteItem(id: string): Promise<void> {
-        return this.sp.web.lists
-            .getByTitle(LIST_NAME)
+        return this.list
             .items.getById(+id)
             .delete();
+    }
+
+    async getFolders() {
+        return this.list.rootFolder.folders();
     }
 }

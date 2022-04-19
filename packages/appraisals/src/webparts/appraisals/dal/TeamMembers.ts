@@ -4,6 +4,8 @@ import { Caching } from 'sp-preset';
 import GroupService from './Groups';
 import UserService from './Users';
 import AppraisalsWebPart from '../AppraisalsWebPart';
+import { intersectionBy } from 'lodash';
+import ItemService, { LIST_NAME } from './Items';
 
 const LIST_TITLE = 'TeamLeaders';
 const GROUP_CONTENTTYPE_PREFIX = '0x010B';
@@ -21,41 +23,16 @@ export interface ITeamMember {
 
 /**
  * Get user's current team members
- * From list 'TeamLeaders'
+ * This is basically the list of folders from Appraisal Items
+ * that match site user names
+ * If user doesn't need to have access to another user, he shouldn't have access to folder
  */
-export async function getTeamMembers(): Promise<IUser[]> {
-    const groupService = new GroupService();
+export async function getTeamMembers() {
     const userService = new UserService();
     const sp = AppraisalsWebPart.SPBuilder.getSP().using(Caching());
-    const currentUser = await userService.getCurrentUser();
-    const items: ITeamMember[] = await sp.web.lists
-        .getByTitle(LIST_TITLE)
-        .items.filter(`UserId eq ${currentUser.Id}`)
-        .select(
-            'UserId',
-            'TeamMembers/Id',
-            'TeamMembers/Title',
-            'TeamMembers/ContentTypeId'
-        )
-        .expand('TeamMembers')();
-    /*
-     * if there are no users, means you are not allowed to see any other
-     * users appraisals except your own
-     */
-    if (items.length === 0) {
-        return [];
-    }
-    const users = items[0].TeamMembers.filter(
-        (tm) => tm.ContentTypeId.indexOf(USER_CONTENTTYPE_PREFIX) === 0
-    );
-    const groups = items[0].TeamMembers.filter(
-        (tm) => tm.ContentTypeId.indexOf(GROUP_CONTENTTYPE_PREFIX) === 0
-    );
-    const groupUsers = flatten(
-        await Promise.all(groups.map(async (gr) => await groupService.getGroupUsers(gr.Id)))
-    );
-    const calls = await Promise.all(
-        users.map(async (user) => userService.getUserById(user.Id))
-    );
-    return Promise.resolve(uniqBy(calls.concat(groupUsers), (x) => x.Id));
+    const folders = (await sp.web.lists.getByTitle(LIST_NAME).rootFolder.folders()).map((folder) => folder.Name);
+    const siteUsers = await userService.getSiteUsers();
+    const teamMembers = intersectionBy(siteUsers, folders, (t) => typeof t === 'string' ? t : t.Title);
+
+    return teamMembers;
 }

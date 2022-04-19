@@ -17,6 +17,9 @@ export interface IUserContext {
     GroupService: GroupService;
     ItemService: ItemService;
     UserService: UserService;
+    canFinish: boolean;
+    canLock: boolean;
+    canManageFolders: boolean;
 }
 
 const UserContext = React.createContext<IUserContext>({
@@ -29,6 +32,9 @@ const UserContext = React.createContext<IUserContext>({
     GroupService: null,
     ItemService: null,
     UserService: null,
+    canFinish: false,
+    canLock: false,
+    canManageFolders: false,
 });
 
 export default UserContext;

@@ -12,6 +12,7 @@ import {
     Selection,
     getTheme,
     SelectionMode,
+    ICommandBarItemProps,
 } from 'office-ui-fabric-react';
 import IPeriod from '../../dal/IPeriod';
 import constants from '../../utils/constants';
@@ -19,8 +20,7 @@ import NewPeriodPanel from './NewPeriodPanel';
 import { useHistory } from 'react-router-dom';
 import useForceUpdate from '../../utils/forceUpdate';
 import UserContext, { IUserContext } from '../../utils/UserContext';
-import { canCurrentUser } from 'property-pane-access-control';
-import AppraisalsWebPart from '../../AppraisalsWebPart';
+import ManageFoldersPanel from '../folders/ManageFoldersPanel';
 
 const theme = getTheme();
 const pillStyles: (item: IPeriod) => React.CSSProperties = (item) => ({
@@ -57,9 +57,6 @@ const AppraisalPeriods: FC = () => {
         }
     }, [searchValue, periods]);
 
-    /* Can current user finish periods */
-    const [canFinish, setCanFinish] = React.useState(false);
-
     /* Selection */
     const [selectedItem, setSelectedItem] = React.useState<IPeriod>(null);
     const selection = React.useMemo(
@@ -78,7 +75,10 @@ const AppraisalPeriods: FC = () => {
     );
 
     /* New period panel state */
-    const [newPanel, setNewPanel] = React.useState<boolean>(false);
+    const [panels, setPanels] = React.useState({
+        'new': false,
+        'folders': false,
+    });
 
     /* Columns */
     const columns: IColumn[] = [
@@ -125,10 +125,6 @@ const AppraisalPeriods: FC = () => {
             if (context) {
                 const result = await context.PeriodService.getPeriods();
                 setPeriods(result);
-                /** Can current user finish periods? */
-                setCanFinish(
-                    await canCurrentUser('finish', context.permissions)
-                );
             }
         }
 
@@ -146,6 +142,62 @@ const AppraisalPeriods: FC = () => {
         forceUpdate();
     };
 
+    /**
+     * Show only menu items user has access to
+     */
+    const commandBarItems = React.useMemo(() => {
+        const result: any[] = [
+            {
+                key: 'open',
+                text: 'Open',
+                onClick: () => handleOpenItem(selectedItem),
+                disabled: !Boolean(selectedItem),
+                iconProps: {
+                    iconName: 'OEM',
+                },
+            },
+        ];
+        if (context.canFinish) {
+            result.push(
+                {
+                    key: 'new',
+                    text: 'New',
+                    onClick: () => setPanels(prev => ({...prev, 'new': true})),
+                    disabled: !context.canFinish,
+                    iconProps: {
+                        iconName: 'Add',
+                    },
+                },
+                {
+                    key: 'finish',
+                    text: 'Finish',
+                    onClick:
+                        context.canFinish &&
+                        Boolean(selectedItem) &&
+                        handleFinishPeriod(selectedItem.ID),
+                    disabled: context.canFinish ? !Boolean(selectedItem) : true,
+                    iconProps: {
+                        iconName: 'LockSolid',
+                    },
+                },
+            );
+        }
+        if (context.canManageFolders) {
+            result.push(
+                {
+                    key: 'folders',
+                    text: 'Manage folders',
+                    onClick: () => setPanels(prev => ({...prev, 'folders': true})),
+                    iconProps: {
+                        iconName: 'FabricFolder',
+                    },
+                }
+            )
+        }
+
+        return result;
+    }, [context, selectedItem]);
+
     return (
         <>
             <Stack verticalAlign="center">
@@ -157,39 +209,7 @@ const AppraisalPeriods: FC = () => {
                 <main>
                     {/* Add new periods, finish periods, open */}
                     <CommandBar
-                        items={[
-                            {
-                                key: 'new',
-                                text: 'New',
-                                onClick: () => setNewPanel(true),
-                                iconProps: {
-                                    iconName: 'Add',
-                                },
-                            },
-                            {
-                                key: 'open',
-                                text: 'Open',
-                                onClick: () => handleOpenItem(selectedItem),
-                                disabled: !Boolean(selectedItem),
-                                iconProps: {
-                                    iconName: 'OEM',
-                                },
-                            },
-                            {
-                                key: 'finish',
-                                text: 'Finish',
-                                onClick:
-                                    canFinish &&
-                                    Boolean(selectedItem) &&
-                                    handleFinishPeriod(selectedItem.ID),
-                                disabled: canFinish
-                                    ? !Boolean(selectedItem)
-                                    : true,
-                                iconProps: {
-                                    iconName: 'LockSolid',
-                                },
-                            },
-                        ]}
+                        items={commandBarItems}
                         farItems={[
                             {
                                 key: 'search',
@@ -219,10 +239,11 @@ const AppraisalPeriods: FC = () => {
                 </main>
             </Stack>
             <NewPeriodPanel
-                isOpen={newPanel}
-                setOpen={setNewPanel}
+                isOpen={panels['new']}
+                setOpen={(val) => setPanels(prev => ({...prev, 'new': val}))}
                 update={forceUpdate}
             />
+            <ManageFoldersPanel isOpen={panels['folders']} setOpen={(val) => setPanels(prev => ({...prev, folders: val}))} />
         </>
     );
 };
