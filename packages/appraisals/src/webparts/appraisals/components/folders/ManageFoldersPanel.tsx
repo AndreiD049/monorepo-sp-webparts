@@ -1,7 +1,8 @@
-import { Panel, PanelType, setPortalAttribute } from 'office-ui-fabric-react';
+import { Panel, PanelType, setPortalAttribute, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { IFolderInfo } from 'sp-preset';
 import UserContext from '../../utils/UserContext';
+import Folder from './Folder';
 import ManageFolderService from './folders';
 import IUserFolder from './IFolder';
 
@@ -34,9 +35,10 @@ const ManageFoldersPanel: React.FC<ManageFoldersPanelProps> = (props) => {
         >
             { canManageFolders && (
                 <div>
+                    <Text variant='xLargePlus'>Manage roles</Text>
                     <ul>
                         { folders.map((folder) => (
-                            <li>{folder.Title} ({folder.Users.map((user) => user.Title).join(',')})</li>
+                            <Folder folder={folder} />
                         )) }
                     </ul>
                 </div>

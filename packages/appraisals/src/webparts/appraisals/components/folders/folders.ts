@@ -1,6 +1,6 @@
 import { clone } from '@microsoft/sp-lodash-subset';
-import { ThemeSettingName } from 'office-ui-fabric-react';
 import { Caching, getHashCode, IFolderInfo, IList, IRoleDefinitionInfo, ISiteUserInfo, SPFI } from 'sp-preset';
+import { Queryable } from 'sp-preset/node_modules/@pnp/queryable';
 import AppraisalsWebPart from '../../AppraisalsWebPart';
 import { LIST_NAME } from '../../dal/Items';
 import UserService from '../../dal/Users';
@@ -17,10 +17,12 @@ export default class ManageFolderService {
     private userSet: Set<string>;
     private userMap: Map<number, ISiteUserInfo>;
     private roleDefinitions: IRoleDefinitionInfo[];
+    private cacheKeys: { [id: number]: string };
 
     constructor() {
+        this.cacheKeys = {};
         this.sp = AppraisalsWebPart.SPBuilder.getSP().using(Caching({
-            keyFactory: (url) => `MFS-${getHashCode(url)}`,
+            keyFactory: (url) => url,
             expireFunc: () => new Date(Date.now() + MINUTE * 5),
         }));
         this.list = this.sp.web.lists.getByTitle(LIST_NAME);
@@ -49,7 +51,8 @@ export default class ManageFolderService {
      */
     async getUserFolders(): Promise<IUserFolder[]> {
         await this.ensureUserAndRoleDefinitionInfo();
-        const folders: IUserFolder[] = await this.list.items.filter(`ContentType eq 'Folder'`).select(...LIST_SELECT)();
+        const query = `ContentType eq 'Folder'`;
+        const folders: IUserFolder[] = await this.list.items.filter(query).select(...LIST_SELECT)();
         return folders.filter((folder) => this.userSet.has(folder.Title));
     }
 
@@ -98,6 +101,7 @@ export default class ManageFolderService {
         }
         await this.assertRoleDefintion(roleDefinition);
         const foundRole = this.roleDefinitions.find((role) => role.Name === roleDefinition);
+        this.invalidateCache(folder.roleAssignments.toRequestUrl());
         await folder.roleAssignments.add(userId, foundRole.Id);
     }
 
@@ -113,6 +117,7 @@ export default class ManageFolderService {
         const folder = this.list.items.getById(folderId);
         await this.assertRoleDefintion(roleDefinition);
         const foundRole = this.roleDefinitions.find((role) => role.Name === roleDefinition);
+        this.invalidateCache(folder.roleAssignments.toRequestUrl());
         folder.roleAssignments.remove(userId, foundRole.Id);
     }
 
@@ -136,6 +141,15 @@ export default class ManageFolderService {
         const foundRole = this.roleDefinitions.find((role) => role.Name === roleName);
         if (!foundRole) {
             throw Error(`Role definition '${roleName}' was not found`);
+        }
+    }
+
+    private invalidateCache(url: string) {
+        for (let i = 0; i < localStorage.length; i++) {
+            const element = localStorage.key(i);
+            if (element.endsWith(url)) {
+                localStorage.removeItem(element);
+            }
         }
     }
 }

@@ -4,7 +4,7 @@
   "private": true,
   "main": "lib/index.js",
   "scripts": {
-    "build": "npm i && gulp bundle --ship && gulp package-solution --ship",
+    "build": "gulp bundle --ship && gulp package-solution --ship",
     "clean": "gulp clean",
     "test": "jest",
     "serve": "gulp bundle --custom-serve --max_old_space_size=4096 && fast-serve"
@@ -27,7 +27,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "16.13.1",
     "react-visibility-hook": "^1.0.0",
-    "sp-preset": "^2.0.1",
+    "sp-preset": "^2.0.5",
     "sp-react-notifications": "^1.0.22",
     "use-web-storage-api": "^1.0.3"
   },
@@ -43,6 +43,7 @@
     "@types/react-dom": "16.9.8",
     "@types/webpack-env": "1.13.1",
     "ajv": "~5.2.2",
+    "duplicate-package-checker-webpack-plugin": "^3.0.0",
     "gulp": "~4.0.2",
     "jest": "^27.5.1",
     "jest-environment-jsdom": "^27.5.1",
