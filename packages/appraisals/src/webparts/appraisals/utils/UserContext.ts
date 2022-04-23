@@ -20,6 +20,7 @@ export interface IUserContext {
     canFinish: boolean;
     canLock: boolean;
     canManageFolders: boolean;
+    defaultFolderRole: string;
 }
 
 const UserContext = React.createContext<IUserContext>({
@@ -35,6 +36,7 @@ const UserContext = React.createContext<IUserContext>({
     canFinish: false,
     canLock: false,
     canManageFolders: false,
+    defaultFolderRole: '',
 });
 
 export default UserContext;

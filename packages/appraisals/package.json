@@ -34,7 +34,7 @@
         "duplicate-package-checker-webpack-plugin": "^3.0.0",
         "gulp": "~4.0.2",
         "prettier": "^2.5.1",
-        "spfx-fast-serve-helpers": "1.13.1",
+        "spfx-fast-serve-helpers": "~1.13.0",
         "typescript": "^4.5.5",
         "webpack-bundle-analyzer": "^4.5.0"
     }

@@ -1,6 +1,9 @@
 import IItem, { ItemType } from './IItem';
 import { IList, SPFI } from 'sp-preset';
 import AppraisalsWebPart from '../AppraisalsWebPart';
+import UserService from './Users';
+import { Guid } from '@microsoft/sp-core-library';
+import { ThemeSettingName } from 'office-ui-fabric-react';
 
 export const LIST_NAME = 'Appraisal items';
 const SELECT = [
@@ -18,9 +21,10 @@ const EXPAND = ['User', 'PlannedIn', 'AchievedIn'];
 
 export interface ICreateItem
     extends Omit<IItem, 'User' | 'PlannedIn' | 'AchievedIn' | 'Id'> {
-    UserId: string;
-    PlannedInId: string;
-    AchievedInId: string;
+    User: string;
+    PlannedIn: string;
+    AchievedIn: string;
+    GUID?: string;
 }
 
 export type IUpdateItem = Partial<
@@ -30,10 +34,20 @@ export type IUpdateItem = Partial<
 export default class ItemService {
     private sp: SPFI;
     private list: IList;
+    private parentWebUrl: string;
+    private listTitle: string;
+    private userService: UserService;
 
     constructor() {
         this.sp = AppraisalsWebPart.SPBuilder.getSP();
         this.list = this.sp.web.lists.getByTitle(LIST_NAME);
+        this.userService = new UserService();
+    }
+
+    async getItemByGuid(guid: string) {
+        return this.list.items.filter(`GUID eq '${guid}'`)
+            .select(...SELECT)
+            .expand(...EXPAND)();
     }
 
     /**
@@ -59,14 +73,14 @@ export default class ItemService {
      *  Get items of a certain type for a user/period
      */
     async getSwotItems(periodId: string, userId: string): Promise<IItem[]> {
-        const sp = AppraisalsWebPart.SPBuilder.getSP();
         return this.list
             .items.filter(
                 `(UserId eq '${userId}') and
-             (ItemStatus eq 'NA') and
-             (ItemType ne 'Feedback') and
-             (PlannedInId le ${periodId}) and
-             ((AchievedInId ge ${periodId}) or (AchievedInId eq null))`
+                (ItemStatus eq 'NA') and
+                (ItemType ne 'Feedback') and
+                (PlannedInId le ${periodId}) and
+                ((AchievedInId ge ${periodId}) or 
+                (AchievedInId eq null))`
             )
             .select(...SELECT)
             .expand(...EXPAND)();
@@ -76,8 +90,18 @@ export default class ItemService {
      * Create appraisal item for a given user/period
      */
     async createItem(item: ICreateItem): Promise<IItem> {
-        const created = await this.list.items.add(item);
-        return created.item.select(...SELECT).expand(...EXPAND)();
+        const user = await this.userService.getUserById(item.User);
+        item.User = JSON.stringify([{Key: user.LoginName }]);
+        await this.ensureListInfo();
+        // Generate a guid so you can find the item later
+        const guid = Guid.newGuid().toString();
+        item.GUID = guid;
+        // construct form values
+        const formValues = this.createFormValues(item);
+        // Create item in folder
+        await this.list.addValidateUpdateItemUsingPath(formValues, `${this.parentWebUrl}/Lists/${this.listTitle}/${user.Title}`, false)
+        const result = await this.getItemByGuid(guid);
+        return result[0];
     }
 
     /**
@@ -98,5 +122,27 @@ export default class ItemService {
 
     async getFolders() {
         return this.list.rootFolder.folders();
+    }
+
+    private async ensureListInfo() {
+        if (!this.parentWebUrl) {
+            const listInfo = await this.list.select('Title', 'ParentWebUrl')();
+            this.parentWebUrl = listInfo.ParentWebUrl;
+            this.listTitle = listInfo.Title;
+        }
+    }
+
+    private createFormValues(item: any) {
+        const keys = Object.keys(item);
+        const result = [];
+        for (const key of keys) {
+            if (item[key]) {
+                result.push({
+                    FieldName: key,
+                    FieldValue: item[key].toString(),
+                });
+            }
+        }
+        return result;
     }
 }

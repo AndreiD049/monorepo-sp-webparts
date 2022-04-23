@@ -1,6 +1,11 @@
 import { clone } from '@microsoft/sp-lodash-subset';
-import { Caching, getHashCode, IFolderInfo, IList, IRoleDefinitionInfo, ISiteUserInfo, SPFI } from 'sp-preset';
-import { Queryable } from 'sp-preset/node_modules/@pnp/queryable';
+import {
+    Caching,
+    IList,
+    IRoleDefinitionInfo,
+    ISiteUserInfo,
+    SPFI,
+} from 'sp-preset';
 import AppraisalsWebPart from '../../AppraisalsWebPart';
 import { LIST_NAME } from '../../dal/Items';
 import UserService from '../../dal/Users';
@@ -11,20 +16,24 @@ const MINUTE = 1000 * 60;
 
 export default class ManageFolderService {
     private sp: SPFI;
+    private cachedSP: SPFI;
     private list: IList;
     private userService: UserService;
     private userList: ISiteUserInfo[];
     private userSet: Set<string>;
     private userMap: Map<number, ISiteUserInfo>;
     private roleDefinitions: IRoleDefinitionInfo[];
-    private cacheKeys: { [id: number]: string };
+    private parentWebUrl: string;
+    private listTitle: string;
 
-    constructor() {
-        this.cacheKeys = {};
-        this.sp = AppraisalsWebPart.SPBuilder.getSP().using(Caching({
-            keyFactory: (url) => url,
-            expireFunc: () => new Date(Date.now() + MINUTE * 5),
-        }));
+    constructor(private defaultRole: string) {
+        this.cachedSP = AppraisalsWebPart.SPBuilder.getSP().using(
+            Caching({
+                keyFactory: (url) => url,
+                expireFunc: () => new Date(Date.now() + MINUTE * 5),
+            })
+        );
+        this.sp = AppraisalsWebPart.SPBuilder.getSP();
         this.list = this.sp.web.lists.getByTitle(LIST_NAME);
         this.userService = new UserService();
     }
@@ -36,13 +45,37 @@ export default class ManageFolderService {
         if (!this.userList) {
             this.userList = await this.userService.getSiteUsers();
             this.userSet = new Set(this.userList.map((user) => user.Title));
-            this.userMap = new Map(this.userList.map((user) => [user.Id, user]));
-            this.roleDefinitions = await this.sp.web.roleDefinitions();
+            this.userMap = new Map(
+                this.userList.map((user) => [user.Id, user])
+            );
+            this.roleDefinitions = await this.cachedSP.web.roleDefinitions();
+            const listInfo = await this.list.select('Title', 'ParentWebUrl')();
+            this.parentWebUrl = listInfo.ParentWebUrl;
+            this.listTitle = listInfo.Title;
         }
     }
 
+    async createUserFolder(name: string) {
+        await this.ensureUserAndRoleDefinitionInfo();
+        await this.sp.web.getFolderByServerRelativePath(`${this.parentWebUrl}/Lists/${this.listTitle}`).addSubFolderUsingPath(name);
+        const folder = (await this.list.items.filter(`ContentType eq 'Folder' and Title eq '${name}'`)())[0];
+        const added = this.list.items.getById(folder.Id);
+        // Break inheritance
+        await added.breakRoleInheritance();
+        const user = this.userList.find((u) => u.Title === name);
+        const item: {Id: number} = await added();
+        // Add access to the user himself
+        await this.assignUserToFolder(user.Id, item.Id, this.defaultRole);
+        return item.Id;
+    }
+
     async getFolder(folderId: number): Promise<IUserFolder> {
-        return this.list.items.getById(folderId).select(...LIST_SELECT)();
+        await this.ensureUserAndRoleDefinitionInfo();
+        const result: IUserFolder = await this.list.items
+            .getById(folderId)
+            .select(...LIST_SELECT)();
+        result.folderUser = this.userList.find((u) => u.Title === result.Title);
+        return result;
     }
 
     /**
@@ -52,7 +85,14 @@ export default class ManageFolderService {
     async getUserFolders(): Promise<IUserFolder[]> {
         await this.ensureUserAndRoleDefinitionInfo();
         const query = `ContentType eq 'Folder'`;
-        const folders: IUserFolder[] = await this.list.items.filter(query).select(...LIST_SELECT)();
+        const folders: IUserFolder[] = (
+            await this.list.items.filter(query).select(...LIST_SELECT)()
+        ).map((folder: IUserFolder) => {
+            folder.folderUser = this.userList.find(
+                (u) => u.Title === folder.Title
+            );
+            return folder;
+        });
         return folders.filter((folder) => this.userSet.has(folder.Title));
     }
 
@@ -63,12 +103,16 @@ export default class ManageFolderService {
      */
     async populateUserInfo(folders: IUserFolder[]): Promise<IUserFolder[]> {
         await this.ensureUserAndRoleDefinitionInfo();
-        const [batchedSP, execute] = this.sp.batched();
+        const [batchedSP, execute] = this.cachedSP.batched();
         const result = clone(folders);
         const batchedList = batchedSP.web.lists.getByTitle(LIST_NAME);
         const calls = result.map(async (folder) => {
-            const assignements = await batchedList.items.getById(folder.Id).roleAssignments();
-            folder.Users = assignements.map((u) => this.userMap.get(u.PrincipalId)).filter((u) => Boolean(u));
+            const assignements = await batchedList.items
+                .getById(folder.Id)
+                .roleAssignments();
+            folder.Users = assignements
+                .map((u) => this.userMap.get(u.PrincipalId))
+                .filter((u) => Boolean(u));
         });
         await execute();
         await Promise.all(calls);
@@ -82,17 +126,23 @@ export default class ManageFolderService {
      */
     async hasFolderBrokenInheritance(folderId: number): Promise<boolean> {
         const folder = await this.getFolder(folderId);
-        const firstUniqueAncestor = await this.list.items.getById(folderId).firstUniqueAncestorSecurableObject();
+        const firstUniqueAncestor = await this.list.items
+            .getById(folderId)
+            .firstUniqueAncestorSecurableObject();
         return folder.GUID === firstUniqueAncestor.GUID;
     }
 
     /**
      * Adds a specific user access to a folder
-     * @param userId 
-     * @param folderId 
+     * @param userId
+     * @param folderId
      * @param roleDefinition the name of the role definition, example 'Edit', or 'Contribute'
      */
-    async assignUserToFolder(userId: number, folderId: number, roleDefinition: string) {
+    async assignUserToFolder(
+        userId: number,
+        folderId: number,
+        roleDefinition: string
+    ) {
         await this.assertUserId(userId);
         await this.assertFolderId(folderId);
         const folder = this.list.items.getById(folderId);
@@ -100,25 +150,28 @@ export default class ManageFolderService {
             await folder.breakRoleInheritance();
         }
         await this.assertRoleDefintion(roleDefinition);
-        const foundRole = this.roleDefinitions.find((role) => role.Name === roleDefinition);
+        const foundRole = this.roleDefinitions.find(
+            (role) => role.Name === roleDefinition
+        );
         this.invalidateCache(folder.roleAssignments.toRequestUrl());
         await folder.roleAssignments.add(userId, foundRole.Id);
     }
 
     /**
      * Removes user access from folder
-     * @param userId 
-     * @param folderId 
+     * @param userId
+     * @param folderId
      * @param roleDefinition
      */
-    async removeUserFromFolder(userId: number, folderId: number, roleDefinition: string) {
+    async removeUserFromFolder(userId: number, folderId: number) {
         await this.assertUserId(userId);
         await this.assertFolderId(folderId);
         const folder = this.list.items.getById(folderId);
-        await this.assertRoleDefintion(roleDefinition);
-        const foundRole = this.roleDefinitions.find((role) => role.Name === roleDefinition);
         this.invalidateCache(folder.roleAssignments.toRequestUrl());
-        folder.roleAssignments.remove(userId, foundRole.Id);
+        const foundRole = await folder.roleAssignments
+            .getById(userId)
+            .bindings();
+        folder.roleAssignments.remove(userId, foundRole[0].Id);
     }
 
     private async assertUserId(userId: number) {
@@ -130,15 +183,18 @@ export default class ManageFolderService {
 
     private async assertFolderId(folderId: number) {
         await this.ensureUserAndRoleDefinitionInfo();
-        const folder: { ContentType: string } = await this.list.items.getById(folderId)();
-        if (folder.ContentType !== 'Folder') {
+        const folder: { FileSystemObjectType: number } =
+            await this.list.items.getById(folderId)();
+        if (folder.FileSystemObjectType !== 1) {
             throw Error(`There is no folder with id ${folderId}`);
         }
     }
 
     private async assertRoleDefintion(roleName: string) {
         await this.ensureUserAndRoleDefinitionInfo();
-        const foundRole = this.roleDefinitions.find((role) => role.Name === roleName);
+        const foundRole = this.roleDefinitions.find(
+            (role) => role.Name === roleName
+        );
         if (!foundRole) {
             throw Error(`Role definition '${roleName}' was not found`);
         }

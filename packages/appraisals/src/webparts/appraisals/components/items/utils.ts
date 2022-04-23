@@ -22,10 +22,10 @@ const handleCreate = async (
         Content: item.Content,
         ItemStatus: status,
         ItemType: itemType,
-        PlannedInId: periodId,
-        AchievedInId:
+        PlannedIn: periodId,
+        AchievedIn:
             status === 'Achieved' || status === 'NA' ? periodId : null,
-        UserId: userId,
+        User: userId,
     });
     setItems({
         action: 'create',

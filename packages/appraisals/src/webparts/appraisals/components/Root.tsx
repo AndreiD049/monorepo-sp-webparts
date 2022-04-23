@@ -14,6 +14,7 @@ import ItemService from '../dal/Items';
 
 export interface IRootProps {
     permissions: IUserGroupPermissions;
+    defaultFolderRole: string;
 }
 
 const Root: React.FC<IRootProps> = (props) => {
@@ -30,6 +31,7 @@ const Root: React.FC<IRootProps> = (props) => {
         canFinish: false,
         canLock: false,
         canManageFolders: false,
+        defaultFolderRole: props.defaultFolderRole,
     });
 
     React.useEffect(() => {

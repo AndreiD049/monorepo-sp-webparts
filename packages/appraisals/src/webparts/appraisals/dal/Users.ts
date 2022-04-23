@@ -21,4 +21,8 @@ export default class UserService {
     async getSiteUsers() {
         return this.sp.web.siteUsers();
     }
+
+    async getSiteGroups() {
+        return this.sp.web.siteGroups();
+    }
 }

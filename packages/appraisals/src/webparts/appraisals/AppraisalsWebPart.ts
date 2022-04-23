@@ -1,7 +1,10 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Version } from '@microsoft/sp-core-library';
-import { IPropertyPaneConfiguration } from '@microsoft/sp-property-pane';
+import {
+    IPropertyPaneConfiguration,
+    PropertyPaneTextField,
+} from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
 
@@ -14,6 +17,7 @@ import AccessControl, {
 
 export interface IAppraisalsWebPartProps {
     permissions: IUserGroupPermissions;
+    defaultFolderRole: string;
 }
 
 export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisalsWebPartProps> {
@@ -23,6 +27,7 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
             Root,
             {
                 permissions: this.properties.permissions,
+                defaultFolderRole: this.properties.defaultFolderRole,
             }
         );
 
@@ -64,10 +69,24 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
                             groupFields: [
                                 AccessControl('permissions', {
                                     key: 'test',
-                                    permissions: ['lock', 'finish', 'manage-folders'],
+                                    permissions: [
+                                        'lock',
+                                        'finish',
+                                        'manage-folders',
+                                    ],
                                     context: this.context,
                                     selectedUserGroups:
                                         this.properties.permissions,
+                                }),
+                            ],
+                        },
+                        {
+                            groupName: strings.FolderManagementGroupName,
+                            groupFields: [
+                                PropertyPaneTextField('defaultFolderRole', {
+                                    label: strings.DefaultFolderRoleLabel,
+                                    description:
+                                        strings.DefaultFolderRoleDescription,
                                 }),
                             ],
                         },
