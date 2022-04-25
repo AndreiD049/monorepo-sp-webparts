@@ -17,9 +17,13 @@ import GlobalContext from './utils/GlobalContext';
 import TaskLogsService from './services/tasklogs';
 import UserService from './services/users';
 import TeamService from './services/teams';
-import { ACCESS_EDIT_OTHERS, USER_WEB_RE } from './utils/constants';
+import { ACCESS_EDIT_OTHERS, ACCESS_SEE_ALL, USER_WEB_RE } from './utils/constants';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
-import PropertyPaneAccessControl, { canCurrentUser, IUserGroupPermissions, setupAccessControl } from 'property-pane-access-control';
+import PropertyPaneAccessControl, {
+    canCurrentUser,
+    IUserGroupPermissions,
+    setupAccessControl,
+} from 'property-pane-access-control';
 
 export interface ITasksWebPartProps {
     dataSourceRoot: string;
@@ -44,6 +48,7 @@ export default class TasksWebPart extends BaseClientSideWebPart<ITasksWebPartPro
             this.properties.teamColumn,
             this.properties.roleColumn
         );
+        const canSeeAll = await canCurrentUser(ACCESS_SEE_ALL, this.properties.permissions);
         const element: React.ReactElement = React.createElement(
             GlobalContext.Provider,
             {
@@ -53,8 +58,14 @@ export default class TasksWebPart extends BaseClientSideWebPart<ITasksWebPartPro
                     UserService: userServeice,
                     TeamService: teamService,
                     currentUser: await teamService.getCurrentUser(),
-                    teamMembers: await teamService.getCurrentUserTeamMembers(),
-                    canEditOthers: await canCurrentUser(ACCESS_EDIT_OTHERS, this.properties.permissions),
+                    teamMembers: canSeeAll
+                        ? await teamService.getAllUserTeams()
+                        : await teamService.getCurrentUserTeamMembers(),
+                    canEditOthers: await canCurrentUser(
+                        ACCESS_EDIT_OTHERS,
+                        this.properties.permissions
+                    ),
+                    canSeeAll: canSeeAll,
                     maxPeople: this.properties.maxPeople,
                 },
             },
@@ -79,7 +90,7 @@ export default class TasksWebPart extends BaseClientSideWebPart<ITasksWebPartPro
             })
             .withAdditionalTimelines([
                 InjectHeaders({
-                    "Accept": "application/json;odata=nometadata"
+                    Accept: 'application/json;odata=nometadata',
                 }),
             ]);
     }
@@ -146,11 +157,11 @@ export default class TasksWebPart extends BaseClientSideWebPart<ITasksWebPartPro
                                 PropertyPaneAccessControl('permissions', {
                                     key: 'access',
                                     context: this.context,
-                                    permissions: [ACCESS_EDIT_OTHERS],
-                                    selectedUserGroups: this.properties.permissions
-                                })
-                            ]
-                        }
+                                    permissions: [ACCESS_EDIT_OTHERS, ACCESS_SEE_ALL],
+                                    selectedUserGroups: this.properties.permissions,
+                                }),
+                            ],
+                        },
                     ],
                 },
             ],

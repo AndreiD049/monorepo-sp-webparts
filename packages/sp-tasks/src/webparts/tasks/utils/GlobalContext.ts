@@ -5,6 +5,7 @@ import TaskLogsService from '../services/tasklogs';
 import TaskService from '../services/tasks';
 import TeamService from '../services/teams';
 import UserService from '../services/users';
+import ITeams from './ITeams';
 
 export interface IGlobalContext {
     TaskService: TaskService;
@@ -12,8 +13,9 @@ export interface IGlobalContext {
     UserService: UserService;
     TeamService: TeamService;
     currentUser: IUser;
-    teamMembers: IUser[];
+    teamMembers: ITeams<IUser>;
     canEditOthers: boolean;
+    canSeeAll: boolean;
     maxPeople: number;
 }
 
@@ -25,6 +27,7 @@ const GlobalContext = React.createContext<IGlobalContext>({
     currentUser: null,
     teamMembers: null,
     canEditOthers: false,
+    canSeeAll: false,
     maxPeople: 1,
 });
 

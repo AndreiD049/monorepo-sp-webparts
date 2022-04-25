@@ -4,7 +4,7 @@ import { IUser } from '../models/IUser';
 import GlobalContext from '../utils/GlobalContext';
 import DateSelector from './DateSelector';
 import styles from './Tasks.module.scss';
-import UserSelctor from './UserSelector';
+import UserSelctor from './user-selector/UserSelector';
 
 export interface IHeaderProps {
     date: Date;

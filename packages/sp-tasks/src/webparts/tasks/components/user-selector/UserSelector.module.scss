@@ -1,0 +1,11 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.teamCheckbox {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+.userCheckbox {
+    margin-left: .5em;
+}

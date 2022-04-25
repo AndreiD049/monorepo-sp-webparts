@@ -5,6 +5,7 @@ const CHANGE_TOKEN_RE = /LastChangeToken=['"](.*?)['"]/;
 const CHANGE_ROW_RE = /\<.?\:row/;
 const CHANGE_DELETE_RE = /\<Id ChangeType=['"]Delete['"]/;
 const ACCESS_EDIT_OTHERS = 'edit-others';
+const ACCESS_SEE_ALL = 'see-all-users';
 
 export {
     MINUTE,
@@ -14,4 +15,5 @@ export {
     CHANGE_ROW_RE,
     CHANGE_DELETE_RE,
     ACCESS_EDIT_OTHERS,
+    ACCESS_SEE_ALL,
 };

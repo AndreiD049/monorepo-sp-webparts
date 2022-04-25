@@ -2,6 +2,7 @@ import { SPFI, IItems, IList, Caching } from 'sp-preset';
 import { convertToUser, IUser } from '../models/IUser';
 import TasksWebPart from '../TasksWebPart';
 import { HOUR } from '../utils/constants';
+import ITeams from '../utils/ITeams';
 import UserService from './users';
 
 const LIST_NAME_RE = /^.*sharepoint.com\/(sites|teams)\/.*\/(\w+)$/;
@@ -54,7 +55,7 @@ export default class TeamService {
         );
     }
 
-    async getCurrentUserTeamMembers(): Promise<IUser[]> {
+    async getCurrentUserTeamMembers(): Promise<ITeams<IUser>> {
         const currentUser = await this.getCurrentUser();
 
         const filter = currentUser.Teams.map(
@@ -65,11 +66,40 @@ export default class TeamService {
                 `(${filter}) and ${this.userCol}Id ne ${currentUser.User.ID}`
             )
         )();
-        return members.then((users) =>
+        const users = await members.then((users) =>
             users.map((user) =>
                 convertToUser(user, this.userCol, this.teamCol, this.roleCol)
             )
         );
+        return this.createTeams(users);
+    }
+
+    async getAllUserTeams(): Promise<ITeams<IUser>> {
+        const currentUser = await this.getCurrentUser();
+        const members = this._wrap(
+            this.list.items.filter(
+                `${this.userCol}Id ne ${currentUser.User.ID}`
+            )
+        )();
+        const users = await members.then((users) =>
+            users.map((user) =>
+                convertToUser(user, this.userCol, this.teamCol, this.roleCol)
+            )
+        );
+        return this.createTeams(users);
+    }
+
+    private async createTeams(users: IUser[]): Promise<ITeams<IUser>> {
+        const result: ITeams<IUser> = {};
+        users.forEach((user) => {
+            user.Teams.forEach((team) => {
+                if (result[team] === undefined) {
+                    result[team] = [];
+                }
+                result[team].push(user);
+            });
+        });
+        return result;
     }
 
     private _wrap(items: IItems) {
