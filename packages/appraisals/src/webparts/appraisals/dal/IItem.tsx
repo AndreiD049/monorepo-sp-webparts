@@ -4,7 +4,7 @@ interface IPeriodLookup {
 }
 
 export type ItemType =
-    | 'Goal'
+    | 'Objective'
     | 'Training'
     | 'Strength'
     | 'Weakness'

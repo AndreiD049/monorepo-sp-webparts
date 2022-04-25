@@ -26,7 +26,7 @@ export default class ManageFolderService {
     private parentWebUrl: string;
     private listTitle: string;
 
-    constructor(private defaultRole: string) {
+    constructor(private defaultRole?: string) {
         this.cachedSP = AppraisalsWebPart.SPBuilder.getSP().using(
             Caching({
                 keyFactory: (url) => url,
@@ -76,6 +76,13 @@ export default class ManageFolderService {
             .select(...LIST_SELECT)();
         result.folderUser = this.userList.find((u) => u.Title === result.Title);
         return result;
+    }
+
+    async getCurrentUserFolder(): Promise<IUserFolder> {
+        const currentUser = await this.userService.getCurrentUser();
+        const query = `ContentType eq 'Folder' and Title eq '${currentUser.Title}'`;
+        const folders = await this.list.items.filter(query).select(...LIST_SELECT)();
+        return folders[0];
     }
 
     /**

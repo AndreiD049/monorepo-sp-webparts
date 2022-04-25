@@ -1,6 +1,8 @@
 import { IUserGroupPermissions } from 'property-pane-access-control';
 import * as React from 'react';
 import { IContextInfo } from 'sp-preset';
+import { IAppraisalsWebPartProps } from '../AppraisalsWebPart';
+import ManageFolderService from '../components/folders/folder-service';
 import GroupService, { IUserGroup } from '../dal/Groups';
 import ItemService from '../dal/Items';
 import { IUser } from '../dal/IUser';
@@ -12,15 +14,18 @@ export interface IUserContext {
     userInfo: IUser;
     userGroups: IUserGroup[];
     teamUsers: any[];
-    permissions: IUserGroupPermissions;
     PeriodService: PeriodService;
     GroupService: GroupService;
     ItemService: ItemService;
     UserService: UserService;
+    FolderService: ManageFolderService;
+    canCreate: boolean;
     canFinish: boolean;
     canLock: boolean;
     canManageFolders: boolean;
-    defaultFolderRole: string;
+    canSeeOtherUsers: boolean;
+    properties: IAppraisalsWebPartProps;
+    isFolderCreated: boolean;
 }
 
 const UserContext = React.createContext<IUserContext>({
@@ -28,15 +33,18 @@ const UserContext = React.createContext<IUserContext>({
     userInfo: null,
     userGroups: [],
     teamUsers: [],
-    permissions: {},
+    properties: null,
     PeriodService: null,
     GroupService: null,
     ItemService: null,
     UserService: null,
+    FolderService: null,
+    canCreate: false,
     canFinish: false,
     canLock: false,
     canManageFolders: false,
-    defaultFolderRole: '',
+    canSeeOtherUsers: false,
+    isFolderCreated: false,
 });
 
 export default UserContext;

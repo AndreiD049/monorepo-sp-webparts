@@ -6,6 +6,7 @@ import UserService from './Users';
 import AppraisalsWebPart from '../AppraisalsWebPart';
 import { intersectionBy } from 'lodash';
 import ItemService, { LIST_NAME } from './Items';
+import ManageFolderService from '../components/folders/folder-service';
 
 const LIST_TITLE = 'TeamLeaders';
 const GROUP_CONTENTTYPE_PREFIX = '0x010B';
@@ -29,10 +30,10 @@ export interface ITeamMember {
  */
 export async function getTeamMembers() {
     const userService = new UserService();
-    const sp = AppraisalsWebPart.SPBuilder.getSP().using(Caching());
-    const folders = (await sp.web.lists.getByTitle(LIST_NAME).rootFolder.folders()).map((folder) => folder.Name);
+    const folderService = new ManageFolderService();
+    const folders = await folderService.getUserFolders();
     const siteUsers = await userService.getSiteUsers();
-    const teamMembers = intersectionBy(siteUsers, folders, (t) => typeof t === 'string' ? t : t.Title);
+    const teamMembers = folders.map((f) => siteUsers.find((u) => u.Title === f.Title));
 
     return teamMembers;
 }

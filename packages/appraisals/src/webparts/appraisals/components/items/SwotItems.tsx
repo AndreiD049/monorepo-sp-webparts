@@ -13,14 +13,14 @@ import ItemContainer from './ItemContainer';
 import styles from './AppraisalItems.module.scss';
 import UserContext from '../../utils/UserContext';
 
-export interface IGoalItemsProps {
+export interface IObjectiveItemsProps {
     user: IUser;
     period: IPeriod;
 }
 
 const theme = getTheme();
 
-const SwotItems: FC<IGoalItemsProps> = (props) => {
+const SwotItems: FC<IObjectiveItemsProps> = (props) => {
     const { ItemService } = React.useContext(UserContext);
     const [items, setItems] = React.useState<IItem[]>([]);
 

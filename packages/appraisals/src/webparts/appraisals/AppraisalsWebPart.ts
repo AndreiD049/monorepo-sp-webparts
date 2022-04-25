@@ -18,6 +18,7 @@ import AccessControl, {
 export interface IAppraisalsWebPartProps {
     permissions: IUserGroupPermissions;
     defaultFolderRole: string;
+    defaultSupportEmails: string;
 }
 
 export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisalsWebPartProps> {
@@ -26,8 +27,7 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
         const element: React.ReactElement<IRootProps> = React.createElement(
             Root,
             {
-                permissions: this.properties.permissions,
-                defaultFolderRole: this.properties.defaultFolderRole,
+                properties: this.properties,
             }
         );
 
@@ -70,9 +70,11 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
                                 AccessControl('permissions', {
                                     key: 'test',
                                     permissions: [
+                                        'create',
                                         'lock',
                                         'finish',
                                         'manage-folders',
+                                        'see-other-users',
                                     ],
                                     context: this.context,
                                     selectedUserGroups:
@@ -87,6 +89,11 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
                                     label: strings.DefaultFolderRoleLabel,
                                     description:
                                         strings.DefaultFolderRoleDescription,
+                                }),
+                                PropertyPaneTextField('defaultSupportEmails', {
+                                    label: strings.SupportEmailsLabel,
+                                    description:
+                                        strings.SupportEmailsDescription,
                                 }),
                             ],
                         },

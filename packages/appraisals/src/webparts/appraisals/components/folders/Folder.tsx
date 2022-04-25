@@ -30,7 +30,7 @@ export function siteUserInfoToPersona(user: ISiteUserInfo) {
 }
 
 const Folder: React.FC<IFolderProps> = (props) => {
-    const { defaultFolderRole } = React.useContext(UserContext);
+    const { properties } = React.useContext(UserContext);
     const [editable, setEditable] = React.useState<boolean>(false);
     const [selectedUsers, setSelectedUsers] = React.useState<IPersonaProps[]>(
         props.folder.Users.map((user) => siteUserInfoToPersona(user))
@@ -59,7 +59,7 @@ const Folder: React.FC<IFolderProps> = (props) => {
             return props.service.assignUserToFolder(
                 +item.id,
                 props.folder.Id,
-                defaultFolderRole
+                properties.defaultFolderRole
             );
         });
 
@@ -97,7 +97,7 @@ const Folder: React.FC<IFolderProps> = (props) => {
         } else {
             return (
                 <div>
-                    {props.folder.Users.map((user) => user.Title).join(', ')}
+                    {props.folder.Users.map((user) => user.Title).join('; ')}
                 </div>
             );
         }

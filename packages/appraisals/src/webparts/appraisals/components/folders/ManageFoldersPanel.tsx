@@ -23,12 +23,8 @@ export interface ManageFoldersPanelProps {
 }
 
 const ManageFoldersPanel: React.FC<ManageFoldersPanelProps> = (props) => {
-    const { canManageFolders, defaultFolderRole } =
+    const { canManageFolders, properties, FolderService } =
         React.useContext(UserContext);
-    const folderService = React.useMemo(
-        () => new ManageFolderService(defaultFolderRole),
-        []
-    );
     const [folders, setFolders] = React.useState<IUserFolder[]>([]);
     const [users, setUsers] = React.useState<ISiteUserInfo[]>([]);
     const [searchValue, setSearchValue] = React.useState('');
@@ -65,8 +61,8 @@ const ManageFoldersPanel: React.FC<ManageFoldersPanelProps> = (props) => {
     React.useEffect(() => {
         async function run() {
             if (props.isOpen) {
-                const folders = await folderService.getUserFolders();
-                setFolders(await folderService.populateUserInfo(folders));
+                const folders = await FolderService.getUserFolders();
+                setFolders(await FolderService.populateUserInfo(folders));
                 const userService = new UserService();
                 const users = await userService.getSiteUsers();
                 setUsers(users.filter((user) => user.Email !== ''));
@@ -76,8 +72,8 @@ const ManageFoldersPanel: React.FC<ManageFoldersPanelProps> = (props) => {
     }, [props.isOpen]);
 
     const handleFolderUpdate = async (id: number) => {
-        const folder = await folderService.getFolder(id);
-        const userFolder = await folderService.populateUserInfo([folder]);
+        const folder = await FolderService.getFolder(id);
+        const userFolder = await FolderService.populateUserInfo([folder]);
         setFolders((prev) =>
             prev.map((prevFolder) =>
                 prevFolder.Id === id ? userFolder[0] : prevFolder
@@ -86,8 +82,8 @@ const ManageFoldersPanel: React.FC<ManageFoldersPanelProps> = (props) => {
     };
 
     const handleFolderCreated = async (id: number) => {
-        const folder = await folderService.getFolder(id);
-        const userFolder = await folderService.populateUserInfo([folder]);
+        const folder = await FolderService.getFolder(id);
+        const userFolder = await FolderService.populateUserInfo([folder]);
         setFolders((prev) => [...prev, userFolder[0]]);
     };
 
@@ -116,7 +112,7 @@ const ManageFoldersPanel: React.FC<ManageFoldersPanelProps> = (props) => {
                                     key={folder.Id}
                                     folder={folder}
                                     users={personas}
-                                    service={folderService}
+                                    service={FolderService}
                                     handleFolderUpdate={handleFolderUpdate}
                                 />
                             ))}
@@ -128,7 +124,7 @@ const ManageFoldersPanel: React.FC<ManageFoldersPanelProps> = (props) => {
                                 <MissingFolder
                                     key={missing.Id}
                                     user={missing}
-                                    service={folderService}
+                                    service={FolderService}
                                     handleFolderCreated={handleFolderCreated}
                                 />
                             ))}

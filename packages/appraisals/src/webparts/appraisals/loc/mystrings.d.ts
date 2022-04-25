@@ -5,6 +5,10 @@ declare interface IAppraisalsWebPartStrings {
     DefaultFolderRoleLabel: string;
     DefaultFolderRoleDescription: string;
     FolderManagementGroupName: string;
+    SupportEmailsLabel: string;
+    SupportEmailsDescription: string;
+    CreateFolderMailSubject: string;
+    CreateFolderMailBody: string;
 }
 
 declare module 'AppraisalsWebPartStrings' {

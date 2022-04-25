@@ -7,12 +7,12 @@ import ItemContainer from './ItemContainer';
 import styles from './AppraisalItems.module.scss';
 import UserContext from '../../utils/UserContext';
 
-export interface IGoalItemsProps {
+export interface IObjectiveItemsProps {
     user: IUser;
     period: IPeriod;
 }
 
-const TrainingItems: FC<IGoalItemsProps> = (props) => {
+const TrainingItems: FC<IObjectiveItemsProps> = (props) => {
     const { ItemService } = React.useContext(UserContext);
     const [items, setItems] = React.useState<IItem[]>([]);
 

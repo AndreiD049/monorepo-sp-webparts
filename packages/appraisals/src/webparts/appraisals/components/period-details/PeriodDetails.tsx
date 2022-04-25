@@ -3,18 +3,20 @@ import {
     Stack,
     StackItem,
 } from '@microsoft/office-ui-fabric-react-bundle';
-import { Separator, Text } from 'office-ui-fabric-react';
+import { MessageBarType, Separator, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import IPeriod from '../../dal/IPeriod';
 import { IUser } from '../../dal/IUser';
 import useForceUpdate from '../../utils/forceUpdate';
 import UserContext from '../../utils/UserContext';
 import Feedback from '../items/Feedback';
-import GoalItems from '../items/GoalItems';
+import ObjectiveItems from '../items/ObjectiveItems';
 import PeoplePicker from '../items/PeoplePicker';
 import SwotItems from '../items/SwotItems';
 import TrainingItems from '../items/TrainingItems';
 import styles from './PeriodDetails.module.scss';
+import { SPnotify } from 'sp-react-notifications';
+import * as strings from 'AppraisalsWebPartStrings';
 
 export interface IPeriodDetailsProps {
     ID: string;
@@ -25,7 +27,7 @@ const theme = getTheme();
 /**
  * Page showing the details for the choosen apprisal period
  * There are 3 sections on the appraisal:
- * - Goals
+ * - Objectives
  * - Trainings
  * - SWOT Matrix
  */
@@ -45,7 +47,21 @@ const PeriodDetails = (props: IPeriodDetailsProps) => {
 
     React.useEffect(() => {
         async function run() {
-            setCurrentUser(await context.UserService.getCurrentUser());
+            const cu = await context.UserService.getCurrentUser();
+            setCurrentUser(cu);
+            if (!Boolean(await context.FolderService.getCurrentUserFolder())) {
+                SPnotify({
+                    message: 'Folder is not created. Contact administration in order to create it.',
+                    messageType: MessageBarType.severeWarning,
+                    messageActions: [
+                        {
+                            text: 'Send mail',
+                            onClick: () => window.open(`mailto:${context.properties.defaultSupportEmails}?subject=${strings.CreateFolderMailSubject}&body=${strings.CreateFolderMailBody}`, '_blank'),
+                        }
+                    ],
+                    timeout: 10000,
+                });
+            }
         }
         run();
     }, []);
@@ -87,11 +103,11 @@ const PeriodDetails = (props: IPeriodDetailsProps) => {
                 style={{ marginTop: theme.spacing.l1 }}
             >
                 <Separator className={styles.itemDetailsSeparator}>
-                    <Text variant="mediumPlus">Goals</Text>
+                    <Text variant="mediumPlus">Objectives</Text>
                 </Separator>
-                <GoalItems user={currentUser} period={period} />
+                <ObjectiveItems user={currentUser} period={period} />
             </Stack>
-            {/* My goals */}
+            {/* My Objectives */}
             <Stack
                 verticalAlign="center"
                 horizontalAlign="center"

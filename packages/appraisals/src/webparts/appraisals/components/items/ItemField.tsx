@@ -24,10 +24,10 @@ const theme = getTheme();
 
 const ItemField: FC<IItemFieldProps> = (props) => {
     const [value, setValue] = React.useState<string>(props.item.Content);
-    const handleBlur = () => {
+    const handleBlur = async () => {
         /* If value didn't change, do nothing */
         if (value !== props.item.Content) {
-            props.handleBlur(value);
+            await props.handleBlur(value);
         }
     };
 

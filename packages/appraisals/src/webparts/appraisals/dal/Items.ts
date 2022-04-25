@@ -44,8 +44,8 @@ export default class ItemService {
         this.userService = new UserService();
     }
 
-    async getItemByGuid(guid: string) {
-        return this.list.items.filter(`GUID eq '${guid}'`)
+    async getItemByGuid(guid: string, userId: number) {
+        return this.list.items.filter(`GUID eq '${guid}' and UserId eq ${userId}`)
             .select(...SELECT)
             .expand(...EXPAND)();
     }
@@ -100,7 +100,7 @@ export default class ItemService {
         const formValues = this.createFormValues(item);
         // Create item in folder
         await this.list.addValidateUpdateItemUsingPath(formValues, `${this.parentWebUrl}/Lists/${this.listTitle}/${user.Title}`, false)
-        const result = await this.getItemByGuid(guid);
+        const result = await this.getItemByGuid(guid, +user.Id);
         return result[0];
     }
 

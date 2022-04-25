@@ -8,12 +8,12 @@ import ItemContainer from './ItemContainer';
 import styles from './AppraisalItems.module.scss';
 import UserContext from '../../utils/UserContext';
 
-export interface IGoalItemsProps {
+export interface IObjectiveItemsProps {
     user: IUser;
     period: IPeriod;
 }
 
-const GoalItems: FC<IGoalItemsProps> = (props) => {
+const ObjectiveItems: FC<IObjectiveItemsProps> = (props) => {
     const { ItemService } = React.useContext(UserContext);
     const [items, setItems] = React.useState<IItem[]>([]);
 
@@ -37,7 +37,7 @@ const GoalItems: FC<IGoalItemsProps> = (props) => {
         async function run() {
             if (props.user && props.period) {
                 const result = await ItemService.getItems(
-                    'Goal',
+                    'Objective',
                     props.period.ID,
                     props.user?.Id
                 );
@@ -64,7 +64,7 @@ const GoalItems: FC<IGoalItemsProps> = (props) => {
                 items={achieved}
                 minItems={5}
                 status="Achieved"
-                itemType="Goal"
+                itemType="Objective"
                 period={props.period}
                 userId={props.user?.Id}
                 setItems={setItems}
@@ -75,7 +75,7 @@ const GoalItems: FC<IGoalItemsProps> = (props) => {
                 items={planned}
                 minItems={5}
                 status="Planned"
-                itemType="Goal"
+                itemType="Objective"
                 period={props.period}
                 userId={props.user?.Id}
                 setItems={setItems}
@@ -84,4 +84,4 @@ const GoalItems: FC<IGoalItemsProps> = (props) => {
     );
 };
 
-export default GoalItems;
+export default ObjectiveItems;

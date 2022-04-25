@@ -5,6 +5,7 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { IUser } from '../../dal/IUser';
+import UserContext from '../../utils/UserContext';
 import styles from './AppraisalItems.module.scss';
 
 export interface IPeoplePickerProps {
@@ -18,6 +19,13 @@ export interface IPersonaPropsWithData extends IPersonaProps {
 }
 
 const PeoplePicker: React.FC<IPeoplePickerProps> = (props) => {
+    const { canSeeOtherUsers } = React.useContext(UserContext);
+
+    // Fail fast, no access to see other users
+    if (!canSeeOtherUsers) {
+        return null;
+    }
+
     const options: IPersonaPropsWithData[] = React.useMemo(() => {
         return props.people.map(
             (person: IUser): IPersonaPropsWithData => ({

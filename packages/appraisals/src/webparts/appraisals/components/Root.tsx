@@ -11,27 +11,32 @@ import { canCurrentUser, IUserGroupPermissions } from 'property-pane-access-cont
 import PeriodService from '../dal/Periods';
 import GroupService from '../dal/Groups';
 import ItemService from '../dal/Items';
+import ManageFolderService from './folders/folder-service';
+import { IAppraisalsProps } from './periods/IAppraisalsProps';
+import { IAppraisalsWebPartProps } from '../AppraisalsWebPart';
 
 export interface IRootProps {
-    permissions: IUserGroupPermissions;
-    defaultFolderRole: string;
+    properties: IAppraisalsWebPartProps;
 }
 
-const Root: React.FC<IRootProps> = (props) => {
+const Root: React.FC<IRootProps> = ({ properties }) => {
     const [ctx, setCtx] = React.useState<IUserContext>({
         siteInfo: null,
         teamUsers: [],
         userGroups: [],
         userInfo: null,
-        permissions: {},
         PeriodService: new PeriodService(),
         GroupService: new GroupService(),
         ItemService: new ItemService(),
         UserService: new UserService(),
+        FolderService: new ManageFolderService(properties.defaultFolderRole),
+        canCreate: false,
         canFinish: false,
         canLock: false,
         canManageFolders: false,
-        defaultFolderRole: props.defaultFolderRole,
+        canSeeOtherUsers: false,
+        properties: properties,
+        isFolderCreated: false,
     });
 
     React.useEffect(() => {
@@ -43,15 +48,17 @@ const Root: React.FC<IRootProps> = (props) => {
                 userInfo: current,
                 userGroups: await ctx.GroupService.getUserGroups(),
                 teamUsers: await getTeamMembers(),
-                permissions: props.permissions,
-                canFinish: await canCurrentUser('finish', props.permissions),
-                canLock: await canCurrentUser('lock', props.permissions),
-                canManageFolders: await canCurrentUser('manage-folders', props.permissions),
+                canCreate: await canCurrentUser('create', properties.permissions),
+                canFinish: await canCurrentUser('finish', properties.permissions),
+                canLock: await canCurrentUser('lock', properties.permissions),
+                canManageFolders: await canCurrentUser('manage-folders', properties.permissions),
+                canSeeOtherUsers: await canCurrentUser('see-other-users', properties.permissions),
+                isFolderCreated: Boolean(await ctx.FolderService.getCurrentUserFolder()),
             };
             setCtx(result);
         }
         run();
-    }, [props.permissions]);
+    }, [properties.permissions]);
 
     return (
         <UserContext.Provider value={ctx}>

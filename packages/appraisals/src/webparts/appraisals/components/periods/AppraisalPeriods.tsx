@@ -157,7 +157,7 @@ const AppraisalPeriods: FC = () => {
                 },
             },
         ];
-        if (context.canFinish) {
+        if (context.canCreate) {
             result.push(
                 {
                     key: 'new',
@@ -168,6 +168,10 @@ const AppraisalPeriods: FC = () => {
                         iconName: 'Add',
                     },
                 },
+            )
+        }
+        if (context.canFinish) {
+            result.push(
                 {
                     key: 'finish',
                     text: 'Finish',
