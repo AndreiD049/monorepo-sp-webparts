@@ -104,7 +104,7 @@ const UserSelctor: React.FC<IUserSelectorProps> = (props) => {
             });
             teamMembers[team].forEach((user) => {
                 result.push({
-                    key: user.User.ID,
+                    key: team + user.User.ID,
                     text: user.User.Title,
                     data: user,
                     disabled: isOptionDisabled(maxPeople, user, props.users),
@@ -115,7 +115,15 @@ const UserSelctor: React.FC<IUserSelectorProps> = (props) => {
         return result;
     }, [teamMembers, props.users]);
 
-    const selectedKeys = React.useMemo(() => props.users.map((u) => u.User.ID), [props.users]);
+    const selectedKeys = React.useMemo(() => {
+        const result = [];
+        props.users.forEach((u) => {
+            u.Teams.forEach((team) => {
+                result.push(team + u.User.ID);
+            })
+        })
+        return result;
+    }, [props.users]);
 
     const handleChange = (_ev: any, option: IComboBoxOption) => {
         if (option.selected) {
