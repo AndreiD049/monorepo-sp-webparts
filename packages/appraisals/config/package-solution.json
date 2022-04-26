@@ -12,7 +12,26 @@
       "privacyUrl": "",
       "termsOfUseUrl": "",
       "mpnId": "Undefined-1.13.1"
-    }
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "appraisals description"
+      },
+      "longDescription": {
+        "default": "appraisals description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "appraisals Feature",
+        "description": "The feature that activates elements of the appraisals solution.",
+        "id": "74178273-f3ef-4c89-9b6d-e93ab43dca92",
+        "version": "1.0.0.6"
+      }
+    ]
   },
   "paths": {
     "zippedPackage": "solution/appraisals.sppkg"

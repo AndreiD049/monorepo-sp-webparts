@@ -11,11 +11,11 @@
   },
   "dependencies": {
     "@microsoft/rush-stack-compiler-4.2": "^0.1.1",
-    "@microsoft/sp-core-library": "1.13.1",
-    "@microsoft/sp-lodash-subset": "1.13.1",
-    "@microsoft/sp-office-ui-fabric-core": "1.13.1",
-    "@microsoft/sp-property-pane": "1.13.1",
-    "@microsoft/sp-webpart-base": "1.13.1",
+    "@microsoft/sp-core-library": "1.14.0",
+    "@microsoft/sp-lodash-subset": "1.14.0",
+    "@microsoft/sp-office-ui-fabric-core": "1.14.0",
+    "@microsoft/sp-property-pane": "1.14.0",
+    "@microsoft/sp-webpart-base": "1.14.0",
     "@pnp/core": "^3.1.0",
     "@pnp/queryable": "^3.1.0",
     "@pnp/sp": "^3.1.0",
@@ -32,9 +32,9 @@
     "use-web-storage-api": "^1.0.3"
   },
   "devDependencies": {
-    "@microsoft/sp-build-web": "1.13.1",
-    "@microsoft/sp-module-interfaces": "1.13.1",
-    "@microsoft/sp-tslint-rules": "1.13.1",
+    "@microsoft/sp-build-web": "1.14.0",
+    "@microsoft/sp-module-interfaces": "1.14.0",
+    "@microsoft/sp-tslint-rules": "1.14.0",
     "@types/enzyme": "^3.10.11",
     "@types/jest": "^27.4.1",
     "@types/luxon": "^2.3.0",
@@ -49,7 +49,7 @@
     "jest-environment-jsdom": "^27.5.1",
     "luxon": "^2.3.1",
     "sp-react-notifications": "^1.0.21",
-    "spfx-fast-serve-helpers": "~1.13.0",
+    "spfx-fast-serve-helpers": "~1.14.0",
     "ts-jest": "^27.1.4",
     "webpack-bundle-analyzer": "^4.5.0"
   }
