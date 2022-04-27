@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
     "name": "sp-cip-client-side-solution",
-    "id": "891d1fa3-3c22-4fce-ae0a-2268c0616094",
+    "id": "97eca60e-1a3f-4f4b-bf05-1fd0ebf34973",
     "version": "1.0.0.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
@@ -29,7 +29,7 @@
       {
         "title": "sp-cip Feature",
         "description": "The feature that activates elements of the sp-cip solution.",
-        "id": "666f8974-0d94-4778-9cb6-373e6e6022ef",
+        "id": "bd88f8ba-93fc-4ae1-b0d4-cfd2f42b6435",
         "version": "1.0.0.0"
       }
     ]

@@ -1,10 +1,10 @@
 {
-  "name": "sp-cip",
+  "name": "sp-cip-aggregator",
   "version": "0.0.1",
   "private": true,
   "main": "lib/index.js",
   "scripts": {
-    "build": "gulp bundle --ship && gulp package-solution --ship",
+    "build": "gulp bundle",
     "clean": "gulp clean",
     "test": "gulp test",
     "serve": "gulp bundle --custom-serve --max_old_space_size=4096 && fast-serve"
@@ -19,8 +19,7 @@
     "office-ui-fabric-react": "7.174.1",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "sp-preset": "^2.0.5",
-    "sp-react-notifications": "^1.0.22"
+    "sp-preset": "^2.0.5"
   },
   "devDependencies": {
     "@microsoft/sp-build-web": "1.14.0",
@@ -30,9 +29,8 @@
     "@types/react-dom": "16.9.8",
     "@types/webpack-env": "1.13.1",
     "ajv": "~5.2.2",
-    "duplicate-package-checker-webpack-plugin": "^3.0.0",
     "gulp": "~4.0.2",
-    "prettier": "^2.6.2",
-    "spfx-fast-serve-helpers": "~1.14.0"
+    "spfx-fast-serve-helpers": "~1.14.0",
+    "typescript": "^4.6.3"
   }
 }

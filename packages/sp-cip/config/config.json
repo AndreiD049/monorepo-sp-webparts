@@ -2,17 +2,17 @@
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
   "version": "2.0",
   "bundles": {
-    "cip-aggregator-web-part": {
+    "cip-web-part": {
       "components": [
         {
-          "entrypoint": "./lib/webparts/cipAggregator/CipAggregatorWebPart.js",
-          "manifest": "./src/webparts/cipAggregator/CipAggregatorWebPart.manifest.json"
+          "entrypoint": "./lib/webparts/cip/CipWebPart.js",
+          "manifest": "./src/webparts/cip/CipWebPart.manifest.json"
         }
       ]
     }
   },
   "externals": {},
   "localizedResources": {
-    "CipAggregatorWebPartStrings": "lib/webparts/cipAggregator/loc/{locale}.js"
+    "CipWebPartStrings": "lib/webparts/cip/loc/{locale}.js"
   }
 }
