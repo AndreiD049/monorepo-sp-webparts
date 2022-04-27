@@ -11,7 +11,16 @@
       ]
     }
   },
-  "externals": {},
+  "externals": {
+    "sp-preset": {
+      "path": "https://cdn.jsdelivr.net/npm/sp-preset@2.0.6/dist/index.amd.js",
+      "globalName": "spPreset"
+    },
+    "sp-react-notifications": {
+      "path": "https://cdn.jsdelivr.net/npm/sp-react-notifications@1.0.23/dist/index.amd.js",
+      "globalName": "spReactNotifications"
+    }
+  },
   "localizedResources": {
     "CipWebPartStrings": "lib/webparts/cip/loc/{locale}.js"
   }
