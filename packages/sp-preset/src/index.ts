@@ -10,6 +10,7 @@ import '@pnp/sp/site-groups';
 import '@pnp/sp/sites';
 import "@pnp/sp/folders";
 import "@pnp/sp/security";
+import "@pnp/sp/views";
 import RPMController from './controller';
 
 type TennantsType = {
