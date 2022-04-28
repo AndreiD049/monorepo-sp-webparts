@@ -1,6 +1,6 @@
 import { Guid } from '@microsoft/sp-core-library';
 import { MessageBarType } from 'office-ui-fabric-react';
-import { SPFI } from 'sp-preset';
+import { List, SPFI } from 'sp-preset';
 import {
     IFieldAddResult,
 } from 'sp-preset/node_modules/@pnp/sp/fields';
@@ -17,6 +17,16 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
 
     if (taskList.created) {
         const list = sp.web.lists.getByTitle(props.tasksListName);
+        
+        const description = await list.fields.createFieldAsXml(
+            `<Field AppendOnly='FALSE' Description='Task description' DisplayName='Description' Format='Dropdown' IsModern='TRUE' IsolateStyles='FALSE' Name='Description' RichText='FALSE' RichTextMode='Compatible' Title='Description' Type='Note'></Field>`
+        );
+        notifyOnFieldCreation(description);
+
+        const category = await list.fields.createFieldAsXml(
+            `<Field CustomFormatter='{&quot;elmType&quot;:&quot;div&quot;,&quot;style&quot;:{&quot;flex-wrap&quot;:&quot;wrap&quot;,&quot;display&quot;:&quot;flex&quot;},&quot;children&quot;:[{&quot;elmType&quot;:&quot;div&quot;,&quot;style&quot;:{&quot;box-sizing&quot;:&quot;border-box&quot;,&quot;padding&quot;:&quot;4px 8px 5px 8px&quot;,&quot;overflow&quot;:&quot;hidden&quot;,&quot;text-overflow&quot;:&quot;ellipsis&quot;,&quot;display&quot;:&quot;flex&quot;,&quot;border-radius&quot;:&quot;16px&quot;,&quot;height&quot;:&quot;24px&quot;,&quot;align-items&quot;:&quot;center&quot;,&quot;white-space&quot;:&quot;nowrap&quot;,&quot;margin&quot;:&quot;4px 4px 4px 4px&quot;},&quot;attributes&quot;:{&quot;class&quot;:{&quot;operator&quot;:&quot;:&quot;,&quot;operands&quot;:[{&quot;operator&quot;:&quot;==&quot;,&quot;operands&quot;:[&quot;@currentField&quot;,&quot;NA&quot;]},&quot;sp-field-fontSizeSmall&quot;,{&quot;operator&quot;:&quot;:&quot;,&quot;operands&quot;:[{&quot;operator&quot;:&quot;==&quot;,&quot;operands&quot;:[&quot;@currentField&quot;,&quot;&quot;]},&quot;&quot;,&quot;sp-field-borderAllRegular sp-field-borderAllSolid sp-css-borderColor-neutralSecondary&quot;]}]}},&quot;txtContent&quot;:&quot;@currentField&quot;}],&quot;templateId&quot;:&quot;BgColorChoicePill&quot;}' Description='Task&#39;s category' DisplayName='Category' FillInChoice='TRUE' Format='Dropdown' IsModern='TRUE' Name='Category' Title='Category' Type='Choice'><CHOICES><CHOICE>NA</CHOICE></CHOICES></Field>`
+        );
+        notifyOnFieldCreation(category);
 
         const responsible = await list.fields.createFieldAsXml(`<Field Description='User responsible for executing current task' Indexed='TRUE' DisplayName='Responsible' Format='Dropdown' IsModern='TRUE' List='UserInfo' Name='Responsible' Required='TRUE' Title='Responsible' Type='User' UserDisplayOptions='NamePhoto' UserSelectionMode='0' UserSelectionScope='0'></Field>`);
         notifyOnFieldCreation(responsible);
@@ -95,6 +105,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
                     </Query>
                     <ViewFields>
                         <FieldRef Name=\"LinkTitle\"/>
+                        <FieldRef Name=\"${description.data.InternalName}\"/>
                         <FieldRef Name=\"${responsible.data.InternalName}\"/>
                         <FieldRef Name=\"${team.data.InternalName}\"/>
                         <FieldRef Name=\"${status.data.InternalName}\"/>
@@ -104,6 +115,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
                         <FieldRef Name=\"${progress.data.InternalName}\"/>
                         <FieldRef Name=\"${estimated.data.InternalName}\"/>
                         <FieldRef Name=\"${effective.data.InternalName}\"/>
+                        <FieldRef Name=\"${category.data.InternalName}\"/>
                         <FieldRef Name=\"${parent.data.InternalName}\"/>
                         <FieldRef Name=\"${main.data.InternalName}\"/>
                     </ViewFields>
