@@ -1,4 +1,27 @@
-export default interface ITask {
+export const LIST_SELECT = [
+    'Id',
+    'Title',
+    'Description',
+    'Responsible/Id',
+    'Responsible/Title',
+    'Responsible/EMail',
+    'Team',
+    'Status',
+    'Progress',
+    'StartDate',
+    'FinishDate',
+    'DueDate',
+    'EstimatedTime',
+    'EffectiveTime',
+    'Parent/Id',
+    'Parent/Title',
+    'MainTask/Id',
+    'MainTask/Title',
+];
+
+export const LIST_EXPAND = ['Responsible', 'Parent', 'MainTask'];
+
+export interface ITask {
     Id: number;
     Title: string;
     Description?: string;
@@ -6,8 +29,7 @@ export default interface ITask {
         Id: number;
         Title: string;
         EMail: string;
-        LoginName: string;
-    },
+    };
     Team: string;
     Status: string;
     Progress: number;

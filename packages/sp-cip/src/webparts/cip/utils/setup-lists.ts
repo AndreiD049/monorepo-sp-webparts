@@ -8,14 +8,14 @@ import { SPnotify } from 'sp-react-notifications';
 import { ICipWebPartProps } from '../CipWebPart';
 
 export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
-    SPnotify({
-        message: 'Please wait. Creating lists',
-        messageType: MessageBarType.warning,
-    });
-
     const taskList = await sp.web.lists.ensure(props.tasksListName);
-
+    
     if (taskList.created) {
+        SPnotify({
+            message: 'Please wait. Creating lists',
+            messageType: MessageBarType.warning,
+        });
+
         const list = sp.web.lists.getByTitle(props.tasksListName);
         
         const description = await list.fields.createFieldAsXml(
@@ -42,17 +42,17 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         notifyOnFieldCreation(status);
 
         const startDate = await list.fields.createFieldAsXml(
-            `<Field DisplayName='Start Date' FriendlyDisplayFormat='Disabled' Format='DateTime' IsModern='TRUE' Name='StartDate' Required='FALSE' Title='StartDate' Type='DateTime'></Field>`
+            `<Field DisplayName='StartDate' FriendlyDisplayFormat='Disabled' Format='DateTime' IsModern='TRUE' Name='StartDate' Required='FALSE' Title='StartDate' Type='DateTime'></Field>`
         );
         notifyOnFieldCreation(startDate);
 
         const finishDate = await list.fields.createFieldAsXml(
-            `<Field DisplayName='Finish Date' FriendlyDisplayFormat='Disabled' Format='DateTime' IsModern='TRUE' Name='FinishDate' Required='FALSE' Title='FinishDate' Type='DateTime'></Field>`
+            `<Field DisplayName='FinishDate' FriendlyDisplayFormat='Disabled' Format='DateTime' IsModern='TRUE' Name='FinishDate' Required='FALSE' Title='FinishDate' Type='DateTime'></Field>`
         );
         notifyOnFieldCreation(finishDate);
 
         const dueDate = await list.fields.createFieldAsXml(
-            `<Field DisplayName='Due Date' FriendlyDisplayFormat='Disabled' Format='DateTime' IsModern='TRUE' Name='DueDate' Required='TRUE' Title='DueDate' Type='DateTime'></Field>`
+            `<Field DisplayName='DueDate' FriendlyDisplayFormat='Disabled' Format='DateTime' IsModern='TRUE' Name='DueDate' Required='TRUE' Title='DueDate' Type='DateTime'></Field>`
         );
         notifyOnFieldCreation(dueDate);
 
@@ -62,12 +62,12 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         notifyOnFieldCreation(progress);
 
         const estimated = await list.fields.createFieldAsXml(
-            `<Field CommaSeparator='FALSE' CustomUnitName='hour(s)' CustomUnitOnRight='TRUE' Decimals='0' Description='Estimated time (in hours) for completion of this task and all of it&#39;s subtasks.' DisplayName='Estimated Time' Format='Dropdown' IsModern='TRUE' Name='EstimatedTime' Percentage='FALSE' Required='TRUE' Title='EstimatedTime' Type='Number' Unit='Custom'></Field>`
+            `<Field CommaSeparator='FALSE' CustomUnitName='hour(s)' CustomUnitOnRight='TRUE' Decimals='0' Description='Estimated time (in hours) for completion of this task and all of it&#39;s subtasks.' DisplayName='EstimatedTime' Format='Dropdown' IsModern='TRUE' Name='EstimatedTime' Percentage='FALSE' Required='TRUE' Title='EstimatedTime' Type='Number' Unit='Custom'></Field>`
         );
         notifyOnFieldCreation(estimated);
 
         const effective = await list.fields.createFieldAsXml(
-            `<Field CommaSeparator='FALSE' CustomUnitName='hour(s)' CustomUnitOnRight='TRUE' Decimals='0' Description='Actual time (in hours) required to complete this task' DisplayName='Effective Time' Format='Dropdown' IsModern='TRUE' Name='EffectiveTime' Percentage='FALSE' Required='TRUE' Title='EffectiveTime' Type='Number' Unit='Custom'><Default>0</Default></Field>`
+            `<Field CommaSeparator='FALSE' CustomUnitName='hour(s)' CustomUnitOnRight='TRUE' Decimals='0' Description='Actual time (in hours) required to complete this task' DisplayName='EffectiveTime' Format='Dropdown' IsModern='TRUE' Name='EffectiveTime' Percentage='FALSE' Required='TRUE' Title='EffectiveTime' Type='Number' Unit='Custom'><Default>0</Default></Field>`
         );
         notifyOnFieldCreation(effective);
 
@@ -77,7 +77,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         notifyOnFieldCreation(parent)
 
         const main = await list.fields.createFieldAsXml(
-            `<Field Description='Link to main (top) task' DisplayName='Main Task' Format='Dropdown' Indexed='TRUE' IsModern='TRUE' IsRelationship='TRUE' List='${taskList.data.Id}' Name='MainTask' RelationshipDeleteBehavior='Restrict' ShowField='Title' Title='MainTask' Type='Lookup'></Field>`
+            `<Field Description='Link to main (top) task' DisplayName='MainTask' Format='Dropdown' Indexed='TRUE' IsModern='TRUE' IsRelationship='TRUE' List='${taskList.data.Id}' Name='MainTask' RelationshipDeleteBehavior='Restrict' ShowField='Title' Title='MainTask' Type='Lookup'></Field>`
         );
         notifyOnFieldCreation(main)
 
@@ -126,12 +126,18 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
                     <ViewType2>COMPACTLIST</ViewType2>
             </View>`
         );
+
+        SPnotify({
+            message: 'All lists were created successfully',
+            messageType: MessageBarType.success,
+        });
+    } else {
+        SPnotify({
+            message: 'List is already created. Skipping...',
+            messageType: MessageBarType.info,
+        });
     }
 
-    SPnotify({
-        message: 'All lists were created successfully',
-        messageType: MessageBarType.success,
-    });
 }
 
 function notifyOnFieldCreation(field: IFieldAddResult) {

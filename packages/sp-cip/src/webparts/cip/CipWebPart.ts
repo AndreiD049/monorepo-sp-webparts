@@ -47,11 +47,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
         const element: React.ReactElement<ICipProps> = React.createElement(
             Cip,
             {
-                description: '',
-                isDarkTheme: this._isDarkTheme,
-                environmentMessage: '',
-                hasTeamsContext: !!this.context.sdks.microsoftTeams,
-                userDisplayName: this.context.pageContext.user.displayName,
+                properties: this.properties,
             }
         );
 
@@ -82,6 +78,22 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
 
     protected get dataVersion(): Version {
         return Version.parse('1.0');
+    }
+
+    protected onPropertyPaneFieldChanged(propertyPath: string, oldValue: any, newValue: any): void {
+        if (propertyPath === "rootDataSource") {
+            CipWebPart.SPBuilder = new SPBuilder(this.context)
+                .withRPM(600)
+                .withTennants({
+                    Data: this.properties.rootDataSource,
+                })
+                .withAdditionalTimelines([
+                    InjectHeaders({
+                        UserAgent: `NONISV|Katoen Natie|Cip/${this.dataVersion.toString()}`,
+                        Accept: 'application/json;odata=nometadata',
+                    }),
+                ]);
+        }
     }
 
     protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {

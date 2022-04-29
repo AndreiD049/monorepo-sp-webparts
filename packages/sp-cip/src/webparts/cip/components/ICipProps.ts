@@ -1,7 +1,5 @@
+import { ICipWebPartProps } from "../CipWebPart";
+
 export interface ICipProps {
-  description: string;
-  isDarkTheme: boolean;
-  environmentMessage: string;
-  hasTeamsContext: boolean;
-  userDisplayName: string;
+  properties: ICipWebPartProps;
 }
