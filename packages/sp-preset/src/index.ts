@@ -11,6 +11,7 @@ import '@pnp/sp/sites';
 import "@pnp/sp/folders";
 import "@pnp/sp/security";
 import "@pnp/sp/views";
+import "@pnp/sp/comments";
 import RPMController from './controller';
 
 type TennantsType = {
@@ -79,6 +80,16 @@ export {
     IRoleDefinition,
     IRoleDefinitionAddResult,
 } from '@pnp/sp/security';
+
+export {
+    IComment,
+    ICommentAuthorData,
+    ICommentInfo,
+    IComments,
+    ILikeData,
+    ILikedByInformation,
+    IReplies
+} from '@pnp/sp/comments'
 
 export {
     IFolder,
