@@ -12,11 +12,12 @@ import { IReadonlyTheme } from '@microsoft/sp-component-base';
 
 import * as strings from 'CipWebPartStrings';
 import Cip from './components/Cip';
-import { ICipProps } from './components/ICipProps';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { initNotifications } from 'sp-react-notifications';
+import { GlobalContext } from './utils/GlobalContext';
 
 export interface ICipWebPartProps {
+    headerText: string;
     rootDataSource: string;
     tasksListName: string;
 }
@@ -44,11 +45,14 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
     }
 
     public render(): void {
-        const element: React.ReactElement<ICipProps> = React.createElement(
-            Cip,
+        const element: React.ReactElement = React.createElement(
+            GlobalContext.Provider,
             {
-                properties: this.properties,
-            }
+                value: {
+                    properties: this.properties,
+                },
+            },
+            React.createElement(Cip)
         );
 
         ReactDom.render(element, this.domElement);
@@ -80,8 +84,12 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
         return Version.parse('1.0');
     }
 
-    protected onPropertyPaneFieldChanged(propertyPath: string, oldValue: any, newValue: any): void {
-        if (propertyPath === "rootDataSource") {
+    protected onPropertyPaneFieldChanged(
+        propertyPath: string,
+        oldValue: any,
+        newValue: any
+    ): void {
+        if (propertyPath === 'rootDataSource') {
             CipWebPart.SPBuilder = new SPBuilder(this.context)
                 .withRPM(600)
                 .withTennants({
@@ -105,6 +113,15 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                     },
                     groups: [
                         {
+                            groupName: strings.LabelGroupDescription,
+                            groupFields: [
+                                PropertyPaneTextField('headerText', {
+                                    label: strings.HeaderTextLabel,
+                                    description: strings.HeaderTextDescription,
+                                }),
+                            ],
+                        },
+                        {
                             groupName: strings.BasicGroupName,
                             groupFields: [
                                 PropertyPaneTextField('rootDataSource', {
@@ -125,8 +142,14 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                                             /* webpackChunkName: 'CipSetupLists' */
                                             './utils/setup-lists'
                                         );
-                                        const sp = await CipWebPart.SPBuilder.getSP('Data');
-                                        await setup.default(sp, this.properties);
+                                        const sp =
+                                            await CipWebPart.SPBuilder.getSP(
+                                                'Data'
+                                            );
+                                        await setup.default(
+                                            sp,
+                                            this.properties
+                                        );
                                     },
                                     icon: 'Add',
                                 }),

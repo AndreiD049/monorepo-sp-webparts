@@ -7,6 +7,7 @@ export const LIST_SELECT = [
     'Responsible/EMail',
     'Team',
     'Status',
+    'Priority',
     'Progress',
     'StartDate',
     'FinishDate',
@@ -29,9 +30,10 @@ export interface ITask {
         Id: number;
         Title: string;
         EMail: string;
-    };
+    }[];
     Team: string;
     Status: string;
+    Priority: 'None' | 'Low' | 'Medium' | 'High';
     Progress: number;
     StartDate?: string; // ISO formatted date
     FinishDate?: string; // ISO formatted date

@@ -1,13 +1,25 @@
+import {
+    Text,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
-import { useTasks } from '../tasks/useTasks';
-import { ICipProps } from './ICipProps';
+import { GlobalContext } from '../utils/GlobalContext';
+import CipCommandBar from './CipCommandBar';
+import styles from './Cip.module.scss';
+import TasksTable from '../tasks/TasksTable';
 
-const Cip: React.FC<ICipProps> = ({properties}) => {
-  const { getAll, getNonFinishedMains } = useTasks(properties.tasksListName);
-  
-  getNonFinishedMains().then((result) => console.log(result));
+const Cip: React.FC = () => {
+    const ctx = React.useContext(GlobalContext);
 
-  return (<div>test</div>)
+    return (
+        <div className={styles.cip}>
+            <Text variant="xxLargePlus" className={styles.header} block>
+                {ctx.properties.headerText}
+            </Text>
+            <CipCommandBar />
+
+            <TasksTable />
+        </div>
+    );
 };
 
 export default Cip;

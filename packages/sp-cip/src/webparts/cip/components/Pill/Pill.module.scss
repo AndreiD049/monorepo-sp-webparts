@@ -1,0 +1,67 @@
+.pill-container {
+    display: flex;
+    flex-wrap: nowrap;
+
+    &__inner {
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        box-sizing: border-box;
+        display: flex;
+        height: 24px;
+        margin: 4px;
+        overflow: hidden;
+        padding: 4px 8px 5px 8px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        border: 1px solid;
+    }
+}
+
+:global(.low), :global(.finished) {
+    background-color: #caf0cc;
+    border-color: #437406;
+    color: #437406;
+}
+
+:global(.new) {
+    background-color: #d4e7f6;
+    color: #0068b8;
+    border-color: transparent;
+}
+
+:global(.on-hold) {
+    background-color: #ffebc0;
+    color: #8f6200;
+    border-color: transparent;
+}
+
+:global(.in-progress) {
+    background-color: #80c6ff;
+    color: #004e8c;
+    border-color: #004e8c;
+}
+
+:global(.blocked), :global(.high) {
+    background-color: #f5cccf;
+    color: #aa272b;
+    border-color: #aa272b;
+}
+
+:global(.cancelled) {
+    background-color: #d13438;
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+:global(.none) {
+    background-color: #e5e5e5;
+    color: #666666;
+    border-color: #666666;
+}
+
+:global(.medium) {
+    background-color: #ffebc0;
+    color: #8f6200;
+    border-color: #8f6200;
+}

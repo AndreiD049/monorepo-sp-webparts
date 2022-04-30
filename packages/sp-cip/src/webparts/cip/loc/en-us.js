@@ -1,6 +1,9 @@
 define([], function() {
   return {
     "PropertyPaneDescription": "Setup properties",
+    "LabelGroupDescription": "Description",
+    "HeaderTextLabel": "Header text",
+    "HeaderTextDescription": "Text to show on the top of the page",
     "BasicGroupName": "Data sources",
     "RootDataSourceLabel": "Root site",
     "RootDataSourceDescription": "The site where your lists are",

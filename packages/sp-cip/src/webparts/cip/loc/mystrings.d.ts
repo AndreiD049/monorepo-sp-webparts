@@ -1,5 +1,8 @@
 declare interface ICipWebPartStrings {
   PropertyPaneDescription: string;
+  LabelGroupDescription: string;
+  HeaderTextLabel: string;
+  HeaderTextDescription: string;
   BasicGroupName: string;
   RootDataSourceLabel: string;
   RootDataSourceDescription: string;

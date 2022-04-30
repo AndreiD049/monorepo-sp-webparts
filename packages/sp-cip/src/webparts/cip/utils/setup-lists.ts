@@ -28,7 +28,12 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         );
         notifyOnFieldCreation(category);
 
-        const responsible = await list.fields.createFieldAsXml(`<Field Description='User responsible for executing current task' Indexed='TRUE' DisplayName='Responsible' Format='Dropdown' IsModern='TRUE' List='UserInfo' Name='Responsible' Required='TRUE' Title='Responsible' Type='User' UserDisplayOptions='NamePhoto' UserSelectionMode='0' UserSelectionScope='0'></Field>`);
+        const priority = await list.fields.createFieldAsXml(
+            `<Field Description='Task&#39;s priority' DisplayName='Priority' FillInChoice='FALSE' Format='Dropdown' IsModern='TRUE' Name='Priority' Title='Priority' Required='TRUE' Type='Choice'><CHOICES><CHOICE>None</CHOICE><CHOICE>Low</CHOICE><CHOICE>Medium</CHOICE><CHOICE>High</CHOICE></CHOICES></Field>`
+        );
+        notifyOnFieldCreation(priority);
+
+        const responsible = await list.fields.createFieldAsXml(`<Field Description='Users responsible for executing current task' DisplayName='Responsible' Format='Dropdown' IsModern='TRUE' List='UserInfo' Mult='TRUE' Name='Responsible' Title='Responsible' Type='UserMulti' UserDisplayOptions='NamePhoto' UserSelectionMode='1' UserSelectionScope='0'></Field>`);
         notifyOnFieldCreation(responsible);
 
         const team = await list.fields.createFieldAsXml(
@@ -109,6 +114,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
                         <FieldRef Name=\"${responsible.data.InternalName}\"/>
                         <FieldRef Name=\"${team.data.InternalName}\"/>
                         <FieldRef Name=\"${status.data.InternalName}\"/>
+                        <FieldRef Name=\"${priority.data.InternalName}\"/>
                         <FieldRef Name=\"${startDate.data.InternalName}\"/>
                         <FieldRef Name=\"${finishDate.data.InternalName}\"/>
                         <FieldRef Name=\"${dueDate.data.InternalName}\"/>
