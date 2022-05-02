@@ -15,9 +15,22 @@ import { SPnotify } from 'sp-react-notifications';
 import { MessageBarType, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import useWebStorage from 'use-web-storage-api';
 import { HOUR } from '../utils/constants';
+import { TasksContext } from '../utils/TasksContext';
+import { TaskEditPanelWrapper } from './panels/TaskEditPanel';
 
 const Tasks: React.FC = () => {
     const { currentUser, TaskLogsService, maxPeople } = useContext(GlobalContext);
+
+    const [panels, setPanels] = React.useState({
+        task: {
+            open: false,
+            task: null,
+        },
+        tasklog: {
+            open: false,
+            tasklog: null,
+        },
+    });
 
     const [date, setDate] = useWebStorage<Date>(new Date(), {
         key: 'selectedDate',
@@ -40,9 +53,12 @@ const Tasks: React.FC = () => {
      * Custom sorting of tasks.
      * Applied when user changes task order manually (drag & drop)
      */
-    const [customSorting, setCustomSorting]: [ICustomSorting, any] = useWebStorage<ICustomSorting>({}, {
-        key: 'customTaskSorting'
-    });
+    const [customSorting, setCustomSorting]: [ICustomSorting, any] = useWebStorage<ICustomSorting>(
+        {},
+        {
+            key: 'customTaskSorting',
+        }
+    );
 
     /**
      * Check with the list every few minutes
@@ -163,19 +179,68 @@ const Tasks: React.FC = () => {
     }, [userIds, tasksPerUser.tasks, loading]);
 
     return (
-        <DragDropContext onDragEnd={handleTaskDropped}>
-            <div className={styles.tasks}>
-                <Header
-                    date={date}
-                    setDate={setDate}
-                    loading={loading}
-                    setLoading={setLoading}
-                    selectedUsers={selectedUsers}
-                    setSelectedUsers={setSelectedUsers}
-                />
-                {body}
-            </div>
-        </DragDropContext>
+        <TasksContext.Provider
+            value={{
+                onTaskEditPanel: (open, task) => {
+                    setPanels((prev) => ({
+                        ...prev,
+                        task: {
+                            open,
+                            task,
+                        },
+                    }));
+                },
+                onTaskEditPanelDismiss: () =>
+                    setPanels((prev) => ({
+                        ...prev,
+                        task: {
+                            open: false,
+                            task: null,
+                        },
+                    })),
+                onTaskLogEditPanel: (open, tasklog) => {
+                    setPanels((prev) => ({
+                        ...prev,
+                        tasklog: {
+                            open,
+                            tasklog,
+                        },
+                    }));
+                },
+                onTaskLogEditPanelDismiss: () =>
+                    setPanels((prev) => ({
+                        ...prev,
+                        tasklog: {
+                            open: false,
+                            tasklog: null,
+                        },
+                    })),
+            }}
+        >
+            <DragDropContext onDragEnd={handleTaskDropped}>
+                <div className={styles.tasks}>
+                    <Header
+                        date={date}
+                        setDate={setDate}
+                        loading={loading}
+                        setLoading={setLoading}
+                        selectedUsers={selectedUsers}
+                        setSelectedUsers={setSelectedUsers}
+                    />
+                    {body}
+                </div>
+            </DragDropContext>
+            <TaskEditPanelWrapper
+                open={true}
+                task={panels['task'].task}
+                type="task"
+            />
+            <TaskEditPanelWrapper
+                open={panels['tasklog'].open}
+                task={panels['tasklog'].tasklog}
+                type="tasklog"
+            />
+        </TasksContext.Provider>
     );
 };
 

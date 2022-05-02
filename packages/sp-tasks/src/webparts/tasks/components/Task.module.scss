@@ -21,6 +21,13 @@
         justify-content: space-between;
     }
 
+    .headerPersonArea {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+    }
+
     .subheader {
         display: flex;
         flex-flow: row nowrap;
@@ -33,6 +40,15 @@
 
         .person {
             align-self: end;
+        }
+        
+    }
+
+    .moreButton {
+        margin-left: 4px;
+
+        & i[data-icon-name='ChevronDown'] {
+            display: none;
         }
     }
 

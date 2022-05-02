@@ -93,7 +93,9 @@ const Task: FC<ITaskProps> = (props) => {
             title: props.task.Title,
             user: props.task.User,
             date: DateTime.fromISO(props.task.Date).toLocaleString(DateTime.DATE_SHORT),
-            time: DateTime.fromISO(props.task.Task?.Time || props.task.Time).toLocaleString(DateTime.TIME_24_SIMPLE),
+            time: DateTime.fromISO(props.task.Task?.Time || props.task.Time).toLocaleString(
+                DateTime.TIME_24_SIMPLE
+            ),
             status: props.task.Status,
         };
     }, [props.task]);
@@ -129,6 +131,31 @@ const Task: FC<ITaskProps> = (props) => {
             </>
         );
     }, [open]);
+
+    const taskMoreButton = React.useMemo(() => {
+        if (!canEditOthers) return null;
+        return (
+            <IconButton
+                className={styles.moreButton}
+                iconProps={{ iconName: 'MoreVertical' }}
+                menuProps={{
+                    items: [
+                        {
+                            key: 'editTask',
+                            text: 'Edit task',
+                            secondaryText: 'Changes all future tasks',
+                        },
+                        {
+                            key: 'editTaskLog',
+                            text: 'Edit task log',
+                            secondaryText: 'Changes only this task',
+                        },
+                    ],
+                    hidden: true,
+                }}
+            />
+        );
+    }, [canEditOthers, props.task]);
 
     const toggleOpen = React.useCallback(() => {
         setOpen((prev) => !prev);
@@ -181,14 +208,17 @@ const Task: FC<ITaskProps> = (props) => {
                         <Text className={expired && styles.expired} variant="mediumPlus">
                             {info.title}
                         </Text>
-                        <Persona
-                            data-testid="task-person"
-                            className={styles.person}
-                            text={info.user.Title}
-                            size={PersonaSize.size24}
-                            title={info.user.EMail}
-                            hidePersonaDetails
-                        />
+                        <div className={styles.headerPersonArea}>
+                            <Persona
+                                data-testid="task-person"
+                                className={styles.person}
+                                text={info.user.Title}
+                                size={PersonaSize.size24}
+                                title={info.user.EMail}
+                                hidePersonaDetails
+                            />
+                            {taskMoreButton}
+                        </div>
                     </div>
                     <div className={styles.subheader}>
                         <Text variant="medium">{info.date}</Text>
