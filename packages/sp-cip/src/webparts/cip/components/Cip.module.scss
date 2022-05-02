@@ -7,3 +7,17 @@
 .header {
   text-align: center;
 }
+
+.parent-stroke {
+  fill: none;
+  stroke: "[theme: neutralTertiaryAlt, default: #005a9e]";
+  stroke-width: 2px;
+  stroke-dasharray: 3,3;
+  position: absolute;
+  overflow: visible;
+  top: -27px;
+  left: -16px;
+  z-index: -100;
+  width: 40px;
+  height: 40px;
+}

@@ -1,0 +1,56 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.round-button {
+    border-radius: 20px;
+    background-color: "[theme: neutralTertiaryAlt, default: #3c3c3c]";
+    border: 1px solid;
+    border-color: "[theme: neutralQuaternary, default: #666666]";
+    outline: none;
+    margin-right: .8em;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    cursor: pointer;
+    transition: background-color .2s ease-out;
+    font-size: 1.2em;
+    position: relative;
+
+    &__parent-stroke {
+        position: absolute;
+        top: 30px;
+        left: 0px;
+    }
+
+    &:hover {
+        background-color: "[theme: neutralTertiary, default: #666666]";
+    }
+
+    &.round-success-button {
+        &:hover {
+            background-color: $ms-color-greenLight;
+        }
+    }
+}
+
+.action-buttons-container {
+    opacity: 0.5;
+    transition: opacity .2s;
+
+    &:hover {
+        opacity: 1;
+    }
+
+    &__action-button {
+        width: 1.5em;
+        height: 1.5em;
+        margin-right: .5em;
+        
+        i {
+            font-size: 1em;
+        }
+    }
+}

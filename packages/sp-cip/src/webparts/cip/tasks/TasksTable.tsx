@@ -7,7 +7,7 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { SPnotify } from 'sp-react-notifications';
-import { ITask } from './ITask';
+import { ITaskOverview } from './ITaskOverview';
 import Task from './Task';
 import { useTasks } from './useTasks';
 
@@ -16,8 +16,14 @@ const columns: IColumn[] = [
         key: 'Title',
         name: 'Title',
         fieldName: 'Title',
-        minWidth: 300,
+        minWidth: 500,
         isResizable: true,
+    },
+    {
+        key: 'Actions',
+        name: 'Actions',
+        fieldName: 'Actions',
+        minWidth: 100,
     },
     {
         key: 'Priority',
@@ -59,12 +65,13 @@ const columns: IColumn[] = [
 
 const TasksTable = () => {
     const { getNonFinishedMains } = useTasks()
-    const [items, setItems] = React.useState<ITask[]>([]);
+    const [items, setItems] = React.useState<ITaskOverview[]>([]);
 
     React.useEffect(() => {
         async function run() {
             try {
                 const tasks = await getNonFinishedMains();
+                console.log(tasks);
                 setItems(tasks);
             } catch (err) {
                 SPnotify({

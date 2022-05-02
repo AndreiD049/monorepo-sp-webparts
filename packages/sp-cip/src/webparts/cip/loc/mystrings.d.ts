@@ -8,6 +8,8 @@ declare interface ICipWebPartStrings {
   RootDataSourceDescription: string;
   CipTasksListLabel: string;
   CipTasksListDescription: string;
+  CipCommentListLabel: string;
+  CipCommentListDescription: string;
   AppLocalEnvironmentSharePoint: string;
   AppLocalEnvironmentTeams: string;
   AppSharePointEnvironment: string;

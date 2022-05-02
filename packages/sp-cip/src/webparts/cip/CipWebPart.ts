@@ -20,11 +20,13 @@ export interface ICipWebPartProps {
     headerText: string;
     rootDataSource: string;
     tasksListName: string;
+    commentListName: string;
 }
 
 export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> {
     public static SPBuilder: SPBuilder = null;
     private _isDarkTheme: boolean = false;
+    private theme: IReadonlyTheme;
 
     protected async onInit(): Promise<void> {
         CipWebPart.SPBuilder = new SPBuilder(this.context)
@@ -50,6 +52,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
             {
                 value: {
                     properties: this.properties,
+                    theme: this.theme,
                 },
             },
             React.createElement(Cip)
@@ -62,6 +65,8 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
         if (!currentTheme) {
             return;
         }
+
+        this.theme = currentTheme;
 
         this._isDarkTheme = !!currentTheme.isInverted;
         const { semanticColors } = currentTheme;
@@ -86,8 +91,6 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
 
     protected onPropertyPaneFieldChanged(
         propertyPath: string,
-        oldValue: any,
-        newValue: any
     ): void {
         if (propertyPath === 'rootDataSource') {
             CipWebPart.SPBuilder = new SPBuilder(this.context)
@@ -133,6 +136,10 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                                     label: strings.CipTasksListLabel,
                                     description:
                                         strings.CipTasksListDescription,
+                                }),
+                                PropertyPaneTextField('commentListName', {
+                                    label: strings.CipCommentListLabel,
+                                    description: strings.CipCommentListDescription,
                                 }),
                                 PropertyPaneButton('', {
                                     text: 'Create list',

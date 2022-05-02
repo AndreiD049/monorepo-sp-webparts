@@ -18,11 +18,13 @@ export const LIST_SELECT = [
     'Parent/Title',
     'MainTask/Id',
     'MainTask/Title',
+    'CommentsId',
+    'SubtasksId',
 ];
 
 export const LIST_EXPAND = ['Responsible', 'Parent', 'MainTask'];
 
-export interface ITask {
+export interface ITaskDetails {
     Id: number;
     Title: string;
     Description?: string;
@@ -40,6 +42,8 @@ export interface ITask {
     DueDate: string; // ISO formatted date
     EstimatedTime: number; // number of hours
     EffectiveTime: number; // number of hours
-    Parent?: Partial<ITask>;
-    MainTask?: Partial<ITask>;
+    Parent?: Partial<ITaskDetails>;
+    MainTask?: Partial<ITaskDetails>;
+    CommentsId: number[];
+    SubtasksId: number[];
 }

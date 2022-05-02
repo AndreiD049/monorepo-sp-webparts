@@ -18,7 +18,7 @@ const CipCommandBar = () => {
                 farItems={[
                     {
                         key: 'search',
-                        onRender: () => (<SearchBox />)
+                        onRender: () => (<SearchBox placeholder='Quick search...' />)
                     }
                 ]}
             />

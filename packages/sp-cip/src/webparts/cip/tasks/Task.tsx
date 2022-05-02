@@ -7,16 +7,17 @@ import {
     Persona,
     PersonaSize,
     Text,
-    themeRulesStandardCreator,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { ITask } from './ITask';
+import { ITaskOverview } from './ITaskOverview';
 import styles from './Task.module.scss';
 import Pill from '../components/Pill/Pill';
 import Timing from '../components/Timing';
-import { Items } from 'sp-preset';
 import { TaskContext } from './TaskContext';
-import { GlobalContext } from '../utils/GlobalContext';
+import { TitleCell } from './Cells/TitleCell';
+import { ICellRenderer } from './Cells/ICellRenderer';
+import SubtasksProxy from './SubtasksProxy';
+import ActionsCell from './Cells/ActionsCell';
 export interface ITaskProps {
     rowProps: IDetailsRowProps;
     nestLevel: number;
@@ -27,10 +28,7 @@ export interface ITaskProps {
  * showing how to render this property in a table
  */
 type RenderMapType = {
-    [field in keyof Partial<ITask> & 'default']: (
-        col: IColumn,
-        props: IDetailsRowProps
-    ) => React.ReactElement;
+    [field in keyof Partial<ITaskOverview> & 'default']: ICellRenderer;
 };
 
 const RenderMap: RenderMapType = {
@@ -39,33 +37,8 @@ const RenderMap: RenderMapType = {
             {props.item[col.fieldName]}
         </Text>
     ),
-    Title: (col: IColumn, props: IDetailsRowProps) => {
-        return (
-            <TaskContext.Consumer>
-                {(ctx) => {
-                    return (
-                        <div
-                            style={{
-                                display: 'flex',
-                                flexFlow: 'row nowrap',
-                                alignItems: 'center',
-                                justifyContent: 'start',
-                                marginLeft: 30 * ctx.nestLevel,
-                            }}
-                        >
-                            <IconButton
-                                iconProps={{ iconName: ctx.open ? 'ChevronFold10' : 'ChevronUnfold10' }}
-                                onClick={() => ctx.setOpen(prev => !prev)}
-                            />
-                            <Text variant="medium" block>
-                                {props.item[col.fieldName]}
-                            </Text>
-                        </div>
-                    );
-                }}
-            </TaskContext.Consumer>
-        );
-    },
+    Title: TitleCell,
+    Actions: ActionsCell,
     Priority: (_col, props) => {
         return (
             <Pill
@@ -79,7 +52,7 @@ const RenderMap: RenderMapType = {
         );
     },
     Responsible: (_col, props) => {
-        const item: ITask = props.item;
+        const item: ITaskOverview = props.item;
         if (!item.Responsible) return null;
         if (item.Responsible.length === 1) {
             return (
@@ -126,7 +99,7 @@ const RenderMap: RenderMapType = {
         </Text>
     ),
     Timing: (_col, props) => {
-        const item: ITask = props.item;
+        const item: ITaskOverview = props.item;
         return (
             <Timing
                 estimatedTime={item.EstimatedTime}
@@ -146,12 +119,26 @@ const RenderMap: RenderMapType = {
  */
 const Task: React.FC<ITaskProps> = (props) => {
     const [open, setOpen] = React.useState<boolean>(false);
+    const [subtasks, setSubtasks] = React.useState<ITaskOverview[]>([]);
+
+    const subtasksNode = React.useMemo(() => {
+        if (!open) return null;
+        return (
+            <SubtasksProxy
+                rowProps={props.rowProps}
+                subtasks={subtasks}
+                onLoad={(tasks) => setSubtasks(tasks)}
+            />
+        );
+    }, [open, props.rowProps.columns, subtasks]);
+
     return (
         <TaskContext.Provider
             value={{
                 open: open,
                 setOpen: setOpen,
                 nestLevel: props.nestLevel,
+                task: props.rowProps.item,
             }}
         >
             <div className={styles.task}>
@@ -173,7 +160,7 @@ const Task: React.FC<ITaskProps> = (props) => {
                     );
                 })}
             </div>
-            {open ? <Task rowProps={props.rowProps} nestLevel={props.nestLevel + 1} /> : null}
+            {subtasksNode}
         </TaskContext.Provider>
     );
 };

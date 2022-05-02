@@ -1,6 +1,5 @@
-import { Guid } from '@microsoft/sp-core-library';
 import { MessageBarType } from 'office-ui-fabric-react';
-import { List, SPFI } from 'sp-preset';
+import { SPFI } from 'sp-preset';
 import {
     IFieldAddResult,
 } from 'sp-preset/node_modules/@pnp/sp/fields';
@@ -8,6 +7,90 @@ import { SPnotify } from 'sp-react-notifications';
 import { ICipWebPartProps } from '../CipWebPart';
 
 export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
+    /**
+     * Comment list
+     */
+    const commentList = await sp.web.lists.ensure(props.commentListName);
+    console.log(commentList);
+
+    if (commentList.created) {
+        /** Set title not required */
+        const titleField = commentList.list.fields.getByTitle('Title');
+        await titleField.update({
+            Hidden: true,
+            Required: false,
+        });
+
+        /** List id */
+        const listId = await commentList.list.fields.createFieldAsXml(
+            `<Field Indexed='TRUE'  CommaSeparator='TRUE' CustomUnitOnRight='TRUE' Decimals='0' Description='Id of the list item where comment was left' DisplayName='ListId' Format='Dropdown' IsModern='TRUE' Name='ListId' Percentage='FALSE' Required='TRUE' Title='ListId' Type='Number' Unit='None'></Field>`
+        );
+        notifyOnFieldCreation(listId);
+
+        /** Item id */
+        const itemId = await commentList.list.fields.createFieldAsXml(
+            `<Field Indexed='TRUE' CommaSeparator='TRUE' CustomUnitOnRight='TRUE' Decimals='0' Description='Id of the list item where comment was left' DisplayName='ItemId' Format='Dropdown' IsModern='TRUE' Name='ItemId' Percentage='FALSE' Required='TRUE' Title='ItemId' Type='Number' Unit='None'></Field>`
+        );
+        notifyOnFieldCreation(itemId);
+
+        /** Comment contents */
+        const comment = await commentList.list.fields.createFieldAsXml(
+            `<Field AppendOnly='FALSE' Description='Comment contents' DisplayName='Comment' Format='Dropdown' IsModern='TRUE' IsolateStyles='FALSE' Name='Comment' Required='TRUE' RichText='FALSE' RichTextMode='Compatible' Title='Comment' Type='Note'></Field>`
+        );
+        notifyOnFieldCreation(comment);
+
+        /**
+         * Adjust default view
+         */
+        const view = await commentList.list.defaultView();
+        await commentList.list.defaultView.setViewXml(
+            `<View 
+                Name=\"${view.Id}\" 
+                DefaultView=\"TRUE\" 
+                MobileView=\"TRUE\" 
+                MobileDefaultView=\"TRUE\" 
+                Type=\"HTML\" 
+                DisplayName=\"All Items\" 
+                Url=\"${view.ServerRelativeUrl}\" 
+                Level=\"1\" 
+                BaseViewID=\"1\" 
+                ContentTypeID=\"0x\" 
+                ImageUrl=\"${view.ImageUrl}\">
+                    <Query>
+                        <OrderBy>
+                            <FieldRef Name=\"ID\"/>
+                        </OrderBy>
+                    </Query>
+                    <ViewFields>
+                        <FieldRef Name=\"LinkTitle\"/>
+                        <FieldRef Name=\"${listId.data.InternalName}\"/>
+                        <FieldRef Name=\"${itemId.data.InternalName}\"/>
+                        <FieldRef Name=\"${comment.data.InternalName}\"/>
+                        <FieldRef Name=\"Author\"/>
+                        <FieldRef Name=\"Created\"/>
+                    </ViewFields>
+                    <RowLimit Paged=\"TRUE\">30</RowLimit>
+                    <JSLink>clienttemplates.js</JSLink>
+                    <XslLink Default=\"TRUE\">main.xsl</XslLink>
+                    <Toolbar Type=\"Standard\"/>
+                    <ViewType2>COMPACTLIST</ViewType2>
+            </View>`
+        );
+
+        SPnotify({
+            message: 'Comment list was created successfully',
+            messageType: MessageBarType.success,
+        });
+    } else {
+        SPnotify({
+            message: 'Comment list is already created. Skipping...',
+            messageType: MessageBarType.info,
+        });
+    }
+
+    /**
+     * Task list
+     */
     const taskList = await sp.web.lists.ensure(props.tasksListName);
     
     if (taskList.created) {
@@ -86,6 +169,18 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         );
         notifyOnFieldCreation(main)
 
+        /** Comments hidden field */
+        const commentsListDetails = await commentList.list();
+        const comments = await list.fields.createFieldAsXml(
+            `<Field Description='Item comments' DisplayName='Comments' Format='Dropdown' Indexed='FALSE' IsModern='TRUE' IsRelationship='FALSE' List='${commentsListDetails.Id}' Mult='TRUE' Name='Comments' ShowField='ID' Title='Comments' Type='LookupMulti'></Field>`
+        )
+        notifyOnFieldCreation(comments)
+
+        const subtasks = await list.fields.createFieldAsXml(
+            `<Field Description='This task&#39;s children' DisplayName='Subtasks' Format='Dropdown' Indexed='FALSE' IsModern='TRUE' IsRelationship='FALSE' List='${taskList.data.Id}' Mult='TRUE' Name='Subtasks' ShowField='ID' Title='Subtasks' Type='LookupMulti'></Field>`
+        );
+        notifyOnFieldCreation(subtasks)
+
         /**
          * Adjust default view
          */
@@ -132,18 +227,16 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
                     <ViewType2>COMPACTLIST</ViewType2>
             </View>`
         );
-
         SPnotify({
-            message: 'All lists were created successfully',
+            message: 'Task list was created successfully',
             messageType: MessageBarType.success,
         });
     } else {
         SPnotify({
-            message: 'List is already created. Skipping...',
+            message: 'Task list is already created. Skipping...',
             messageType: MessageBarType.info,
         });
     }
-
 }
 
 function notifyOnFieldCreation(field: IFieldAddResult) {
