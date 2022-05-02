@@ -93,7 +93,7 @@ const Task: FC<ITaskProps> = (props) => {
             title: props.task.Title,
             user: props.task.User,
             date: DateTime.fromISO(props.task.Date).toLocaleString(DateTime.DATE_SHORT),
-            time: DateTime.fromISO(props.task.Task.Time).toLocaleString(DateTime.TIME_24_SIMPLE),
+            time: DateTime.fromISO(props.task.Task?.Time || props.task.Time).toLocaleString(DateTime.TIME_24_SIMPLE),
             status: props.task.Status,
         };
     }, [props.task]);

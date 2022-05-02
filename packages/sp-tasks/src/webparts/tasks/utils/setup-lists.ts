@@ -150,6 +150,11 @@ export const setupLists = async (properties: ITasksWebPartProps) => {
             Description: 'Whether task should be transferred to next day if it was not completed',
             Indexed: true,
         });
+
+        await taskLogsExists.list.fields.addDateTime('Time', {
+            DisplayFormat: DateTimeFieldFormatType.DateTime,
+            Description: 'Time when task needs to be performed',
+        });
     }
     
     SPnotify({

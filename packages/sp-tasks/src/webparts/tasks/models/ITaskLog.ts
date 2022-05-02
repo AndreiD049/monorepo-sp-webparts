@@ -15,6 +15,7 @@ export default interface ITaskLog {
     DateTimeStarted: Date;
     DateTimeFinished: Date;
     Status: TaskStatus;
+    Time: string;
     User: {
         ID: number;
         Title: string;
