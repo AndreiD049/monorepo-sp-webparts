@@ -3,7 +3,7 @@ import TasksWebPart, { ITasksWebPartProps } from '../TasksWebPart';
 import UserService from './users';
 import { DateTime } from 'luxon';
 import ITask from '../models/ITask';
-import { isCurrentWorkday, processChangeResult } from '../utils/utils';
+import { processChangeResult } from '../utils/utils';
 import { SPFI, IList, IItemAddResult, IItems } from 'sp-preset';
 
 const LOG_SELECT = [
@@ -86,6 +86,10 @@ export default class TaskLogsService {
                 list.items.filter(this.getTaskLogFilter(userId, dt))
             )().then((r) => (res = res.concat(r)));
         });
+        // Additional query for incomplete tasks
+        this._wrap(
+            list.items.filter(this.getIncompleteUserTasks(dt))
+        )().then((r) => (res = res.concat(r)));
 
         await execute();
         return res;
@@ -202,11 +206,15 @@ export default class TaskLogsService {
      * @returns the filter to be applied on the list of task logs
      */
     private getTaskLogFilter(userId: number, dt: DateTime) {
-        const currentWorkday = isCurrentWorkday(dt);
-        if (currentWorkday) {
-            return `(Date eq '${dt.toISODate()}') and ((UserId eq ${userId}) or (OriginalUserId eq ${userId})) or (Completed eq false)`;
-        } else {
-            return `(Date eq '${dt.toISODate()}') and ((UserId eq ${userId}) or (OriginalUserId eq ${userId}))`;
-        }
+        return `(Date eq '${dt.toISODate()}') and ((UserId eq ${userId}) or (OriginalUserId eq ${userId}))`;
+    }
+
+    /**
+     * Get incomplete tasks for all users (normally there shouldn't be too many)
+     * @param dt upper date for incomplete tasks filter
+     * @returns 
+     */
+    private getIncompleteUserTasks(dt: DateTime) {
+        return `(Completed eq false) and (Date le '${dt.toISODate()}')`;
     }
 }
