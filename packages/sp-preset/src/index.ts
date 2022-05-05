@@ -13,6 +13,7 @@ import "@pnp/sp/security";
 import "@pnp/sp/views";
 import "@pnp/sp/comments";
 import RPMController from './controller';
+import { ThrottlingDetector, IThrottlingDetectorProps } from './throttling-detector';
 
 type TennantsType = {
     [name: string]: string;
@@ -24,13 +25,19 @@ export default class SPBuilder {
 
     constructor(private context: any) { }
 
-    withRPM(treshlod: number = 600, rpmTracing: boolean = false, rpmAlerting: boolean = true) {
+    withRPM(treshlod: number = 600, rpmTracing: boolean = false, rpmAlerting: boolean = true, onAlert?: (message: string) => void) {
         this.timelinePipes.push(RPMController(
             treshlod,
             this.context,
             rpmTracing,
-            rpmAlerting
+            rpmAlerting,
+            onAlert,
         ));
+        return this;
+    }
+
+    withThrottlingControl(props: IThrottlingDetectorProps) {
+        this.timelinePipes.push(ThrottlingDetector(props));
         return this;
     }
 
