@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "sp-test-project-client-side-solution",
+    "id": "9bfeaab7-b88c-4aff-b962-265180c06a80",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.14.0"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "sp-test-project description"
+      },
+      "longDescription": {
+        "default": "sp-test-project description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "sp-test-project Feature",
+        "description": "The feature that activates elements of the sp-test-project solution.",
+        "id": "916e7a19-68b4-47f1-b1f2-cd1d9c865e51",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/sp-test-project.sppkg"
+  }
+}

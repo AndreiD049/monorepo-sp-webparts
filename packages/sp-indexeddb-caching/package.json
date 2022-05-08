@@ -7,7 +7,7 @@
   "types": "dist/index.d.ts",
   "private": "true",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "rollup -c --environment BUILD:production",
     "dev": "rollup -c --watch"
   },
@@ -22,9 +22,17 @@
   "author": "Andrei Dimitrascu",
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.17.10",
+    "@babel/preset-env": "^7.17.10",
+    "@babel/preset-typescript": "^7.16.7",
     "@pnp/core": "^3.2.0",
     "@pnp/queryable": "^3.2.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
+    "@types/jest": "^27.5.0",
+    "babel-jest": "^28.1.0",
+    "fake-indexeddb": "^3.1.7",
+    "jest": "^28.1.0",
+    "jest-environment-jsdom": "^28.1.0",
     "rollup": "^2.71.1",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-size-snapshot": "^0.12.0",
