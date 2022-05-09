@@ -15,13 +15,14 @@ import {
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { CREATE_PANEL_ID } from '../../components/useCipPanels';
 import { IPanelComponentProps } from '../../components/usePanel';
 import { useUsers } from '../../users/useUsers';
 import {
+    PANEL_OPEN_EVT,
     REFRESH_PARENT_EVT,
     REFRESH_SUBTASKS_EVT,
     REFRESH_TASK_EVT,
-    RELINK_PARENT_EVT,
 } from '../../utils/constants';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { ICreateTask } from '../ITaskDetails';
@@ -84,6 +85,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                 setParent(null);
             }
         })();
+        () => setParent(null);
     }, []);
 
     /** Data validation */
@@ -102,6 +104,15 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
             return true;
         }
     }, [data]);
+
+    const handleDismissPanel = React.useCallback(() => {
+        document.dispatchEvent(new CustomEvent(PANEL_OPEN_EVT, {
+            detail: {
+                id: CREATE_PANEL_ID,
+                open: false,
+            }
+        }));
+    }, []);
 
     const handleCreateTask = React.useCallback(
         async (ev: React.FormEvent) => {
@@ -129,7 +140,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                 await createTask(data);
                 document.dispatchEvent(new CustomEvent(REFRESH_PARENT_EVT));
             }
-            props.setOpen(false);
+            handleDismissPanel();
         },
         [data, validateData]
     );
@@ -144,7 +155,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                 >
                     Create
                 </PrimaryButton>
-                <DefaultButton onClick={() => props.setOpen(false)}>
+                <DefaultButton onClick={handleDismissPanel}>
                     Cancel
                 </DefaultButton>
             </>

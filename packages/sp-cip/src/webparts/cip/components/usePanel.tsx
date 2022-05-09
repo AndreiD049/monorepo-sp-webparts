@@ -25,7 +25,6 @@ export interface IPanelContext extends IPanelState {
 
 export interface IPanelComponentProps {
     setFooter: React.Dispatch<any>;
-    setOpen: React.Dispatch<boolean>;
 }
 
 export interface IPanelProps {
@@ -51,7 +50,11 @@ const usePanel = (props?: IPanelProps) => {
                 if (detail.props) {
                     setComponentProps(detail.props);
                 }
-                setIsOpen(detail.open);
+                if (detail.open) {
+                    setIsOpen(detail.open);
+                } else {
+                    handleDismiss();
+                }
             }
         }
         document.addEventListener(PANEL_OPEN_EVT, handlePanelOpen);
@@ -79,7 +82,6 @@ const usePanel = (props?: IPanelProps) => {
             >
                 <RenderComponent
                     setFooter={setFooter}
-                    setOpen={setIsOpen}
                     {...props.ComponentProps}
                     {...componentProps}
                 />
