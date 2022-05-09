@@ -1,7 +1,7 @@
 import { round } from '@microsoft/sp-lodash-subset';
 import { IDetailsRowProps } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { REFRESH_SUBTASKS_EVT } from '../utils/constants';
+import { REFRESH_SUBTASKS_EVT, RELINK_PARENT_EVT } from '../utils/constants';
 import { ITaskOverview } from './ITaskOverview';
 import Task from './Task';
 import { TaskContext } from './TaskContext';
@@ -28,7 +28,8 @@ const SubtasksProxy: React.FC<ISubtaskProxyProps> = (props) => {
         run();
         async function refreshSubtasks(evt) {
             if (evt.detail && evt.detail.parentId && evt.detail.parentId === ctx.task.Id) {
-                run();
+                await run();
+                document.dispatchEvent(new CustomEvent(RELINK_PARENT_EVT));
             }
         }
         document.addEventListener(REFRESH_SUBTASKS_EVT, refreshSubtasks);

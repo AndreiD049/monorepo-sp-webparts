@@ -21,6 +21,7 @@ import {
     REFRESH_PARENT_EVT,
     REFRESH_SUBTASKS_EVT,
     REFRESH_TASK_EVT,
+    RELINK_PARENT_EVT,
 } from '../../utils/constants';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { ICreateTask } from '../ITaskDetails';
@@ -199,7 +200,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                             onChange={(items) =>
                                 setData((prev) => ({
                                     ...prev,
-                                    ResponsibleId: +items[0].id,
+                                    ResponsibleId: +items[0]?.id,
                                 }))
                             }
                         />

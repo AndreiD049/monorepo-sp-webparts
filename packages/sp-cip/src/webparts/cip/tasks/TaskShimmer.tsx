@@ -18,11 +18,7 @@ const TaskShimmer: React.FC<ITaskShimmerProps> = (props) => {
             {props.rowProps.columns.map((column) => {
                 let shim;
                 if (column.fieldName === 'Title') {
-                    shim = (<Shimmer shimmerElements={[
-                        {
-                            type: ShimmerElementType.gap,
-                            width: (ctx.nestLevel + 1) * 30,
-                        },
+                    shim = (<Shimmer style={{marginLeft: (ctx.nestLevel + 1) * 30}} shimmerElements={[
                         {
                             type: ShimmerElementType.circle,
                             width: 30

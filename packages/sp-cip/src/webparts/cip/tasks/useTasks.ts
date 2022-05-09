@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import { IndexedDBCacher } from "sp-indexeddb-caching";
-import { Caching, getHashCode } from "sp-preset";
 import CipWebPart from "../CipWebPart";
 import { GlobalContext } from "../utils/GlobalContext";
 import { ICreateTask } from "./ITaskDetails";
@@ -55,6 +54,7 @@ export const useTasks = () => {
             Progress: 0,
         };
         const created = await list.items.add(payload);
+        await caching.Cache.get(getNonFinishedMainsRequest().toRequestUrl()).remove();
         return created.item.update({
             MainTaskId: created.data.Id,
         });
@@ -71,6 +71,10 @@ export const useTasks = () => {
             MainTaskId: parent.MainTaskId,
         }
         const added = await list.items.add(payload);
+        await caching.Cache.get(getNonFinishedMainsRequest().toRequestUrl()).remove();
+        await caching.Cache.get(getTaskRequest(parent.Id).toRequestUrl()).remove();
+        await caching.Cache.get(getSubtasksRequest(parent.Id).toRequestUrl()).remove();
+        await caching.Cache.get(getSubtasksRequest(parent.ParentId).toRequestUrl()).remove();
         return setSubtasks(parent.Id, [...parent.SubtasksId, added.data.Id]);
     }
     

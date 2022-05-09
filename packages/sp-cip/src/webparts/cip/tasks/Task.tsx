@@ -95,22 +95,22 @@ const RenderMap: RenderMapType = {
  * * Additional tasks are lazily loaded, showing a Shimmer while
  * * subtasks are loading (https://developer.microsoft.com/en-us/fluentui#/controls/web/shimmer)
  */
-const Task: React.FC<ITaskProps> = (props) => {
+const Task: React.FC<ITaskProps> = ({ rowProps, nestLevel }) => {
     const [open, setOpen] = React.useState<boolean>(false);
     const { getTask } = useTasks();
-    const [task, setTask] = React.useState<ITaskOverview>(props.rowProps.item);
+    const [task, setTask] = React.useState<ITaskOverview>(rowProps.item);
     const [subtasks, setSubtasks] = React.useState<ITaskOverview[]>([]);
 
     const subtasksNode = React.useMemo(() => {
         if (!open) return null;
         return (
             <SubtasksProxy
-                rowProps={props.rowProps}
+                rowProps={rowProps}
                 subtasks={subtasks}
                 onLoad={(tasks) => setSubtasks(tasks)}
             />
         );
-    }, [open, props.rowProps.columns, subtasks]);
+    }, [open, rowProps.columns, subtasks]);
 
     React.useEffect(() => {
         async function refreshTask(evt) {
@@ -127,17 +127,17 @@ const Task: React.FC<ITaskProps> = (props) => {
             value={{
                 open: open,
                 setOpen: setOpen,
-                nestLevel: props.nestLevel,
+                nestLevel: nestLevel,
                 task,
             }}
         >
             <div className={styles.task}>
-                {props.rowProps.columns.map((column) => {
+                {rowProps.columns.map((column) => {
                     let key =
                         column.fieldName in RenderMap
                             ? column.fieldName
                             : 'default';
-                    const cell = RenderMap[key](column, props.rowProps);
+                    const cell = RenderMap[key](column, rowProps);
                     return (
                         <div
                             className={styles.task__cell}

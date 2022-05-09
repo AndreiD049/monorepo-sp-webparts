@@ -25,6 +25,7 @@ export interface ICipWebPartProps {
 
 export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> {
     public static SPBuilder: SPBuilder = null;
+    public static baseUrl: string;
     private _isDarkTheme: boolean = false;
     private theme: IReadonlyTheme;
 
@@ -40,6 +41,8 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                     Accept: 'application/json;odata=nometadata',
                 }),
             ]);
+
+        CipWebPart.baseUrl = this.context.pageContext.web.absoluteUrl;
 
         initNotifications();
 

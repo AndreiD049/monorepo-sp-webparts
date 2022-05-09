@@ -10,7 +10,8 @@ import { ITaskOverview } from '../ITaskOverview';
 import { TaskContext } from '../TaskContext';
 import { ICellRenderer } from './ICellRenderer';
 import styles from './Cells.module.scss';
-import ParentStroke from '../../components/ParentStroke';
+import useParentStroke from '../../components/ParentStroke';
+import { RELINK_PARENT_EVT } from '../../utils/constants';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {
@@ -45,12 +46,13 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
     return (
         <button
             ref={button}
+            id={`task-${props.item.Id}`}
             data-taskid={props.item.Id}
             onClick={props.onClick}
             className={classNames}
         >
             {content}
-            <ParentStroke parentId={props.item.ParentId} />
+            {useParentStroke(props.item.ParentId)}
         </button>
     );
 };
@@ -74,7 +76,14 @@ export const TitleCell: ICellRenderer = (
                     >
                         <CheckExpandButton
                             item={ctx.task}
-                            onClick={() => ctx.setOpen((prev) => !prev)}
+                            onClick={() => {
+                                if (ctx.task.SubtasksId.length === 0) {
+                                    return console.log('Finish');
+                                } else {
+                                    ctx.setOpen(prev => !prev);
+                                    document.dispatchEvent(new CustomEvent(RELINK_PARENT_EVT))
+                                }
+                            }}
                         />
                         <Text variant="medium" block style={{
                             overflow: 'hidden',
