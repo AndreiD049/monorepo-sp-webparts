@@ -61,7 +61,7 @@ export class IndexedDbClientStorage implements IClientStorage {
     async has(key: string): Promise<boolean> {
         const db = await openDb(IndexedDbClientStorage.dbName);
         return new Promise((resolve) => {
-            const request = db.transaction(IndexedDbClientStorage.storeName, 'readwrite')
+            const request = db.transaction(IndexedDbClientStorage.storeName, 'readonly')
                 .objectStore(IndexedDbClientStorage.storeName)
                 .getKey(key)
             request.onsuccess = (ev) => { 

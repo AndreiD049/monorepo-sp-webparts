@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { IndexedDBCacher } from "sp-indexeddb-caching";
 import { Caching, getHashCode } from "sp-preset";
 import CipWebPart from "../CipWebPart";
 import { GlobalContext } from "../utils/GlobalContext";
@@ -14,9 +15,8 @@ const clearCache = (val: string) => {
  */
 export const useTasks = () => {
     const ctx = useContext(GlobalContext);
-    const sp = CipWebPart.SPBuilder.getSP('Data').using(Caching({
-        keyFactory: (url) => getHashCode(url).toString(),
-    }));
+    const caching = IndexedDBCacher();
+    const sp = CipWebPart.SPBuilder.getSP('Data').using(caching.CachingTimeline);
     const list = sp.web.lists.getByTitle(ctx.properties.tasksListName);
 
     const getAllRequest = () => list.items.select(...LIST_SELECT).expand(...LIST_EXPAND);
