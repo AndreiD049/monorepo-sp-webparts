@@ -73,7 +73,7 @@ export const TitleCell: ICellRenderer = (
                         }}
                     >
                         <CheckExpandButton
-                            item={props.item}
+                            item={ctx.task}
                             onClick={() => ctx.setOpen((prev) => !prev)}
                         />
                         <Text variant="medium" block style={{

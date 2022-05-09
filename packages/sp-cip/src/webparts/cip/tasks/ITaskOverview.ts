@@ -26,7 +26,7 @@ export interface ITaskOverview {
         Id: number;
         Title: string;
         EMail: string;
-    }[];
+    };
     Team: string;
     Status: string;
     Priority: 'None' | 'Low' | 'Medium' | 'High';
@@ -35,7 +35,7 @@ export interface ITaskOverview {
     EstimatedTime: number; // number of hours
     EffectiveTime: number; // number of hours
     ParentId: number;
-    MainTask?: number;
+    MainTaskId?: number;
     CommentsId?: number[];
     SubtasksId?: number[];
 }
