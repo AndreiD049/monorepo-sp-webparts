@@ -1,5 +1,7 @@
+import { round } from '@microsoft/sp-lodash-subset';
 import { IDetailsRowProps } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { REFRESH_SUBTASKS_EVT } from '../utils/constants';
 import { ITaskOverview } from './ITaskOverview';
 import Task from './Task';
 import { TaskContext } from './TaskContext';
@@ -18,11 +20,20 @@ const SubtasksProxy: React.FC<ISubtaskProxyProps> = (props) => {
     const [loaded, setLoaded] = React.useState(false);
 
     React.useEffect(() => {
-        (async function run() {
+        async function run() {
             const sub = await getSubtasks(ctx.task.Id);
             props.onLoad(sub);
             setLoaded(true);
-        })();
+        }
+        run();
+        async function refreshSubtasks(evt) {
+            if (evt.detail && evt.detail.parentId && evt.detail.parentId === ctx.task.Id) {
+                run();
+            }
+        }
+        document.addEventListener(REFRESH_SUBTASKS_EVT, refreshSubtasks);
+        return () => document.removeEventListener(REFRESH_SUBTASKS_EVT, refreshSubtasks);
+
     }, []);
 
     const shimmers = React.useMemo(() => {
@@ -39,8 +50,6 @@ const SubtasksProxy: React.FC<ISubtaskProxyProps> = (props) => {
     if (!loaded) {
         return shimmers;
     }
-
-    console.log(props.subtasks);
 
     return (
         <div>

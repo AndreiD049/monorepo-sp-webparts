@@ -18,6 +18,8 @@ import { TitleCell } from './Cells/TitleCell';
 import { ICellRenderer } from './Cells/ICellRenderer';
 import SubtasksProxy from './SubtasksProxy';
 import ActionsCell from './Cells/ActionsCell';
+import { useTasks } from './useTasks';
+import { REFRESH_TASK_EVT } from '../utils/constants';
 export interface ITaskProps {
     rowProps: IDetailsRowProps;
     nestLevel: number;
@@ -54,38 +56,14 @@ const RenderMap: RenderMapType = {
     Responsible: (_col, props) => {
         const item: ITaskOverview = props.item;
         if (!item.Responsible) return null;
-        if (item.Responsible.length === 1) {
-            return (
-                <Persona
-                    text={item.Responsible[0].Title}
-                    size={PersonaSize.size24}
-                    imageUrl={`/_layouts/15/userphoto.aspx?AccountName=${item.Responsible[0].EMail}&Size=M`}
-                    title={item.Responsible[0].Title}
-                />
-            );
-        }
         return (
-            <Facepile
-                personas={item.Responsible.map((pers) => ({
-                    personaName: pers.Title,
-                    imageUrl: `/_layouts/15/userphoto.aspx?AccountName=${pers.EMail}&Size=M`,
-                }))}
-                maxDisplayablePersonas={3}
-                overflowButtonType={OverflowButtonType.descriptive}
-                overflowButtonProps={{
-                    ariaLabel: 'More users',
-                }}
-                personaSize={PersonaSize.size24}
-                styles={{
-                    members: {
-                        paddingRight: '10px',
-                    },
-                    member: {
-                        marginRight: '-10px',
-                    },
-                }}
+            <Persona
+                text={item.Responsible.Title}
+                size={PersonaSize.size24}
+                imageUrl={`/_layouts/15/userphoto.aspx?AccountName=${item.Responsible.EMail}&Size=M`}
+                title={item.Responsible.Title}
             />
-        );
+        )
     },
     Status: (_col, props) => {
         return <Pill value={props.item?.Status} />;
@@ -119,6 +97,8 @@ const RenderMap: RenderMapType = {
  */
 const Task: React.FC<ITaskProps> = (props) => {
     const [open, setOpen] = React.useState<boolean>(false);
+    const { getTask } = useTasks();
+    const [task, setTask] = React.useState<ITaskOverview>(props.rowProps.item);
     const [subtasks, setSubtasks] = React.useState<ITaskOverview[]>([]);
 
     const subtasksNode = React.useMemo(() => {
@@ -132,13 +112,23 @@ const Task: React.FC<ITaskProps> = (props) => {
         );
     }, [open, props.rowProps.columns, subtasks]);
 
+    React.useEffect(() => {
+        async function refreshTask(evt) {
+            if (evt.detail && evt.detail.Id === task.Id) {
+                setTask(await getTask(task.Id));
+            }
+        }
+        document.addEventListener(REFRESH_TASK_EVT, refreshTask);
+        return () => document.removeEventListener(REFRESH_TASK_EVT, refreshTask);
+    }, []);
+
     return (
         <TaskContext.Provider
             value={{
                 open: open,
                 setOpen: setOpen,
                 nestLevel: props.nestLevel,
-                task: props.rowProps.item,
+                task,
             }}
         >
             <div className={styles.task}>

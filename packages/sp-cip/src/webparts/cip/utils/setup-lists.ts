@@ -116,7 +116,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         );
         notifyOnFieldCreation(priority);
 
-        const responsible = await list.fields.createFieldAsXml(`<Field Description='Users responsible for executing current task' DisplayName='Responsible' Format='Dropdown' IsModern='TRUE' List='UserInfo' Mult='TRUE' Name='Responsible' Title='Responsible' Type='UserMulti' UserDisplayOptions='NamePhoto' UserSelectionMode='1' UserSelectionScope='0'></Field>`);
+        const responsible = await list.fields.createFieldAsXml(`<Field Description='Users responsible for executing current task' DisplayName='Responsible' Format='Dropdown' IsModern='TRUE' List='UserInfo' Mult='TRUE' Name='Responsible' Title='Responsible' Type='User' UserDisplayOptions='NamePhoto' UserSelectionMode='1' UserSelectionScope='0'></Field>`);
         notifyOnFieldCreation(responsible);
 
         const team = await list.fields.createFieldAsXml(

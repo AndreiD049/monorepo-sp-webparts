@@ -7,6 +7,8 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { SPnotify } from 'sp-react-notifications';
+import usePanel from '../components/usePanel';
+import { REFRESH_PARENT_EVT } from '../utils/constants';
 import { ITaskOverview } from './ITaskOverview';
 import Task from './Task';
 import { useTasks } from './useTasks';
@@ -60,11 +62,11 @@ const columns: IColumn[] = [
         name: 'Timing',
         fieldName: 'Timing',
         minWidth: 200,
-    }
+    },
 ];
 
 const TasksTable = () => {
-    const { getNonFinishedMains } = useTasks()
+    const { getNonFinishedMains } = useTasks();
     const [items, setItems] = React.useState<ITaskOverview[]>([]);
 
     React.useEffect(() => {
@@ -81,6 +83,9 @@ const TasksTable = () => {
             }
         }
         run();
+        // Register an event to refresh the list when needed
+        document.addEventListener(REFRESH_PARENT_EVT, run);
+        return () => document.removeEventListener(REFRESH_PARENT_EVT, run);
     }, []);
 
     return (

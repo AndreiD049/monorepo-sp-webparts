@@ -32,7 +32,7 @@ export interface ITaskDetails {
         Id: number;
         Title: string;
         EMail: string;
-    }[];
+    };
     Team: string;
     Status: string;
     Priority: 'None' | 'Low' | 'Medium' | 'High';
@@ -46,4 +46,20 @@ export interface ITaskDetails {
     MainTask?: Partial<ITaskDetails>;
     CommentsId: number[];
     SubtasksId: number[];
+}
+
+export interface ICreateTask {
+    Title: string;
+    Description: string;
+    Status?: string;
+    ResponsibleId: number;
+    Priority: string;
+    StartDate?: string;
+    DueDate: string;
+    Team?: string;
+    Progress?: number;
+    EstimatedTime: number;
+    EffectiveTime?: number;
+    ParentId?: number;
+    MainTaskId?: number;
 }
