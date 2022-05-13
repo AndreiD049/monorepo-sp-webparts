@@ -9,7 +9,7 @@ import styles from './Task.module.scss';
 
 interface ITaskShimmerProps {
     rowProps: IDetailsRowProps;
-    node: TaskNode;
+    parentNode: TaskNode;
 }
 
 const TaskShimmer: React.FC<ITaskShimmerProps> = (props) => {
@@ -18,7 +18,7 @@ const TaskShimmer: React.FC<ITaskShimmerProps> = (props) => {
             {props.rowProps.columns.map((column) => {
                 let shim;
                 if (column.fieldName === 'Title') {
-                    shim = (<Shimmer style={{marginLeft: (props.node.level + 1) * 30}} shimmerElements={[
+                    shim = (<Shimmer style={{marginLeft: (props.parentNode.level + 1) * 30}} shimmerElements={[
                         {
                             type: ShimmerElementType.circle,
                             width: 30

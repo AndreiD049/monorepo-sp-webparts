@@ -48,7 +48,7 @@ const SubtasksProxy: React.FC<ISubtaskProxyProps> = ({
     return (
         <>
             {node.getTask().SubtasksId.map(() => (
-                <TaskShimmer rowProps={rowProps} node={node} />
+                <TaskShimmer rowProps={rowProps} parentNode={node} />
             ))}
         </>
     );
