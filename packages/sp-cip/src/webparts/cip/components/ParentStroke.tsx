@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { containsInvalidFileFolderChars } from 'sp-preset/node_modules/@pnp/sp';
-import { TaskContext } from '../tasks/TaskContext';
+import { TaskNode } from '../tasks/graph/TaskNode';
+import TasksTable from '../tasks/TasksTable';
 import { RELINK_PARENT_EVT } from '../utils/constants';
 import styles from './Cip.module.scss';
 
@@ -30,16 +30,17 @@ const ConnectElements = (from: HTMLElement, to: HTMLElement) => {
     to.appendChild(svg);
 };
 
-const useParentStroke = (parentId) => {
-    const ctx = React.useContext(TaskContext);
-
+const useParentStroke = (node: TaskNode) => {
+    const task = node.getTask();
     React.useLayoutEffect(() => {
         function linkElements() {
             setTimeout(() => {
-                if (parentId > 0) {
-                    const parent = document.getElementById(`task-${parentId}`);
-                    const self = document.getElementById(`task-${ctx.task.Id}`);
-                    ConnectElements(parent, self);
+                if (task.ParentId) {
+                    const parent = document.getElementById(`task-${task.ParentId}`);
+                    const self = document.getElementById(`task-${task.Id}`);
+                    if (parent && self) {
+                        ConnectElements(parent, self);
+                    }
                 }
             }, 0);
         }
@@ -48,15 +49,7 @@ const useParentStroke = (parentId) => {
         return () => document.removeEventListener(RELINK_PARENT_EVT, linkElements);
     }, []);
 
-    if (!parentId) {
-        return null;
-    }
     return null;
-    // return (
-    //     <svg className={styles['parent-stroke']}>
-    //         <path d="M0 0 l0 40 l25 0"/>
-    //     </svg>
-    // );
 };
 
 export default useParentStroke;

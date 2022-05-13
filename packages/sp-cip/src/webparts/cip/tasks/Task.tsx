@@ -1,91 +1,20 @@
-import {
-    Facepile,
-    IColumn,
-    IconButton,
-    IDetailsRowProps,
-    OverflowButtonType,
-    Persona,
-    PersonaSize,
-    Text,
-} from 'office-ui-fabric-react';
+import { IDetailsRowProps } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { ITaskOverview } from './ITaskOverview';
 import styles from './Task.module.scss';
-import Pill from '../components/Pill/Pill';
-import Timing from '../components/Timing';
-import { TaskContext } from './TaskContext';
-import { TitleCell } from './Cells/TitleCell';
-import { ICellRenderer } from './Cells/ICellRenderer';
-import SubtasksProxy from './SubtasksProxy';
-import ActionsCell from './Cells/ActionsCell';
 import { useTasks } from './useTasks';
-import { REFRESH_TASK_EVT } from '../utils/constants';
+import { TaskNode } from './graph/TaskNode';
+import { renderCell } from './Cells/render-cells';
+import {
+    nodeRefreshTaskHandler,
+    nodeToggleOpenHandler,
+} from '../utils/dom-events';
+import SubtasksProxy from './SubtasksProxy';
 export interface ITaskProps {
     rowProps: IDetailsRowProps;
-    nestLevel: number;
+    node: TaskNode;
+    setTasks: React.Dispatch<React.SetStateAction<ITaskOverview[]>>;
 }
-
-/**
- * Dictionary containing field properties as keys, and a function
- * showing how to render this property in a table
- */
-type RenderMapType = {
-    [field in keyof Partial<ITaskOverview> & 'default']: ICellRenderer;
-};
-
-const RenderMap: RenderMapType = {
-    default: (col: IColumn, props: IDetailsRowProps) => (
-        <Text variant="medium" block>
-            {props.item[col.fieldName]}
-        </Text>
-    ),
-    Title: TitleCell,
-    Actions: ActionsCell,
-    Priority: (_col, props) => {
-        return (
-            <Pill
-                style={{
-                    height: '100%',
-                    width: '100%',
-                    borderRadius: '5px',
-                }}
-                value={props.item['Priority']}
-            />
-        );
-    },
-    Responsible: (_col, props) => {
-        const item: ITaskOverview = props.item;
-        if (!item.Responsible) return null;
-        return (
-            <Persona
-                text={item.Responsible.Title}
-                size={PersonaSize.size24}
-                imageUrl={`/_layouts/15/userphoto.aspx?AccountName=${item.Responsible.EMail}&Size=M`}
-                title={item.Responsible.Title}
-            />
-        )
-    },
-    Status: (_col, props) => {
-        return <Pill value={props.item?.Status} />;
-    },
-    Progress: (_col, props) => {
-        return <Text variant="medium">{`${props.item?.Progress * 100}%`}</Text>;
-    },
-    DueDate: (_col, props) => (
-        <Text variant="medium">
-            {new Date(props.item.DueDate).toLocaleDateString()}
-        </Text>
-    ),
-    Timing: (_col, props) => {
-        const item: ITaskOverview = props.item;
-        return (
-            <Timing
-                estimatedTime={item.EstimatedTime}
-                effectiveTime={item.EffectiveTime}
-            />
-        );
-    },
-};
 
 /**
  * How to render a task.
@@ -95,49 +24,66 @@ const RenderMap: RenderMapType = {
  * * Additional tasks are lazily loaded, showing a Shimmer while
  * * subtasks are loading (https://developer.microsoft.com/en-us/fluentui#/controls/web/shimmer)
  */
-const Task: React.FC<ITaskProps> = ({ rowProps, nestLevel }) => {
+const Task: React.FC<ITaskProps> = (props) => {
     const [open, setOpen] = React.useState<boolean>(false);
     const { getTask } = useTasks();
-    const [task, setTask] = React.useState<ITaskOverview>(rowProps.item);
-    const [subtasks, setSubtasks] = React.useState<ITaskOverview[]>([]);
 
     const subtasksNode = React.useMemo(() => {
         if (!open) return null;
         return (
             <SubtasksProxy
-                rowProps={rowProps}
-                subtasks={subtasks}
-                onLoad={(tasks) => setSubtasks(tasks)}
-            />
+                rowProps={props.rowProps}
+                node={props.node}
+                onLoad={(tasks) => {
+                    const task = props.node.getTask();
+                    // Only reset if node is a proxy
+                    if (props.node.getType() === 'proxy') {
+                        props.setTasks((prev) => {
+                            const filtered = prev.filter(
+                                (t) => t.ParentId !== task.Id
+                            );
+                            console.log(filtered, prev);
+                            return [...filtered, ...tasks];
+                        });
+                    }
+                }}
+            >
+                <div>
+                    {props.node.getChildren().map((child) => (
+                        <Task
+                            node={child}
+                            rowProps={props.rowProps}
+                            setTasks={props.setTasks}
+                        />
+                    ))}
+                </div>
+            </SubtasksProxy>
         );
-    }, [open, rowProps.columns, subtasks]);
+    }, [open, props.rowProps.columns, props.node]);
 
     React.useEffect(() => {
-        async function refreshTask(evt) {
-            if (evt.detail && evt.detail.Id === task.Id) {
-                setTask(await getTask(task.Id));
+        const removeRefreshHandler = nodeRefreshTaskHandler(
+            props.node.Id,
+            async () => {
+                const task = await getTask(props.node.Id);
+                props.setTasks(prev => {
+                    return prev.map((t) => t.Id === task.Id ? task : t);
+                });
             }
-        }
-        document.addEventListener(REFRESH_TASK_EVT, refreshTask);
-        return () => document.removeEventListener(REFRESH_TASK_EVT, refreshTask);
+        );
+        const removeOpenHandler = nodeToggleOpenHandler(props.node.Id, () =>
+            setOpen((prev) => !prev)
+        );
+        return () => {
+            removeRefreshHandler();
+            removeOpenHandler();
+        };
     }, []);
 
     return (
-        <TaskContext.Provider
-            value={{
-                open: open,
-                setOpen: setOpen,
-                nestLevel: nestLevel,
-                task,
-            }}
-        >
+        <>
             <div className={styles.task}>
-                {rowProps.columns.map((column) => {
-                    let key =
-                        column.fieldName in RenderMap
-                            ? column.fieldName
-                            : 'default';
-                    const cell = RenderMap[key](column, rowProps);
+                {props.rowProps.columns.map((column) => {
                     return (
                         <div
                             className={styles.task__cell}
@@ -145,13 +91,13 @@ const Task: React.FC<ITaskProps> = ({ rowProps, nestLevel }) => {
                                 width: column.calculatedWidth,
                             }}
                         >
-                            {cell}
+                            {renderCell(column.fieldName, props.node)}
                         </div>
                     );
                 })}
             </div>
             {subtasksNode}
-        </TaskContext.Provider>
+        </>
     );
 };
 

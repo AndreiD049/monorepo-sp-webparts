@@ -1,38 +1,32 @@
-import {
-    IColumn,
-    Icon,
-    IconButton,
-    IDetailsRowProps,
-    Text,
-} from 'office-ui-fabric-react';
+import { Icon, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { ITaskOverview } from '../ITaskOverview';
-import { TaskContext } from '../TaskContext';
 import { ICellRenderer } from './ICellRenderer';
 import styles from './Cells.module.scss';
 import useParentStroke from '../../components/ParentStroke';
 import { RELINK_PARENT_EVT } from '../../utils/constants';
+import { TaskNode } from '../graph/TaskNode';
+import { nodeToggleOpen } from '../../utils/dom-events';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {
-    item: ITaskOverview;
+    node: TaskNode;
 }
 
 const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
-    const ctx = React.useContext(TaskContext);
     const button = React.useRef(null);
+    const item = props.node.getTask();
 
     let classNames = React.useMemo(() => {
         let result = styles['round-button'];
-        if (!props.item.SubtasksId?.length) {
+        if (!item.SubtasksId?.length) {
             result += ` ${styles['round-success-button']}`;
         }
         return result;
-    }, [props.item]);
+    }, [props.node]);
 
     const content = React.useMemo(() => {
-        if (props.item.SubtasksId?.length) {
-            return <span>{props.item.SubtasksId.length}</span>;
+        if (item.SubtasksId?.length) {
+            return <span>{item.SubtasksId.length}</span>;
         } else {
             return (
                 <Icon
@@ -41,60 +35,57 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
                 />
             );
         }
-    }, [props.item]);
+    }, [props.node]);
 
     return (
         <button
             ref={button}
-            id={`task-${props.item.Id}`}
-            data-taskid={props.item.Id}
+            id={`task-${item.Id}`}
+            data-taskid={item.Id}
             onClick={props.onClick}
             className={classNames}
         >
             {content}
-            {useParentStroke(props.item.ParentId)}
+            {useParentStroke(props.node)}
         </button>
     );
 };
 
-export const TitleCell: ICellRenderer = (
-    col: IColumn,
-    props: IDetailsRowProps
-) => {
+export const TitleCell: ICellRenderer = (task, nestLevel) => {
     return (
-        <TaskContext.Consumer>
-            {(ctx) => {
-                return (
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexFlow: 'row nowrap',
-                            alignItems: 'center',
-                            justifyContent: 'start',
-                            marginLeft: 30 * ctx.nestLevel,
-                        }}
-                    >
-                        <CheckExpandButton
-                            item={ctx.task}
-                            onClick={() => {
-                                if (ctx.task.SubtasksId.length === 0) {
-                                    return console.log('Finish');
-                                } else {
-                                    ctx.setOpen(prev => !prev);
-                                    document.dispatchEvent(new CustomEvent(RELINK_PARENT_EVT))
-                                }
-                            }}
-                        />
-                        <Text variant="medium" block style={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'pre',
-                        }}>
-                            {props.item[col.fieldName]}
-                        </Text>
-                    </div>
-                );
+        <div
+            style={{
+                display: 'flex',
+                flexFlow: 'row nowrap',
+                alignItems: 'center',
+                justifyContent: 'start',
+                marginLeft: 30 * nestLevel,
             }}
-        </TaskContext.Consumer>
+        >
+            <CheckExpandButton
+                node={task}
+                onClick={() => {
+                    if (task.getTask().SubtasksId.length === 0) {
+                        return console.log('Finish');
+                    } else {
+                        nodeToggleOpen(task.Id);
+                        document.dispatchEvent(
+                            new CustomEvent(RELINK_PARENT_EVT)
+                        );
+                    }
+                }}
+            />
+            <Text
+                variant="medium"
+                block
+                style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'pre',
+                }}
+            >
+                {task.getTask().Title}
+            </Text>
+        </div>
     );
 };

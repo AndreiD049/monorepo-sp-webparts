@@ -4,21 +4,21 @@ import {
     ShimmerElementType,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { TaskNode } from './graph/TaskNode';
 import styles from './Task.module.scss';
-import { TaskContext } from './TaskContext';
 
 interface ITaskShimmerProps {
     rowProps: IDetailsRowProps;
+    node: TaskNode;
 }
 
 const TaskShimmer: React.FC<ITaskShimmerProps> = (props) => {
-    const ctx = React.useContext(TaskContext);
     return (
         <div className={styles.task}>
             {props.rowProps.columns.map((column) => {
                 let shim;
                 if (column.fieldName === 'Title') {
-                    shim = (<Shimmer style={{marginLeft: (ctx.nestLevel + 1) * 30}} shimmerElements={[
+                    shim = (<Shimmer style={{marginLeft: (props.node.level + 1) * 30}} shimmerElements={[
                         {
                             type: ShimmerElementType.circle,
                             width: 30

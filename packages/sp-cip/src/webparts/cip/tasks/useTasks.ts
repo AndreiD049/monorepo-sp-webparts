@@ -71,6 +71,7 @@ export const useTasks = () => {
             MainTaskId: parent.MainTaskId,
         }
         const added = await list.items.add(payload);
+        // Invalidate cache
         await caching.Cache.get(getNonFinishedMainsRequest().toRequestUrl()).remove();
         await caching.Cache.get(getTaskRequest(parent.Id).toRequestUrl()).remove();
         await caching.Cache.get(getSubtasksRequest(parent.Id).toRequestUrl()).remove();

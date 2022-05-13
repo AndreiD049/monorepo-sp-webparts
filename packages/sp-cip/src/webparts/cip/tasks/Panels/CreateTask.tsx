@@ -24,6 +24,7 @@ import {
     REFRESH_SUBTASKS_EVT,
     REFRESH_TASK_EVT,
 } from '../../utils/constants';
+import { nodeRefreshTask } from '../../utils/dom-events';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { ICreateTask } from '../ITaskDetails';
 import { useTasks } from '../useTasks';
@@ -121,13 +122,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
             if (props.parentId) {
                 await createSubtask(data, parent);
                 // Refresh the parent task
-                document.dispatchEvent(
-                    new CustomEvent(REFRESH_TASK_EVT, {
-                        detail: {
-                            Id: props.parentId,
-                        },
-                    })
-                );
+                nodeRefreshTask(props.parentId);
                 // Refresh the subtasks
                 document.dispatchEvent(
                     new CustomEvent(REFRESH_SUBTASKS_EVT, {

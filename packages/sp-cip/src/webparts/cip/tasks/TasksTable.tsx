@@ -1,3 +1,4 @@
+import { getAllByAltText } from '@testing-library/react';
 import {
     DetailsList,
     DetailsListLayoutMode,
@@ -9,6 +10,8 @@ import * as React from 'react';
 import { SPnotify } from 'sp-react-notifications';
 import usePanel from '../components/usePanel';
 import { REFRESH_PARENT_EVT } from '../utils/constants';
+import { createTaskTree } from './graph/factory';
+import { TaskNode } from './graph/TaskNode';
 import { ITaskOverview } from './ITaskOverview';
 import Task from './Task';
 import { useTasks } from './useTasks';
@@ -66,15 +69,15 @@ const columns: IColumn[] = [
 ];
 
 const TasksTable = () => {
-    const { getNonFinishedMains } = useTasks();
-    const [items, setItems] = React.useState<ITaskOverview[]>([]);
+    const { getNonFinishedMains, getAll } = useTasks();
+    const [tasks, setTasks] = React.useState<ITaskOverview[]>([]);
 
     React.useEffect(() => {
         async function run() {
             try {
+                // if no filters are applied
                 const tasks = await getNonFinishedMains();
-                console.log(tasks);
-                setItems(tasks);
+                setTasks(tasks);
             } catch (err) {
                 SPnotify({
                     message: err.message,
@@ -88,14 +91,18 @@ const TasksTable = () => {
         return () => document.removeEventListener(REFRESH_PARENT_EVT, run);
     }, []);
 
+    const tree = React.useMemo(() => {
+        return createTaskTree(tasks);
+    }, [tasks]);
+
     return (
         <>
             <DetailsList
                 layoutMode={DetailsListLayoutMode.fixedColumns}
                 selectionMode={SelectionMode.none}
                 columns={columns}
-                items={items}
-                onRenderRow={(props) => <Task rowProps={props} nestLevel={0} />}
+                items={tree.getChildren()}
+                onRenderRow={(props) => <Task rowProps={props} node={props.item} setTasks={setTasks} />}
             />
         </>
     );
