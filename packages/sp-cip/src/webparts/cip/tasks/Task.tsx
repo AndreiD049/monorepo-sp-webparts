@@ -6,7 +6,6 @@ import { useTasks } from './useTasks';
 import { TaskNode } from './graph/TaskNode';
 import { renderCell } from './Cells/render-cells';
 import {
-    nodeRefreshTaskHandler,
     nodeToggleOpenHandler,
 } from '../utils/dom-events';
 import SubtasksProxy from './SubtasksProxy';
@@ -62,20 +61,10 @@ const Task: React.FC<ITaskProps> = (props) => {
     }, [open, props.rowProps.columns, props.node]);
 
     React.useEffect(() => {
-        const removeRefreshHandler = nodeRefreshTaskHandler(
-            props.node.Id,
-            async () => {
-                const task = await getTask(props.node.Id);
-                props.setTasks(prev => {
-                    return prev.map((t) => t.Id === task.Id ? task : t);
-                });
-            }
-        );
         const removeOpenHandler = nodeToggleOpenHandler(props.node.Id, () =>
             setOpen((prev) => !prev)
         );
         return () => {
-            removeRefreshHandler();
             removeOpenHandler();
         };
     }, []);

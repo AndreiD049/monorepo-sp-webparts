@@ -21,10 +21,8 @@ import { useUsers } from '../../users/useUsers';
 import {
     PANEL_OPEN_EVT,
     REFRESH_PARENT_EVT,
-    REFRESH_SUBTASKS_EVT,
-    REFRESH_TASK_EVT,
 } from '../../utils/constants';
-import { nodeRefreshTask } from '../../utils/dom-events';
+import { tasksAdded, taskUpdated } from '../../utils/dom-events';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { ICreateTask } from '../ITaskDetails';
 import { useTasks } from '../useTasks';
@@ -37,7 +35,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
     props
 ) => {
     const { fieldInfo } = useChoiceFields('Priority');
-    const { createTask, createSubtask, getTask } = useTasks();
+    const { createTask, createSubtask, getTask, getSubtasks } = useTasks();
 
     const choises = React.useMemo(() => {
         if (!fieldInfo) return [];
@@ -81,7 +79,15 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
         (async function () {
             setUsers(await getPersonaProps());
             if (props.parentId) {
-                setParent(await getTask(props.parentId));
+                const parent = await getTask(props.parentId);
+                setParent(parent);
+                setData(prev => ({
+                    ...prev,
+                    ResponsibleId: parent.Responsible.Id,
+                    EstimatedTime: parent.EstimatedTime,
+                    Priority: parent.Priority,
+                    DueDate: parent.DueDate,
+                }));
             } else {
                 setParent(null);
             }
@@ -120,20 +126,16 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
             ev.preventDefault();
             if (!validateData()) return;
             if (props.parentId) {
-                await createSubtask(data, parent);
+                const parent = await getTask(props.parentId);
+                const addedId = await createSubtask(data, parent);
+                parent.SubtasksId.push(addedId);
                 // Refresh the parent task
-                nodeRefreshTask(props.parentId);
-                // Refresh the subtasks
-                document.dispatchEvent(
-                    new CustomEvent(REFRESH_SUBTASKS_EVT, {
-                        detail: {
-                            parentId: props.parentId,
-                        },
-                    })
-                );
+                const subtasks = await getSubtasks(props.parentId);
+                taskUpdated(parent);
+                tasksAdded(subtasks);
             } else {
-                await createTask(data);
-                document.dispatchEvent(new CustomEvent(REFRESH_PARENT_EVT));
+                const createdId = await createTask(data);
+                tasksAdded([await getTask(createdId)]);
             }
             handleDismissPanel();
         },
@@ -203,6 +205,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                                 )
                             }
                             onEmptyResolveSuggestions={() => users}
+                            selectedItems={users.filter((u) => +u.id === data.ResponsibleId)}
                             onChange={(items) =>
                                 setData((prev) => ({
                                     ...prev,

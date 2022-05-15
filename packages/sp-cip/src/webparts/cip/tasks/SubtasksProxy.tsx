@@ -1,6 +1,6 @@
 import { IDetailsRowProps } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { REFRESH_SUBTASKS_EVT, RELINK_PARENT_EVT } from '../utils/constants';
+import { RELINK_PARENT_EVT } from '../utils/constants';
 import { TaskNode } from './graph/TaskNode';
 import { ITaskOverview } from './ITaskOverview';
 import Task from './Task';
@@ -28,19 +28,6 @@ const SubtasksProxy: React.FC<ISubtaskProxyProps> = ({
             onLoad(sub);
         }
         run();
-        async function refreshSubtasks(evt) {
-            if (
-                evt.detail &&
-                evt.detail.parentId &&
-                evt.detail.parentId === node.Id
-            ) {
-                await run();
-                document.dispatchEvent(new CustomEvent(RELINK_PARENT_EVT));
-            }
-        }
-        document.addEventListener(REFRESH_SUBTASKS_EVT, refreshSubtasks);
-        return () =>
-            document.removeEventListener(REFRESH_SUBTASKS_EVT, refreshSubtasks);
     }, []);
 
     if (node.getType() !== 'proxy') return <>{children}</>;

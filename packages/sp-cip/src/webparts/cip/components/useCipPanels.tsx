@@ -3,7 +3,8 @@ import * as React from "react";
 import CreateTaskPanel from "../tasks/Panels/CreateTask"
 import usePanel from "./usePanel"
 
-export const CREATE_PANEL_ID = 'create';
+export const CREATE_PANEL_ID = 'sp-cip-create-panel';
+export const DETAILS_PANEL_ID = 'sp-cip-details-panel';
 
 export const useCipPanels = () => {
     const createPanel = usePanel({
@@ -15,9 +16,19 @@ export const useCipPanels = () => {
         type: PanelType.medium,
     });
 
+    const detailsPanel = usePanel({
+        id: DETAILS_PANEL_ID,
+        RenderComponent: () => <>test</>,
+        isLightDismiss: true,
+        headerText: 'Details',
+        isFooterAtBottom: true,
+        type: PanelType.medium,
+    })
+
     return (
         <>
             {createPanel.PanelComponent}
+            {detailsPanel.PanelComponent}
         </>
     );
 };

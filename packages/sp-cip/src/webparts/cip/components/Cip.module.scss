@@ -10,10 +10,11 @@
 
 .parent-stroke {
   fill: none;
+  width: 1px;
+  height: 1px;
   stroke: "[theme: neutralTertiaryAlt, default: #005a9e]";
   stroke-width: 2px;
   stroke-dasharray: 3,3;
   position: absolute;
   overflow: visible;
-  z-index: -100;
 }

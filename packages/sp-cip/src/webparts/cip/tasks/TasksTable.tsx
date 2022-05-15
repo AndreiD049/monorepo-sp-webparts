@@ -1,4 +1,3 @@
-import { getAllByAltText } from '@testing-library/react';
 import {
     DetailsList,
     DetailsListLayoutMode,
@@ -8,10 +7,9 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { SPnotify } from 'sp-react-notifications';
-import usePanel from '../components/usePanel';
 import { REFRESH_PARENT_EVT } from '../utils/constants';
+import { taskAddedHandler, taskUpdated, taskUpdatedHandler } from '../utils/dom-events';
 import { createTaskTree } from './graph/factory';
-import { TaskNode } from './graph/TaskNode';
 import { ITaskOverview } from './ITaskOverview';
 import Task from './Task';
 import { useTasks } from './useTasks';
@@ -86,9 +84,22 @@ const TasksTable = () => {
             }
         }
         run();
-        // Register an event to refresh the list when needed
-        document.addEventListener(REFRESH_PARENT_EVT, run);
-        return () => document.removeEventListener(REFRESH_PARENT_EVT, run);
+    }, []);
+
+    // Dom events
+    React.useEffect(() => {
+        const removeTasksAdded = taskAddedHandler((tasks) => {
+            const set = new Set(tasks.map(t => t.Id));
+            setTasks(prev => [...prev.filter((x) => !set.has(x.Id)), ...tasks]);
+        });
+        const removeTaskUpdated = taskUpdatedHandler((task) => {
+            setTasks(prev => prev.map((t) => t.Id === task.Id ? task : t));
+        });
+
+        return () => {
+            removeTasksAdded();
+            removeTaskUpdated();
+        }
     }, []);
 
     const tree = React.useMemo(() => {
@@ -101,8 +112,11 @@ const TasksTable = () => {
                 layoutMode={DetailsListLayoutMode.fixedColumns}
                 selectionMode={SelectionMode.none}
                 columns={columns}
-                items={tree.getChildren()}
-                onRenderRow={(props) => <Task rowProps={props} node={props.item} setTasks={setTasks} />}
+                items={tree.getChildren().map((item) => ({
+                    key: item.Id,
+                    data: item,
+                }))}
+                onRenderRow={(props) => <Task rowProps={props} node={props.item.data} setTasks={setTasks} />}
             />
         </>
     );

@@ -55,9 +55,10 @@ export const useTasks = () => {
         };
         const created = await list.items.add(payload);
         await caching.Cache.get(getNonFinishedMainsRequest().toRequestUrl()).remove();
-        return created.item.update({
+        await created.item.update({
             MainTaskId: created.data.Id,
         });
+        return created.data.Id;
     };
 
     const createSubtask = async (details: ICreateTask, parent: ITaskOverview) => {
@@ -76,7 +77,8 @@ export const useTasks = () => {
         await caching.Cache.get(getTaskRequest(parent.Id).toRequestUrl()).remove();
         await caching.Cache.get(getSubtasksRequest(parent.Id).toRequestUrl()).remove();
         await caching.Cache.get(getSubtasksRequest(parent.ParentId).toRequestUrl()).remove();
-        return setSubtasks(parent.Id, [...parent.SubtasksId, added.data.Id]);
+        await setSubtasks(parent.Id, [...parent.SubtasksId, added.data.Id]);
+        return added.data.Id;
     }
     
     return { getAll, getNonFinishedMains, getSubtasks, getTask, createTask, createSubtask };
