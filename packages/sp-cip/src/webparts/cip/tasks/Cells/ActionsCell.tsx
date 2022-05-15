@@ -2,24 +2,12 @@ import { IconButton } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { ICellRenderer } from './ICellRenderer';
 import styles from './Cells.module.scss';
-import { PANEL_OPEN_EVT } from '../../utils/constants';
 import { CREATE_PANEL_ID } from '../../components/useCipPanels';
+import { openPanel } from '../../utils/dom-events';
 
 const ActionsCell: ICellRenderer = (node) => {
     const handleCreateSubtask = React.useCallback(
-        (id) => () => {
-            document.dispatchEvent(
-                new CustomEvent(PANEL_OPEN_EVT, {
-                    detail: {
-                        id: CREATE_PANEL_ID,
-                        open: true,
-                        props: {
-                            parentId: id,
-                        },
-                    },
-                })
-            );
-        },
+        (id) => () => openPanel(CREATE_PANEL_ID, true, { parentId: id }),
         []
     );
 

@@ -18,11 +18,7 @@ import * as React from 'react';
 import { CREATE_PANEL_ID } from '../../components/useCipPanels';
 import { IPanelComponentProps } from '../../components/usePanel';
 import { useUsers } from '../../users/useUsers';
-import {
-    PANEL_OPEN_EVT,
-    REFRESH_PARENT_EVT,
-} from '../../utils/constants';
-import { tasksAdded, taskUpdated } from '../../utils/dom-events';
+import { openPanel, tasksAdded, taskUpdated } from '../../utils/dom-events';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { ICreateTask } from '../ITaskDetails';
 import { useTasks } from '../useTasks';
@@ -112,14 +108,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
         }
     }, [data]);
 
-    const handleDismissPanel = React.useCallback(() => {
-        document.dispatchEvent(new CustomEvent(PANEL_OPEN_EVT, {
-            detail: {
-                id: CREATE_PANEL_ID,
-                open: false,
-            }
-        }));
-    }, []);
+    const handleDismissPanel = React.useCallback(() => openPanel(CREATE_PANEL_ID, false), []);
 
     const handleCreateTask = React.useCallback(
         async (ev: React.FormEvent) => {

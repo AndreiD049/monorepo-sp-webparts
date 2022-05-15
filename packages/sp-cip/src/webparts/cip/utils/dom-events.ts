@@ -56,7 +56,7 @@ export const taskUpdatedHandler = (func: (task: ITaskOverview) => void) => {
     return () => document.removeEventListener(TASK_UPDATED_EVT, handler);
 }
 
-export const openPanel = (panelId: string, open: boolean, props: any) => {
+export const openPanel = (panelId: string, open: boolean, props?: any) => {
     document.dispatchEvent(
         new CustomEvent(PANEL_OPEN_EVT, {
             detail: {
@@ -68,10 +68,13 @@ export const openPanel = (panelId: string, open: boolean, props: any) => {
     );
 };
 
-export const openPanelHandler = (id: string, func: (open: boolean, props: any) => void) => {
+export const openPanelHandler = (id: string, func: (open: boolean, props?: any) => void) => {
     const handler = (evt: CustomEvent) => {
-        if (evt.detail && evt.detail.id) {
+        if (evt.detail && evt.detail.id === id) {
             func(evt.detail.open, evt.detail.props);
         }
     };
+
+    document.addEventListener(PANEL_OPEN_EVT, handler);
+    return () => document.removeEventListener(PANEL_OPEN_EVT, handler);
 }

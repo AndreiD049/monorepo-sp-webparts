@@ -1,11 +1,9 @@
 import {
-    ColumnDragEndLocation,
     Panel,
     PanelType,
-    setPortalAttribute,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { PANEL_OPEN_EVT } from '../utils/constants';
+import { openPanelHandler } from '../utils/dom-events';
 
 export interface IPanelState {
     isOpen: boolean;
@@ -44,22 +42,17 @@ const usePanel = (props?: IPanelProps) => {
     const [componentProps, setComponentProps] = React.useState({});
 
     React.useEffect(() => {
-        function handlePanelOpen(evt) {
-            const detail = evt.detail;
-            if (detail && detail.id === props.id) {
-                if (detail.props) {
-                    setComponentProps(detail.props);
-                }
-                if (detail.open) {
-                    setIsOpen(detail.open);
-                } else {
-                    handleDismiss();
-                }
+        const removeOpenHandler = openPanelHandler(props.id, (open, props) => {
+            if (props) {
+                setComponentProps(props);
             }
-        }
-        document.addEventListener(PANEL_OPEN_EVT, handlePanelOpen);
-        return () =>
-            document.removeEventListener(PANEL_OPEN_EVT, handlePanelOpen);
+            if (open) {
+                setIsOpen(open);
+            } else {
+                handleDismiss();
+            }
+        });
+        return () => removeOpenHandler();
     }, []);
 
     const handleDismiss = React.useCallback(() => {

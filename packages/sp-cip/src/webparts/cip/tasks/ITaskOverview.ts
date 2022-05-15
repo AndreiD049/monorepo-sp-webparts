@@ -7,6 +7,7 @@ export const LIST_SELECT = [
     'Team',
     'Status',
     'Priority',
+    'Category',
     'Progress',
     'DueDate',
     'EstimatedTime',
@@ -31,6 +32,7 @@ export interface ITaskOverview {
     Status: string;
     Priority: 'None' | 'Low' | 'Medium' | 'High';
     Progress: number;
+    Category: string;
     DueDate: string; // ISO formatted date
     EstimatedTime: number; // number of hours
     EffectiveTime: number; // number of hours

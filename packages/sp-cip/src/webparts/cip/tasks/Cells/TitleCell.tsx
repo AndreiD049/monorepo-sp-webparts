@@ -5,7 +5,8 @@ import styles from './Cells.module.scss';
 import useParentStroke from '../../components/ParentStroke';
 import { RELINK_PARENT_EVT } from '../../utils/constants';
 import { TaskNode } from '../graph/TaskNode';
-import { nodeToggleOpen } from '../../utils/dom-events';
+import { nodeToggleOpen, openPanel } from '../../utils/dom-events';
+import { DETAILS_PANEL_ID } from '../../components/useCipPanels';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {
@@ -43,6 +44,7 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
             id={`task-${item.Id}`}
             data-taskid={item.Id}
             onClick={props.onClick}
+            onDoubleClick={props.onDoubleClick}
             className={classNames}
         >
             {content}
@@ -54,12 +56,18 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
 export const TitleCell: ICellRenderer = (task, nestLevel) => {
     return (
         <div
+            data-type="row"
             style={{
                 display: 'flex',
                 flexFlow: 'row nowrap',
                 alignItems: 'center',
                 justifyContent: 'start',
                 marginLeft: 30 * nestLevel,
+            }}
+            itemType="button"
+            onDoubleClick={(evt) => {
+                openPanel(DETAILS_PANEL_ID, true);
+                document.getSelection().empty();
             }}
         >
             <CheckExpandButton
@@ -73,6 +81,9 @@ export const TitleCell: ICellRenderer = (task, nestLevel) => {
                             new CustomEvent(RELINK_PARENT_EVT)
                         );
                     }
+                }}
+                onDoubleClick={(evt) => {
+                    evt.stopPropagation();
                 }}
             />
             <Text
