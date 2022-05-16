@@ -54,6 +54,7 @@ export interface ICreateTask {
     Status?: string;
     ResponsibleId: number;
     Priority: string;
+    Category: string;
     StartDate?: string;
     DueDate: string;
     Team?: string;

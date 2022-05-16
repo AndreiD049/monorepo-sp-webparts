@@ -1,6 +1,11 @@
+import { ICalloutProps, Target } from "office-ui-fabric-react";
+import * as React from "react";
 import { ITaskOverview } from "../tasks/ITaskOverview";
-import { NODE_OPEN_EVT, PANEL_OPEN_EVT, TASKS_ADDED_EVT, TASK_UPDATED_EVT } from "./constants"
+import { CALLOUT_MENU_EVT, NODE_OPEN_EVT, PANEL_OPEN_EVT, TASKS_ADDED_EVT, TASK_UPDATED_EVT } from "./constants"
 
+/**
+ *  Open/Close toggle
+ */
 export const nodeToggleOpen = (id: number) => {
     document.dispatchEvent(new CustomEvent(NODE_OPEN_EVT, {
         detail: {
@@ -20,6 +25,9 @@ export const nodeToggleOpenHandler = (id: number, func: () => void) => {
 };
 
 
+/**
+ * Handle new tasks added
+ */
 export const tasksAdded = (tasks: ITaskOverview[]) => {
     document.dispatchEvent(new CustomEvent(TASKS_ADDED_EVT, {
         detail: {
@@ -38,6 +46,10 @@ export const taskAddedHandler = (func: (tasks: ITaskOverview[]) => void) => {
     return () => document.removeEventListener(TASKS_ADDED_EVT, handler);
 }
 
+
+/**
+ * Handle task details updated
+ */
 export const taskUpdated = (task: ITaskOverview) => {
     document.dispatchEvent(new CustomEvent(TASK_UPDATED_EVT, {
         detail: {
@@ -56,6 +68,9 @@ export const taskUpdatedHandler = (func: (task: ITaskOverview) => void) => {
     return () => document.removeEventListener(TASK_UPDATED_EVT, handler);
 }
 
+/**
+ * Handle panel opened
+ */
 export const openPanel = (panelId: string, open: boolean, props?: any) => {
     document.dispatchEvent(
         new CustomEvent(PANEL_OPEN_EVT, {
@@ -78,3 +93,29 @@ export const openPanelHandler = (id: string, func: (open: boolean, props?: any) 
     document.addEventListener(PANEL_OPEN_EVT, handler);
     return () => document.removeEventListener(PANEL_OPEN_EVT, handler);
 }
+
+/**
+ * Handle callout menu opened
+ */
+export interface ICalloutEventProps extends ICalloutProps {
+    visible: boolean;
+    componentProps?: any;
+    RenderComponent?: React.FunctionComponent;
+}
+export const calloutVisibility = (props: ICalloutEventProps) => {
+    document.dispatchEvent(new CustomEvent(CALLOUT_MENU_EVT, {
+        detail: {
+            props,
+        }
+    }));
+};
+
+export const calloutVisibilityHandler = (func: (props: ICalloutEventProps) => void) => {
+    const handler = (evt: CustomEvent) => {
+        if (evt.detail?.props) {
+            func(evt.detail.props);
+        }
+    }
+    document.addEventListener(CALLOUT_MENU_EVT, handler);
+    return () => document.removeEventListener(CALLOUT_MENU_EVT, handler);
+};

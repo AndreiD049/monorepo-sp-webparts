@@ -9,10 +9,12 @@ export class TaskNode implements IClonable<TaskNode> {
     private parent?: TaskNode;
     public Id: number;
     public level: number;
+    public Category: string;
 
     constructor(private task?: ITaskOverview) {
         this.children = new Map();
         this.Id = this.task?.Id;
+        this.Category = this.task?.Category || 'Other';
         this.level = -1;
         if (!task) {
             this.type = 'root';

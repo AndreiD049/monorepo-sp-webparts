@@ -5,14 +5,15 @@ export interface IPillProps extends React.HTMLAttributes<HTMLDivElement> {
     value: string;
 }
 
-const Pill: React.FC<IPillProps> = ({ value, ...rest }) => {
+const Pill: React.FC<IPillProps> = ({ value, id, ...rest }) => {
     return (
         <div className={styles['pill-container']}>
             <div
+                id={id}
                 {...rest}
                 className={`${
                     styles['pill-container__inner']
-                } ${value.toLowerCase()} ${rest.className}`}
+                } sp-cip-pill-${value.toLowerCase()} ${rest.className}`}
                 style={{ ...rest.style }}
             >
                 {value}

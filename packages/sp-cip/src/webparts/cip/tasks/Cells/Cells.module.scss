@@ -54,3 +54,44 @@
         }
     }
 }
+
+.callout {
+  padding: .5em;
+}
+
+.center-content {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items:  stretch;
+}
+
+.callout-progress {
+    min-width: 200px;
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.progress {
+    position: relative;
+    width: 100%;
+    color: "[theme: white, default: #fff]";
+    background-color: "[theme: neutralQuaternaryAlt, default: #fff]";
+    border: 1px solid lightgray;
+
+    &-value {
+        position: relative;
+        z-index: 2;
+        margin-left: 2px;
+        margin-top: 2px;
+    }
+
+    &-bar {
+        position: absolute;
+        background-color: "[theme: themeSecondary, default: #a4262c]";
+        height: 100%;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        min-width: 3px;
+    }
+}

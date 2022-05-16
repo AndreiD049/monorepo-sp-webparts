@@ -21,7 +21,8 @@
     "react-dom": "16.13.1",
     "sp-indexeddb-caching": "^1.0.0",
     "sp-preset": "^2.0.5",
-    "sp-react-notifications": "^1.0.22"
+    "sp-react-notifications": "^1.0.22",
+    "use-web-storage-api": "^1.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",

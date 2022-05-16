@@ -41,7 +41,6 @@ const Task: React.FC<ITaskProps> = (props) => {
                             const filtered = prev.filter(
                                 (t) => t.ParentId !== task.Id
                             );
-                            console.log(filtered, prev);
                             return [...filtered, ...tasks];
                         });
                     }

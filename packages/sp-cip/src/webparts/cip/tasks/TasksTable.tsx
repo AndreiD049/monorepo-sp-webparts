@@ -1,18 +1,19 @@
 import {
-    CollapseAllVisibility,
+    ColumnActionsMode,
     DetailsList,
     DetailsListLayoutMode,
     IColumn,
-    IGroup,
     MessageBarType,
     SelectionMode,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { SPnotify } from 'sp-react-notifications';
+import { useCallout } from '../components/useCallout';
 import { taskAddedHandler, taskUpdatedHandler } from '../utils/dom-events';
 import { createTaskTree } from './graph/factory';
 import { ITaskOverview } from './ITaskOverview';
 import Task from './Task';
+import { useGroups } from './useGroups';
 import { useTasks } from './useTasks';
 
 const columns: IColumn[] = [
@@ -22,6 +23,10 @@ const columns: IColumn[] = [
         fieldName: 'Title',
         minWidth: 500,
         isResizable: true,
+        columnActionsMode: ColumnActionsMode.hasDropdown,
+        onColumnContextMenu: (col, ev) => {
+            console.log(col, ev);
+        }
     },
     {
         key: 'Actions',
@@ -45,7 +50,7 @@ const columns: IColumn[] = [
         key: 'Status',
         name: 'Status',
         fieldName: 'Status',
-        minWidth: 150,
+        minWidth: 100,
     },
     {
         key: 'Progress',
@@ -70,6 +75,7 @@ const columns: IColumn[] = [
 const TasksTable = () => {
     const { getNonFinishedMains, getAll } = useTasks();
     const [tasks, setTasks] = React.useState<ITaskOverview[]>([]);
+    const { CalloutComponent } = useCallout();
 
     React.useEffect(() => {
         async function run() {
@@ -114,38 +120,21 @@ const TasksTable = () => {
         return tree
             .getChildren()
             .sort((a, b) =>
-                a.getTask().Category < b.getTask().Category ? -1 : 1
+                a.Category < b.Category ? -1 : 1
             ).map((item) => ({
                 key: item.Id,
                 data: item,
             }));
     }, [tree]);
 
-    const groups: IGroup[] = React.useMemo(() => {
-        const groups = {};
-        sortedTasks.forEach((node, idx) => {
-            const category = node.data.getTask().Category || 'Other';
-            if (category in groups) {
-                groups[category].count += 1;
-            } else {
-                groups[category] = {
-                    key: category,
-                    name: category,
-                    count: 1,
-                    startIndex: idx,
-                };
-            }
-        });
-        return Object.values(groups);
-    }, [sortedTasks]);
+    const { groups, groupProps } = useGroups(sortedTasks);
+
 
     return (
         <>
             <DetailsList
                 groups={groups}
-                groupProps={{
-                    collapseAllVisibility: CollapseAllVisibility.hidden,
-                }}
+                groupProps={groupProps}
                 layoutMode={DetailsListLayoutMode.fixedColumns}
                 selectionMode={SelectionMode.none}
                 columns={columns}
@@ -158,6 +147,7 @@ const TasksTable = () => {
                     />
                 )}
             />
+            {CalloutComponent}
         </>
     );
 };

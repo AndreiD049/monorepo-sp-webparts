@@ -4,6 +4,8 @@ import Pill from '../../components/Pill/Pill';
 import Timing from '../../components/Timing';
 import { TaskNode } from '../graph/TaskNode';
 import ActionsCell from './ActionsCell';
+import { ProgressCell } from './ProgressCell';
+import { StatusCell } from './StatusCell';
 import { TitleCell } from './TitleCell';
 
 export const renderCell = (
@@ -25,7 +27,7 @@ export const renderCell = (
                 />
             );
         case 'status':
-            return <Pill value={task?.Status} />;
+            return <StatusCell node={node} />;
         case 'priority':
             return (
                 <Pill
@@ -40,7 +42,7 @@ export const renderCell = (
         case 'actions':
             return ActionsCell(node, nestLevel);
         case 'progress':
-            return <Text variant="medium">{`${task?.Progress * 100}%`}</Text>;
+            return <ProgressCell node={node} />;
         case 'duedate':
             return (
                 <Text variant="medium">

@@ -3,7 +3,7 @@ import {
     SearchBox,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { openPanel } from '../utils/dom-events';
+import { calloutVisibility, openPanel } from '../utils/dom-events';
 import { CREATE_PANEL_ID } from './useCipPanels';
 
 const CipCommandBar = () => {
@@ -18,13 +18,13 @@ const CipCommandBar = () => {
                             iconName: 'Add',
                         },
                         onClick: () => openPanel(CREATE_PANEL_ID, true),
-                    },
+                    }
                 ]}
                 farItems={[
                     {
                         key: 'search',
                         onRender: () => (
-                            <SearchBox placeholder="Quick search..." />
+                            <SearchBox id="sp-cip-quick-search" placeholder="Quick search..." />
                         ),
                     },
                 ]}

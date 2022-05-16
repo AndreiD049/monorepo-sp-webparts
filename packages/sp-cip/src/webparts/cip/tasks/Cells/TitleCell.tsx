@@ -44,7 +44,7 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
             id={`task-${item.Id}`}
             data-taskid={item.Id}
             onClick={props.onClick}
-            onDoubleClick={props.onDoubleClick}
+            onDoubleClick={(evt) => evt.stopPropagation()}
             className={classNames}
         >
             {content}
@@ -67,6 +67,7 @@ export const TitleCell: ICellRenderer = (task, nestLevel) => {
             itemType="button"
             onDoubleClick={(evt) => {
                 openPanel(DETAILS_PANEL_ID, true);
+                // Empty the selection is text was selected while double clicking
                 document.getSelection().empty();
             }}
         >
@@ -81,9 +82,6 @@ export const TitleCell: ICellRenderer = (task, nestLevel) => {
                             new CustomEvent(RELINK_PARENT_EVT)
                         );
                     }
-                }}
-                onDoubleClick={(evt) => {
-                    evt.stopPropagation();
                 }}
             />
             <Text

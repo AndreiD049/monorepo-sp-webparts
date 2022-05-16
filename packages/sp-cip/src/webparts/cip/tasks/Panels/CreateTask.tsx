@@ -1,4 +1,5 @@
 import {
+    ComboBox,
     CompactPeoplePicker,
     DatePicker,
     DefaultButton,
@@ -21,6 +22,7 @@ import { useUsers } from '../../users/useUsers';
 import { openPanel, tasksAdded, taskUpdated } from '../../utils/dom-events';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { ICreateTask } from '../ITaskDetails';
+import { useGroups } from '../useGroups';
 import { useTasks } from '../useTasks';
 
 export interface ICreateTaskProps {
@@ -30,26 +32,38 @@ export interface ICreateTaskProps {
 const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
     props
 ) => {
-    const { fieldInfo } = useChoiceFields('Priority');
     const { createTask, createSubtask, getTask, getSubtasks } = useTasks();
 
+    /** Group labels */
+    const { groupLabels, setGroupLabels } = useGroups();
+    const groupOptions = React.useMemo(() => {
+        if (!groupLabels) return [];
+        return ['NA', ...groupLabels].map((label) => ({
+            key: label,
+            text: label,
+        }));
+    }, [groupLabels]);
+
+    /** Priority options */
+    const priorityChoice = useChoiceFields('Priority');
     const choises = React.useMemo(() => {
-        if (!fieldInfo) return [];
-        return fieldInfo.Choices.map((choise) => ({
+        if (!priorityChoice.fieldInfo) return [];
+        return priorityChoice.fieldInfo.Choices.map((choise) => ({
             key: choise,
             text: choise,
         }));
-    }, [fieldInfo]);
+    }, [priorityChoice.fieldInfo]);
 
-    /** Created task data */
     const [parent, setParent] = React.useState(null);
 
+    /** Created task data */
     const [data, setData] = React.useState<ICreateTask>({
         Title: '',
         Description: '',
         DueDate: new Date().toISOString(),
         EstimatedTime: 0,
         Priority: 'None',
+        Category: 'NA',
         ResponsibleId: 0,
     });
 
@@ -74,15 +88,16 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
     React.useEffect(() => {
         (async function () {
             setUsers(await getPersonaProps());
+            /** If parent present, load it's data and set as default values */
             if (props.parentId) {
                 const parent = await getTask(props.parentId);
                 setParent(parent);
-                setData(prev => ({
+                setData((prev) => ({
                     ...prev,
                     ResponsibleId: parent.Responsible.Id,
-                    EstimatedTime: parent.EstimatedTime,
                     Priority: parent.Priority,
                     DueDate: parent.DueDate,
+                    Category: parent.Category,
                 }));
             } else {
                 setParent(null);
@@ -108,8 +123,12 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
         }
     }, [data]);
 
-    const handleDismissPanel = React.useCallback(() => openPanel(CREATE_PANEL_ID, false), []);
+    const handleDismissPanel = React.useCallback(
+        () => openPanel(CREATE_PANEL_ID, false),
+        []
+    );
 
+    /** Task creation */
     const handleCreateTask = React.useCallback(
         async (ev: React.FormEvent) => {
             ev.preventDefault();
@@ -131,6 +150,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
         [data, validateData]
     );
 
+    /** Add foorter to panel */
     React.useEffect(() => {
         props.setFooter(
             <>
@@ -158,7 +178,8 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                 </MessageBar>
             )}
             <form onSubmit={handleCreateTask} id="create-task-form">
-                <Stack horizontal tokens={{ childrenGap: 10 }}>
+                {/* Title & Description */}
+                <Stack tokens={{ childrenGap: 10 }}>
                     <StackItem grow={1}>
                         <TextField
                             label="Title"
@@ -166,17 +187,20 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                             onChange={handleSetTextField('Title')}
                         />
                     </StackItem>
-                    <StackItem style={{ width: '50%' }}>
+                    <StackItem style={{ width: '100%' }}>
                         <TextField
                             label="Description"
                             multiline
                             onChange={handleSetTextField('Description')}
+                            resizable={false}
+                            autoAdjustHeight
                         />
                     </StackItem>
                 </Stack>
 
                 <Separator />
 
+                {/* Responsible */}
                 <Stack horizontal tokens={{ childrenGap: 10 }}>
                     <StackItem grow={1}>
                         <Label required htmlFor="ResponsiblePicker">
@@ -194,24 +218,13 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                                 )
                             }
                             onEmptyResolveSuggestions={() => users}
-                            selectedItems={users.filter((u) => +u.id === data.ResponsibleId)}
+                            selectedItems={users.filter(
+                                (u) => +u.id === data.ResponsibleId
+                            )}
                             onChange={(items) =>
                                 setData((prev) => ({
                                     ...prev,
                                     ResponsibleId: +items[0]?.id,
-                                }))
-                            }
-                        />
-                    </StackItem>
-                    <StackItem style={{ width: '50%' }}>
-                        <Dropdown
-                            label="Priority"
-                            options={choises}
-                            selectedKey={data.Priority}
-                            onChange={(_ev, option) =>
-                                setData((prev) => ({
-                                    ...prev,
-                                    Priority: option.text,
                                 }))
                             }
                         />
@@ -221,52 +234,114 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                 <Separator />
 
                 <Stack horizontal tokens={{ childrenGap: 10 }}>
-                    <StackItem grow={1}>
-                        <DatePicker
-                            label="Start date"
-                            value={data.StartDate && new Date(data.StartDate)}
-                            onSelectDate={handleSelectDateField('StartDate')}
-                        />
-                    </StackItem>
-                    <StackItem style={{ width: '50%' }}>
-                        <DatePicker
-                            label="Due date"
-                            value={new Date(data.DueDate)}
-                            isRequired
-                            onSelectDate={handleSelectDateField('DueDate')}
-                        />
-                    </StackItem>
+                    {/* Start & Due Dates */}
+                    <Stack style={{ width: '45%' }}>
+                        <StackItem grow={1}>
+                            <DatePicker
+                                label="Start date"
+                                value={
+                                    data.StartDate && new Date(data.StartDate)
+                                }
+                                onSelectDate={handleSelectDateField(
+                                    'StartDate'
+                                )}
+                            />
+                        </StackItem>
+                        <StackItem>
+                            <DatePicker
+                                label="Due date"
+                                value={new Date(data.DueDate)}
+                                isRequired
+                                onSelectDate={handleSelectDateField('DueDate')}
+                            />
+                        </StackItem>
+                    </Stack>
+
+                    <Separator vertical style={{ height: '100%' }} />
+
+                    {/* Priority & Category */}
+                    <Stack
+                        style={{ width: '45%' }}
+                        tokens={{ childrenGap: 10 }}
+                    >
+                        <StackItem>
+                            <Dropdown
+                                label="Priority"
+                                options={choises}
+                                selectedKey={data.Priority}
+                                onChange={(_ev, option) =>
+                                    setData((prev) => ({
+                                        ...prev,
+                                        Priority: option.text,
+                                    }))
+                                }
+                            />
+                        </StackItem>
+                        {/* Show category only if there is no parent */}
+                        {!Boolean(props.parentId) ? (
+                            <StackItem>
+                                <ComboBox
+                                    label="Category"
+                                    options={groupOptions}
+                                    useComboBoxAsMenuWidth
+                                    autoComplete="on"
+                                    allowFreeform
+                                    selectedKey={data.Category}
+                                    onChange={(evt, option) => {
+                                        let category: string =
+                                            option?.key as string;
+                                        /** New category added */
+                                        if (!category) {
+                                            const target: any = evt.target;
+                                            category = target.value as string;
+                                            setGroupLabels((prev) => [
+                                                ...prev,
+                                                category,
+                                            ]);
+                                        }
+                                        setData((prev) => ({
+                                            ...prev,
+                                            Category: category,
+                                        }));
+                                    }}
+                                />
+                            </StackItem>
+                        ) : null}
+                    </Stack>
                 </Stack>
 
                 <Separator />
 
-                <Label htmlFor="DurationSpinButton" required>
-                    Estimated duaration
-                </Label>
-                <SpinButton
-                    labelPosition={Position.top}
-                    min={0}
-                    inputProps={{ id: 'DurationSpinButton' }}
-                    value={data.EstimatedTime.toString()}
-                    onIncrement={(val) =>
-                        setData((prev) => ({
-                            ...prev,
-                            EstimatedTime: +val + 1,
-                        }))
-                    }
-                    onDecrement={(val) =>
-                        setData((prev) => ({
-                            ...prev,
-                            EstimatedTime: +val - 1,
-                        }))
-                    }
-                    onValidate={(val: string) =>
-                        setData((prev) => ({
-                            ...prev,
-                            EstimatedTime: +val,
-                        }))
-                    }
-                />
+                {/* Estimated time */}
+                <Stack>
+                    <Label htmlFor="DurationSpinButton" required>
+                        Estimated duaration
+                    </Label>
+                    <SpinButton
+                        labelPosition={Position.top}
+                        min={0}
+                        inputProps={{ id: 'DurationSpinButton' }}
+                        value={data.EstimatedTime.toString()}
+                        onIncrement={(val) =>
+                            setData((prev) => ({
+                                ...prev,
+                                EstimatedTime: +val + 1,
+                            }))
+                        }
+                        onDecrement={(val) =>
+                            setData((prev) => ({
+                                ...prev,
+                                EstimatedTime: +val - 1,
+                            }))
+                        }
+                        onValidate={(val: string) =>
+                            setData((prev) => ({
+                                ...prev,
+                                EstimatedTime: +val,
+                            }))
+                        }
+                    />
+                </Stack>
                 {props.parentId && (
                     <TextField
                         label="Parent task"
