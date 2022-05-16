@@ -115,8 +115,7 @@ const TasksTable = () => {
     }, []);
 
     const tree = React.useMemo(() => {
-        // return createTaskTree(tasks.sort((a, b) => a.Category < b.Category ? -1 : 1));
-        return createTaskTree(tasks);
+        return createTaskTree(tasks.sort((a, b) => a.Category < b.Category ? -1 : 1));
     }, [tasks]);
 
     const rows = React.useMemo(() => {
