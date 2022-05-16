@@ -14,7 +14,6 @@ const webpackConfig = {
 const transformConfig = function (initialWebpackConfig) {
   // transform the initial webpack config here, i.e.
   // initialWebpackConfig.plugins.push(new webpack.Plugin()); etc.
-
   return initialWebpackConfig;
 }
 

@@ -39,17 +39,19 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
     }, [props.node]);
 
     return (
-        <button
-            ref={button}
-            id={`task-${item.Id}`}
-            data-taskid={item.Id}
-            onClick={props.onClick}
-            onDoubleClick={(evt) => evt.stopPropagation()}
-            className={classNames}
-        >
-            {content}
+        <div style={{position: 'relative'}}>
+            <button
+                ref={button}
+                id={`task-${item.Id}`}
+                data-taskid={item.Id}
+                onClick={props.onClick}
+                onDoubleClick={(evt) => evt.stopPropagation()}
+                className={classNames}
+            >
+                {content}
+            </button>
             {useParentStroke(props.node)}
-        </button>
+        </div>
     );
 };
 
@@ -78,9 +80,6 @@ export const TitleCell: ICellRenderer = (task, nestLevel) => {
                         return console.log('Finish');
                     } else {
                         nodeToggleOpen(task.Id);
-                        document.dispatchEvent(
-                            new CustomEvent(RELINK_PARENT_EVT)
-                        );
                     }
                 }}
             />

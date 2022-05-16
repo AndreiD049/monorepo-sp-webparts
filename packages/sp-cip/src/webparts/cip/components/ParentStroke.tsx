@@ -1,55 +1,68 @@
 import * as React from 'react';
 import { TaskNode } from '../tasks/graph/TaskNode';
-import TasksTable from '../tasks/TasksTable';
-import { RELINK_PARENT_EVT } from '../utils/constants';
+import { relinkParentHandler } from '../utils/dom-events';
 import styles from './Cip.module.scss';
 
-const ConnectElements = (from: HTMLElement, to: HTMLElement) => {
-    let svg: any = document.getElementById(`svg-stroke-task-${from.id}-${to.id}`);
-    if (!svg) {
-        svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    }
-    svg.id = `svg-stroke-task-${from.id}-${to.id}`;
+const getConnectingStroke = (from: HTMLElement, to: HTMLElement, prev :HTMLElement) => {
+    const hasPrev = prev !== from;
     const fromRect = from.getBoundingClientRect();
     const toRect = to.getBoundingClientRect();
-    const yDiff = Math.abs(fromRect.bottom - toRect.top);
-    const xDiff = Math.abs(fromRect.left + from.clientWidth / 2 - toRect.left);
-    svg.classList.add(styles['parent-stroke']);
-    svg.style.top = `-${yDiff}px`;
-    svg.style.left = `-${xDiff}px`;
-    let path: any = document.getElementById(`svg-path-task-${from.id}-${to.id}`);
-    if (!path) {
-        path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const prevRect = hasPrev ? prev.getBoundingClientRect() : fromRect;
+    let yDiff = Math.abs(prevRect.bottom - toRect.top);
+    if (hasPrev) {
+        yDiff += from.clientHeight / 2 + 3;
     }
-    path.id = `svg-path-task-${from.id}-${to.id}`;
-    path.setAttribute(
-        'd',
-        `M0 0 l0 ${yDiff + to.clientHeight / 2 - 3} l3 3 l${xDiff - 3} 0`
+    const xDiff = Math.abs(fromRect.left + from.clientWidth / 2 - toRect.left);
+
+    return (
+        <svg
+            className={styles['parent-stroke']}
+            style={{
+                top: `-${yDiff}px`,
+                left: `-${xDiff}px`,
+                height: `${yDiff + to.clientHeight / 2}px`,
+                width: `${xDiff + 1}px`,
+            }}
+        >
+            <path
+                d={`M0 0 l0 ${yDiff + to.clientHeight / 2 - 3} l3 3 l${
+                    xDiff - 3
+                } 0`}
+            />
+        </svg>
     );
-    svg.appendChild(path);
-    to.appendChild(svg);
 };
 
 const useParentStroke = (node: TaskNode) => {
     const task = node.getTask();
-    React.useLayoutEffect(() => {
+    const [elem, setElem] = React.useState(null);
+
+    React.useEffect(() => {
         function linkElements() {
+            setElem(null);
             setTimeout(() => {
                 if (task.ParentId) {
-                    const parent = document.getElementById(`task-${task.ParentId}`);
+                    const prevSibling = node.getPreviousSibling();
+                    const parent = document.getElementById(
+                        `task-${task.ParentId}`
+                    );
                     const self = document.getElementById(`task-${task.Id}`);
+                    const prev = prevSibling ? document.getElementById(`task-${prevSibling.Id}`) : parent;
                     if (parent && self) {
-                        ConnectElements(parent, self);
+                        setElem(getConnectingStroke(parent, self, prev));
                     }
                 }
             }, 0);
         }
         linkElements();
-        document.addEventListener(RELINK_PARENT_EVT, linkElements);
-        return () => document.removeEventListener(RELINK_PARENT_EVT, linkElements);
+        const removeRelinkHanler = relinkParentHandler(
+            node.Id,
+            linkElements
+        );
+        return () => removeRelinkHanler();
     }, []);
 
-    return null;
+    return <>{elem}</>;
 };
 
 export default useParentStroke;

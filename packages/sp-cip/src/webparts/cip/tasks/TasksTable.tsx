@@ -9,7 +9,7 @@ import {
 import * as React from 'react';
 import { SPnotify } from 'sp-react-notifications';
 import { useCallout } from '../components/useCallout';
-import { taskAddedHandler, taskUpdatedHandler } from '../utils/dom-events';
+import { relinkParent, taskAddedHandler, taskUpdatedHandler } from '../utils/dom-events';
 import { createTaskTree } from './graph/factory';
 import { ITaskOverview } from './ITaskOverview';
 import Task from './Task';
@@ -101,6 +101,8 @@ const TasksTable = () => {
                 ...prev.filter((x) => !set.has(x.Id)),
                 ...tasks,
             ]);
+            // relink all tasks
+            relinkParent('all')
         });
         const removeTaskUpdated = taskUpdatedHandler((task) => {
             setTasks((prev) => prev.map((t) => (t.Id === task.Id ? task : t)));
@@ -113,22 +115,20 @@ const TasksTable = () => {
     }, []);
 
     const tree = React.useMemo(() => {
+        // return createTaskTree(tasks.sort((a, b) => a.Category < b.Category ? -1 : 1));
         return createTaskTree(tasks);
     }, [tasks]);
 
-    const sortedTasks = React.useMemo(() => {
+    const rows = React.useMemo(() => {
         return tree
             .getChildren()
-            .sort((a, b) =>
-                a.Category < b.Category ? -1 : 1
-            ).map((item) => ({
+            .map((item) => ({
                 key: item.Id,
                 data: item,
             }));
     }, [tree]);
 
-    const { groups, groupProps } = useGroups(sortedTasks);
-
+    const { groups, groupProps } = useGroups(rows);
 
     return (
         <>
@@ -138,7 +138,7 @@ const TasksTable = () => {
                 layoutMode={DetailsListLayoutMode.fixedColumns}
                 selectionMode={SelectionMode.none}
                 columns={columns}
-                items={sortedTasks}
+                items={rows}
                 onRenderRow={(props) => (
                     <Task
                         rowProps={props}

@@ -1,7 +1,7 @@
 import { ICalloutProps, Target } from "office-ui-fabric-react";
 import * as React from "react";
 import { ITaskOverview } from "../tasks/ITaskOverview";
-import { CALLOUT_MENU_EVT, NODE_OPEN_EVT, PANEL_OPEN_EVT, TASKS_ADDED_EVT, TASK_UPDATED_EVT } from "./constants"
+import { CALLOUT_MENU_EVT, NODE_OPEN_EVT, PANEL_OPEN_EVT, RELINK_PARENT_EVT, TASKS_ADDED_EVT, TASK_UPDATED_EVT } from "./constants"
 
 /**
  *  Open/Close toggle
@@ -22,6 +22,27 @@ export const nodeToggleOpenHandler = (id: number, func: () => void) => {
     };
     document.addEventListener(NODE_OPEN_EVT, handler);
     return () => document.removeEventListener(NODE_OPEN_EVT, handler);;
+};
+
+/**
+ * Relink parent
+ */
+export const relinkParent = (id: number | 'all') => {
+    document.dispatchEvent(new CustomEvent(RELINK_PARENT_EVT, {
+        detail: {
+            id,
+        }
+    }));
+};
+
+export const relinkParentHandler = (id: number, func: () => void) => {
+    const handler = (evt: CustomEvent) => {
+        if (evt.detail?.id === id || evt.detail?.id === 'all') {
+            func();
+        }
+    };
+    document.addEventListener(RELINK_PARENT_EVT, handler);
+    return () => document.removeEventListener(RELINK_PARENT_EVT, handler);
 };
 
 

@@ -6,7 +6,9 @@ type NodeType = 'root' | 'normal' | 'proxy' | 'stub';
 export class TaskNode implements IClonable<TaskNode> {
     private type: NodeType;
     private children: Map<number, TaskNode>;
+    private childrenArray: TaskNode[] = [];
     private parent?: TaskNode;
+    public index: number = 0;
     public Id: number;
     public level: number;
     public Category: string;
@@ -31,11 +33,11 @@ export class TaskNode implements IClonable<TaskNode> {
                 this.type = 'normal';
             }
             this.children = new Map();
+            this.childrenArray = [];
             for (const task of tasks) {
-                const node = new TaskNode(task)
+                new TaskNode(task)
                     .withParent(this)
                     .withLevel(this.level + 1);
-                this.children.set(task.Id, node);
             }
         }
         return this;
@@ -47,11 +49,19 @@ export class TaskNode implements IClonable<TaskNode> {
         return this;
     }
 
+    public withIndex(idx: number) {
+        this.index = idx;
+        return this;
+    }
+
     public setChild(child: TaskNode) {
         if (this.type === 'proxy') {
             this.type = 'normal';
         }
+        child.parent = this;
+        child.withIndex(this.children.size);
         this.children.set(child.task.Id, child.withLevel(this.level + 1));
+        this.childrenArray.push(child);
     }
     
     public withParent(parent: TaskNode) {
@@ -84,10 +94,25 @@ export class TaskNode implements IClonable<TaskNode> {
     }
 
     public getChildren(): TaskNode[] {
-        return Array.from(this.children.values());
+        return this.childrenArray;
     }
 
     public getParent(): TaskNode {
         return this.parent || null;
+    }
+
+    public getPreviousSibling(): TaskNode | null {
+        if (this.index === 0) return null;
+        const parent = this.getParent();
+        if (!parent) return null;
+        if (parent.children.size <= (this.index - 1)) return null;
+        return parent.getChildren()[this.index - 1];
+    }
+
+    public getNextSibling(): TaskNode | null {
+        const parent = this.getParent();
+        if (!parent) return null;
+        if (parent.children.size <= (this.index + 1)) return null;
+        return parent.getChildren()[this.index + 1];
     }
 }

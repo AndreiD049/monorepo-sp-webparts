@@ -1,9 +1,7 @@
 import { IDetailsRowProps } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { RELINK_PARENT_EVT } from '../utils/constants';
 import { TaskNode } from './graph/TaskNode';
 import { ITaskOverview } from './ITaskOverview';
-import Task from './Task';
 import TaskShimmer from './TaskShimmer';
 import { useTasks } from './useTasks';
 

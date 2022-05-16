@@ -2,11 +2,10 @@ import { IDetailsRowProps } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { ITaskOverview } from './ITaskOverview';
 import styles from './Task.module.scss';
-import { useTasks } from './useTasks';
 import { TaskNode } from './graph/TaskNode';
 import { renderCell } from './Cells/render-cells';
 import {
-    nodeToggleOpenHandler,
+    nodeToggleOpenHandler, relinkParent,
 } from '../utils/dom-events';
 import SubtasksProxy from './SubtasksProxy';
 export interface ITaskProps {
@@ -25,7 +24,6 @@ export interface ITaskProps {
  */
 const Task: React.FC<ITaskProps> = (props) => {
     const [open, setOpen] = React.useState<boolean>(false);
-    const { getTask } = useTasks();
 
     const subtasksNode = React.useMemo(() => {
         if (!open) return null;
@@ -61,7 +59,14 @@ const Task: React.FC<ITaskProps> = (props) => {
 
     React.useEffect(() => {
         const removeOpenHandler = nodeToggleOpenHandler(props.node.Id, () =>
-            setOpen((prev) => !prev)
+            setOpen((prev) => {
+                let next = props.node;
+                while (next.getParent()) {
+                    relinkParent(next.getNextSibling()?.Id);
+                    next = next.getParent();
+                }
+                return !prev;
+            })
         );
         return () => {
             removeOpenHandler();

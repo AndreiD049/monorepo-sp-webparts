@@ -18,11 +18,23 @@ const ProgressCellCallout: React.FC<IProgressCellProps> = (props) => {
             Progress: value,
         });
         taskUpdated(await getTask(props.node.Id));
+        calloutVisibility({
+            visible: false,
+        });
     }, [props.node, value]);
 
     return (
         <div className={`${styles.callout} ${styles['callout-progress']}`}>
-            <Slider min={0} max={100} step={5} onChange={(val) => { setValue(val / 100); } } value={Math.round(value * 100)} valueFormat={(num) => `${num}%`} />
+            <Slider
+                min={0}
+                max={100}
+                step={5}
+                onChange={(val) => {
+                    setValue(val / 100);
+                }}
+                value={Math.round(value * 100)}
+                valueFormat={(num) => `${num}%`}
+            />
             <PrimaryButton
                 style={{
                     marginTop: '.5em',
@@ -43,15 +55,23 @@ export const ProgressCell: React.FC<IProgressCellProps> = (props) => {
             visible: true,
             RenderComponent: ProgressCellCallout,
             componentProps: props,
-        })
+        });
     }, [props.node, progressRef]);
 
     return (
-        <div ref={progressRef} className={styles.progress} onClick={handleClick}>
-            <Text variant="medium" className={styles['progress-value']}>{`${
-                Math.round(props.node.getTask()?.Progress * 100)
-            }%`}</Text>
-            <div className={styles['progress-bar']} style={{ width: `${props.node.getTask().Progress * 100}%` }} />
+        <div
+            ref={progressRef}
+            className={styles.progress}
+            onClick={handleClick}
+        >
+            <Text
+                variant="medium"
+                className={styles['progress-value']}
+            >{`${Math.round(props.node.getTask()?.Progress * 100)}%`}</Text>
+            <div
+                className={styles['progress-bar']}
+                style={{ width: `${props.node.getTask().Progress * 100}%` }}
+            />
         </div>
     );
 };
