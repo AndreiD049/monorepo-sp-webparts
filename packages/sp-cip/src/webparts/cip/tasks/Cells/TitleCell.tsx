@@ -55,7 +55,7 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
     );
 };
 
-export const TitleCell: ICellRenderer = (task, nestLevel) => {
+export const TitleCell: ICellRenderer = (node, nestLevel) => {
     return (
         <div
             data-type="row"
@@ -68,18 +68,18 @@ export const TitleCell: ICellRenderer = (task, nestLevel) => {
             }}
             itemType="button"
             onDoubleClick={(evt) => {
-                openPanel(DETAILS_PANEL_ID, true);
+                openPanel(DETAILS_PANEL_ID, true, { node: node, headerText: node.getTask().Title });
                 // Empty the selection is text was selected while double clicking
                 document.getSelection().empty();
             }}
         >
             <CheckExpandButton
-                node={task}
+                node={node}
                 onClick={() => {
-                    if (task.getTask().SubtasksId.length === 0) {
+                    if (node.getTask().SubtasksId.length === 0) {
                         return console.log('Finish');
                     } else {
-                        nodeToggleOpen(task.Id);
+                        nodeToggleOpen(node.Id);
                     }
                 }}
             />
@@ -92,7 +92,7 @@ export const TitleCell: ICellRenderer = (task, nestLevel) => {
                     whiteSpace: 'pre',
                 }}
             >
-                {task.getTask().Title}
+                {node.getTask().Title}
             </Text>
         </div>
     );

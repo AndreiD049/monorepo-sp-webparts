@@ -1,6 +1,7 @@
 import { PanelType } from "office-ui-fabric-react"
 import * as React from "react";
 import CreateTaskPanel from "../tasks/Panels/CreateTask"
+import { TaskDetails } from "../tasks/Panels/TaskDetails";
 import usePanel from "./usePanel"
 
 export const CREATE_PANEL_ID = 'sp-cip-create-panel';
@@ -18,9 +19,8 @@ export const useCipPanels = () => {
 
     const detailsPanel = usePanel({
         id: DETAILS_PANEL_ID,
-        RenderComponent: () => <>test</>,
+        RenderComponent: TaskDetails,
         isLightDismiss: true,
-        headerText: 'Details',
         isFooterAtBottom: true,
         type: PanelType.medium,
     })

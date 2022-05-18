@@ -39,7 +39,7 @@ const usePanel = (props?: IPanelProps) => {
     const [isOpen, setIsOpen] = React.useState<boolean>(false);
     const [footer, setFooter] = React.useState(null);
     const { RenderComponent } = props;
-    const [componentProps, setComponentProps] = React.useState({});
+    const [componentProps, setComponentProps] = React.useState<any>({});
 
     React.useEffect(() => {
         const removeOpenHandler = openPanelHandler(props.id, (open, props) => {
@@ -68,7 +68,7 @@ const usePanel = (props?: IPanelProps) => {
                 isOpen={isOpen}
                 onDismiss={handleDismiss}
                 isLightDismiss={props?.isLightDismiss || false}
-                headerText={props?.headerText || ''}
+                headerText={componentProps?.headerText || props?.headerText || ''}
                 onRenderFooterContent={() => footer}
                 isFooterAtBottom={props?.isFooterAtBottom || false}
                 type={props?.type || PanelType.smallFixedFar}

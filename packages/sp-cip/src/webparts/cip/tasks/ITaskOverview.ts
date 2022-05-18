@@ -1,6 +1,7 @@
 export const LIST_SELECT = [
     'Id',
     'Title',
+    'Description',
     'Responsible/Id',
     'Responsible/Title',
     'Responsible/EMail',
@@ -23,6 +24,7 @@ export const LIST_EXPAND = ['Responsible'];
 export interface ITaskOverview {
     Id: number;
     Title: string;
+    Description: string;
     Responsible: {
         Id: number;
         Title: string;
