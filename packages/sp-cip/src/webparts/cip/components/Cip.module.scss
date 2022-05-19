@@ -20,3 +20,40 @@
 .callout {
   padding: .5em;
 }
+
+.description-editor {
+  display: flex;
+  flex-flow: column nowrap;
+  background-color: "[theme: neutralLighterAlt, default: #fff]";
+  border-color: $ms-color-neutralTertiaryAlt;
+
+  &__buttons {
+    border: 1px;
+    border-style: dashed;
+    border-color: inherit;
+  }
+
+  &__file-input {
+    border: 1px;
+    border-style: dashed;
+    border-color: inherit;
+  }
+}
+
+.file-input {
+  position: relative;
+  min-height: 30px;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  font-size: .85em;
+  padding: .1em .3em;
+
+  &__input {
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+}

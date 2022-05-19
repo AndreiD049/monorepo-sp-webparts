@@ -68,7 +68,7 @@ export const TitleCell: ICellRenderer = (node, nestLevel) => {
             }}
             itemType="button"
             onDoubleClick={(evt) => {
-                openPanel(DETAILS_PANEL_ID, true, { node: node, headerText: node.getTask().Title });
+                openPanel(DETAILS_PANEL_ID, true, { node: node, headerText: "" });
                 // Empty the selection is text was selected while double clicking
                 document.getSelection().empty();
             }}

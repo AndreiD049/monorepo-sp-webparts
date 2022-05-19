@@ -9,7 +9,8 @@ import {
 import * as React from 'react';
 import { SPnotify } from 'sp-react-notifications';
 import { useCallout } from '../components/useCallout';
-import { relinkParent, taskAddedHandler, taskUpdatedHandler } from '../utils/dom-events';
+import { DETAILS_PANEL_ID } from '../components/useCipPanels';
+import { openPanel, relinkParent, taskAddedHandler, taskUpdatedHandler } from '../utils/dom-events';
 import { createTaskTree } from './graph/factory';
 import { ITaskOverview } from './ITaskOverview';
 import Task from './Task';
