@@ -47,7 +47,13 @@ export const useAttachments = () => {
             await taskFolder(task.Id)();
         } catch (err) {
             if (err.message.indexOf('File Not Found') !== -1) {
-                await folder.addSubFolderUsingPath(task.Id.toString());
+                const added = await folder.addSubFolderUsingPath(task.Id.toString());
+                const addedFolderItem = await added.listItemAllFields();    
+                console.log(addedFolderItem);
+                const list = sp.web.lists.getByTitle(properties.attachmentsPath);
+                await list.items.getById(addedFolderItem.Id).update({
+                    Task: task.Title
+                });
             }
         }
     }
