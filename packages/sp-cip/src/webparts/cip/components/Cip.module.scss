@@ -56,4 +56,8 @@
     height: 100%;
     z-index: 1;
   }
+
+  &__input_dragover {
+    background-color: "[theme: themeLighter, default: #f0d3d4]";
+  }
 }

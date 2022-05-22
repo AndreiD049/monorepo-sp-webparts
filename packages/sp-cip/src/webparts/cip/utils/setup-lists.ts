@@ -10,8 +10,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
     /**
      * Comment list
      */
-    const commentList = await sp.web.lists.ensure(props.commentListName);
-    console.log(commentList);
+    const commentList = await sp.web.lists.ensure(props.activitiesListName);
 
     if (commentList.created) {
         /** Set title not required */
@@ -23,7 +22,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
 
         /** List id */
         const listId = await commentList.list.fields.createFieldAsXml(
-            `<Field Indexed='TRUE'  CommaSeparator='TRUE' CustomUnitOnRight='TRUE' Decimals='0' Description='Id of the list item where comment was left' DisplayName='ListId' Format='Dropdown' IsModern='TRUE' Name='ListId' Percentage='FALSE' Required='TRUE' Title='ListId' Type='Number' Unit='None'></Field>`
+            `<Field Indexed='TRUE' DisplayName='ListId' Format='Dropdown' IsModern='TRUE' MaxLength='255' Name='ListId' Required='TRUE' Title='ListId' Type='Text'></Field>`
         );
         notifyOnFieldCreation(listId);
 
@@ -38,6 +37,11 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
             `<Field AppendOnly='FALSE' Description='Comment contents' DisplayName='Comment' Format='Dropdown' IsModern='TRUE' IsolateStyles='FALSE' Name='Comment' Required='TRUE' RichText='FALSE' RichTextMode='Compatible' Title='Comment' Type='Note'></Field>`
         );
         notifyOnFieldCreation(comment);
+
+        const activityType = await commentList.list.fields.createFieldAsXml(
+            `<Field CustomFormatter='{&quot;elmType&quot;:&quot;div&quot;,&quot;style&quot;:{&quot;flex-wrap&quot;:&quot;wrap&quot;,&quot;display&quot;:&quot;flex&quot;},&quot;children&quot;:[{&quot;elmType&quot;:&quot;div&quot;,&quot;style&quot;:{&quot;box-sizing&quot;:&quot;border-box&quot;,&quot;padding&quot;:&quot;4px 8px 5px 8px&quot;,&quot;overflow&quot;:&quot;hidden&quot;,&quot;text-overflow&quot;:&quot;ellipsis&quot;,&quot;display&quot;:&quot;flex&quot;,&quot;border-radius&quot;:&quot;16px&quot;,&quot;height&quot;:&quot;24px&quot;,&quot;align-items&quot;:&quot;center&quot;,&quot;white-space&quot;:&quot;nowrap&quot;,&quot;margin&quot;:&quot;4px 4px 4px 4px&quot;},&quot;attributes&quot;:{&quot;class&quot;:{&quot;operator&quot;:&quot;:&quot;,&quot;operands&quot;:[{&quot;operator&quot;:&quot;==&quot;,&quot;operands&quot;:[&quot;@currentField&quot;,&quot;Comment&quot;]},&quot;sp-field-fontSizeSmall&quot;,{&quot;operator&quot;:&quot;:&quot;,&quot;operands&quot;:[{&quot;operator&quot;:&quot;==&quot;,&quot;operands&quot;:[&quot;@currentField&quot;,&quot;Time log&quot;]},&quot;sp-field-fontSizeSmall&quot;,{&quot;operator&quot;:&quot;:&quot;,&quot;operands&quot;:[{&quot;operator&quot;:&quot;==&quot;,&quot;operands&quot;:[&quot;@currentField&quot;,&quot;Modify&quot;]},&quot;sp-field-fontSizeSmall&quot;,{&quot;operator&quot;:&quot;:&quot;,&quot;operands&quot;:[{&quot;operator&quot;:&quot;==&quot;,&quot;operands&quot;:[&quot;@currentField&quot;,&quot;&quot;]},&quot;&quot;,&quot;sp-field-borderAllRegular sp-field-borderAllSolid sp-css-borderColor-neutralSecondary&quot;]}]}]}]}},&quot;txtContent&quot;:&quot;@currentField&quot;}],&quot;templateId&quot;:&quot;BgColorChoicePill&quot;}' Description='Type of action (Ex: Comment, Status change, Time log..)' DisplayName='ActivityType' FillInChoice='FALSE' Format='Dropdown' IsModern='TRUE' Name='ActivityType' Required='TRUE' Title='ActivityType' Type='Choice'><CHOICES><CHOICE>Comment</CHOICE><CHOICE>Time log</CHOICE><CHOICE>Modify</CHOICE></CHOICES></Field>`
+        );
+        notifyOnFieldCreation(activityType);
 
         /**
          * Adjust default view
@@ -66,6 +70,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
                         <FieldRef Name=\"${listId.data.InternalName}\"/>
                         <FieldRef Name=\"${itemId.data.InternalName}\"/>
                         <FieldRef Name=\"${comment.data.InternalName}\"/>
+                        <FieldRef Name=\"${activityType.data.InternalName}\"/>
                         <FieldRef Name=\"Author\"/>
                         <FieldRef Name=\"Created\"/>
                     </ViewFields>
@@ -234,6 +239,66 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
     } else {
         SPnotify({
             message: 'Task list is already created. Skipping...',
+            messageType: MessageBarType.info,
+        });
+    }
+
+    const attachmentsLibrary = await sp.web.lists.ensure(props.attachmentsPath, 'CIP Attachments', 101, false, { OnQuickLaunch: false });
+
+    if (attachmentsLibrary.created) {
+        const taskName = await attachmentsLibrary.list.fields.createFieldAsXml(
+            `<Field Description='Task title' DisplayName='Task' Format='Dropdown' IsModern='TRUE' MaxLength='255' Name='Task' Required='TRUE' Title='Task' Type='Text'></Field>`
+        );
+        notifyOnFieldCreation(taskName);
+
+        const commentId = await attachmentsLibrary.list.fields.createFieldAsXml(
+            `<Field Indexed='TRUE' CommaSeparator='TRUE' CustomUnitOnRight='TRUE' DisplayName='CommentId' Format='Dropdown' IsModern='TRUE' Name='CommentId' Percentage='FALSE' Title='CommentId' Type='Number' Unit='None'></Field>`
+        );
+        notifyOnFieldCreation(commentId);
+
+        const view = await attachmentsLibrary.list.defaultView();
+        await attachmentsLibrary.list.defaultView.setViewXml(
+            `<View 
+                Name=\"${view.Id}\" 
+                DefaultView=\"TRUE\" 
+                MobileView=\"TRUE\" 
+                MobileDefaultView=\"TRUE\" 
+                Type=\"HTML\" 
+                DisplayName=\"All Documents\" 
+                Url=\"${view.ServerRelativeUrl}\" 
+                Level=\"1\" 
+                BaseViewID=\"1\" 
+                ContentTypeID=\"0x\" 
+                ImageUrl=\"${view.ImageUrl}\">
+                    <Query>
+                        <OrderBy>
+                            <FieldRef Name=\"ID\"/>
+                        </OrderBy>
+                    </Query>
+                    <ViewFields>
+                        <FieldRef Name=\"DocIcon\"/>
+                        <FieldRef Name=\"LinkFilename\"/>
+                        <FieldRef Name=\"${taskName.data.InternalName}\"/>
+                        <FieldRef Name=\"Modified\"/>
+                        <FieldRef Name=\"Editor\"/>
+                        <FieldRef Name=\"${commentId.data.InternalName}\"/>
+                    </ViewFields>
+                    <RowLimit Paged=\"TRUE\">30</RowLimit>
+                    <JSLink>clienttemplates.js</JSLink>
+                    <XslLink Default=\"TRUE\">main.xsl</XslLink>
+                    <Toolbar Type=\"Standard\"/>
+                    <ViewType2>COMPACTLIST</ViewType2>
+            </View>`
+        );
+
+        SPnotify({
+            message: 'Attachments library was created',
+            messageType: MessageBarType.success,
+        });
+    } else {
+
+        SPnotify({
+            message: 'Attachments library is already created. Skipping...',
             messageType: MessageBarType.info,
         });
     }

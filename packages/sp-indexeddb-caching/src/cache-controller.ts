@@ -19,7 +19,7 @@ export interface ICacheValueProxy {
 export class CachedValueProxy implements ICacheValueProxy {
     private hashKey: string;
     private options: {
-        expireFunc: () => Date;
+        expireFunction: () => Date;
         keyFactory: (url: string) => string;
     };
 
@@ -32,7 +32,7 @@ export class CachedValueProxy implements ICacheValueProxy {
         }
     ) {
         this.options = {
-            expireFunc: defaultExpiry,
+            expireFunction: defaultExpiry,
             keyFactory: defaultKeyFactory,
             ...options,
         };
@@ -81,7 +81,7 @@ export class CachedValueProxy implements ICacheValueProxy {
 
     private wrapAndSerialize<T>(v: T): string | ICachedValue<T> {
         const cachedValue: ICachedValue<T> = {
-            expiration: this.options.expireFunc().getTime(),
+            expiration: this.options.expireFunction().getTime(),
             value: v,
         };
         return this.storage.type === 'index' ? cachedValue : JSON.stringify(cachedValue);
@@ -89,7 +89,7 @@ export class CachedValueProxy implements ICacheValueProxy {
 }
 
 export interface ICacheControllerOptions {
-    expireFunc?: () => Date;
+    expireFunction?: () => Date;
     keyFactory?: (url: string) => string;
 }
 
@@ -103,7 +103,7 @@ export class CacheController {
     ) {
         this.ProxyPull = new Map();
         this.options = {
-            expireFunc: defaultExpiry,
+            expireFunction: defaultExpiry,
             keyFactory: defaultKeyFactory,
             ...options,
         };

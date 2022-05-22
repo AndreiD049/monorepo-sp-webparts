@@ -1,6 +1,6 @@
 import { TimelinePipe } from "@pnp/core";
 
 export interface ICacherConfig {
-    exireFunction?: () => Date;
+    expireFunction?: () => Date;
     keyFactory?: (url: string) => string;
 }

@@ -10,12 +10,16 @@ import '@pnp/sp/site-groups';
 import '@pnp/sp/sites';
 import '@pnp/sp/files';
 import '@pnp/sp/files/folder';
-import "@pnp/sp/folders";
-import "@pnp/sp/security";
-import "@pnp/sp/views";
-import "@pnp/sp/comments";
+import '@pnp/sp/folders';
+import '@pnp/sp/security';
+import '@pnp/sp/views';
+import '@pnp/sp/comments';
+import '@pnp/sp/sputilities';
 import RPMController from './controller';
-import { ThrottlingDetector, IThrottlingDetectorProps } from './throttling-detector';
+import {
+    ThrottlingDetector,
+    IThrottlingDetectorProps,
+} from './throttling-detector';
 
 type TennantsType = {
     [name: string]: string;
@@ -25,16 +29,23 @@ export default class SPBuilder {
     private tennants: TennantsType = {};
     private timelinePipes: TimelinePipe[] = [];
 
-    constructor(private context: any) { }
+    constructor(private context: any) {}
 
-    withRPM(treshlod: number = 600, rpmTracing: boolean = false, rpmAlerting: boolean = true, onAlert?: (message: string) => void) {
-        this.timelinePipes.push(RPMController(
-            treshlod,
-            this.context,
-            rpmTracing,
-            rpmAlerting,
-            onAlert,
-        ));
+    withRPM(
+        treshlod: number = 600,
+        rpmTracing: boolean = false,
+        rpmAlerting: boolean = true,
+        onAlert?: (message: string) => void
+    ) {
+        this.timelinePipes.push(
+            RPMController(
+                treshlod,
+                this.context,
+                rpmTracing,
+                rpmAlerting,
+                onAlert
+            )
+        );
         return this;
     }
 
@@ -44,7 +55,7 @@ export default class SPBuilder {
     }
 
     withAdditionalTimelines(timelines: TimelinePipe[]) {
-        this.timelinePipes = [...this.timelinePipes, ...timelines]
+        this.timelinePipes = [...this.timelinePipes, ...timelines];
         return this;
     }
 
@@ -62,20 +73,17 @@ export default class SPBuilder {
 
     private usingDefault(sp: SPFI) {
         let result = sp.using(SPFx(this.context));
-        this.timelinePipes.forEach((pipe) => result = result.using(pipe));
+        this.timelinePipes.forEach((pipe) => (result = result.using(pipe)));
         return result;
     }
 }
 
 //Export usual stuff from sp
-export {
-    SPFI,
-} from '@pnp/sp';
+export { SPFI } from '@pnp/sp';
 
-export { 
-    IContextInfo, 
-    ISite 
-} from '@pnp/sp/sites';
+export { IContextInfo, ISite } from '@pnp/sp/sites';
+
+export { IEmailProperties, IUtilities } from '@pnp/sp/sputilities';
 
 export {
     IBasePermissions,
@@ -101,7 +109,7 @@ export {
     IVersions,
     MoveOperations,
     TemplateFileType,
-    CheckinType
+    CheckinType,
 } from '@pnp/sp/files';
 
 export {
@@ -111,8 +119,8 @@ export {
     IComments,
     ILikeData,
     ILikedByInformation,
-    IReplies
-} from '@pnp/sp/comments'
+    IReplies,
+} from '@pnp/sp/comments';
 
 export {
     IFolder,
@@ -144,12 +152,7 @@ export {
     IFieldCreationProperties,
 } from '@pnp/sp/fields';
 
-export {
-    IWeb,
-    Web,
-    IWebs,
-    Webs,
-} from "@pnp/sp/webs";
+export { IWeb, Web, IWebs, Webs } from '@pnp/sp/webs';
 
 export {
     ILists,
@@ -158,7 +161,7 @@ export {
     Lists,
     IListAddResult,
     IListUpdateResult,
-} from "@pnp/sp/lists";
+} from '@pnp/sp/lists';
 
 export {
     IItems,
@@ -167,22 +170,16 @@ export {
     Items,
     IItemAddResult,
     IItemUpdateResult,
-} from "@pnp/sp/items";
+} from '@pnp/sp/items';
 
-export {
-    Caching,
-    InjectHeaders,
-} from '@pnp/queryable';
+export { Caching, InjectHeaders } from '@pnp/queryable';
 
 export {
     IGroupAddResult,
     ISiteGroup,
     ISiteGroupInfo,
     ISiteGroups,
-    IGroupUpdateResult
+    IGroupUpdateResult,
 } from '@pnp/sp/site-groups';
 
-export {
-    getHashCode,
-    getGUID,
-} from '@pnp/core';
+export { getHashCode, getGUID } from '@pnp/core';
