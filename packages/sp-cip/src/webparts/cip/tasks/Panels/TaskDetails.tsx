@@ -7,6 +7,7 @@ import {
     Text,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { useAttachments } from '../../attachments/useAttachments';
 import { DescriptionEditor } from '../../components/DescriptionEditor';
 import { nodeToggleOpen, taskUpdated, taskUpdatedHandler } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
@@ -21,6 +22,7 @@ const TaskGeneralDetails = (props: { node: TaskNode }) => {
     const task = React.useMemo(() => props.node.getTask(), [props.node]);
     const [description, setDescription] = React.useState(task.Description);
     const {updateTask, getTask} = useTasks();
+    const attachments = useAttachments();
 
     return (
         <div className={styles['details-panel']}>

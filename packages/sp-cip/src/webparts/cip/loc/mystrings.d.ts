@@ -10,6 +10,8 @@ declare interface ICipWebPartStrings {
   CipTasksListDescription: string;
   CipCommentListLabel: string;
   CipCommentListDescription: string;
+  AttachmentsListLabel: string;
+  AttachmentsListDescription: string;
   AppLocalEnvironmentSharePoint: string;
   AppLocalEnvironmentTeams: string;
   AppSharePointEnvironment: string;

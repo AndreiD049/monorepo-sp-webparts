@@ -21,6 +21,7 @@ export interface ICipWebPartProps {
     rootDataSource: string;
     tasksListName: string;
     commentListName: string;
+    attachmentsPath: string;
 }
 
 export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> {
@@ -143,6 +144,10 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                                 PropertyPaneTextField('commentListName', {
                                     label: strings.CipCommentListLabel,
                                     description: strings.CipCommentListDescription,
+                                }),
+                                PropertyPaneTextField('attachmentsPath', {
+                                    label: strings.AttachmentsListLabel,
+                                    description: strings.AttachmentsListDescription,
                                 }),
                                 PropertyPaneButton('', {
                                     text: 'Create list',

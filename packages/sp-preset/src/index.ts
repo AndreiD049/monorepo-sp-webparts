@@ -8,6 +8,8 @@ import '@pnp/sp/fields';
 import '@pnp/sp/site-users/web';
 import '@pnp/sp/site-groups';
 import '@pnp/sp/sites';
+import '@pnp/sp/files';
+import '@pnp/sp/files/folder';
 import "@pnp/sp/folders";
 import "@pnp/sp/security";
 import "@pnp/sp/views";
@@ -87,6 +89,20 @@ export {
     IRoleDefinition,
     IRoleDefinitionAddResult,
 } from '@pnp/sp/security';
+
+export {
+    IAddUsingPathProps,
+    IFile,
+    IFileAddResult,
+    IFileInfo,
+    IFileUploadProgressData,
+    IFiles,
+    IVersion,
+    IVersions,
+    MoveOperations,
+    TemplateFileType,
+    CheckinType
+} from '@pnp/sp/files';
 
 export {
     IComment,
