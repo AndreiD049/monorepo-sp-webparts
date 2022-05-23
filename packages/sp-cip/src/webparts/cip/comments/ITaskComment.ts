@@ -1,4 +1,5 @@
 export interface ITaskComment {
+    Id?: number;
     Author?: {
         Id: number;
         Title: string;

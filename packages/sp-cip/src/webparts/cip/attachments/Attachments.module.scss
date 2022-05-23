@@ -1,0 +1,38 @@
+.attachments {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.attachment {
+    border: 1px solid;
+    border-color: inherit;
+    border-radius: 3px;
+    width: 130px;
+    margin: .6em;
+    padding-top: .6em;
+
+    &__fileicon {
+        font-size: 2em;
+        padding-left: .6em;
+    }
+
+    &__filename {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-break: anywhere;
+        padding-right: .6em;
+    }
+
+    &__links {
+        margin-top: .6em;
+        padding-top: .6em;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-evenly;
+        border-top: 1px dashed;
+        border-color: inherit;
+        font-size: 1em;
+    }
+}

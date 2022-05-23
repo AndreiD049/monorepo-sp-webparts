@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { Caching, IFieldInfo } from 'sp-preset';
+import { Caching, IFieldInfo, SPFI } from 'sp-preset';
 import CipWebPart from '../CipWebPart';
 import { ITaskOverview } from '../tasks/ITaskOverview';
 import { GlobalContext } from './GlobalContext';
 
-export const useChoiceFields = (fieldName: keyof ITaskOverview) => {
+export const useChoiceFields = (fieldName: keyof ITaskOverview, customSP?: SPFI) => {
     const ctx = React.useContext(GlobalContext);
-    const sp = React.useMemo(
+    const sp = customSP || React.useMemo(
         () => CipWebPart.SPBuilder.getSP('Data').using(Caching()),
         []
     );

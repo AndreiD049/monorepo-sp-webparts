@@ -16,6 +16,8 @@ declare interface ICipWebPartStrings {
   AppLocalEnvironmentTeams: string;
   AppSharePointEnvironment: string;
   AppTeamsTabEnvironment: string;
+  TeamsList: string;
+  TeamsListField: string;
 }
 
 declare module 'CipWebPartStrings' {

@@ -15,11 +15,13 @@ import {
     StackItem,
     TextField,
 } from 'office-ui-fabric-react';
+import { useControlledState } from 'office-ui-fabric-react/lib/Foundation';
 import * as React from 'react';
 import { CREATE_PANEL_ID } from '../../components/useCipPanels';
 import { IPanelComponentProps } from '../../components/usePanel';
 import { useUsers } from '../../users/useUsers';
 import { openPanel, tasksAdded, taskUpdated } from '../../utils/dom-events';
+import { GlobalContext } from '../../utils/GlobalContext';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { ICreateTask } from '../ITaskDetails';
 import { useGroups } from '../useGroups';
@@ -32,6 +34,7 @@ export interface ICreateTaskProps {
 const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
     props
 ) => {
+    const { teams } = React.useContext(GlobalContext);
     const { createTask, createSubtask, getTask, getSubtasks } = useTasks();
 
     /** Group labels */
@@ -65,7 +68,16 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
         Priority: 'None',
         Category: 'NA',
         ResponsibleId: 0,
+        Team: '',
     });
+
+    /** Team options */
+    const teamsOptions = React.useMemo(() => {
+        return teams.map((team) => ({
+            key: team,
+            text: team,
+        }));
+    }, [teams]);
 
     const handleSetTextField = (field: keyof ICreateTask) => (_ev, val) => {
         setData((prev) => ({
@@ -98,6 +110,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                     Priority: parent.Priority,
                     DueDate: parent.DueDate,
                     Category: parent.Category,
+                    Team: parent.Team,
                 }));
             } else {
                 setParent(null);
@@ -202,7 +215,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
 
                 {/* Responsible */}
                 <Stack horizontal tokens={{ childrenGap: 10 }}>
-                    <StackItem grow={1}>
+                    <StackItem style={{ width: '75%' }}>
                         <Label required htmlFor="ResponsiblePicker">
                             Responsible
                         </Label>
@@ -225,6 +238,19 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                                 setData((prev) => ({
                                     ...prev,
                                     ResponsibleId: +items[0]?.id,
+                                }))
+                            }
+                        />
+                    </StackItem>
+                    <StackItem grow={1}>
+                        <Dropdown
+                            label="Team"
+                            options={teamsOptions}
+                            selectedKey={data['Team']}
+                            onChange={(evt, option) =>
+                                setData((prev) => ({
+                                    ...prev,
+                                    Team: option.text,
                                 }))
                             }
                         />

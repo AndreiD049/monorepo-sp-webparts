@@ -66,6 +66,12 @@ const columns: IColumn[] = [
         minWidth: 100,
     },
     {
+        key: 'Team',
+        name: 'Team',
+        fieldName: 'Team',
+        minWidth: 100,
+    },
+    {
         key: 'Timing',
         name: 'Timing',
         fieldName: 'Timing',

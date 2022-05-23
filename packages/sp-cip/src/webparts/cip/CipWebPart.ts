@@ -15,6 +15,7 @@ import Cip from './components/Cip';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { initNotifications } from 'sp-react-notifications';
 import { GlobalContext } from './utils/GlobalContext';
+import { useUsers } from './users/useUsers';
 
 export interface ICipWebPartProps {
     headerText: string;
@@ -22,6 +23,8 @@ export interface ICipWebPartProps {
     tasksListName: string;
     activitiesListName: string;
     attachmentsPath: string;
+    teamsList: string;
+    teamsField: string;
 }
 
 export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> {
@@ -50,16 +53,13 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
         return super.onInit();
     }
 
-    public render(): void {
+    public async render(): Promise<void> {
         const element: React.ReactElement = React.createElement(
-            GlobalContext.Provider,
+            Cip,
             {
-                value: {
-                    properties: this.properties,
-                    theme: this.theme,
-                },
-            },
-            React.createElement(Cip)
+                properties: this.properties,
+                theme: this.theme,
+            }
         );
 
         ReactDom.render(element, this.domElement);
@@ -148,6 +148,13 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                                 PropertyPaneTextField('attachmentsPath', {
                                     label: strings.AttachmentsListLabel,
                                     description: strings.AttachmentsListDescription,
+                                }),
+                                PropertyPaneTextField('teamsList', {
+                                    label: strings.TeamsList,
+                                }),
+                                PropertyPaneTextField('teamsField', {
+
+                                    label: strings.TeamsListField,
                                 }),
                                 PropertyPaneButton('', {
                                     text: 'Create list',

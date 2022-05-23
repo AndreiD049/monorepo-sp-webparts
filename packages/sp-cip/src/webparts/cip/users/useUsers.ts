@@ -1,12 +1,28 @@
 import { IPersonaProps, PersonaSize } from "office-ui-fabric-react";
-import { Caching } from "sp-preset";
-import CipWebPart from "../CipWebPart";
+import { useContext } from "react";
+import { IndexedDBCacher } from "sp-indexeddb-caching";
+import CipWebPart, { ICipWebPartProps } from "../CipWebPart";
+import { GlobalContext } from "../utils/GlobalContext";
+import { useChoiceFields } from "../utils/useChoiceFields";
 
-export const useUsers = () => {
-    const sp = CipWebPart.SPBuilder.getSP('Data').using(Caching());
+const HOUR = 1000 * 60 * 60;
+
+export const useUsers = (props?: { properties: ICipWebPartProps }) => {
+    const { properties } = props || useContext(GlobalContext);
+    const { Cache, CachingTimeline } = IndexedDBCacher({
+        expireFunction: () => new Date(Date.now() + HOUR),
+    });
+    const sp = CipWebPart.SPBuilder.getSP().using(CachingTimeline);
+    const usersList = sp.web.lists.getByTitle(properties.teamsList);
+
     const getAll = async () => {
         return sp.web.siteUsers();
     }
+
+    const getTeams = async () => {
+        const teamsField = await usersList.fields.getByTitle(properties.teamsField)();
+        return teamsField.Choices;
+    };
 
     const getPersonaProps: () => Promise<IPersonaProps[]> = async () => {
         const users = await getAll();
@@ -23,6 +39,7 @@ export const useUsers = () => {
 
     return {
         getAll,
+        getTeams,
         getPersonaProps,
     }
 }

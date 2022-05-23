@@ -14,6 +14,8 @@ define([], function() {
     "AttachmentsListLabel": "Attachments path",
     "AttachmentsListDescription": "Example: 'Shared Documents/CIP Attachments'",
     "AppSharePointEnvironment": "The app is running on SharePoint page",
-    "AppTeamsTabEnvironment": "The app is running in Microsoft Teams"
+    "AppTeamsTabEnvironment": "The app is running in Microsoft Teams",
+    "TeamsList": "Teams list name",
+    "TeamsListField": "Teams list field name"
   }
 });

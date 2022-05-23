@@ -61,7 +61,6 @@ export const useTasks = () => {
     const createTask = async (details: ICreateTask) => {
         const payload: ICreateTask = {
             ...details,
-            Team: '',
             EffectiveTime: 0,
             Status: 'New',
             Progress: 0,
@@ -82,7 +81,6 @@ export const useTasks = () => {
     ) => {
         const payload: ICreateTask = {
             ...details,
-            Team: '',
             EffectiveTime: 0,
             Status: 'New',
             Progress: 0,
