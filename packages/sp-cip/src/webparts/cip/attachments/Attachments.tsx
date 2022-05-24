@@ -53,8 +53,9 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
 
     const linkHref = React.useCallback((file: string) => {
         const url = getAttachmentsRequest(props.task).toRequestUrl();
-        const re = /sharepoint.com(\/sites.*)\/_api/;
-        const site = url.match(re)[1] || '';
+        const re = /sharepoint.com(\/(sites|teams).*)\/_api/;
+        const match = url.match(re);
+        const site = match ? match[1] : '';
         return `${site}/${properties.attachmentsPath}/Forms/AllItems.aspx?id=${site}/${properties.attachmentsPath}/${props.task.Id}/${file}&parent=${site}/${props.task.Id}`;
     }, []);
 
