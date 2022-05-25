@@ -1,7 +1,6 @@
 import {
     ActionButton,
     ActivityItem,
-    FontSizes,
     Icon,
     IconButton,
     Link,
@@ -63,16 +62,17 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
                 />
             ),
             comments: (
-                <span className={styles['comments__content']}>
+                <div className={styles['comments__content']}>
                     {comment.Comment}
-                </span>
+                </div>
             ),
             timeStamp: new Date(comment.Created).toLocaleString(),
         }));
     }, [taskComments]);
 
     return (
-        <>
+        <div style={{ overflowX: 'hidden', wordBreak: 'break-all' }}>
+            <Separator style={{ padding: '1em 0' }} />
             <Stack
                 horizontal
                 horizontalAlign="stretch"
@@ -112,6 +112,6 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
                     Load more
                 </ActionButton>
             )}
-        </>
+        </div>
     );
 };
