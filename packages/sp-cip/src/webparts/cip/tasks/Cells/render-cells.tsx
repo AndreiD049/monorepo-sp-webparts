@@ -4,8 +4,10 @@ import Pill from '../../components/Pill/Pill';
 import Timing from '../../components/Timing';
 import { TaskNode } from '../graph/TaskNode';
 import ActionsCell from './ActionsCell';
+import { DueDateCell } from './DueDateCell';
 import { ProgressCell } from './ProgressCell';
 import { StatusCell } from './StatusCell';
+import { TeamCell } from './TeamCell';
 import { TitleCell } from './TitleCell';
 
 export const renderCell = (
@@ -44,11 +46,9 @@ export const renderCell = (
         case 'progress':
             return <ProgressCell node={node} />;
         case 'duedate':
-            return (
-                <Text variant="medium">
-                    {new Date(task.DueDate).toLocaleDateString()}
-                </Text>
-            );
+            return (<DueDateCell node={node} />);
+        case 'team':
+            return (<TeamCell node={node} />)
         case 'timing':
             return (
                 <Timing

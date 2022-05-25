@@ -22,6 +22,7 @@ export const useCipPanels = () => {
         RenderComponent: TaskDetails,
         isLightDismiss: true,
         isFooterAtBottom: true,
+        headerText: 'Task details',
         type: PanelType.medium,
     })
 

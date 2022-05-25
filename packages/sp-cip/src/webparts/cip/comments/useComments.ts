@@ -6,7 +6,7 @@ import { ITaskOverview } from '../tasks/ITaskOverview';
 import { GlobalContext } from '../utils/GlobalContext';
 import { ITaskComment } from './ITaskComment';
 
-const COMMENTS_SELECT = ['Id', 'ListId', 'ItemId', 'Comment', 'ActivityType', 'Created', 'Author/Title'];
+const COMMENTS_SELECT = ['Id', 'ListId', 'ItemId', 'Comment', 'ActivityType', 'Created', 'Author/Title', 'Author/EMail'];
 const COMMENTS_EXPAND = ['Author'];
 
 export const useComments = () => {

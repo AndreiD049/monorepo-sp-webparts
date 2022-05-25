@@ -1,4 +1,4 @@
-import { Icon, Link, Stack, Text, themeRulesStandardCreator } from 'office-ui-fabric-react';
+import { DefaultButton, Icon, Label, Link, Stack, Text, themeRulesStandardCreator } from 'office-ui-fabric-react';
 import { useControlledState } from 'office-ui-fabric-react/lib/Foundation';
 import * as React from 'react';
 import { FileInput } from '../components/Utils/FileInput';
@@ -7,6 +7,7 @@ import { GlobalContext } from '../utils/GlobalContext';
 import { IAttachment } from './IAttachment';
 import { useAttachments } from './useAttachments';
 import styles from './Attachments.module.scss';
+import { getAlert } from '../components/AlertDialog';
 
 interface IAttachmentsProps {
     task: ITaskOverview;
@@ -15,7 +16,6 @@ interface IAttachmentsProps {
 const getFileIconName = (name: string) => {
     const tokens = name.split('.');
     const extension = tokens[tokens.length - 1].toLowerCase();
-    console.log(extension);
     switch (extension) {
         case 'xls':
         case 'xlsx':
@@ -26,6 +26,10 @@ const getFileIconName = (name: string) => {
             return 'WordDocument'
         case 'pdf':
             return 'PDF'
+        case 'jpg':
+        case 'png':
+        case 'jpeg':
+            return 'FileImage';
         case 'html':
         case 'xml':
         case 'xsl':
@@ -59,6 +63,14 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
         return `${site}/${properties.attachmentsPath}/Forms/AllItems.aspx?id=${site}/${properties.attachmentsPath}/${props.task.Id}/${file}&parent=${site}/${props.task.Id}`;
     }, []);
 
+    const downloadLinkHref = React.useCallback((file: string) => {
+        const url = getAttachmentsRequest(props.task).toRequestUrl();
+        const re = /sharepoint.com(\/(sites|teams).*)\/_api/;
+        const match = url.match(re);
+        const site = match ? match[1] : '';
+        return `${site}/_layouts/download.aspx?SourceUrl=${site}/${properties.attachmentsPath}/${props.task.Id}/${file}`;
+    }, []);
+
     const fileIcon = React.useMemo(() => getFileIconName(props.attachment.Name), []);
 
     return (
@@ -78,16 +90,29 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
                     <Icon iconName="RedEye" />
                 </Link>
                 <Link
+                    data-interception="off"
+                    underline={false}
+                    href={downloadLinkHref(props.attachment.Name)}
                     title="Download"
                 >
                     <Icon iconName="Download" />
                 </Link>
                 <Link
                     onClick={async () => {
-                        await removeAttachment(props.task, props.attachment.Name);
-                        props.setAttachments((prev) =>
-                            prev.filter((pa) => pa.Name !== props.attachment.Name)
-                        );
+                        const alert = await getAlert({
+                            title: 'Delete',
+                            subText: `You are about to delete file '${props.attachment.Name}'. Are you sure?`,
+                            buttons: [
+                                { key: 'Yes', text: 'Yes', },
+                                { key: 'No', text: 'No', },
+                            ]
+                        });
+                        if (alert === 'Yes') {
+                            await removeAttachment(props.task, props.attachment.Name);
+                            props.setAttachments((prev) =>
+                                prev.filter((pa) => pa.Name !== props.attachment.Name)
+                            );
+                        }
                     }}
                     title="Delete"
                 >
@@ -99,7 +124,7 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
 }
 
 export const Attachments: React.FC<IAttachmentsProps> = (props) => {
-    const { properties, theme } = React.useContext(GlobalContext);
+    const { theme } = React.useContext(GlobalContext);
     const [attachments, setAttachments] = React.useState([]);
     const {
         addAttachments,
@@ -111,22 +136,25 @@ export const Attachments: React.FC<IAttachmentsProps> = (props) => {
     }, []);
 
     return (
-        <div
-            style={{
-                backgroundColor: theme.palette.themeLighterAlt,
-                padding: '.5em',
-            }}
-        >
-            <div className={styles.attachments} style={{ borderColor: theme.palette.themeLight }} >
-                {attachments.map((a) => (<Attachment key={a.Name} attachment={a} task={props.task} setAttachments={setAttachments} />))}
-            </div>
-            <FileInput
-                multiple
-                onFilesAdded={async (files) => {
-                    await addAttachments(props.task, files);
-                    setAttachments(await getAttachments(props.task));
+        <>
+            <Label className={styles.attachments__label}>Files</Label>
+            <div
+                style={{
+                    backgroundColor: theme.palette.themeLighterAlt,
+                    padding: '.5em',
                 }}
-            />
-        </div>
+            >
+                <div className={styles.attachments} style={{ borderColor: theme.palette.themeLight }} >
+                    {attachments.map((a) => (<Attachment key={a.Name} attachment={a} task={props.task} setAttachments={setAttachments} />))}
+                </div>
+                <FileInput
+                    multiple
+                    onFilesAdded={async (files) => {
+                        await addAttachments(props.task, files);
+                        setAttachments(await getAttachments(props.task));
+                    }}
+                />
+            </div>
+        </>
     );
 };

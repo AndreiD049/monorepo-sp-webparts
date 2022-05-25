@@ -6,3 +6,4 @@ export const NODE_OPEN_EVT ='cip-node-open-event';
 export const TASKS_ADDED_EVT = 'sp-cip-tasks-added-event';
 export const TASK_UPDATED_EVT = 'sp-cip-task-updated-event';
 export const CALLOUT_MENU_EVT = 'sp-cip-contextual-menu-event';
+export const DIALOG_EVT = 'sp-cip-alert-dialog-event';

@@ -13,6 +13,7 @@ import * as React from 'react';
 import styles from './Comments.module.scss';
 import { ITaskOverview } from '../tasks/ITaskOverview';
 import { useComments } from './useComments';
+import { ITaskComment } from './ITaskComment';
 
 interface ICommentsProps {
     task: ITaskOverview;
@@ -22,7 +23,7 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
     const commentsAPI = useComments();
     const [newComment, setNewComment] = React.useState('');
     const [allLoaded, setAllLoaded] = React.useState(false);
-    const [taskComments, setTaskComments] = React.useState([]);
+    const [taskComments, setTaskComments] = React.useState<ITaskComment[]>([]);
 
     const onLoadMore = React.useCallback(async () => {
         const all = await commentsAPI.getByTask(props.task);
@@ -61,6 +62,9 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
                     styles={{ root: { fontSize: '16px' } }}
                 />
             ),
+            activityPersonas: [{
+                imageUrl: `/_layouts/15/userphoto.aspx?accountname=${comment.Author.EMail}&Size=M`
+            }],
             comments: (
                 <div className={styles['comments__content']}>
                     {comment.Comment}
@@ -86,6 +90,7 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
                         resizable={false}
                         autoAdjustHeight
                         onChange={(evt, val) => setNewComment(val)}
+                        placeholder="Add comment"
                     />
                 </StackItem>
                 <IconButton
@@ -97,7 +102,8 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
                 <div className={styles.comments}>
                     <ActivityItem
                         key={item.key}
-                        activityIcon={item.activityIcon}
+                        // activityIcon={item.activityIcon}
+                        activityPersonas={item.activityPersonas}
                         activityDescription={item.activityDescription}
                         comments={item.comments}
                         timeStamp={item.timeStamp}

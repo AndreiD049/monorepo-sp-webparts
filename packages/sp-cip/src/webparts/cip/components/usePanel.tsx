@@ -72,6 +72,7 @@ const usePanel = (props?: IPanelProps) => {
                 onRenderFooterContent={() => footer}
                 isFooterAtBottom={props?.isFooterAtBottom || false}
                 type={props?.type || PanelType.smallFixedFar}
+                onOuterClick={() => null}
             >
                 <RenderComponent
                     setFooter={setFooter}

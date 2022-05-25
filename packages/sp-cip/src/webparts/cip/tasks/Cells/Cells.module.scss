@@ -71,6 +71,14 @@
     flex-flow: column nowrap;
 }
 
+.teamCell {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 40px;
+}
+
 .progress {
     position: relative;
     width: 100%;

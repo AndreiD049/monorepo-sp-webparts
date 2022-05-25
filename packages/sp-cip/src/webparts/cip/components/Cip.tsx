@@ -8,6 +8,7 @@ import { useCipPanels } from './useCipPanels';
 import { ICipWebPartProps } from '../CipWebPart';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import { useUsers } from '../users/useUsers';
+import { AlertDialog } from './AlertDialog';
 
 interface ICipProps {
     properties: ICipWebPartProps;
@@ -39,6 +40,7 @@ const Cip: React.FC<ICipProps> = (props) => {
 
                 <TasksTable />
                 {panels}
+                <AlertDialog />
             </div>
         </GlobalContext.Provider>
     );

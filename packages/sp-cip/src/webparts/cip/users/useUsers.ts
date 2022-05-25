@@ -19,6 +19,10 @@ export const useUsers = (props?: { properties: ICipWebPartProps }) => {
         return sp.web.siteUsers();
     }
 
+    const getUser = async (id: number) => {
+        return sp.web.siteUsers.getById(id)();
+    }
+
     const getTeams = async () => {
         const teamsField = await usersList.fields.getByTitle(properties.teamsField)();
         return teamsField.Choices;
@@ -39,6 +43,7 @@ export const useUsers = (props?: { properties: ICipWebPartProps }) => {
 
     return {
         getAll,
+        getUser,
         getTeams,
         getPersonaProps,
     }

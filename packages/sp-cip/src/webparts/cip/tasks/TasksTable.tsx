@@ -33,7 +33,7 @@ const columns: IColumn[] = [
         key: 'Actions',
         name: 'Actions',
         fieldName: 'Actions',
-        minWidth: 100,
+        minWidth: 150,
     },
     {
         key: 'Priority',

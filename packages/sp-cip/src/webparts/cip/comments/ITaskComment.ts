@@ -3,6 +3,7 @@ export interface ITaskComment {
     Author?: {
         Id: number;
         Title: string;
+        EMail: string;
     };
     Created?: string;
     ListId: string;
