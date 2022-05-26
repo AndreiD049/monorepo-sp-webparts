@@ -104,7 +104,7 @@ const ResponsibleCell = (props: IResponsibleCellProps) => {
     );
 
     return (
-        <button className={styles.button} disabled={props.node.Display === 'disabled'} ref={elemRef} onClick={handleClick}>
+        <button className={`${styles.button} ${styles.responsible_button}`} disabled={props.node.Display === 'disabled'} ref={elemRef} onClick={handleClick}>
             <Persona
                 text={task.Responsible.Title}
                 size={PersonaSize.size24}
