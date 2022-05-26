@@ -1,4 +1,4 @@
-import { DefaultButton, Icon, Label, Link, Stack, Text, themeRulesStandardCreator } from 'office-ui-fabric-react';
+import { ButtonType, DefaultButton, Icon, Label, Link, Stack, Text, themeRulesStandardCreator } from 'office-ui-fabric-react';
 import { useControlledState } from 'office-ui-fabric-react/lib/Foundation';
 import * as React from 'react';
 import { FileInput } from '../components/Utils/FileInput';
@@ -104,7 +104,7 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
                             subText: `You are about to delete file '${props.attachment.Name}'. Are you sure?`,
                             buttons: [
                                 { key: 'Yes', text: 'Yes', },
-                                { key: 'No', text: 'No', },
+                                { key: 'No', text: 'No', type: ButtonType.default },
                             ]
                         });
                         if (alert === 'Yes') {

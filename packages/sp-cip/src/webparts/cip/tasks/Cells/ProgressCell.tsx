@@ -1,4 +1,11 @@
-import { PrimaryButton, Slider, Text } from 'office-ui-fabric-react';
+import {
+    ActionButton,
+    PrimaryButton,
+    Separator,
+    Slider,
+    StackItem,
+    Text,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
@@ -25,6 +32,9 @@ const ProgressCellCallout: React.FC<IProgressCellProps> = (props) => {
 
     return (
         <div className={`${styles.callout} ${styles['callout-progress']}`}>
+            <Text style={{ marginBottom: '.5em' }} variant="medium">
+                Update progress:
+            </Text>
             <Slider
                 min={0}
                 max={100}
@@ -35,14 +45,14 @@ const ProgressCellCallout: React.FC<IProgressCellProps> = (props) => {
                 value={Math.round(value * 100)}
                 valueFormat={(num) => `${num}%`}
             />
-            <PrimaryButton
-                style={{
-                    marginTop: '.5em',
-                }}
-                onClick={handleClick}
-            >
-                Save
-            </PrimaryButton>
+            <StackItem align="center">
+                <ActionButton
+                    iconProps={{ iconName: 'Save' }}
+                    onClick={handleClick}
+                >
+                    Save
+                </ActionButton>
+            </StackItem>
         </div>
     );
 };
@@ -59,19 +69,22 @@ export const ProgressCell: React.FC<IProgressCellProps> = (props) => {
     }, [props.node, progressRef]);
 
     return (
-        <div
+        <button
             ref={progressRef}
-            className={styles.progress}
+            className={`${styles.progress} ${styles.button}`}
             onClick={handleClick}
+            disabled={props.node.Display === 'disabled'}
         >
             <Text
                 variant="medium"
                 className={styles['progress-value']}
             >{`${Math.round(props.node.getTask()?.Progress * 100)}%`}</Text>
             <div
-                className={styles['progress-bar']}
+                className={`${styles['progress-bar']} ${
+                    props.node.Display === 'disabled' ? styles.disabled : ''
+                }`}
                 style={{ width: `${props.node.getTask().Progress * 100}%` }}
             />
-        </div>
+        </button>
     );
 };

@@ -16,4 +16,9 @@
         background-color: "[theme: themeLighterAlt, default: #fbf4f4]";
         background-blend-mode: hue;
     }
+
+    &.disabled {
+        color:  "[theme: neutralTertiary, default: #f4f4f4]";
+        background-color:  "[theme: neutralLighterAlt, default: #f4f4f4]";
+    }
 }

@@ -47,7 +47,7 @@ const useParentStroke = (node: TaskNode) => {
                         `task-${task.ParentId}`
                     );
                     const self = document.getElementById(`task-${task.Id}`);
-                    const prev = prevSibling ? document.getElementById(`task-${prevSibling.Id}`) : parent;
+                    const prev = prevSibling && document.getElementById(`task-${prevSibling.Id}`) ? document.getElementById(`task-${prevSibling.Id}`) : parent;
                     if (parent && self) {
                         setElem(getConnectingStroke(parent, self, prev));
                     }

@@ -1,7 +1,7 @@
 import { Persona, PersonaSize, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import Pill from '../../components/Pill/Pill';
-import Timing from '../../components/Timing';
+import Timing from './Timing';
 import { TaskNode } from '../graph/TaskNode';
 import ActionsCell from './ActionsCell';
 import { DueDateCell } from './DueDateCell';
@@ -9,57 +9,40 @@ import { ProgressCell } from './ProgressCell';
 import { StatusCell } from './StatusCell';
 import { TeamCell } from './TeamCell';
 import { TitleCell } from './TitleCell';
+import PriorityCell from './PriorityCell';
+import ResponsibleCell from './ResponsibleCell';
 
-export const renderCell = (
-    fieldName: string,
-    node: TaskNode,
-) => {
-    const nestLevel = node.level || 0;
-    const task = node.getTask();
-    switch (fieldName.toLowerCase()) {
+interface IRenderCellProps {
+    fieldName: string;
+    node: TaskNode;
+}
+
+export const RenderCell: React.FC<IRenderCellProps> = (props) => {
+    const nestLevel = props.node.level || 0;
+    const task = props.node.getTask();
+    switch (props.fieldName.toLowerCase()) {
         case 'title':
-            return TitleCell(node, nestLevel);
+            return TitleCell(props.node, nestLevel);
         case 'responsible':
-            return (
-                <Persona
-                    text={task.Responsible.Title}
-                    size={PersonaSize.size24}
-                    imageUrl={`/_layouts/15/userphoto.aspx?AccountName=${task.Responsible.EMail}&Size=M`}
-                    title={task.Responsible.Title}
-                />
-            );
+            return <ResponsibleCell node={props.node} />
         case 'status':
-            return <StatusCell node={node} />;
+            return <StatusCell node={props.node} />;
         case 'priority':
-            return (
-                <Pill
-                    style={{
-                        height: '100%',
-                        width: '100%',
-                        borderRadius: '5px',
-                    }}
-                    value={task.Priority}
-                />
-            )
+            return <PriorityCell node={props.node} />;
         case 'actions':
-            return ActionsCell(node, nestLevel);
+            return ActionsCell(props.node, nestLevel);
         case 'progress':
-            return <ProgressCell node={node} />;
+            return <ProgressCell node={props.node} />;
         case 'duedate':
-            return (<DueDateCell node={node} />);
+            return <DueDateCell node={props.node} />;
         case 'team':
-            return (<TeamCell node={node} />)
+            return <TeamCell node={props.node} />;
         case 'timing':
-            return (
-                <Timing
-                    estimatedTime={task.EstimatedTime}
-                    effectiveTime={task.EffectiveTime}
-                />
-            );
+            return <Timing node={props.node} />;
         default:
             return (
                 <Text variant="medium" block>
-                    {node.getTask()[fieldName]}
+                    {props.node.getTask()[props.fieldName]}
                 </Text>
             );
     }

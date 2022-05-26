@@ -3,15 +3,23 @@ import * as React from 'react';
 import { ITaskOverview } from './ITaskOverview';
 import styles from './Task.module.scss';
 import { TaskNode } from './graph/TaskNode';
-import { renderCell } from './Cells/render-cells';
-import {
-    nodeToggleOpenHandler, relinkParent,
-} from '../utils/dom-events';
+import { RenderCell } from './Cells/render-cells';
+import { nodeToggleOpenHandler, relinkParent } from '../utils/dom-events';
 import SubtasksProxy from './SubtasksProxy';
+import { GlobalContext } from '../utils/GlobalContext';
+
+function initialOpen(node: TaskNode, isFiltered: boolean) {
+    if (!isFiltered) return false;
+    if (!node.hasChildren()) return false;
+    if (node.getChildren().some((c) => c.isFilterApplicable)) return true;
+    return node.getChildren().some((c) => initialOpen(c, isFiltered));
+}
+
 export interface ITaskProps {
     rowProps: IDetailsRowProps;
     node: TaskNode;
     setTasks: React.Dispatch<React.SetStateAction<ITaskOverview[]>>;
+    isFiltered?: boolean;
 }
 
 /**
@@ -23,10 +31,16 @@ export interface ITaskProps {
  * * subtasks are loading (https://developer.microsoft.com/en-us/fluentui#/controls/web/shimmer)
  */
 const Task: React.FC<ITaskProps> = (props) => {
+    const { theme } = React.useContext(GlobalContext);
     const [open, setOpen] = React.useState<boolean>(false);
+
+    React.useEffect(() => {
+        setOpen(initialOpen(props.node, props.isFiltered));
+    }, [props.isFiltered]);
 
     const subtasksNode = React.useMemo(() => {
         if (!open) return null;
+        if (props.node.Display === 'hidden') return null;
         return (
             <SubtasksProxy
                 rowProps={props.rowProps}
@@ -47,6 +61,7 @@ const Task: React.FC<ITaskProps> = (props) => {
                 <div>
                     {props.node.getChildren().map((child) => (
                         <Task
+                            isFiltered={props.isFiltered}
                             node={child}
                             rowProps={props.rowProps}
                             setTasks={props.setTasks}
@@ -73,18 +88,24 @@ const Task: React.FC<ITaskProps> = (props) => {
         };
     }, []);
 
+    if (props.node.Display === 'hidden') return null;
+
     return (
         <>
-            <div className={styles.task}>
+            <div className={`${styles.task} ${props.node.Display === 'disabled' ? styles.disabled : ''}`}>
                 {props.rowProps.columns.map((column) => {
                     return (
                         <div
+                            key={column.fieldName}
                             className={styles.task__cell}
                             style={{
                                 width: column.calculatedWidth,
                             }}
                         >
-                            {renderCell(column.fieldName, props.node)}
+                            <RenderCell
+                                fieldName={column.fieldName}
+                                node={props.node}
+                            />
                         </div>
                     );
                 })}

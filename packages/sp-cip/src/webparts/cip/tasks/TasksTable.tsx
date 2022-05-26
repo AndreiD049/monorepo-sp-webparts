@@ -8,6 +8,7 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { SPnotify } from 'sp-react-notifications';
+import CipCommandBar from '../components/CipCommandBar';
 import { useCallout } from '../components/useCallout';
 import { DETAILS_PANEL_ID } from '../components/useCipPanels';
 import { openPanel, relinkParent, taskAddedHandler, taskUpdatedHandler } from '../utils/dom-events';
@@ -82,23 +83,17 @@ const columns: IColumn[] = [
 const TasksTable = () => {
     const { getNonFinishedMains, getAll } = useTasks();
     const [tasks, setTasks] = React.useState<ITaskOverview[]>([]);
+    const [allTasks, setAllTasks] = React.useState<ITaskOverview[]>([]);
     const { CalloutComponent } = useCallout();
+    const [search, setSearch] = React.useState('');
 
     React.useEffect(() => {
-        async function run() {
-            try {
-                // if no filters are applied
-                const tasks = await getNonFinishedMains();
-                setTasks(tasks);
-            } catch (err) {
-                SPnotify({
-                    message: err.message,
-                    messageType: MessageBarType.error,
-                });
-            }
-        }
-        run();
-    }, []);
+        if (tasks.length === 0) getNonFinishedMains().then((t) => setTasks(t));
+        if (allTasks.length === 0 && search !== '') getAll().then((t) => {
+            setAllTasks(t);
+            setTasks(t);
+        });
+    }, [tasks, setAllTasks, search]);
 
     // Dom events
     React.useEffect(() => {
@@ -122,22 +117,33 @@ const TasksTable = () => {
     }, []);
 
     const tree = React.useMemo(() => {
-        return createTaskTree(tasks.sort((a, b) => a.Category < b.Category ? -1 : 1));
+        return createTaskTree(tasks);
     }, [tasks]);
 
+    const filteredTree = React.useMemo(() => {
+        const lowerSearch = search.toLowerCase();
+        return tree.clone().filter([
+            (node) => node.getTask().Title.toLowerCase().indexOf(lowerSearch) !== -1,
+            (node) => node.getTask().Responsible.Title.toLowerCase().indexOf(lowerSearch) !== -1,
+        ]);
+    }, [tree, search]);
+
     const rows = React.useMemo(() => {
-        return tree
+        return filteredTree
             .getChildren()
+            .filter((c) => c.Display !== 'hidden')
+            .sort((a, b) => a.Category < b.Category ? -1 : 1)
             .map((item) => ({
                 key: item.Id,
                 data: item,
             }));
-    }, [tree]);
+    }, [filteredTree]);
 
     const { groups, groupProps } = useGroups(rows);
 
     return (
         <>
+            <CipCommandBar onSearch={(val) => setSearch(val)} />
             <DetailsList
                 groups={groups}
                 groupProps={groupProps}
@@ -147,6 +153,7 @@ const TasksTable = () => {
                 items={rows}
                 onRenderRow={(props) => (
                     <Task
+                        isFiltered={search !== ''}
                         rowProps={props}
                         node={props.item.data}
                         setTasks={setTasks}

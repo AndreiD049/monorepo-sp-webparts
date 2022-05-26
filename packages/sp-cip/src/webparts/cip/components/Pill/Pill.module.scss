@@ -4,6 +4,7 @@
     cursor: pointer;
 
     &__inner {
+        cursor: pointer;
         align-items: center;
         justify-content: center;
         border-radius: 16px;
@@ -66,4 +67,10 @@
     background-color: #ffebc0;
     color: #8f6200;
     border-color: #8f6200;
+}
+
+.disabled {
+    background-color: transparentize($color: lightgray, $amount: .7);
+    color: transparentize($color: gray, $amount: .5);
+    border-color: gray;
 }

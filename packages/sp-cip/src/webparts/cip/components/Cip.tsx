@@ -1,7 +1,6 @@
 import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { GlobalContext } from '../utils/GlobalContext';
-import CipCommandBar from './CipCommandBar';
 import styles from './Cip.module.scss';
 import TasksTable from '../tasks/TasksTable';
 import { useCipPanels } from './useCipPanels';
@@ -36,8 +35,6 @@ const Cip: React.FC<ICipProps> = (props) => {
                 <Text variant="xxLargePlus" className={styles.header} block>
                     {props.properties.headerText}
                 </Text>
-                <CipCommandBar />
-
                 <TasksTable />
                 {panels}
                 <AlertDialog />

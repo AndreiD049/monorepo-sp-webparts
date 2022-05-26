@@ -39,6 +39,10 @@
 .action-buttons-container {
     opacity: 0.5;
     transition: opacity .2s;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
 
     &:hover {
         opacity: 1;
@@ -69,6 +73,7 @@
     min-width: 200px;
     display: flex;
     flex-flow: column nowrap;
+    align-items: stretch;
 }
 
 .teamCell {
@@ -77,14 +82,16 @@
     align-items: flex-start;
     justify-content: center;
     min-height: 40px;
+    width: 100%;
 }
 
 .progress {
     position: relative;
     width: 100%;
     color: "[theme: white, default: #fff]";
-    background-color: "[theme: neutralQuaternaryAlt, default: #fff]";
+    background-color: "[theme: neutralQuaternaryAlt, default: #fff]" !important;
     border: 1px solid lightgray;
+    text-align: start;
 
     &-value {
         position: relative;
@@ -102,4 +109,38 @@
         left: 0;
         min-width: 3px;
     }
+
+    .disabled {
+        color:  "[theme: neutralTertiary, default: #f4f4f4]";
+        background-color:  "[theme: neutralLight, default: #f4f4f4]";
+    }
+}
+
+.priority {
+    min-width: 100px;
+}
+
+.responsible {
+    max-height: 400px;
+    width: 200px;
+}
+
+.responsible_user {
+    padding: .3em;
+    cursor: pointer;
+    display: block;
+    background: none;
+    border: none;
+    width: 100%;
+
+    &:hover {
+        background-color: "[theme: neutralLighter, default: #f4f4f4]";
+    }
+}
+
+.button {
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
 }

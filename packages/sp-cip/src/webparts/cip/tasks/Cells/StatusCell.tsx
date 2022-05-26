@@ -46,6 +46,7 @@ export const StatusCell: React.FC<IStatusCellProps> = (props) => {
             id={`task-status-pill-${props.node.Id}`}
             onClick={handleClick}
             value={props.node.getTask()?.Status}
+            disabled={props.node.Display === 'disabled'}
         />
     );
 };

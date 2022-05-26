@@ -3,7 +3,6 @@ import * as React from 'react';
 import { ICellRenderer } from './ICellRenderer';
 import styles from './Cells.module.scss';
 import useParentStroke from '../../components/ParentStroke';
-import { RELINK_PARENT_EVT } from '../../utils/constants';
 import { TaskNode } from '../graph/TaskNode';
 import { nodeToggleOpen, openPanel } from '../../utils/dom-events';
 import { DETAILS_PANEL_ID } from '../../components/useCipPanels';
@@ -41,6 +40,7 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
     return (
         <div style={{position: 'relative'}}>
             <button
+                disabled={props.node.Display === 'disabled'}
                 ref={button}
                 id={`task-${item.Id}`}
                 data-taskid={item.Id}

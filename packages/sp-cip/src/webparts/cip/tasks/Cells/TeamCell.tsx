@@ -1,8 +1,9 @@
 import { ActionButton } from '@microsoft/office-ui-fabric-react-bundle';
 import { DirectionalHint, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
+import { calloutVisibility, nodeToggleOpen, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
+import { TaskNode } from '../graph/TaskNode';
 import { ITaskOverview } from '../ITaskOverview';
 import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
@@ -29,7 +30,11 @@ const TeamCellCallout = (props) => {
     );
 };
 
-export const TeamCell = (props) => {
+interface ITeamCellProps {
+    node: TaskNode;
+}
+
+export const TeamCell: React.FC<ITeamCellProps> = (props) => {
     const task: ITaskOverview = props.node.getTask();
     const teamRef = React.useRef(null);
 
@@ -46,8 +51,8 @@ export const TeamCell = (props) => {
     );
 
     return (
-        <div ref={teamRef} onClick={handleClick} className={styles.teamCell}>
+        <button disabled={props.node.Display === 'disabled'} ref={teamRef} onClick={handleClick} className={`${styles.teamCell} ${styles.button}`}>
             <Text variant="medium">{task.Team || ''}</Text>
-        </div>
+        </button>
     );
 };

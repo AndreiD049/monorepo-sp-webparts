@@ -1,14 +1,10 @@
-import {
-    ActionButton,
-    Calendar,
-    Stack,
-    Text,
-} from 'office-ui-fabric-react';
+import { ActionButton, Calendar, Stack, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
 import { ITaskOverview } from '../ITaskOverview';
 import { useTasks } from '../useTasks';
+import styles from './Cells.module.scss';
 
 const defaultCalendarStrings = {
     months: [
@@ -73,27 +69,28 @@ const DueDateCellCallout = (props) => {
     );
 
     return (
-            <Stack horizontalAlign='center'>
-                <Calendar
-                    showGoToToday
-                    onSelectDate={(dt) => setSelectedDate(dt)}
-                    value={selectedDate}
-                    strings={defaultCalendarStrings}
-                />
-                <ActionButton
-                    onClick={async () => {
-                        await updateTask(task.Id, {
-                            DueDate: selectedDate.toISOString(),
-                        });
-                        taskUpdated(await getTask(task.Id));
-                        calloutVisibility({
-                            visible: false,
-                        });
-                    }}
-                >
-                    Save
-                </ActionButton>
-            </Stack>
+        <Stack horizontalAlign="center">
+            <Calendar
+                showGoToToday
+                onSelectDate={(dt) => setSelectedDate(dt)}
+                value={selectedDate}
+                strings={defaultCalendarStrings}
+            />
+            <ActionButton
+                iconProps={{ iconName: 'Save' }}
+                onClick={async () => {
+                    await updateTask(task.Id, {
+                        DueDate: selectedDate.toISOString(),
+                    });
+                    taskUpdated(await getTask(task.Id));
+                    calloutVisibility({
+                        visible: false,
+                    });
+                }}
+            >
+                Save
+            </ActionButton>
+        </Stack>
     );
 };
 
@@ -111,10 +108,15 @@ export const DueDateCell = ({ node }: { node: TaskNode }) => {
     }, [node, textRef]);
 
     return (
-        <div ref={textRef} onClick={handleClick}>
+        <button
+            ref={textRef}
+            onClick={handleClick}
+            disabled={node.Display === 'disabled'}
+            className={styles.button}
+        >
             <Text variant="medium">
                 {new Date(task.DueDate).toLocaleDateString()}
             </Text>
-        </div>
+        </button>
     );
 };
