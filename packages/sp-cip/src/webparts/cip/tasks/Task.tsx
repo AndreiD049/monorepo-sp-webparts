@@ -3,7 +3,7 @@ import * as React from 'react';
 import { ITaskOverview } from './ITaskOverview';
 import styles from './Task.module.scss';
 import { TaskNode } from './graph/TaskNode';
-import { RenderCell } from './Cells/render-cells';
+import { RenderCell } from './cells/render-cells';
 import { nodeToggleOpenHandler, relinkParent } from '../utils/dom-events';
 import SubtasksProxy from './SubtasksProxy';
 import { GlobalContext } from '../utils/GlobalContext';

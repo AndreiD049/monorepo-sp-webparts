@@ -2,7 +2,7 @@ import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { GlobalContext } from '../utils/GlobalContext';
 import styles from './Cip.module.scss';
-import TasksTable from '../tasks/TasksTable';
+import TasksTable from '../tasks/table/TasksTable';
 import { useCipPanels } from './useCipPanels';
 import { ICipWebPartProps } from '../CipWebPart';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';

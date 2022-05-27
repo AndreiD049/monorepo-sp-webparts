@@ -1,7 +1,7 @@
 import { PanelType } from "office-ui-fabric-react"
 import * as React from "react";
-import CreateTaskPanel from "../tasks/Panels/CreateTask"
-import { TaskDetails } from "../tasks/Panels/TaskDetails";
+import CreateTaskPanel from "../tasks/panels/CreateTask"
+import { TaskDetails } from "../tasks/panels/TaskDetails";
 import usePanel from "./usePanel"
 
 export const CREATE_PANEL_ID = 'sp-cip-create-panel';

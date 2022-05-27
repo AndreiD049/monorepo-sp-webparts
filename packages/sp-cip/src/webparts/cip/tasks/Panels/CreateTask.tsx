@@ -15,7 +15,6 @@ import {
     StackItem,
     TextField,
 } from 'office-ui-fabric-react';
-import { useControlledState } from 'office-ui-fabric-react/lib/Foundation';
 import * as React from 'react';
 import { CREATE_PANEL_ID } from '../../components/useCipPanels';
 import { IPanelComponentProps } from '../../components/usePanel';
@@ -24,7 +23,7 @@ import { openPanel, tasksAdded, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { ICreateTask } from '../ITaskDetails';
-import { useGroups } from '../useGroups';
+import { useGroups } from '../table/useGroups';
 import { useTasks } from '../useTasks';
 
 export interface ICreateTaskProps {

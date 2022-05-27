@@ -123,6 +123,15 @@ export class TaskNode implements IClonable<TaskNode> {
         return parent.getChildren()[this.index + 1];
     }
 
+    public getAllDescendants(): TaskNode[] {
+        const result = [];
+        this.getChildren().forEach((child) => { 
+            result.push(child);
+            result.push(...child.getAllDescendants());
+        });
+        return result;
+    }
+
     public filter(filters: ((node: TaskNode) => boolean)[]) {
         if (this.getType() === 'root') {
             this.getChildren().forEach((child) => child.filter(filters));

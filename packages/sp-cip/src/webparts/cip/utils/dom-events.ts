@@ -140,12 +140,12 @@ export const openPanelHandler = (
 /**
  * Handle callout menu opened
  */
-export interface ICalloutEventProps extends ICalloutProps {
+export interface ICalloutEventProps<T> extends ICalloutProps {
     visible: boolean;
-    componentProps?: any;
+    componentProps?: T;
     RenderComponent?: React.FunctionComponent;
 }
-export const calloutVisibility = (props: ICalloutEventProps) => {
+export const calloutVisibility = <T>(props: ICalloutEventProps<T>) => {
     document.dispatchEvent(
         new CustomEvent(CALLOUT_MENU_EVT, {
             detail: {
@@ -156,7 +156,7 @@ export const calloutVisibility = (props: ICalloutEventProps) => {
 };
 
 export const calloutVisibilityHandler = (
-    func: (props: ICalloutEventProps) => void
+    func: <T>(props: ICalloutEventProps<T>) => void
 ) => {
     const handler = (evt: CustomEvent) => {
         if (evt.detail?.props) {

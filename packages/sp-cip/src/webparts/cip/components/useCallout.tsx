@@ -4,14 +4,14 @@ import { calloutVisibilityHandler, ICalloutEventProps } from "../utils/dom-event
 
 
 export const useCallout = () => {
-    const defaultProps: ICalloutEventProps = React.useMemo(() => ({
+    const defaultProps: ICalloutEventProps<any> = React.useMemo(() => ({
         target: null,
         visible: false,
         directionalHint: DirectionalHint.bottomCenter,
         RenderComponent: () => null,
     }), []);
 
-    const [calloutData, setCalloutData] = React.useState<ICalloutEventProps>({
+    const [calloutData, setCalloutData] = React.useState<ICalloutEventProps<any>>({
         ...defaultProps,
         onDismiss: () => setCalloutData((prev) => ({
             ...prev,

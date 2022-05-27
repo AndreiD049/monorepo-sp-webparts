@@ -1,84 +1,19 @@
 import {
-    ColumnActionsMode,
     DetailsList,
     DetailsListLayoutMode,
-    IColumn,
-    MessageBarType,
     SelectionMode,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { SPnotify } from 'sp-react-notifications';
-import CipCommandBar from '../components/CipCommandBar';
-import { useCallout } from '../components/useCallout';
-import { DETAILS_PANEL_ID } from '../components/useCipPanels';
-import { openPanel, relinkParent, taskAddedHandler, taskUpdatedHandler } from '../utils/dom-events';
-import { createTaskTree } from './graph/factory';
-import { ITaskOverview } from './ITaskOverview';
-import Task from './Task';
+import CipCommandBar from '../../components/CipCommandBar';
+import { useCallout } from '../../components/useCallout';
+import { relinkParent, taskAddedHandler, taskUpdatedHandler } from '../../utils/dom-events';
+import { createTaskTree } from '../graph/factory';
+import { ITaskOverview } from '../ITaskOverview';
+import Task from '../Task';
 import { useGroups } from './useGroups';
-import { useTasks } from './useTasks';
+import { useTasks } from '../useTasks';
+import { useColumns } from './useColumns';
 
-const columns: IColumn[] = [
-    {
-        key: 'Title',
-        name: 'Title',
-        fieldName: 'Title',
-        minWidth: 500,
-        isResizable: true,
-        columnActionsMode: ColumnActionsMode.hasDropdown,
-        onColumnContextMenu: (col, ev) => {
-            console.log(col, ev);
-        }
-    },
-    {
-        key: 'Actions',
-        name: 'Actions',
-        fieldName: 'Actions',
-        minWidth: 150,
-    },
-    {
-        key: 'Priority',
-        name: 'Priority',
-        fieldName: 'Priority',
-        minWidth: 100,
-    },
-    {
-        key: 'Responsible',
-        name: 'Responsible',
-        fieldName: 'Responsible',
-        minWidth: 150,
-    },
-    {
-        key: 'Status',
-        name: 'Status',
-        fieldName: 'Status',
-        minWidth: 100,
-    },
-    {
-        key: 'Progress',
-        name: 'Progress',
-        fieldName: 'Progress',
-        minWidth: 100,
-    },
-    {
-        key: 'DueDate',
-        name: 'Due Date',
-        fieldName: 'DueDate',
-        minWidth: 100,
-    },
-    {
-        key: 'Team',
-        name: 'Team',
-        fieldName: 'Team',
-        minWidth: 100,
-    },
-    {
-        key: 'Timing',
-        name: 'Timing',
-        fieldName: 'Timing',
-        minWidth: 200,
-    },
-];
 
 const TasksTable = () => {
     const { getNonFinishedMains, getAll } = useTasks();
@@ -138,6 +73,8 @@ const TasksTable = () => {
                 data: item,
             }));
     }, [filteredTree]);
+    
+    const { columns } = useColumns(filteredTree);
 
     const { groups, groupProps } = useGroups(rows);
 

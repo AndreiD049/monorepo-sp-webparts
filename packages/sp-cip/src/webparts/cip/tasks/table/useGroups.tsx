@@ -6,8 +6,8 @@ import {
 import * as React from 'react';
 import { useState } from 'react';
 import useWebStorage from 'use-web-storage-api';
-import { GROUP_LABELS_KEY } from '../utils/constants';
-import { TaskNode } from './graph/TaskNode';
+import { GROUP_LABELS_KEY } from '../../utils/constants';
+import { TaskNode } from '../graph/TaskNode';
 
 export const useGroups = (tasks?: { key: number; data: TaskNode }[]) => {
     const [allCollapsed, setAllCollapsed] = useState(false);
