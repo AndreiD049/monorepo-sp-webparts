@@ -41,10 +41,20 @@ const TimingCallout: React.FC<ITimingProps> = (props) => {
                 tabIndex={1}
                 value={value.toString()}
                 min={0}
-                onChange={(ev: any) => setValue(+ev.target.value)}
-                onIncrement={(val) => setValue(+val + 1)}
+                onValidate={(val) => !Number.isNaN(+val) ? val : null}
+                onChange={(ev: any) => {
+                    const val = ev.target.value;
+                    if (!Number.isNaN(+val)) {
+                        setValue(+val);
+                    }
+                }}
+                onIncrement={(val) => {
+                    if (!Number.isNaN(+val)) {
+                        setValue(+val + 1);
+                    }
+                }}
                 onDecrement={(val) => {
-                    if (+val > 0) {
+                    if (!Number.isNaN(+val) && +val > 0) {
                         setValue(+val - 1);
                     }
                 }}
