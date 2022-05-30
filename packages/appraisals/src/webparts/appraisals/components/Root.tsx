@@ -12,7 +12,6 @@ import PeriodService from '../dal/Periods';
 import GroupService from '../dal/Groups';
 import ItemService from '../dal/Items';
 import ManageFolderService from './folders/folder-service';
-import { IAppraisalsProps } from './periods/IAppraisalsProps';
 import { IAppraisalsWebPartProps } from '../AppraisalsWebPart';
 
 export interface IRootProps {
@@ -20,6 +19,8 @@ export interface IRootProps {
 }
 
 const Root: React.FC<IRootProps> = ({ properties }) => {
+    const [period, setPeriod] = React.useState(null);
+
     const [ctx, setCtx] = React.useState<IUserContext>({
         siteInfo: null,
         teamUsers: [],
@@ -59,6 +60,23 @@ const Root: React.FC<IRootProps> = ({ properties }) => {
         }
         run();
     }, [properties.permissions]);
+
+    React.useEffect(() => {
+        if (properties.showOnlyLastPeriod) {
+            const service = new PeriodService();
+            service.getPeriods().then((periods) => setPeriod(periods[periods.length - 1].ID));
+        }
+    }, [properties.showOnlyLastPeriod]);
+
+    if (properties.showOnlyLastPeriod) {
+        return period !== null && (
+            <UserContext.Provider value={ctx}>
+                <PeriodDetails
+                    ID={period}
+                />
+            </UserContext.Provider>
+        )
+    }
 
     return (
         <UserContext.Provider value={ctx}>

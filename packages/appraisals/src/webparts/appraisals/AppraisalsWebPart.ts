@@ -7,7 +7,7 @@ import {
     PropertyPaneTextField,
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import SPBuilder, { InjectHeaders } from 'sp-preset';
+import SPBuilder, { InjectHeaders, RequestDigest } from 'sp-preset';
 
 import * as strings from 'AppraisalsWebPartStrings';
 import Root, { IRootProps } from './components/Root';
@@ -39,15 +39,16 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
     protected async onInit(): Promise<void> {
         await super.onInit();
 
-        setupAccessControl(this.context);
-
         AppraisalsWebPart.SPBuilder = new SPBuilder(this.context)
             .withRPM()
             .withAdditionalTimelines([
                 InjectHeaders({
                     Accept: 'application/json;odata=nometadata',
                 }),
+                RequestDigest(),
             ]);
+
+        setupAccessControl(this.context);
     }
 
     protected onDispose(): void {
@@ -70,7 +71,9 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
                             groupName: strings.GeneralGroupName,
                             groupFields: [
                                 PropertyPaneCheckbox('showOnlyLastPeriod', {
-                                    checked: this.properties.showOnlyLastPeriod || false,
+                                    checked:
+                                        this.properties.showOnlyLastPeriod ||
+                                        false,
                                     text: strings.ShowOnlyLastPeriodDetailsLabel,
                                 }),
                             ],
