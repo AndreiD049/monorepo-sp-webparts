@@ -1,4 +1,6 @@
 declare interface IAppraisalsWebPartStrings {
+    GeneralGroupName: string;
+    ShowOnlyLastPeriodDetailsLabel: string;
     PropertyPaneDescription: string;
     BasicGroupName: string;
     DescriptionFieldLabel: string;

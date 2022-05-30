@@ -3,6 +3,7 @@ import * as ReactDom from 'react-dom';
 import { Version } from '@microsoft/sp-core-library';
 import {
     IPropertyPaneConfiguration,
+    PropertyPaneCheckbox,
     PropertyPaneTextField,
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
@@ -17,6 +18,7 @@ import AccessControl, {
 
 export interface IAppraisalsWebPartProps {
     permissions: IUserGroupPermissions;
+    showOnlyLastPeriod: boolean;
     defaultFolderRole: string;
     defaultSupportEmails: string;
 }
@@ -64,6 +66,15 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
                         description: strings.PropertyPaneDescription,
                     },
                     groups: [
+                        {
+                            groupName: strings.GeneralGroupName,
+                            groupFields: [
+                                PropertyPaneCheckbox('showOnlyLastPeriod', {
+                                    checked: this.properties.showOnlyLastPeriod || false,
+                                    text: strings.ShowOnlyLastPeriodDetailsLabel,
+                                }),
+                            ],
+                        },
                         {
                             groupName: strings.BasicGroupName,
                             groupFields: [

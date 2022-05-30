@@ -174,6 +174,8 @@ export {
 
 export { Caching, InjectHeaders } from '@pnp/queryable';
 
+export { RequestDigest } from '@pnp/sp';
+
 export {
     IGroupAddResult,
     ISiteGroup,

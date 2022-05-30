@@ -1,5 +1,7 @@
 define([], function () {
     return {
+        GeneralGroupName: "General Settings",
+        ShowOnlyLastPeriodDetailsLabel: "Show last period details only",
         PropertyPaneDescription: 'Settings of appraisal web-part',
         BasicGroupName: 'Permissions',
         FolderManagementGroupName: 'Folder management',
