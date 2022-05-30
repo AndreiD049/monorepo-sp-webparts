@@ -1,7 +1,10 @@
+import { useConst } from '@uifabric/react-hooks';
+import { eq, isEqualWith, result, setWith } from 'lodash';
 import {
     Checkbox,
     getVirtualParent,
     IColumn,
+    PrimaryButton,
     SearchBox,
     Separator,
     Stack,
@@ -16,40 +19,118 @@ export interface IChoiceFacetProps {
     column: IColumn;
 }
 
+function eqSet(as, bs) {
+    if (as.size !== bs.size) return false;
+    for (var a of as) if (!bs.has(a)) return false;
+    return true;
+}
+
 export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
-    const selected = React.useMemo(
-        () => props.options.filter((c) => c.isFilterApplicable),
-        [props.options]
+    // const [selected, setSelected] = React.useState<TaskNode[]>([]);
+    const [search, setSearch] = React.useState('');
+    const [allSelected, setAllSelected] = React.useState(true);
+    const [selectedValues, setSelectedValues] = React.useState<Set<string>>(new Set());
+
+    const initialValuesSet = useConst(
+        new Set(props.options.map((n) => props.getValue(n)))
     );
+    const displayedItems = React.useMemo(
+        () => {
+            const result = props.options.filter((n) => {
+                if (n.isFilterApplicable) {
+                    if (search !== '') {
+                        return (
+                            props
+                                .getValue(n)
+                                .toLowerCase()
+                                .indexOf(search.toLowerCase()) > -1
+                        );
+                    }
+                    return true;
+                }
+                return false;
+            });
+            setSelectedValues(new Set(result.map((n) => props.getValue(n))));
+            return result;
+        },
+        [search]
+    );
+
+    React.useEffect(() => {
+        setAllSelected(displayedItems.every((n) => selectedValues.has(props.getValue(n))));
+    }, [selectedValues]);
 
     return (
         <div
             style={{
                 width: props.column.currentWidth,
-                maxHeight: '300px',
+                maxHeight: '400px',
                 padding: '0px 8px 0px 12px',
+                display: 'flex',
+                flexFlow: 'column nowrap',
+                alignItems: 'stretch',
+                justifyContent: 'stretch',
             }}
         >
-            <SearchBox />
+            <div
+                style={{
+                    paddingTop: '20px',
+                }}
+            >
+                <SearchBox onChange={(_ev, val) => {
+                    setSearch(val);
+                }} />
+            </div>
             <Separator />
-            {props.options
-                .sort((c) => (c.isFilterApplicable ? -1 : 0))
-                .map((option) => (
-                    <Stack
-                        style={{ marginBottom: '.5em', cursor: 'pointer' }}
-                        horizontal
-                        tokens={{ childrenGap: 10 }}
-                        onClick={(ev) =>
-                            props.onChange([
-                                ...selected.map((n) => props.getValue(n)),
-                                props.getValue(option),
-                            ])
-                        }
-                    >
-                        <Checkbox checked={option.isFilterApplicable} />{' '}
-                        {props.getValue(option)}
-                    </Stack>
+            <div
+                style={{
+                    overflowY: 'auto',
+                }}
+            >
+                {/* Select all checkbox */}
+                <Checkbox
+                    styles={{
+                        root: {
+                            marginTop: '10px',
+                        },
+                    }}
+                    label="All"
+                    checked={allSelected}
+                    onChange={(_ev, checked) => setSelected(checked ? displayedItems : [])}
+                />
+                {/* Options checkboxes */}
+                {displayedItems.map((option) => (
+                    <Checkbox
+                        key={option.Id}
+                        styles={{
+                            root: {
+                                marginTop: '10px',
+                            },
+                        }}
+                        label={props.getValue(option)}
+                        checked={selectedValues.has(props.getValue(option))}
+                        onChange={(ev, checked) => {
+                            if (checked) {
+                                setSelected((prev) => [...prev, option]);
+                            } else {
+                                setSelected((prev) =>
+                                    prev.filter((node) => node.Id !== option.Id)
+                                );
+                            }
+                        }}
+                    />
                 ))}
+            </div>
+            <Separator />
+            <div
+                style={{
+                    paddingBottom: '15px'
+                }}
+            >
+                <PrimaryButton disabled={eqSet(initialValuesSet, selectedValues)} onClick={() => props.onChange(Array.from(selectedValues.values()))}>
+                    Apply
+                </PrimaryButton>
+            </div>
         </div>
     );
 };
