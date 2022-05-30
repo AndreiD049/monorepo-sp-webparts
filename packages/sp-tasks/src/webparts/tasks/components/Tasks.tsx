@@ -58,6 +58,7 @@ const Tasks: React.FC = () => {
     const taskItems = useTasks(date, userIds, setLoading, sync);
     const [taskLogs, setTaskLogs] = taskItems.taskLogs;
     const [tasks, setTasks] = taskItems.tasks;
+    const { descriptions } = taskItems;
 
     /**
      * Data structures showing tasks and logs per user
@@ -73,6 +74,7 @@ const Tasks: React.FC = () => {
         setTaskLogs((prev) => {
             let copy;
             const created = prev.find((p) => p.ID === t.ID) === undefined;
+            t.Description = descriptions.get(t.Task.ID);
             if (created) {
                 copy = [...prev].concat(t);
             } else {

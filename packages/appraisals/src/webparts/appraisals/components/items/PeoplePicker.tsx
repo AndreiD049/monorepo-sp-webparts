@@ -61,7 +61,7 @@ const PeoplePicker: React.FC<IPeoplePickerProps> = (props) => {
                 onResolveSuggestions={(filter: string) =>
                     options.filter(
                         (opt: IPersonaPropsWithData) =>
-                            opt.text.indexOf(filter) !== -1 &&
+                            opt.text.toLowerCase().indexOf(filter.toLowerCase()) !== -1 &&
                             opt.user.Id !== props.selected.Id
                     )
                 }

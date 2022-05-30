@@ -6,7 +6,6 @@ export default interface ITaskLog {
     Task: {
         ID: number;
         Title: string;
-        Description: string;
         Time: string;
         Transferable: "0" | "1";
     };
@@ -14,6 +13,7 @@ export default interface ITaskLog {
     Date: string;
     DateTimeStarted: Date;
     DateTimeFinished: Date;
+    Description?: string;
     Status: TaskStatus;
     Time: string;
     User: {

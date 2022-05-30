@@ -78,7 +78,7 @@ const Task: FC<ITaskProps> = (props) => {
     const [expired, setExpired] = React.useState<boolean>(false);
 
     let info: ITaskInfo = React.useMemo(() => {
-        if ('Description' in props.task) {
+        if (isTask(props.task)) {
             return {
                 description: props.task.Description,
                 title: props.task.Title,
@@ -89,7 +89,7 @@ const Task: FC<ITaskProps> = (props) => {
             };
         }
         return {
-            description: props.task.Task.Description,
+            description: props.task.Description || '',
             title: props.task.Title,
             user: props.task.User,
             date: DateTime.fromISO(props.task.Date).toLocaleString(DateTime.DATE_SHORT),

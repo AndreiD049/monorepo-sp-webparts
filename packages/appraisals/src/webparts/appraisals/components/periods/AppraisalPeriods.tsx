@@ -51,8 +51,9 @@ const AppraisalPeriods: FC = () => {
         if (!searchValue) {
             return periods;
         } else {
+            const val = searchValue.toLowerCase()
             return periods.filter(
-                (p) => p.Title.toLowerCase().indexOf(searchValue) > -1
+                (p) => p.Title.toLowerCase().indexOf(val) > -1
             );
         }
     }, [searchValue, periods]);

@@ -11,6 +11,7 @@ import { checkTasksAndCreateTaskLogs } from '../utils/utils';
 export interface ITasksResult {
     tasks: [tasks: ITask[], setTasks: React.Dispatch<React.SetStateAction<ITask[]>>];
     taskLogs: [tasks: ITaskLog[], setTasks: React.Dispatch<React.SetStateAction<ITaskLog[]>>];
+    descriptions: Map<number, string>
 }
 
 export function useTasks(
@@ -22,6 +23,7 @@ export function useTasks(
     const { TaskService, TaskLogsService } = React.useContext(GlobalContext);
     const [taskLogs, setTaskLogs] = React.useState<ITaskLog[]>([]);
     const [tasks, setTasks] = React.useState<ITask[]>([]);
+    const [descriptions, setDescriptions] = React.useState<Map<number, string>>(null);
     const isSameDay = React.useMemo(
         () => DateTime.fromJSDate(date).hasSame(DateTime.now(), 'day'),
         [date]
@@ -34,6 +36,8 @@ export function useTasks(
         async function run() {
             // Select only valid tasks on that day
             const tasks = selectTasks(await TaskService.getTasksByMultipleUserIds(userIds), date);
+            const taskDescriptions = new Map(tasks.map((t) => [t.ID, t.Description]));
+            setDescriptions(taskDescriptions);
             let logs: ITaskLog[] = [];
             if (isSameDay) {
                 logs = await TaskLogsService.getTaskLogsByUserIds(date, userIds);
@@ -43,10 +47,16 @@ export function useTasks(
                     date,
                     TaskLogsService
                 );
-                logs = logs.concat(newTasks);
+                logs = logs.concat(newTasks).map((log) => {
+                    log.Description = taskDescriptions.get(log.Task.ID);
+                    return log;
+                });
                 setTaskLogs(uniqBy(logs, (l) => l.ID));
             } else {
-                logs = await TaskLogsService.getTaskLogsByUserIds(date, userIds);
+                logs = (await TaskLogsService.getTaskLogsByUserIds(date, userIds)).map((log) => {
+                    log.Description = taskDescriptions.get(log.Task.ID);
+                    return log;
+                });
                 setTaskLogs(uniqBy(logs, (l) => l.ID));
             }
             const logSet = new Set(logs.map((log) => log.Task.ID));
@@ -59,5 +69,6 @@ export function useTasks(
     return {
         tasks: [tasks, setTasks],
         taskLogs: [taskLogs, setTaskLogs],
+        descriptions,
     };
 }
