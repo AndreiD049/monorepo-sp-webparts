@@ -11,7 +11,12 @@
       ]
     }
   },
-  "externals": { },
+  "externals": { 
+    "sp-preset": {
+      "path": "https://cdn.jsdelivr.net/npm/sp-preset@2.0.12/dist/index.amd.js",
+      "globalName": "spPreset"
+    }
+  },
   "localizedResources": {
     "AppraisalsWebPartStrings": "lib/webparts/appraisals/loc/{locale}.js"
   }

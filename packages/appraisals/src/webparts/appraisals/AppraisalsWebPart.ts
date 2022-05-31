@@ -45,7 +45,6 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
                 InjectHeaders({
                     Accept: 'application/json;odata=nometadata',
                 }),
-                RequestDigest(),
             ]);
 
         setupAccessControl(this.context);

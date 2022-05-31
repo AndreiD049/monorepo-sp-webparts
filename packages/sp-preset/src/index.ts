@@ -1,4 +1,4 @@
-import { spfi, SPFI, SPFx } from '@pnp/sp';
+import { RequestDigest, spfi, SPFI, SPFx } from '@pnp/sp';
 import { TimelinePipe } from '@pnp/core';
 import '@pnp/sp/webs';
 import '@pnp/sp/lists';
@@ -72,7 +72,7 @@ export default class SPBuilder {
     }
 
     private usingDefault(sp: SPFI) {
-        let result = sp.using(SPFx(this.context));
+        let result = sp.using(RequestDigest()).using(SPFx(this.context));
         this.timelinePipes.forEach((pipe) => (result = result.using(pipe)));
         return result;
     }

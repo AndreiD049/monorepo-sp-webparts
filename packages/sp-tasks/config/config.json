@@ -13,7 +13,7 @@
   },
   "externals": {
     "sp-preset": {
-      "path": "https://cdn.jsdelivr.net/npm/sp-preset@2.0.7/dist/index.amd.js",
+      "path": "https://cdn.jsdelivr.net/npm/sp-preset@2.0.12/dist/index.amd.js",
       "globalName": "spPreset"
     },
     "sp-react-notifications": {

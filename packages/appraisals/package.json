@@ -19,7 +19,7 @@
         "react": "16.13.1",
         "react-dom": "16.13.1",
         "react-router-dom": "^5.3.0",
-        "sp-preset": "^2.0.6",
+        "sp-preset": "^2.0.12",
         "sp-react-notifications": "^1.0.23"
     },
     "devDependencies": {

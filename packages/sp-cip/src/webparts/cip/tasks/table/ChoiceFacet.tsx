@@ -96,7 +96,7 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
                     }}
                     label="All"
                     checked={allSelected}
-                    onChange={(_ev, checked) => setSelected(checked ? displayedItems : [])}
+                    // onChange={(_ev, checked) => setSelectedValues(checked ? displayedItems : [])}
                 />
                 {/* Options checkboxes */}
                 {displayedItems.map((option) => (
