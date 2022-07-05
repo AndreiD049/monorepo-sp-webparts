@@ -1,13 +1,10 @@
 import { useConst } from '@uifabric/react-hooks';
-import { eq, isEqualWith, result, setWith } from 'lodash';
 import {
     Checkbox,
-    getVirtualParent,
     IColumn,
     PrimaryButton,
     SearchBox,
     Separator,
-    Stack,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { TaskNode } from '../graph/TaskNode';
@@ -29,35 +26,36 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
     // const [selected, setSelected] = React.useState<TaskNode[]>([]);
     const [search, setSearch] = React.useState('');
     const [allSelected, setAllSelected] = React.useState(true);
-    const [selectedValues, setSelectedValues] = React.useState<Set<string>>(new Set());
+    const [selectedValues, setSelectedValues] = React.useState<Set<string>>(
+        new Set()
+    );
 
     const initialValuesSet = useConst(
         new Set(props.options.map((n) => props.getValue(n)))
     );
-    const displayedItems = React.useMemo(
-        () => {
-            const result = props.options.filter((n) => {
-                if (n.isFilterApplicable) {
-                    if (search !== '') {
-                        return (
-                            props
-                                .getValue(n)
-                                .toLowerCase()
-                                .indexOf(search.toLowerCase()) > -1
-                        );
-                    }
-                    return true;
+    const displayedItems = React.useMemo(() => {
+        const result = props.options.filter((n) => {
+            if (n.isFilterApplicable) {
+                if (search !== '') {
+                    return (
+                        props
+                            .getValue(n)
+                            .toLowerCase()
+                            .indexOf(search.toLowerCase()) > -1
+                    );
                 }
-                return false;
-            });
-            setSelectedValues(new Set(result.map((n) => props.getValue(n))));
-            return result;
-        },
-        [search]
-    );
+                return true;
+            }
+            return false;
+        });
+        setSelectedValues(new Set(result.map((n) => props.getValue(n))));
+        return result;
+    }, [search]);
 
     React.useEffect(() => {
-        setAllSelected(displayedItems.every((n) => selectedValues.has(props.getValue(n))));
+        setAllSelected(
+            displayedItems.every((n) => selectedValues.has(props.getValue(n)))
+        );
     }, [selectedValues]);
 
     return (
@@ -77,9 +75,11 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
                     paddingTop: '20px',
                 }}
             >
-                <SearchBox onChange={(_ev, val) => {
-                    setSearch(val);
-                }} />
+                <SearchBox
+                    onChange={(_ev, val) => {
+                        setSearch(val);
+                    }}
+                />
             </div>
             <Separator />
             <div
@@ -111,11 +111,13 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
                         checked={selectedValues.has(props.getValue(option))}
                         onChange={(ev, checked) => {
                             if (checked) {
-                                setSelected((prev) => [...prev, option]);
+                                // setSelected((prev) => [...prev, option]);
                             } else {
-                                setSelected((prev) =>
+                                {
+                                    /* setSelected((prev) =>
                                     prev.filter((node) => node.Id !== option.Id)
-                                );
+                                ); */
+                                }
                             }
                         }}
                     />
@@ -124,10 +126,15 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
             <Separator />
             <div
                 style={{
-                    paddingBottom: '15px'
+                    paddingBottom: '15px',
                 }}
             >
-                <PrimaryButton disabled={eqSet(initialValuesSet, selectedValues)} onClick={() => props.onChange(Array.from(selectedValues.values()))}>
+                <PrimaryButton
+                    disabled={eqSet(initialValuesSet, selectedValues)}
+                    onClick={() =>
+                        props.onChange(Array.from(selectedValues.values()))
+                    }
+                >
                     Apply
                 </PrimaryButton>
             </div>

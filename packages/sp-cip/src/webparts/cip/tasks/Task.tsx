@@ -3,10 +3,10 @@ import * as React from 'react';
 import { ITaskOverview } from './ITaskOverview';
 import styles from './Task.module.scss';
 import { TaskNode } from './graph/TaskNode';
-import { RenderCell } from './cells/render-cells';
 import { nodeToggleOpenHandler, relinkParent } from '../utils/dom-events';
 import SubtasksProxy from './SubtasksProxy';
 import { GlobalContext } from '../utils/GlobalContext';
+import { RenderCell } from './Cells/render-cells';
 
 function initialOpen(node: TaskNode, isFiltered: boolean) {
     if (!isFiltered) return false;
@@ -92,7 +92,11 @@ const Task: React.FC<ITaskProps> = (props) => {
 
     return (
         <>
-            <div className={`${styles.task} ${props.node.Display === 'disabled' ? styles.disabled : ''}`}>
+            <div
+                className={`${styles.task} ${
+                    props.node.Display === 'disabled' ? styles.disabled : ''
+                }`}
+            >
                 {props.rowProps.columns.map((column) => {
                     return (
                         <div
