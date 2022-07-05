@@ -4,7 +4,7 @@ import ITask from '../models/ITask';
 import ITaskLog from '../models/ITaskLog';
 import { IUser } from '../models/IUser';
 import GlobalContext from '../utils/GlobalContext';
-import { getSortedTaskList, ICustomSorting } from '../utils/utils';
+import { filterTasks, getSortedTaskList, ICustomSorting } from '../utils/utils';
 
 export interface IUserTasks {
     user: IUser;
@@ -38,7 +38,8 @@ export function useTasksPerUser(
     taskLogs: ITaskLog[],
     userIds: number[],
     selectedUsers: IUser[],
-    customSorting: ICustomSorting
+    customSorting: ICustomSorting,
+    search: string,
 ): ITaskPerUserResult {
     const { currentUser } = React.useContext(GlobalContext);
     const [tasksPerUser, setTasksPerUser] = React.useState<ITasksPerUser>({});
@@ -108,8 +109,8 @@ export function useTasksPerUser(
                 id === currentUser.User.ID
                     ? currentUser
                     : selectedUsers.find((u) => u.User.ID === id);
-            const userTasks = tasks.filter((t) => t.AssignedTo.ID === id);
-            const userTaskLogs = taskLogs.filter((l) => l.User.ID === id);
+            const userTasks = filterTasks(tasks, id, search);
+            const userTaskLogs = filterTasks(taskLogs, id, search);
             const userResult = getSortedTaskList(
                 userTasks,
                 userTaskLogs,
@@ -123,7 +124,7 @@ export function useTasksPerUser(
         });
 
         setTasksPerUser(result);
-    }, [tasks, taskLogs, customSorting]);
+    }, [tasks, taskLogs, customSorting, search]);
 
     return {
         tasks: tasksPerUser,

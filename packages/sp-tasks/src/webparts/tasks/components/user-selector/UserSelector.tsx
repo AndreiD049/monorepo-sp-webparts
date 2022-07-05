@@ -143,6 +143,7 @@ const UserSelctor: React.FC<IUserSelectorProps> = (props) => {
                 options={options}
                 selectedKey={selectedKeys}
                 onChange={handleChange}
+                allowFreeform
                 useComboBoxAsMenuWidth
                 calloutProps={{
                     calloutMaxHeight: 600,

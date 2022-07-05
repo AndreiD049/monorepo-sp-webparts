@@ -19,6 +19,8 @@ import { HOUR } from '../utils/constants';
 const Tasks: React.FC = () => {
     const { currentUser, TaskLogsService, maxPeople } = useContext(GlobalContext);
 
+    const [search, setSearch] = React.useState<string>("");
+
     const [date, setDate] = useWebStorage<Date>(new Date(), {
         key: 'selectedDate',
         serialize: (val) => val.toISOString(),
@@ -63,7 +65,7 @@ const Tasks: React.FC = () => {
     /**
      * Data structures showing tasks and logs per user
      */
-    const tasksPerUser = useTasksPerUser(tasks, taskLogs, userIds, selectedUsers, customSorting);
+    const tasksPerUser = useTasksPerUser(tasks, taskLogs, userIds, selectedUsers, customSorting, search);
 
     /**
      * When a task is updated, it needs to be replaced within task logs and removed from tasks if present
@@ -174,6 +176,8 @@ const Tasks: React.FC = () => {
                     setLoading={setLoading}
                     selectedUsers={selectedUsers}
                     setSelectedUsers={setSelectedUsers}
+                    search={search}
+                    setSearch={setSearch}
                 />
                 {body}
             </div>

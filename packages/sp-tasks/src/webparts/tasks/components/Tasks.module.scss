@@ -1,8 +1,9 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
+$break: 750px;
 
 .tasks {
     min-height: 500px;
-    padding-bottom: 5em;
+    padding: 0 2em 5em 2em;
 
     :global(.pending) {
         background-color: lighten($color: $ms-color-yellow, $amount: 40);
@@ -18,17 +19,54 @@
 
     .commandbar {
         display: flex;
-        flex-flow: column nowrap;
+        justify-content: center;
         align-items: center;
-        justify-content: flex-start;
+        row-gap: 1em;
+        margin-bottom: 2em;
+        flex-flow: column nowrap;
+
+        @media screen and (min-width: $break) {
+            flex-flow: row nowrap;
+            align-items: flex-end;
+        }
+
+        &_left {
+            visibility: hidden;
+            @media screen and (min-width: $break) {
+                flex: 1 2;
+            }
+        }
+
+        &_middle {
+            @media screen and (min-width: $break) {
+                flex: 2 1;
+            }
+            align-self: center;
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        &_right {
+            @media screen and (min-width: $break) {
+                flex: 1 2;
+            }
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-end;
+        }
     }
 
     .selector {
         padding: 1em 0;
+        display: flex;
+        flex-flow: row nowrap;
     }
     
     .userSelector {
-        margin-bottom: 2em;
+        margin: 0 auto;
+        max-width: 200px;
     }
 
     .container {

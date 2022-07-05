@@ -1,6 +1,6 @@
 import { cloneDeep } from '@microsoft/sp-lodash-subset';
 import { DateTime, Interval } from 'luxon';
-import { DialogType } from 'office-ui-fabric-react';
+import { DialogType, themeRulesStandardCreator } from 'office-ui-fabric-react';
 import ITask, { WeekDay, WeekDayMap } from '../models/ITask';
 import ITaskLog from '../models/ITaskLog';
 import { IUser } from '../models/IUser';
@@ -11,10 +11,7 @@ export interface ICustomSorting {
     [id: string]: string[];
 }
 
-export function processChangeResult(
-    result: string,
-    obj: { lastToken: string }
-) {
+export function processChangeResult(result: string, obj: { lastToken: string }) {
     const newToken = result.match(CHANGE_TOKEN_RE)[1];
     if (!obj.lastToken) {
         obj.lastToken = newToken;
@@ -44,7 +41,7 @@ export function getTime(elem: ITask | ITaskLog) {
 }
 
 export function getReassignedTaskLog(log: ITaskLog, toUser: number, users: IUser[]): ITaskLog {
-    const newUser = users.find(u => u.User.ID === toUser);
+    const newUser = users.find((u) => u.User.ID === toUser);
     return {
         ...log,
         User: newUser.User,
@@ -65,9 +62,7 @@ export function getSortedTaskList(
     });
     if (customSorting[userId.toString()] !== undefined) {
         // Map [task id]: current index
-        const map = new Map(
-            customSorting[userId.toString()].map((id, idx) => [id, idx])
-        );
+        const map = new Map(customSorting[userId.toString()].map((id, idx) => [id, idx]));
         result.sort((t1, t2) => {
             const id1 = getTaskUniqueId(t1);
             const id2 = getTaskUniqueId(t2);
@@ -76,6 +71,39 @@ export function getSortedTaskList(
         });
     }
     return result;
+}
+
+export function filterTasks<T extends ITask | ITaskLog>(
+    tasks: T[],
+    userId: number,
+    search: string
+): T[] {
+    if (tasks.length === 0) return [];
+
+    return tasks.filter((t) => {
+        if (isTask(t)) {
+            if (t.AssignedTo.ID !== userId) return false;
+            if (
+                !search ||
+                t.Title.toLowerCase().indexOf(search) !== -1 ||
+                t.Description && t.Description.toLowerCase().indexOf(search) !== -1
+            ) {
+                return true;
+            }
+            return false;
+        }
+        const log = t as ITaskLog;
+        if (log.User.ID !== userId) return false;
+        if (
+            !search ||
+            log.Title.toLowerCase().indexOf(search) !== -1 ||
+            log.Description && log.Description.toLowerCase().indexOf(search) !== -1 ||
+            log.Status.toLowerCase().indexOf(search) !== -1
+        ) {
+            return true;
+        }
+        return false;
+    });
 }
 
 /**
@@ -101,10 +129,7 @@ export async function checkTasksAndCreateTaskLogs(
         }
     });
     const results = await logService.createTaskLogs(missing, date);
-    let newLogs =
-        results.length === 0
-            ? []
-            : await logService.getTaskLogsFromAddResult(results);
+    let newLogs = results.length === 0 ? [] : await logService.getTaskLogsFromAddResult(results);
     return newLogs;
 }
 
@@ -116,7 +141,7 @@ export interface IDateStatistics {
     workdaysInMonth: number;
     nthDay: number;
     nthWorkday: number;
-};
+}
 
 export function getDateStatistics(date: Date): IDateStatistics {
     const dt = DateTime.fromJSDate(date);
@@ -147,7 +172,7 @@ export function getNumberOfWorkdaysInMonth(dt: DateTime): number {
     // Now we can know the number of full weeks
     // Each full week has 5 workdays
     // Ex: floor(26 / 7) = 3 full weeks
-    const fullWeeks = Math.floor(daysWithoutFirstWeek / 7)
+    const fullWeeks = Math.floor(daysWithoutFirstWeek / 7);
     // And we can get the amount of remaining days at the end of the month
     // that do not form a full week, for example monday till Thursday
     // The amount of workdays is always equal to min(5, number of days in the week)
@@ -175,7 +200,7 @@ export function getNthWorkday(dt: DateTime): number {
 }
 
 export function getWeekDaySet(daysList: WeekDay[]): Set<number> {
-    return new Set(daysList.map(d => WeekDayMap[d]));
+    return new Set(daysList.map((d) => WeekDayMap[d]));
 }
 
 /**
