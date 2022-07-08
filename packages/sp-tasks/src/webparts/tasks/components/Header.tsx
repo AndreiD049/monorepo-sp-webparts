@@ -22,7 +22,7 @@ export interface IHeaderProps {
 const Header: FC<IHeaderProps> = (props) => {
     const { maxPeople } = React.useContext(GlobalContext);
 
-    const handleSearch = debounce((ev, newValue: string) => props.setSearch(newValue.toLowerCase()), 1000);
+    const handleSearch = debounce((_ev, newValue: string) => props.setSearch(newValue.toLowerCase()), 1000);
 
     return (
         <div className={styles.commandbar}>

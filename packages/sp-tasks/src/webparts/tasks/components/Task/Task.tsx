@@ -1,22 +1,16 @@
 import { DateTime } from 'luxon';
-import {
-    Dropdown,
-    IconButton,
-    IDropdownOption,
-    Persona,
-    PersonaSize,
-    Separator,
-    Text,
-} from 'office-ui-fabric-react';
+import { Dropdown, IconButton, IDropdownOption, Separator, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { FC } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import ITask, { TaskType } from '../models/ITask';
-import ITaskLog, { TaskStatus } from '../models/ITaskLog';
-import { ITaskInfo } from '../models/ITaskProperties';
-import { MINUTE } from '../utils/constants';
-import GlobalContext from '../utils/GlobalContext';
-import { getTaskUniqueId, isTask } from '../utils/utils';
+import { useDomEvent } from '../../hooks/useDomEvent';
+import ITask, { TaskType } from '../../models/ITask';
+import ITaskLog, { TaskStatus } from '../../models/ITaskLog';
+import { ITaskInfo } from '../../models/ITaskProperties';
+import { MINUTE } from '../../utils/constants';
+import GlobalContext from '../../utils/GlobalContext';
+import { getTaskUniqueId, isTask } from '../../utils/utils';
+import { TaskPersona } from './Persona/TaskPersona';
 import styles from './Task.module.scss';
 
 const CLOSED_ICON = 'ChevronDown';
@@ -93,7 +87,9 @@ const Task: FC<ITaskProps> = (props) => {
             title: props.task.Title,
             user: props.task.User,
             date: DateTime.fromISO(props.task.Date).toLocaleString(DateTime.DATE_SHORT),
-            time: DateTime.fromISO(props.task.Task?.Time || props.task.Time).toLocaleString(DateTime.TIME_24_SIMPLE),
+            time: DateTime.fromISO(props.task.Task?.Time || props.task.Time).toLocaleString(
+                DateTime.TIME_24_SIMPLE
+            ),
             status: props.task.Status,
         };
     }, [props.task]);
@@ -176,18 +172,16 @@ const Task: FC<ITaskProps> = (props) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     className={`${styles.task} ${info.status.toLowerCase()}`}
+                    data-is-task="true"
                 >
                     <div className={styles.header}>
                         <Text className={expired && styles.expired} variant="mediumPlus">
                             {info.title}
                         </Text>
-                        <Persona
-                            data-testid="task-person"
-                            className={styles.person}
-                            text={info.user.Title}
-                            size={PersonaSize.size24}
-                            title={info.user.EMail}
-                            hidePersonaDetails
+                        <TaskPersona
+                            title={info.user.Title}
+                            email={info.user.EMail}
+                            className={styles.Task_person}
                         />
                     </div>
                     <div className={styles.subheader}>

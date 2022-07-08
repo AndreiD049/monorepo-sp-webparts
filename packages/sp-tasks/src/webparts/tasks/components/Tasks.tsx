@@ -19,7 +19,7 @@ import { HOUR } from '../utils/constants';
 const Tasks: React.FC = () => {
     const { currentUser, TaskLogsService, maxPeople } = useContext(GlobalContext);
 
-    const [search, setSearch] = React.useState<string>("");
+    const [search, setSearch] = React.useState<string>('');
 
     const [date, setDate] = useWebStorage<Date>(new Date(), {
         key: 'selectedDate',
@@ -42,9 +42,12 @@ const Tasks: React.FC = () => {
      * Custom sorting of tasks.
      * Applied when user changes task order manually (drag & drop)
      */
-    const [customSorting, setCustomSorting]: [ICustomSorting, any] = useWebStorage<ICustomSorting>({}, {
-        key: 'customTaskSorting'
-    });
+    const [customSorting, setCustomSorting]: [ICustomSorting, any] = useWebStorage<ICustomSorting>(
+        {},
+        {
+            key: 'customTaskSorting',
+        }
+    );
 
     /**
      * Check with the list every few minutes
@@ -65,7 +68,52 @@ const Tasks: React.FC = () => {
     /**
      * Data structures showing tasks and logs per user
      */
-    const tasksPerUser = useTasksPerUser(tasks, taskLogs, userIds, selectedUsers, customSorting, search);
+    const tasksPerUser = useTasksPerUser(
+        tasks,
+        taskLogs,
+        userIds,
+        selectedUsers,
+        customSorting,
+        search
+    );
+
+    /**
+     * When mouse hover over a task, show the edit IconButton
+     */
+    React.useEffect(() => {
+        function enterHanler(evt: Event) {
+            const target = evt.target as HTMLElement;
+            if (target.dataset.isTask === "true") {
+                const taskPersona = target.querySelector(".Task__persona");
+                if (taskPersona) {
+                    taskPersona.classList.add("Task__persona_theme_primary");
+                }
+                const editButton = target.querySelector(".Task__edit-button");
+                if (editButton) {
+                    editButton.classList.remove("Task__edit-button_hidden");
+                }
+            }
+        }
+        function leaveHandler(evt: Event) {
+            const target = evt.target as HTMLElement;
+            if (target.dataset.isTask === "true") {
+                const taskPersona = target.querySelector(".Task__persona");
+                if (taskPersona) {
+                    taskPersona.classList.remove("Task__persona_theme_primary");
+                }
+                const editButton = target.querySelector(".Task__edit-button");
+                if (editButton) {
+                    editButton.classList.add("Task__edit-button_hidden");
+                }
+            }
+        }
+        document.addEventListener("mouseenter", enterHanler, true);
+        document.addEventListener("mouseleave", leaveHandler, true);
+        return () => {
+            document.removeEventListener("mouseenter", enterHanler);
+            document.removeEventListener("mouseleave", leaveHandler);
+        }
+    }, []);
 
     /**
      * When a task is updated, it needs to be replaced within task logs and removed from tasks if present

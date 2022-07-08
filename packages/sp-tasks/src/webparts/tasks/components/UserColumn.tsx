@@ -7,7 +7,7 @@ import ITaskLog from '../models/ITaskLog';
 import GlobalContext from '../utils/GlobalContext';
 import { getTaskUniqueId } from '../utils/utils';
 import NoTasks from './NoTasks';
-import Task from './Task';
+import Task from './Task/Task';
 import styles from './Tasks.module.scss';
 
 export interface IUserColumnsProps {

@@ -31,9 +31,6 @@
             margin-left: 1em;
         }
 
-        .person {
-            align-self: end;
-        }
     }
 
     .status {
@@ -67,4 +64,8 @@
             white-space: break-spaces;
         }
     }
+}
+
+.Task_person {
+    align-self: end;
 }
