@@ -3,8 +3,7 @@ import { Dropdown, IconButton, IDropdownOption, Separator, Text } from 'office-u
 import * as React from 'react';
 import { FC } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import { useDomEvent } from '../../hooks/useDomEvent';
-import ITask, { TaskType } from '../../models/ITask';
+import ITask from '../../models/ITask';
 import ITaskLog, { TaskStatus } from '../../models/ITaskLog';
 import { ITaskInfo } from '../../models/ITaskProperties';
 import { MINUTE } from '../../utils/constants';
@@ -70,6 +69,7 @@ const Task: FC<ITaskProps> = (props) => {
     const { TaskLogsService, canEditOthers, currentUser } = React.useContext(GlobalContext);
     const [open, setOpen] = React.useState<boolean>(false);
     const [expired, setExpired] = React.useState<boolean>(false);
+    const [isHovering, setIsHovering] = React.useState<boolean>(false);
 
     let info: ITaskInfo = React.useMemo(() => {
         if (isTask(props.task)) {
@@ -160,6 +160,10 @@ const Task: FC<ITaskProps> = (props) => {
         props.handleTaskUpdated(updated);
     };
 
+    const handleHover = (hovering: boolean) => () => {
+        setIsHovering(hovering);
+    };
+
     return (
         <Draggable
             key={getTaskUniqueId(props.task)}
@@ -172,7 +176,8 @@ const Task: FC<ITaskProps> = (props) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     className={`${styles.task} ${info.status.toLowerCase()}`}
-                    data-is-task="true"
+                    onMouseOver={handleHover(true)}
+                    onMouseOut={handleHover(false)}
                 >
                     <div className={styles.header}>
                         <Text className={expired && styles.expired} variant="mediumPlus">
@@ -182,6 +187,7 @@ const Task: FC<ITaskProps> = (props) => {
                             title={info.user.Title}
                             email={info.user.EMail}
                             className={styles.Task_person}
+                            isHovering={isHovering}
                         />
                     </div>
                     <div className={styles.subheader}>

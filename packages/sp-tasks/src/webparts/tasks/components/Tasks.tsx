@@ -15,6 +15,7 @@ import { SPnotify } from 'sp-react-notifications';
 import { MessageBarType, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import useWebStorage from 'use-web-storage-api';
 import { HOUR } from '../utils/constants';
+import { createPanel, usePanel } from '../hooks/usePanel';
 
 const Tasks: React.FC = () => {
     const { currentUser, TaskLogsService, maxPeople } = useContext(GlobalContext);
@@ -76,44 +77,6 @@ const Tasks: React.FC = () => {
         customSorting,
         search
     );
-
-    /**
-     * When mouse hover over a task, show the edit IconButton
-     */
-    React.useEffect(() => {
-        function enterHanler(evt: Event) {
-            const target = evt.target as HTMLElement;
-            if (target.dataset.isTask === "true") {
-                const taskPersona = target.querySelector(".Task__persona");
-                if (taskPersona) {
-                    taskPersona.classList.add("Task__persona_theme_primary");
-                }
-                const editButton = target.querySelector(".Task__edit-button");
-                if (editButton) {
-                    editButton.classList.remove("Task__edit-button_hidden");
-                }
-            }
-        }
-        function leaveHandler(evt: Event) {
-            const target = evt.target as HTMLElement;
-            if (target.dataset.isTask === "true") {
-                const taskPersona = target.querySelector(".Task__persona");
-                if (taskPersona) {
-                    taskPersona.classList.remove("Task__persona_theme_primary");
-                }
-                const editButton = target.querySelector(".Task__edit-button");
-                if (editButton) {
-                    editButton.classList.add("Task__edit-button_hidden");
-                }
-            }
-        }
-        document.addEventListener("mouseenter", enterHanler, true);
-        document.addEventListener("mouseleave", leaveHandler, true);
-        return () => {
-            document.removeEventListener("mouseenter", enterHanler);
-            document.removeEventListener("mouseleave", leaveHandler);
-        }
-    }, []);
 
     /**
      * When a task is updated, it needs to be replaced within task logs and removed from tasks if present
@@ -192,6 +155,11 @@ const Tasks: React.FC = () => {
         }
     };
 
+    /**
+     * Define panel placeholder
+     */
+    const panel = usePanel('SP_TASKS');
+
     const body = React.useMemo(() => {
         if (loading) return <Spinner size={SpinnerSize.large} />;
 
@@ -215,21 +183,24 @@ const Tasks: React.FC = () => {
     }, [userIds, tasksPerUser.tasks, loading]);
 
     return (
-        <DragDropContext onDragEnd={handleTaskDropped}>
-            <div className={styles.tasks}>
-                <Header
-                    date={date}
-                    setDate={setDate}
-                    loading={loading}
-                    setLoading={setLoading}
-                    selectedUsers={selectedUsers}
-                    setSelectedUsers={setSelectedUsers}
-                    search={search}
-                    setSearch={setSearch}
-                />
-                {body}
-            </div>
-        </DragDropContext>
+        <>
+            <DragDropContext onDragEnd={handleTaskDropped}>
+                <div className={styles.tasks}>
+                    <Header
+                        date={date}
+                        setDate={setDate}
+                        loading={loading}
+                        setLoading={setLoading}
+                        selectedUsers={selectedUsers}
+                        setSelectedUsers={setSelectedUsers}
+                        search={search}
+                        setSearch={setSearch}
+                    />
+                    {body}
+                </div>
+            </DragDropContext>
+            {panel}
+        </>
     );
 };
 
