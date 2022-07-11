@@ -1,10 +1,10 @@
-import { IPanelProps, Panel } from 'office-ui-fabric-react';
+import { Button, IPanelProps, Panel, PrimaryButton } from 'office-ui-fabric-react';
 import * as React from 'react';
 
 export const EVENT_NAME = (id: string) => `USE_PANEL_EVENT_${id}`;
 
 export interface IUsePanelProps extends IPanelProps {
-    PanelContents: React.ReactElement;
+    PanelContents?: React.ReactElement;
 }
 
 export const createPanel = (id: string, props: IUsePanelProps) => {
@@ -14,6 +14,24 @@ export const createPanel = (id: string, props: IUsePanelProps) => {
         })
     );
 };
+
+export const closePanel = (id: string) => {
+    document.dispatchEvent(
+        new CustomEvent(EVENT_NAME(id), {
+            detail: {
+                isOpen: false,
+            },
+        })
+    );
+};
+
+export const setPanelProperties = (id: string, props: IUsePanelProps) => {
+    document.dispatchEvent(
+        new CustomEvent(EVENT_NAME(id), {
+            detail: props,
+        })
+    );
+}
 
 export const usePanel = (id: string) => {
     const [state, setState] = React.useState<IUsePanelProps>({

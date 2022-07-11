@@ -6,7 +6,7 @@ import { IUser } from '../models/IUser';
 import GlobalContext from '../utils/GlobalContext';
 import DateSelector from './DateSelector';
 import styles from './Tasks.module.scss';
-import UserSelctor from './user-selector/UserSelector';
+import UserTeamSelctor from './user-selector/UserTeamSelector';
 
 export interface IHeaderProps {
     date: Date;
@@ -38,7 +38,7 @@ const Header: FC<IHeaderProps> = (props) => {
                     className={styles.selector}
                 />
                 {maxPeople > 0 ? (
-                    <UserSelctor
+                    <UserTeamSelctor
                         users={props.selectedUsers}
                         setUsers={props.setSelectedUsers}
                         className={styles.userSelector}

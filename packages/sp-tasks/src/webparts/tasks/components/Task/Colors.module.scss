@@ -1,0 +1,45 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.pending {
+    background-color: lighten($color: $ms-color-yellow, $amount: 40) !important;
+}
+
+.finished {
+    background-color: lighten($color: $ms-color-green, $amount: 65) !important;
+}
+
+.cancelled {
+    background-color: lighten($color: $ms-color-red, $amount: 45) !important;
+}
+
+.button_status_open {
+    background-color: lighten($color: $ms-color-neutralLight, $amount: 0) !important;
+
+    &:hover {
+        background-color: lighten($color: $ms-color-neutralLight, $amount: 5) !important;
+    }
+}
+
+.button_status_pending {
+    background-color: lighten($color: $ms-color-yellow, $amount: 40) !important;
+
+    &:hover {
+        background-color: lighten($color: $ms-color-yellow, $amount: 45) !important;
+    }
+}
+
+.button_status_finished {
+    background-color: lighten($color: $ms-color-green, $amount: 65) !important;
+
+    &:hover {
+        background-color: lighten($color: $ms-color-green, $amount: 70) !important;
+    }
+}
+
+.button_status_cancelled {
+    background-color: lighten($color: $ms-color-red, $amount: 45) !important;
+
+    &:hover {
+        background-color: lighten($color: $ms-color-red, $amount: 50) !important;
+    }
+}

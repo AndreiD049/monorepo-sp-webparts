@@ -90,7 +90,9 @@ export default class TeamService {
     }
 
     private async createTeams(users: IUser[]): Promise<ITeams<IUser>> {
-        const result: ITeams<IUser> = {};
+        const result: ITeams<IUser> = {
+            "All": users,
+        };
         users.forEach((user) => {
             user.Teams.forEach((team) => {
                 if (result[team] === undefined) {

@@ -9,7 +9,7 @@ import {
 import * as React from 'react';
 import { IUser } from '../../models/IUser';
 import GlobalContext from '../../utils/GlobalContext';
-import styles from './UserSelector.module.scss';
+import styles from './UserTeamSelector.module.scss';
 
 export interface IUserSelectorProps extends React.HTMLAttributes<HTMLDivElement> {
     users: IUser[];
@@ -82,12 +82,12 @@ const TeamCheckbox: React.FC<ITeamCheckboxProps> = ({
     );
 };
 
-const UserSelctor: React.FC<IUserSelectorProps> = (props) => {
+const UserTeamSelctor: React.FC<IUserSelectorProps> = (props) => {
     const { teamMembers, maxPeople } = React.useContext(GlobalContext);
 
     const options = React.useMemo(() => {
         const result: IComboBoxOption[] = [];
-        const teams = Object.keys(teamMembers);
+        const teams = Object.keys(teamMembers).filter(k => k !== 'All');
         teams.forEach((team, idx) => {
             result.push({
                 key: team,
@@ -172,4 +172,4 @@ const UserSelctor: React.FC<IUserSelectorProps> = (props) => {
     );
 };
 
-export default UserSelctor;
+export default UserTeamSelctor;

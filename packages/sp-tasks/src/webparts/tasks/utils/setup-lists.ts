@@ -121,9 +121,15 @@ export const setupLists = async (properties: ITasksWebPartProps) => {
             Indexed: true,
         });
 
-        await taskLogsExists.list.fields.addText('Remark', {
+        await taskLogsExists.list.fields.addMultilineText('Remark', {
             Required: false,
             Description: 'Any additional remark',
+        });
+
+
+        await taskLogsExists.list.fields.addMultilineText('Description', {
+            Required: false,
+            Description: 'Task description',
         });
 
         await taskLogsExists.list.fields.addText('UniqueValidation', {

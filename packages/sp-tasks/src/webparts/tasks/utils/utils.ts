@@ -1,11 +1,16 @@
-import { cloneDeep } from '@microsoft/sp-lodash-subset';
 import { DateTime, Interval } from 'luxon';
-import { DialogType, themeRulesStandardCreator } from 'office-ui-fabric-react';
 import ITask, { WeekDay, WeekDayMap } from '../models/ITask';
 import ITaskLog from '../models/ITaskLog';
 import { IUser } from '../models/IUser';
 import TaskLogsService from '../services/tasklogs';
 import { CHANGE_DELETE_RE, CHANGE_ROW_RE, CHANGE_TOKEN_RE } from './constants';
+
+export const maskFormat = {
+    h: /[0-2]/,
+    H: /[0-9]/,
+    m: /[0-5]/,
+    M: /[0-9]/,
+};
 
 export interface ICustomSorting {
     [id: string]: string[];
@@ -37,7 +42,7 @@ export function getTime(elem: ITask | ITaskLog) {
     if (isTask(elem)) {
         return elem.Time;
     }
-    return elem.Task.Time;
+    return elem.Time;
 }
 
 export function getReassignedTaskLog(log: ITaskLog, toUser: number, users: IUser[]): ITaskLog {
@@ -98,6 +103,7 @@ export function filterTasks<T extends ITask | ITaskLog>(
             !search ||
             log.Title.toLowerCase().indexOf(search) !== -1 ||
             log.Description && log.Description.toLowerCase().indexOf(search) !== -1 ||
+            log.Remark && log.Remark.toLowerCase().indexOf(search) !== -1 ||
             log.Status.toLowerCase().indexOf(search) !== -1
         ) {
             return true;

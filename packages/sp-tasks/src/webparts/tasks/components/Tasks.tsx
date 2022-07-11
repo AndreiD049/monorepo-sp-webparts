@@ -2,9 +2,8 @@ import * as React from 'react';
 import { useContext } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import useSyncTasks from '../hooks/useSyncTasks';
-import { useTasks } from '../hooks/useTasks';
+import { updateTaskLog, useTasks } from '../hooks/useTasks';
 import { useTasksPerUser } from '../hooks/useTasksPerUser';
-import ITaskLog from '../models/ITaskLog';
 import { IUser } from '../models/IUser';
 import GlobalContext from '../utils/GlobalContext';
 import { getTaskUniqueId, ICustomSorting, isTask } from '../utils/utils';
@@ -15,7 +14,7 @@ import { SPnotify } from 'sp-react-notifications';
 import { MessageBarType, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import useWebStorage from 'use-web-storage-api';
 import { HOUR } from '../utils/constants';
-import { createPanel, usePanel } from '../hooks/usePanel';
+import { usePanel } from '../hooks/usePanel';
 
 const Tasks: React.FC = () => {
     const { currentUser, TaskLogsService, maxPeople } = useContext(GlobalContext);
@@ -64,7 +63,6 @@ const Tasks: React.FC = () => {
     const taskItems = useTasks(date, userIds, setLoading, sync);
     const [taskLogs, setTaskLogs] = taskItems.taskLogs;
     const [tasks, setTasks] = taskItems.tasks;
-    const { descriptions } = taskItems;
 
     /**
      * Data structures showing tasks and logs per user
@@ -77,26 +75,6 @@ const Tasks: React.FC = () => {
         customSorting,
         search
     );
-
-    /**
-     * When a task is updated, it needs to be replaced within task logs and removed from tasks if present
-     * @param t - updated task
-     */
-    const handleTaskUpdated = (t: ITaskLog) => {
-        setTasks((prev) => prev.filter((p) => p.ID !== t.Task.ID));
-        setTaskLogs((prev) => {
-            let copy;
-            const created = prev.find((p) => p.ID === t.ID) === undefined;
-            t.Description = descriptions.get(t.Task.ID);
-            if (created) {
-                copy = [...prev].concat(t);
-            } else {
-                copy = prev.map((p) => (p.ID === t.ID ? t : p));
-            }
-
-            return copy;
-        });
-    };
 
     /**
      * Handle dragging tasks
@@ -131,7 +109,7 @@ const Tasks: React.FC = () => {
                     UserId: +destination.droppableId,
                     OriginalUserId: originalLog.OriginalUser?.ID ?? +source.droppableId,
                 });
-                handleTaskUpdated(updated);
+                updateTaskLog(updated);
                 setCustomSorting((prev) => ({
                     ...prev,
                     [source.droppableId]: moveResults.from.result.map((i) => getTaskUniqueId(i)),
@@ -173,7 +151,6 @@ const Tasks: React.FC = () => {
                         <UserColumn
                             tasksPerUser={tasksPerUser.tasks}
                             id={id}
-                            handleTaskUpdated={handleTaskUpdated}
                             date={date}
                         />
                     );

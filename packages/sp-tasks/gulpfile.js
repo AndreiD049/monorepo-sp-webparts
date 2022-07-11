@@ -54,6 +54,7 @@ build.configureWebpack.mergeConfig({
 build.addSuppression(
     `Warning - [sass] The local CSS class 'ms-Grid' is not camelCase and will not be type-safe.`
 );
+build.addSuppression(/\[sass\]/g);
 
 var getTasks = build.rig.getTasks;
 build.rig.getTasks = function () {

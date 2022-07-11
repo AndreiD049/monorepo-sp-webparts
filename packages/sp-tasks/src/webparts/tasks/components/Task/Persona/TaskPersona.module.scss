@@ -8,7 +8,9 @@
 
 .Task__persona_size_sm {
     width: 24px;
+    min-width: 24px;
     height: 24px;
+    min-height: 24px;
 }
 
 .Task__persona_theme_primary {
@@ -16,7 +18,6 @@
 }
 
 .Task__edit-button {
-    background-color: '[theme: neutralLight, default: #eaeaea]';
     height: 100%;
     left: 0;
     position: absolute;

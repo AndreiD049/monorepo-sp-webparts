@@ -3,7 +3,6 @@ import * as React from 'react';
 import { FC } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 import { ITasksPerUser } from '../hooks/useTasksPerUser';
-import ITaskLog from '../models/ITaskLog';
 import GlobalContext from '../utils/GlobalContext';
 import { getTaskUniqueId } from '../utils/utils';
 import NoTasks from './NoTasks';
@@ -13,11 +12,10 @@ import styles from './Tasks.module.scss';
 export interface IUserColumnsProps {
     tasksPerUser: ITasksPerUser;
     id: number;
-    handleTaskUpdated: (t: ITaskLog) => void;
     date: Date;
 }
 
-const UserColumn: FC<IUserColumnsProps> = ({ tasksPerUser, id, handleTaskUpdated, date }) => {
+const UserColumn: FC<IUserColumnsProps> = ({ tasksPerUser, id, date }) => {
     const { canEditOthers } = React.useContext(GlobalContext);
 
     let body;
@@ -28,7 +26,6 @@ const UserColumn: FC<IUserColumnsProps> = ({ tasksPerUser, id, handleTaskUpdated
                 task={task}
                 index={index}
                 date={date}
-                handleTaskUpdated={handleTaskUpdated}
                 key={getTaskUniqueId(task)}
             />
         ));

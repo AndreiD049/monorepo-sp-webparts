@@ -23,6 +23,7 @@ const TASK_EXPAND = ['AssignedTo'];
 class TaskService {
     userService: UserService;
     sp: SPFI;
+    spNoCache: SPFI;
     list: IList;
     listTitle: string;
     lastToken: string;
@@ -33,6 +34,7 @@ class TaskService {
         this.sp = TasksWebPart.SPBuilder.getSP('Data').using(Caching({
             keyFactory: (url) => this.id + getHashCode(url),
         }));
+        this.spNoCache = TasksWebPart.SPBuilder.getSP('Data');
         this.list = this.sp.web.lists.getByTitle(props.tasksListTitle);
         this.listTitle = props.tasksListTitle;
         this.userService = new UserService();
@@ -43,9 +45,23 @@ class TaskService {
         return this.list.items.select(...TASK_SELECT).expand(...TASK_EXPAND)();
     }
 
+    async getTask(id: number): Promise<ITask> {
+        return this.spNoCache.web.lists.getByTitle(this.listTitle).items.getById(id).select(...TASK_SELECT).expand(...TASK_EXPAND)();
+    }
+
     async getTasksByUserId(userId: number) {
         return this._wrap(this.list.items
             .filter(`AssignedToId eq ${userId}`))();
+    }
+
+    /**
+     * Update task.
+     * Return just the result of update, if user will need the updated task
+     */
+    async updateTask(taskId: number, update: Partial<ITask>) {
+        var result = this.list.items.getById(taskId).update(update);
+        this.clearCache();
+        return result;
     }
 
     /**

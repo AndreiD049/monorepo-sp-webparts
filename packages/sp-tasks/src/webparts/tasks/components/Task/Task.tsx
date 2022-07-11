@@ -1,8 +1,9 @@
 import { DateTime } from 'luxon';
-import { Dropdown, IconButton, IDropdownOption, Separator, Text } from 'office-ui-fabric-react';
+import { Dropdown, Icon, IconButton, IDropdownOption, Separator, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { FC } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import { updateTaskLog } from '../../hooks/useTasks';
 import ITask from '../../models/ITask';
 import ITaskLog, { TaskStatus } from '../../models/ITaskLog';
 import { ITaskInfo } from '../../models/ITaskProperties';
@@ -11,6 +12,7 @@ import GlobalContext from '../../utils/GlobalContext';
 import { getTaskUniqueId, isTask } from '../../utils/utils';
 import { TaskPersona } from './Persona/TaskPersona';
 import styles from './Task.module.scss';
+import colors from './Colors.module.scss';
 
 const CLOSED_ICON = 'ChevronDown';
 const OPEN_ICON = 'ChevronUp';
@@ -22,7 +24,7 @@ const DROPDOWN_STYLES = {
         border: 'none',
         height: '1.5em',
         lineHeight: '1.5em',
-        minWidth: '80px',
+        minWidth: '100px',
     },
     dropdownItemSelected: {
         minHeight: '1.7em',
@@ -61,7 +63,6 @@ const DROPDOWN_KEYS: { key: TaskStatus; text: string }[] = [
 export interface ITaskProps {
     task: ITaskLog | ITask;
     index: number;
-    handleTaskUpdated: (task: ITaskLog) => void;
     date: Date;
 }
 
@@ -84,10 +85,11 @@ const Task: FC<ITaskProps> = (props) => {
         }
         return {
             description: props.task.Description || '',
+            remark: props.task.Remark,
             title: props.task.Title,
             user: props.task.User,
             date: DateTime.fromISO(props.task.Date).toLocaleString(DateTime.DATE_SHORT),
-            time: DateTime.fromISO(props.task.Task?.Time || props.task.Time).toLocaleString(
+            time: DateTime.fromISO(props.task.Time || props.task.Task?.Time).toLocaleString(
                 DateTime.TIME_24_SIMPLE
             ),
             status: props.task.Status,
@@ -109,19 +111,39 @@ const Task: FC<ITaskProps> = (props) => {
             }
             if (time <= DateTime.now()) {
                 setExpired(true);
+            } else {
+                setExpired(false);
             }
         }
         checkExpired();
         const timer = setInterval(checkExpired, MINUTE);
         return () => clearInterval(timer);
-    }, [info]);
+    }, [info, props.task]);
 
     const body = React.useMemo(() => {
         if (!open) return null;
         return (
             <>
-                <Separator className={styles.separator} />
-                <div className={styles.description}>{info.description}</div>
+                {info.remark && (
+                    <>
+                        <Text className={styles['Task__remark-label']} variant="smallPlus">
+                            Remark:
+                        </Text>
+                        <Text className={styles.description} variant="smallPlus">
+                            {info.remark}
+                        </Text>
+                    </>
+                )}
+                {info.description && (
+                    <>
+                        <Text className={styles['Task__remark-label']} variant="smallPlus">
+                            Description:
+                        </Text>
+                        <Text className={styles.description} variant="smallPlus">
+                            {info.description}
+                        </Text>
+                    </>
+                )}
             </>
         );
     }, [open]);
@@ -157,7 +179,7 @@ const Task: FC<ITaskProps> = (props) => {
                 break;
         }
         const updated = await TaskLogsService.updateTaskLog(log.ID, update);
-        props.handleTaskUpdated(updated);
+        updateTaskLog(updated);
     };
 
     const handleHover = (hovering: boolean) => () => {
@@ -175,12 +197,13 @@ const Task: FC<ITaskProps> = (props) => {
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    className={`${styles.task} ${info.status.toLowerCase()}`}
+                    className={`${styles.task} ${colors[info.status.toLowerCase()]}`}
                     onMouseOver={handleHover(true)}
                     onMouseOut={handleHover(false)}
                 >
                     <div className={styles.header}>
-                        <Text className={expired && styles.expired} variant="mediumPlus">
+                        {info.remark && (<Icon className={styles['Task__remark-icon']} iconName='InfoSolid' title='Has remark' />)}
+                        <Text className={`${expired && styles.expired} ${styles['Task__title']}`} variant="mediumPlus">
                             {info.title}
                         </Text>
                         <TaskPersona
@@ -188,6 +211,10 @@ const Task: FC<ITaskProps> = (props) => {
                             email={info.user.EMail}
                             className={styles.Task_person}
                             isHovering={isHovering}
+                            taskId={isTask(props.task) ? props.task.ID : props.task.Task.ID}
+                            taskLogId={isTask(props.task) ? null : props.task.ID}
+                            date={props.date}
+                            status={info.status}
                         />
                     </div>
                     <div className={styles.subheader}>
@@ -211,7 +238,7 @@ const Task: FC<ITaskProps> = (props) => {
                             disabled={info.user.ID === currentUser.User.ID ? false : !canEditOthers}
                         />
                     </div>
-                    {info.description ? (
+                    {info.description || info.remark ? (
                         <div className={styles.body}>
                             <IconButton
                                 onClick={toggleOpen}

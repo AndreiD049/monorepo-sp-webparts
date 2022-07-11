@@ -19,6 +19,7 @@
         display: flex;
         flex-flow: row nowrap;
         justify-content: space-between;
+        align-items: center;
     }
 
     .subheader {
@@ -62,8 +63,25 @@
         .description {
             align-self: flex-start;
             white-space: break-spaces;
+            margin-bottom: 4px;
         }
     }
+}
+
+.Task__remark-icon {
+    font-size: 1.3em;
+    color: '[theme: themePrimary, default: #a4262c]';
+    cursor: default;
+    padding-right: .5em;
+}
+
+.Task__title {
+    flex-grow: 1;
+}
+
+.Task__remark-label {
+    align-self: flex-start;
+    font-weight: bold;
 }
 
 .Task_person {

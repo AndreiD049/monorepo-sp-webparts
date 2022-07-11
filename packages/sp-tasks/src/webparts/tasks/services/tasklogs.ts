@@ -12,6 +12,7 @@ const LOG_SELECT = [
     'Task/ID',
     'Task/Title',
     'Task/Time',
+    'Description',
     'Date',
     'DateTimeStarted',
     'DateTimeFinished',
@@ -92,6 +93,13 @@ export default class TaskLogsService {
 
         await execute();
         return res;
+    }
+
+    /**
+     * Get single task log by id
+     */
+    async getTaskLog(id: number): Promise<ITaskLog> {
+        return this.list.items.getById(id).select(...LOG_SELECT).expand(...LOG_EXPAND)();
     }
 
     /**
@@ -184,6 +192,7 @@ export default class TaskLogsService {
             TaskId: task.ID,
             UserId: task.AssignedTo.ID,
             UniqueValidation: `${task.ID}-${task.AssignedTo.ID}-${dt}`,
+            Description: task.Description,
             // If task is not transferable, log is set to default completed
             // meaning it will not appear tomorrow if it's not on the list
             Completed: !Boolean(task.Transferable),

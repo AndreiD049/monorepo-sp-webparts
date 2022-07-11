@@ -5,18 +5,6 @@ $break: 750px;
     min-height: 500px;
     padding: 0 2em 5em 2em;
 
-    :global(.pending) {
-        background-color: lighten($color: $ms-color-yellow, $amount: 40);
-    }
-
-    :global(.finished) {
-        background-color: lighten($color: $ms-color-green, $amount: 65);
-    }
-
-    :global(.cancelled) {
-        background-color: lighten($color: $ms-color-red, $amount: 45);
-    }
-
     .commandbar {
         display: flex;
         justify-content: center;
