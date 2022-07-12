@@ -1,6 +1,8 @@
 import {
     CommandBar,
     ICommandBarItemProps,
+    Panel,
+    PanelType,
     Pivot,
     PivotItem,
     Stack,
@@ -8,9 +10,11 @@ import {
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { useLocation, useMatch, useNavigate, useParams } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
 import { Attachments } from '../../attachments/Attachments';
 import { Comments } from '../../comments/Comments';
-import { getAlert } from '../../components/AlertDialog';
+import { AlertDialog, getAlert } from '../../components/AlertDialog';
 import { taskUpdated, taskUpdatedHandler } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
 import { useTasks } from '../useTasks';
@@ -21,14 +25,32 @@ export interface ITaskDetailsProps {
     editable: boolean;
 }
 
-export const TaskDetails: React.FC<ITaskDetailsProps> = (props) => {
-    const [task, setTask] = React.useState(props.node.getTask());
+export const TaskDetails: React.FC = () => {
+    const params = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const state = location.state as { editable: boolean };
+    const [task, setTask] = React.useState(null);
     const { updateTask, getTask } = useTasks();
-    const [editable, setEditable] = React.useState(Boolean(props.editable));
+    const [editable, setEditable] = React.useState(Boolean(state.editable));
     const [editData, setEditData] = React.useState({
-        title: task.Title,
-        description: task.Description,
+        title: task?.Title,
+        description: task?.Description,
     });
+
+    React.useEffect(() => {
+        const id = +params.taskId;
+        if (Number.isInteger(id)) {
+            getTask(id).then((task) => setTask(task));
+        }
+    }, [params]);
+
+    React.useEffect(() => {
+        setEditData({
+            title: task?.Title,
+            description: task?.Description,
+        });
+    }, [task]);
 
     React.useEffect(() => {
         const removeHandler = taskUpdatedHandler((task) => setTask(task));
@@ -107,23 +129,23 @@ export const TaskDetails: React.FC<ITaskDetailsProps> = (props) => {
                         Description: editData.description,
                     });
                     taskUpdated(await getTask(task.Id));
-                    setEditable(false)
+                    setEditable(false);
                 },
             });
             items.push({
                 key: 'cancel',
                 text: 'Cancel',
                 iconProps: {
-                    iconName: 'ChromeClose'
+                    iconName: 'ChromeClose',
                 },
                 onClick: () => {
                     setEditData({
                         title: task.Title,
                         description: task.Description,
                     });
-                    setEditable(false)
-                }
-            })
+                    setEditable(false);
+                },
+            });
         }
         items.push({
             key: 'time',
@@ -131,39 +153,59 @@ export const TaskDetails: React.FC<ITaskDetailsProps> = (props) => {
             iconProps: {
                 iconName: 'Clock',
             },
-            onClick:() => getAlert({
-                title: 'Work in progress',
-                subText: 'Work in progress',
-                buttons: [{ key: 'ok', text: 'Ok' }]
-            }),
+            onClick: () =>
+                getAlert({
+                    alertId: "DETAILS_PANEL",
+                    title: 'Work in progress',
+                    subText: 'Work in progress',
+                    buttons: [{ key: 'ok', text: 'Ok' }],
+                }),
         });
         return items;
     }, [editable, editData]);
 
+    const handleDismiss = React.useCallback(() => {
+        navigate('/');
+    }, []);
+
     return (
-        <div className={styles['details-panel']}>
-            <CommandBar
-                styles={{
-                    root: {
-                        paddingLeft: 0,
-                        height: '2em',
-                        marginBottom: '1em',
-                    },
-                }}
-                items={commandItems}
-            />
-            <Stack>
-                {editableInformation}
-                <Attachments task={task} />
-                <StackItem style={{ marginTop: '1em' }}>
-                    <Pivot>
-                        <PivotItem headerText="General">
-                            <Comments task={task} />
-                        </PivotItem>
-                        <PivotItem headerText="Action log">Actions</PivotItem>
-                    </Pivot>
-                </StackItem>
-            </Stack>
-        </div>
+        <Panel
+            isLightDismiss
+            isFooterAtBottom
+            headerText="Task details"
+            type={PanelType.medium}
+            isOpen={true}
+            onDismiss={handleDismiss}
+        >
+            <div className={styles['details-panel']}>
+                <CommandBar
+                    styles={{
+                        root: {
+                            paddingLeft: 0,
+                            height: '2em',
+                            marginBottom: '1em',
+                        },
+                    }}
+                    items={commandItems}
+                />
+                {task && (
+                    <Stack>
+                        {editableInformation}
+                        <Attachments task={task} />
+                        <StackItem style={{ marginTop: '1em' }}>
+                            <Pivot>
+                                <PivotItem headerText="General">
+                                    <Comments task={task} />
+                                </PivotItem>
+                                <PivotItem headerText="Action log">
+                                    Actions
+                                </PivotItem>
+                            </Pivot>
+                        </StackItem>
+                    </Stack>
+                )}
+            </div>
+            <AlertDialog alertId="DETAILS_PANEL" />
+        </Panel>
     );
 };

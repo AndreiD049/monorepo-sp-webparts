@@ -7,6 +7,8 @@ import {
     Label,
     MessageBar,
     MessageBarType,
+    Panel,
+    PanelType,
     Position,
     PrimaryButton,
     Separator,
@@ -16,25 +18,20 @@ import {
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { CREATE_PANEL_ID } from '../../components/useCipPanels';
-import { IPanelComponentProps } from '../../components/usePanel';
+import { useNavigate, useParams } from 'react-router';
 import { useUsers } from '../../users/useUsers';
-import { openPanel, tasksAdded, taskUpdated } from '../../utils/dom-events';
+import { tasksAdded, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { useChoiceFields } from '../../utils/useChoiceFields';
-import { ICreateTask } from '../ITaskDetails';
+import { ICreateTask } from '../ICreateTask';
 import { useGroups } from '../table/useGroups';
 import { useTasks } from '../useTasks';
 
-export interface ICreateTaskProps {
-    parentId?: number;
-}
-
-const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
-    props
-) => {
+const CreateTaskPanel: React.FC = () => {
     const { teams } = React.useContext(GlobalContext);
     const { createTask, createSubtask, getTask, getSubtasks } = useTasks();
+    const navigate = useNavigate();
+    const params = useParams();
 
     /** Group labels */
     const { groupLabels, setGroupLabels } = useGroups();
@@ -68,6 +65,8 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
         Category: 'NA',
         ResponsibleId: 0,
         Team: '',
+        Subtasks: 0,
+        FinishedSubtasks: 0,
     });
 
     /** Team options */
@@ -100,8 +99,8 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
         (async function () {
             setUsers(await getPersonaProps());
             /** If parent present, load it's data and set as default values */
-            if (props.parentId) {
-                const parent = await getTask(props.parentId);
+            if (params.parentId) {
+                const parent = await getTask(+params.parentId);
                 setParent(parent);
                 setData((prev) => ({
                     ...prev,
@@ -136,7 +135,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
     }, [data]);
 
     const handleDismissPanel = React.useCallback(
-        () => openPanel(CREATE_PANEL_ID, false),
+        () => navigate('/'),
         []
     );
 
@@ -145,12 +144,12 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
         async (ev: React.FormEvent) => {
             ev.preventDefault();
             if (!validateData()) return;
-            if (props.parentId) {
-                const parent = await getTask(props.parentId);
-                const addedId = await createSubtask(data, parent);
-                parent.SubtasksId.push(addedId);
+            if (params.parentId) {
+                const parent = await getTask(+params.parentId);
+                await createSubtask(data, parent);
+                parent.Subtasks += 1;
                 // Refresh the parent task
-                const subtasks = await getSubtasks(props.parentId);
+                const subtasks = await getSubtasks(+params.parentId);
                 taskUpdated(parent);
                 tasksAdded(subtasks);
             } else {
@@ -162,26 +161,29 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
         [data, validateData]
     );
 
-    /** Add foorter to panel */
-    React.useEffect(() => {
-        props.setFooter(
-            <>
-                <PrimaryButton
-                    style={{ marginRight: '.5em' }}
-                    type="submit"
-                    form="create-task-form"
-                >
-                    Create
-                </PrimaryButton>
-                <DefaultButton onClick={handleDismissPanel}>
-                    Cancel
-                </DefaultButton>
-            </>
-        );
-    }, [handleCreateTask]);
-
     return (
-        <>
+        <Panel
+            isOpen={true}
+            onDismiss={handleDismissPanel}
+            type={PanelType.medium}
+            isLightDismiss
+            headerText="Create task"
+            isFooterAtBottom
+            onRenderFooterContent={() => (
+                <>
+                    <PrimaryButton
+                        style={{ marginRight: '.5em' }}
+                        type="submit"
+                        form="create-task-form"
+                    >
+                        Create
+                    </PrimaryButton>
+                    <DefaultButton onClick={handleDismissPanel}>
+                        Cancel
+                    </DefaultButton>
+                </>
+            )}
+        >
             {messages.length > 0 && (
                 <MessageBar messageBarType={MessageBarType.blocked}>
                     {messages.map((message) => (
@@ -303,7 +305,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                             />
                         </StackItem>
                         {/* Show category only if there is no parent */}
-                        {!Boolean(props.parentId) ? (
+                        {!Boolean(params.parentId) ? (
                             <StackItem>
                                 <ComboBox
                                     label="Category"
@@ -367,7 +369,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                         }
                     />
                 </Stack>
-                {props.parentId && (
+                {params.parentId && (
                     <TextField
                         label="Parent task"
                         value={parent?.Title}
@@ -375,7 +377,7 @@ const CreateTaskPanel: React.FC<IPanelComponentProps & ICreateTaskProps> = (
                     />
                 )}
             </form>
-        </>
+        </Panel>
     );
 };
 

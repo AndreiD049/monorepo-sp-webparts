@@ -1,22 +1,17 @@
 import {
-    ContextualMenuItemType,
     IconButton,
-    IOverflowSetItemProps,
-    OverflowSet,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { ICellRenderer } from './ICellRenderer';
 import styles from './Cells.module.scss';
-import {
-    CREATE_PANEL_ID,
-    DETAILS_PANEL_ID,
-} from '../../components/useCipPanels';
-import { openPanel } from '../../utils/dom-events';
 import { getAlert } from '../../components/AlertDialog';
+import { useNavigate } from 'react-router';
 
 const ActionsCell: ICellRenderer = (node) => {
+    const navigate = useNavigate();
+
     const handleCreateSubtask = React.useCallback(
-        (id) => () => openPanel(CREATE_PANEL_ID, true, { parentId: id }),
+        (id) => () => {  navigate(`new/${id}`); },
         []
     );
 
@@ -36,6 +31,7 @@ const ActionsCell: ICellRenderer = (node) => {
                 disabled={node.Display === 'disabled'}
                 onClick={() =>
                     getAlert({
+                        alertId: "MAIN",
                         title: 'Work in progress',
                         subText: 'Work in progress',
                         buttons: [{ key: 'ok', text: 'Ok' }],
@@ -48,10 +44,7 @@ const ActionsCell: ICellRenderer = (node) => {
                 title="Edit task"
                 disabled={node.Display === 'disabled'}
                 onClick={() => {
-                    openPanel(DETAILS_PANEL_ID, true, {
-                        node: node,
-                        editable: true,
-                    });
+                    navigate(`task/${node.Id}`, { state: {editable: true} });
                 }}
             />
             <IconButton
@@ -61,6 +54,7 @@ const ActionsCell: ICellRenderer = (node) => {
                 disabled={node.Display === 'disabled'}
                 onClick={() =>
                     getAlert({
+                        alertId: "MAIN",
                         title: 'Work in progress',
                         subText: 'Work in progress',
                         buttons: [{ key: 'ok', text: 'Ok' }],
@@ -81,6 +75,7 @@ const ActionsCell: ICellRenderer = (node) => {
                             },
                             onClick: () => {
                                 getAlert({
+                                    alertId: "MAIN",
                                     title: 'Work in progress',
                                     subText: 'Work in progress',
                                     buttons: [{ key: 'ok', text: 'Ok' }],
@@ -95,6 +90,7 @@ const ActionsCell: ICellRenderer = (node) => {
                             },
                             onClick: () => {
                                 getAlert({
+                                    alertId: "MAIN",
                                     title: 'Work in progress',
                                     subText: 'Work in progress',
                                     buttons: [{ key: 'ok', text: 'Ok' }],

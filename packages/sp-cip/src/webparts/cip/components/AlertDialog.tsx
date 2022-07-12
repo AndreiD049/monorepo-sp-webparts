@@ -1,4 +1,3 @@
-import { remove } from 'lodash';
 import {
     ButtonType,
     DefaultButton,
@@ -22,6 +21,7 @@ const defaultProps = {
 };
 
 interface IGetAlertProps {
+    alertId: string;
     title: string;
     subText: string;
     buttons: IDialogButtonProp[];
@@ -30,6 +30,7 @@ interface IGetAlertProps {
 export const getAlert = async (props: IGetAlertProps) => {
     return new Promise<any>((resolve) => {
         dialogVisibility({
+            alertId: props.alertId,
             contentProps: {
                 ...defaultProps,
                 title: props.title,
@@ -42,7 +43,11 @@ export const getAlert = async (props: IGetAlertProps) => {
     });
 };
 
-export const AlertDialog = () => {
+export interface IAlertDialogProps {
+    alertId: string
+}
+
+export const AlertDialog: React.FC<IAlertDialogProps>= ({alertId}) => {
     const [hidden, setHidden] = React.useState(true);
     const [contentProps, setContentProps] =
         React.useState<IDialogContentProps>(defaultProps);
@@ -51,16 +56,18 @@ export const AlertDialog = () => {
 
     React.useEffect(() => {
         const removeEvent = dialogVisibilityHandler((props) => {
-            setHidden(props.hidden);
-            setContentProps(props.contentProps);
-            setButtons(props.buttons);
-            setBeforeDismiss((prev) => props.onBeforeDismiss);
+            if (props.alertId === alertId) {
+                setHidden(props.hidden);
+                setContentProps(props.contentProps);
+                setButtons(props.buttons);
+                setBeforeDismiss((prev) => props.onBeforeDismiss);
+            } 
         });
         return () => removeEvent();
     }, []);
 
     const handleDismiss = React.useCallback(
-        (answer) => {
+        (answer) => () => {
             beforeDismiss && beforeDismiss(answer);
             setHidden(true);
         },
@@ -77,7 +84,7 @@ export const AlertDialog = () => {
                         return (
                             <PrimaryButton
                                 key={button.key}
-                                onClick={() => handleDismiss(button.key)}
+                                onClick={handleDismiss(button.key)}
                             >
                                 {button.text}
                             </PrimaryButton>
@@ -86,7 +93,7 @@ export const AlertDialog = () => {
                         return (
                             <DefaultButton
                                 key={button.key}
-                                onClick={() => handleDismiss(button.key)}
+                                onClick={handleDismiss(button.key)}
                             >
                                 {button.text}
                             </DefaultButton>

@@ -14,8 +14,6 @@ import * as strings from 'CipWebPartStrings';
 import Cip from './components/Cip';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { initNotifications } from 'sp-react-notifications';
-import { GlobalContext } from './utils/GlobalContext';
-import { useUsers } from './users/useUsers';
 
 export interface ICipWebPartProps {
     headerText: string;

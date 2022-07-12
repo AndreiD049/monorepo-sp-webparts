@@ -25,7 +25,7 @@ export class TaskNode implements IClonable<TaskNode> {
         this.isFilterApplicable = true;
         if (!task) {
             this.type = 'root';
-        } else if (this.task.SubtasksId?.length > 0) {
+        } else if (this.task.Subtasks > 0) {
             this.type = 'proxy';
         } else {
             this.type = 'normal';

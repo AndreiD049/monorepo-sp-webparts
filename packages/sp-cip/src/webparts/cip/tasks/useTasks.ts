@@ -2,8 +2,9 @@ import { useContext } from 'react';
 import { IndexedDBCacher } from 'sp-indexeddb-caching';
 import CipWebPart from '../CipWebPart';
 import { GlobalContext } from '../utils/GlobalContext';
-import { ICreateTask } from './ITaskDetails';
+import { ICreateTask } from './ICreateTask';
 import { ITaskOverview, LIST_EXPAND, LIST_SELECT } from './ITaskOverview';
+import { isFinished } from './task-utils';
 
 /**
  * Tasks service
@@ -27,6 +28,7 @@ export const useTasks = () => {
             .getById(id)
             .select(...LIST_SELECT)
             .expand(...LIST_EXPAND);
+
     const getTask = async (id: number): Promise<ITaskOverview> => {
         return getTaskRequest(id)();
     };
@@ -48,15 +50,11 @@ export const useTasks = () => {
             .select(...LIST_SELECT)
             .expand(...LIST_EXPAND);
     };
+
     const getSubtasks = async (id: number): Promise<ITaskOverview[]> => {
         return getSubtasksRequest(id)();
     };
 
-    const setSubtasks = async (parentId: number, subtasks: number[]) => {
-        return list.items.getById(parentId).update({
-            SubtasksId: subtasks,
-        });
-    };
 
     const createTask = async (details: ICreateTask) => {
         const payload: ICreateTask = {
@@ -65,6 +63,7 @@ export const useTasks = () => {
             Status: 'New',
             Progress: 0,
         };
+        console.log(payload);
         const created = await list.items.add(payload);
         await handleCacheTaskCreated(created.data.Id);
         await created.item.update({
@@ -91,9 +90,48 @@ export const useTasks = () => {
         return added.data.Id;
     };
 
-    const updateTask = async (id: number, details: Partial<ITaskOverview & {ResponsibleId: number}>) => {
-        const updated = await list.items.getById(id).update(details);
+    const updateTask = async (
+        id: number,
+        details: Partial<ITaskOverview & { ResponsibleId: number }>
+    ) => {
+        await list.items.getById(id).update(details);
         await handleCacheTaskUpdated(id);
+    };
+
+    const finishTask = async (id: number) => {
+        const item = await getTask(id);
+        // Already finished
+        if (isFinished(item)) return;
+        await updateTask(id, {
+            FinishDate: new Date().toISOString(),
+            Status: 'Finished',
+            Progress: 1,
+        });
+        // Check if we need to remove subtask from parent
+        if (item.ParentId) {
+            const parent = await getTask(item.ParentId);
+            await updateTask(parent.Id, {
+                Subtasks: parent.Subtasks - 1,
+                FinishedSubtasks: parent.FinishedSubtasks + 1,
+            });
+        }
+    };
+
+    const reopenTask = async (id: number) => {
+        const item = await getTask(id);
+        // Not finished
+        if (!isFinished(item)) return;
+        await updateTask(id, {
+            FinishDate: null,
+            Status: 'In-Progress',
+        });
+        if (item.ParentId) {
+            const parent = await getTask(item.ParentId);
+            await updateTask(parent.Id, {
+                Subtasks: parent.Subtasks + 1,
+                FinishedSubtasks: parent.FinishedSubtasks - 1,
+            });
+        }
     };
 
     const handleCacheTaskUpdated = async (id: number) => {
@@ -119,9 +157,12 @@ export const useTasks = () => {
             ).set(replace(item));
         } else {
             // Update top level tasks
-            await caching.Cache.get(
-                getNonFinishedMainsRequest().toRequestUrl()
-            ).set(replace(item));
+            const cached = caching.Cache.get(getNonFinishedMainsRequest().toRequestUrl());
+            if (!isFinished(item)) {
+                await cached.set(replace(item));
+            } else {
+                await cached.remove();
+            }
         }
     };
 
@@ -135,25 +176,24 @@ export const useTasks = () => {
         await caching.Cache.get(getTaskRequest(id).toRequestUrl()).remove();
         // get updated item
         const item = await getTask(id);
-        console.log(item);
         // update all tasks
-        await caching.Cache.get(getAllRequest().toRequestUrl()).set(
-            add(item)
-        );
+        await caching.Cache.get(getAllRequest().toRequestUrl()).set(add(item));
         if (item.ParentId) {
             // Update parent task
             await caching.Cache.get(
                 getSubtasksRequest(item.ParentId).toRequestUrl()
             ).remove();
             const subtasks = await getSubtasks(item.ParentId);
-            await setSubtasks(item.ParentId, [...subtasks.map((s) => s.Id), item.Id]);
+            await updateTask(item.ParentId, {
+                Subtasks: subtasks.length,
+            });
         } else {
             // Update top level tasks
             await caching.Cache.get(
                 getNonFinishedMainsRequest().toRequestUrl()
             ).set(add(item));
         }
-    }
+    };
 
     return {
         getAll,
@@ -163,5 +203,7 @@ export const useTasks = () => {
         createTask,
         createSubtask,
         updateTask,
+        finishTask,
+        reopenTask,
     };
 };

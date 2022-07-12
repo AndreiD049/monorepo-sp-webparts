@@ -4,8 +4,11 @@ import { ICellRenderer } from './ICellRenderer';
 import styles from './Cells.module.scss';
 import useParentStroke from '../../components/ParentStroke';
 import { TaskNode } from '../graph/TaskNode';
-import { nodeToggleOpen, openPanel } from '../../utils/dom-events';
-import { DETAILS_PANEL_ID } from '../../components/useCipPanels';
+import { nodeToggleOpen, taskUpdated } from '../../utils/dom-events';
+import { useNavigate } from 'react-router';
+import { useTasks } from '../useTasks';
+import { isFinished } from '../task-utils';
+import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {
@@ -18,19 +21,23 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
 
     let classNames = React.useMemo(() => {
         let result = styles['round-button'];
-        if (!item.SubtasksId?.length) {
-            result += ` ${styles['round-success-button']}`;
+        if (!item.Subtasks) {
+            result += ` ${
+                isFinished(item)
+                    ? styles['round-finished-button']
+                    : styles['round-open-button']
+            }`;
         }
         return result;
     }, [props.node]);
 
     const content = React.useMemo(() => {
-        if (item.SubtasksId?.length) {
-            return <span>{item.SubtasksId.length}</span>;
+        if (item.Subtasks) {
+            return <span>{item.Subtasks}</span>;
         } else {
             return (
                 <Icon
-                    iconName="SkypeCheck"
+                    iconName={`${isFinished(item) ? 'Cancel' : 'CheckMark'}`}
                     className={styles['round-button__icon']}
                 />
             );
@@ -38,7 +45,7 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
     }, [props.node]);
 
     return (
-        <div style={{position: 'relative'}}>
+        <div style={{ position: 'relative' }}>
             <button
                 disabled={props.node.Display === 'disabled'}
                 ref={button}
@@ -56,6 +63,27 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
 };
 
 export const TitleCell: ICellRenderer = (node, nestLevel) => {
+    const navigate = useNavigate();
+    const { finishTask, getTask, reopenTask } = useTasks();
+
+    const handleFinishTask = async (node: TaskNode) => {
+        await finishTask(node.Id);
+        const newItem = await getTask(node.Id);
+        taskUpdated(newItem);
+        if (newItem.ParentId) {
+            taskUpdated(await getTask(newItem.ParentId));
+        }
+    };
+
+    const handleReopenTask = async (node: TaskNode) => {
+        await reopenTask(node.Id);
+        const newItem = await getTask(node.Id);
+        taskUpdated(newItem);
+        if (newItem.ParentId) {
+            taskUpdated(await getTask(newItem.ParentId));
+        }
+    }
+
     return (
         <div
             data-type="row"
@@ -67,17 +95,23 @@ export const TitleCell: ICellRenderer = (node, nestLevel) => {
                 marginLeft: 30 * nestLevel,
             }}
             itemType="button"
-            onDoubleClick={(evt) => {
-                openPanel(DETAILS_PANEL_ID, true, { node: node, headerText: "" });
+            onDoubleClick={() => {
+                navigate(`task/${node.Id}`, { state: { node } });
                 // Empty the selection is text was selected while double clicking
                 document.getSelection().empty();
             }}
         >
             <CheckExpandButton
                 node={node}
-                onClick={() => {
-                    if (node.getTask().SubtasksId.length === 0) {
-                        return console.log('Finish');
+                onClick={async () => {
+                    if (node.getTask().Subtasks === 0) {
+                        loadingStart();
+                        if (!isFinished(node.getTask())) {
+                            await handleFinishTask(node);
+                        } else {
+                            await handleReopenTask(node);
+                        }
+                        loadingStop();
                     } else {
                         nodeToggleOpen(node.Id);
                     }
@@ -97,3 +131,4 @@ export const TitleCell: ICellRenderer = (node, nestLevel) => {
         </div>
     );
 };
+

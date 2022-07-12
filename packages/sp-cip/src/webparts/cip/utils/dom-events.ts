@@ -175,6 +175,7 @@ export interface IDialogButtonProp {
     text: string;
 }
 export interface IDialogVisibilityProps {
+    alertId: string;
     hidden: boolean;
     onBeforeDismiss?: (answer: string) => void
     contentProps: IDialogContentProps;

@@ -75,14 +75,15 @@ const Task: React.FC<ITaskProps> = (props) => {
     React.useEffect(() => {
         const removeOpenHandler = nodeToggleOpenHandler(props.node.Id, () =>
             setOpen((prev) => {
+                return !prev;
+            }));
+            setTimeout(() => {
                 let next = props.node;
                 while (next.getParent()) {
                     relinkParent(next.getNextSibling()?.Id);
                     next = next.getParent();
                 }
-                return !prev;
-            })
-        );
+            }, 0);
         return () => {
             removeOpenHandler();
         };

@@ -17,8 +17,7 @@ const dummyTask: ITaskOverview = {
     Status: 'New',
     Team: 'BSG',
     Title: 'Dummy daily task',
-    CommentsId: [],
-    SubtasksId: [],
+    Subtasks: 0,
     ParentId: null,
 };
 
@@ -29,7 +28,7 @@ it('Should be able to contruct a node from a task', () => {
 
 it('Should be possible to add children to a task', () => {
     const parent = new TaskNode(dummyTask);
-    const child = new TaskNode({...dummyTask, Id: 2, SubtasksId: [3]})
+    const child = new TaskNode({...dummyTask, Id: 2, Subtasks: 1})
         .withParent(parent);
     expect(parent.children.size).toBe(1);
     expect(child.parent.getTask().Id).toBe(1);

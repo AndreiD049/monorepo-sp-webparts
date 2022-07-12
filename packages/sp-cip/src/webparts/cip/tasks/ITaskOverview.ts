@@ -11,12 +11,13 @@ export const LIST_SELECT = [
     'Category',
     'Progress',
     'DueDate',
+    'FinishDate',
     'EstimatedTime',
     'EffectiveTime',
     'ParentId',
     'MainTaskId',
-    'CommentsId',
-    'SubtasksId',
+    'Subtasks',
+    'FinishedSubtasks',
 ];
 
 export const LIST_EXPAND = ['Responsible'];
@@ -36,10 +37,11 @@ export interface ITaskOverview {
     Progress: number;
     Category: string;
     DueDate: string; // ISO formatted date
+    FinishDate: string; // ISO formatted date
     EstimatedTime: number; // number of hours
     EffectiveTime: number; // number of hours
     ParentId: number;
     MainTaskId?: number;
-    CommentsId?: number[];
-    SubtasksId?: number[];
+    Subtasks: number;
+    FinishedSubtasks: number;
 }

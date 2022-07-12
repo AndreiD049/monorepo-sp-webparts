@@ -7,7 +7,7 @@ import { GlobalContext } from '../utils/GlobalContext';
 import { IAttachment } from './IAttachment';
 import { useAttachments } from './useAttachments';
 import styles from './Attachments.module.scss';
-import { getAlert } from '../components/AlertDialog';
+import { AlertDialog, getAlert } from '../components/AlertDialog';
 
 interface IAttachmentsProps {
     task: ITaskOverview;
@@ -98,8 +98,9 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
                     <Icon iconName="Download" />
                 </Link>
                 <Link
-                    onClick={async () => {
+                    onClick={async (evt) => {
                         const alert = await getAlert({
+                            alertId: "DETAILS_PANEL",
                             title: 'Delete',
                             subText: `You are about to delete file '${props.attachment.Name}'. Are you sure?`,
                             buttons: [
@@ -113,6 +114,7 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
                                 prev.filter((pa) => pa.Name !== props.attachment.Name)
                             );
                         }
+                        return false;
                     }}
                     title="Delete"
                 >

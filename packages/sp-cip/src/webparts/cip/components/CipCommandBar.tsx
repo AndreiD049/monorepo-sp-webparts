@@ -4,8 +4,8 @@ import {
     SearchBox,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { openPanel, relinkParent } from '../utils/dom-events';
-import { CREATE_PANEL_ID } from './useCipPanels';
+import { useNavigate } from 'react-router';
+import { relinkParent } from '../utils/dom-events';
 
 interface ICipCommandBarProps {
     onSearch: (val: string) => void;
@@ -16,6 +16,7 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
         props.onSearch(value);
         relinkParent('all');
     }, 1000), [props.onSearch]);
+    const navigate = useNavigate();
 
     return (
         <>
@@ -27,7 +28,7 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                         iconProps: {
                             iconName: 'Add',
                         },
-                        onClick: () => openPanel(CREATE_PANEL_ID, true),
+                        onClick: () => navigate('new'),
                     }
                 ]}
                 farItems={[

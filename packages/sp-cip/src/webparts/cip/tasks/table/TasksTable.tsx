@@ -13,18 +13,19 @@ import Task from '../Task';
 import { useGroups } from './useGroups';
 import { useTasks } from '../useTasks';
 import { useColumns } from './useColumns';
+import { TaskNode } from '../graph/TaskNode';
 
 
 const TasksTable = () => {
     const { getNonFinishedMains, getAll } = useTasks();
-    const [tasks, setTasks] = React.useState<ITaskOverview[]>([]);
-    const [allTasks, setAllTasks] = React.useState<ITaskOverview[]>([]);
+    const [tasks, setTasks] = React.useState<ITaskOverview[]>(null);
+    const [allTasks, setAllTasks] = React.useState<ITaskOverview[]>(null);
     const { CalloutComponent } = useCallout();
     const [search, setSearch] = React.useState('');
 
     React.useEffect(() => {
-        if (tasks.length === 0) getNonFinishedMains().then((t) => setTasks(t));
-        if (allTasks.length === 0 && search !== '') getAll().then((t) => {
+        if (tasks === null) getNonFinishedMains().then((t) => setTasks(t));
+        if (allTasks === null && search !== '') getAll().then((t) => {
             setAllTasks(t);
             setTasks(t);
         });
@@ -52,7 +53,10 @@ const TasksTable = () => {
     }, []);
 
     const tree = React.useMemo(() => {
-        return createTaskTree(tasks);
+        if (tasks !== null) {
+            return createTaskTree(tasks);
+        }
+        return new TaskNode();
     }, [tasks]);
 
     const filteredTree = React.useMemo(() => {
@@ -82,6 +86,11 @@ const TasksTable = () => {
         <>
             <CipCommandBar onSearch={(val) => setSearch(val)} />
             <DetailsList
+                styles={{
+                    root: {
+                        overflow: 'visible',
+                    }
+                }}
                 groups={groups}
                 groupProps={groupProps}
                 layoutMode={DetailsListLayoutMode.fixedColumns}

@@ -121,7 +121,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         );
         notifyOnFieldCreation(priority);
 
-        const responsible = await list.fields.createFieldAsXml(`<Field Description='Users responsible for executing current task' DisplayName='Responsible' Format='Dropdown' IsModern='TRUE' List='UserInfo' Mult='TRUE' Name='Responsible' Title='Responsible' Type='User' UserDisplayOptions='NamePhoto' UserSelectionMode='1' UserSelectionScope='0'></Field>`);
+        const responsible = await list.fields.createFieldAsXml(`<Field Description='Users responsible for executing current task' DisplayName='Responsible' Format='Dropdown' IsModern='TRUE' List='UserInfo' Mult='FALSE' Name='Responsible' Title='Responsible' Type='User' UserDisplayOptions='NamePhoto' UserSelectionMode='1' UserSelectionScope='0'></Field>`);
         notifyOnFieldCreation(responsible);
 
         const team = await list.fields.createFieldAsXml(
@@ -174,17 +174,15 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         );
         notifyOnFieldCreation(main)
 
-        /** Comments hidden field */
-        const commentsListDetails = await commentList.list();
-        const comments = await list.fields.createFieldAsXml(
-            `<Field Description='Item comments' DisplayName='Comments' Format='Dropdown' Indexed='FALSE' IsModern='TRUE' IsRelationship='FALSE' List='${commentsListDetails.Id}' Mult='TRUE' Name='Comments' ShowField='ID' Title='Comments' Type='LookupMulti'></Field>`
-        )
-        notifyOnFieldCreation(comments)
-
         const subtasks = await list.fields.createFieldAsXml(
-            `<Field Description='This task&#39;s children' DisplayName='Subtasks' Format='Dropdown' Indexed='FALSE' IsModern='TRUE' IsRelationship='FALSE' List='${taskList.data.Id}' Mult='TRUE' Name='Subtasks' ShowField='ID' Title='Subtasks' Type='LookupMulti'></Field>`
+            `<Field CommaSeparator='FALSE' CustomUnitOnRight='TRUE' Decimals='0' Description='Number of subtasks' DisplayName='Subtasks' Format='Dropdown' IsModern='TRUE' Name='Subtasks' Percentage='FALSE' Title='Subtasks' Type='Number' Unit='None'><Default>0</Default></Field>`
+        )
+        notifyOnFieldCreation(subtasks);
+
+        const finishedSubtasks = await list.fields.createFieldAsXml(
+            `<Field CommaSeparator='FALSE' CustomUnitOnRight='TRUE' Decimals='0' Description='Number of finished subtasks' DisplayName='FinishedSubtasks' Format='Dropdown' IsModern='TRUE' Name='FinishedSubtasks' Percentage='FALSE' Title='FinishedSubtasks' Type='Number' Unit='None'><Default>0</Default></Field>`
         );
-        notifyOnFieldCreation(subtasks)
+        notifyOnFieldCreation(finishedSubtasks);
 
         /**
          * Adjust default view

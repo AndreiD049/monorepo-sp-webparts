@@ -3,11 +3,14 @@ import * as React from 'react';
 import { GlobalContext } from '../utils/GlobalContext';
 import styles from './Cip.module.scss';
 import TasksTable from '../tasks/table/TasksTable';
-import { useCipPanels } from './useCipPanels';
 import { ICipWebPartProps } from '../CipWebPart';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import { useUsers } from '../users/useUsers';
 import { AlertDialog } from './AlertDialog';
+import { HashRouter, Outlet, Route, Routes } from 'react-router-dom';
+import CreateTaskPanel from '../tasks/Panels/CreateTask';
+import { TaskDetails } from '../tasks/Panels/TaskDetails';
+import { LoadingAnimation } from './Utils/LoadingAnimation';
 
 interface ICipProps {
     properties: ICipWebPartProps;
@@ -15,7 +18,6 @@ interface ICipProps {
 }
 
 const Cip: React.FC<ICipProps> = (props) => {
-    const panels = useCipPanels();
     const [teams, setTeams] = React.useState<string[]>([]);
     const users = useUsers({ properties: props.properties });
 
@@ -31,14 +33,35 @@ const Cip: React.FC<ICipProps> = (props) => {
                 teams,
             }}
         >
-            <div className={styles.cip}>
-                <Text variant="xxLargePlus" className={styles.header} block>
-                    {props.properties.headerText}
-                </Text>
-                <TasksTable />
-                {panels}
-                <AlertDialog />
-            </div>
+            <HashRouter>
+                <Routes>
+                    <Route
+                        path="/"
+                        element={
+                            <div className={styles.cip}>
+                                <Text
+                                    variant="xxLargePlus"
+                                    className={styles.header}
+                                    block
+                                >
+                                    {props.properties.headerText}
+                                </Text>
+                                <TasksTable />
+                                <Outlet />
+                            </div>
+                        }
+                    >
+                        <Route path="new" element={<CreateTaskPanel />} />
+                        <Route
+                            path="new/:parentId"
+                            element={<CreateTaskPanel />}
+                        />
+                        <Route path="task/:taskId" element={<TaskDetails />} />
+                    </Route>
+                </Routes>
+                <AlertDialog alertId="MAIN" />
+                <LoadingAnimation />
+            </HashRouter>
         </GlobalContext.Provider>
     );
 };

@@ -29,9 +29,16 @@
         background-color: "[theme: neutralTertiary, default: #666666]";
     }
 
-    &.round-success-button {
+    &.round-open-button {
         &:hover {
             background-color: $ms-color-greenLight;
+        }
+    }
+
+    &.round-finished-button {
+        &:hover {
+            background-color: $ms-color-red;
+            color: white;
         }
     }
 }
