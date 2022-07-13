@@ -1,5 +1,4 @@
 import { IReadonlyTheme } from "@microsoft/sp-component-base";
-import { IWebPartContext, WebPartContext } from "@microsoft/sp-webpart-base";
 import * as React from "react";
 import { ICipWebPartProps } from "../CipWebPart";
 

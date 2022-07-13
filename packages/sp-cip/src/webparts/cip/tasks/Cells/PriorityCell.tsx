@@ -4,6 +4,8 @@ import Pill from '../../components/Pill/Pill';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { TaskNode } from '../graph/TaskNode';
+import { isFinished } from '../task-utils';
+import { TaskNodeContext } from '../TaskNodeContext';
 import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
 
@@ -52,6 +54,7 @@ type IPriorityCellProps = {
 };
 
 const PriorityCell: React.FC<IPriorityCellProps> = (props) => {
+    const { isTaskFinished } = React.useContext(TaskNodeContext);
     const task = props.node.getTask();
     const elemRef = React.useRef(null);
 
@@ -73,7 +76,7 @@ const PriorityCell: React.FC<IPriorityCellProps> = (props) => {
                     borderRadius: '5px',
                 }}
                 value={task.Priority}
-                disabled={props.node.Display === 'disabled'}
+                disabled={props.node.Display === 'disabled' || isTaskFinished}
             />
         </div>
     );

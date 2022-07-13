@@ -1,14 +1,8 @@
-import {
-    ActionButton,
-    PrimaryButton,
-    Separator,
-    Slider,
-    StackItem,
-    Text,
-} from 'office-ui-fabric-react';
+import { ActionButton, Slider, StackItem, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
+import { TaskNodeContext } from '../TaskNodeContext';
 import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
 
@@ -58,6 +52,7 @@ const ProgressCellCallout: React.FC<IProgressCellProps> = (props) => {
 };
 
 export const ProgressCell: React.FC<IProgressCellProps> = (props) => {
+    const { isTaskFinished } = React.useContext(TaskNodeContext);
     const progressRef = React.useRef();
     const handleClick = React.useCallback(() => {
         calloutVisibility({
@@ -67,13 +62,16 @@ export const ProgressCell: React.FC<IProgressCellProps> = (props) => {
             componentProps: props,
         });
     }, [props.node, progressRef]);
+    const isDisabled = React.useMemo(() => {
+        return props.node.Display === 'disabled' || isTaskFinished;
+    }, [props.node, isTaskFinished]);
 
     return (
         <button
             ref={progressRef}
             className={`${styles.progress} ${styles.button}`}
             onClick={handleClick}
-            disabled={props.node.Display === 'disabled'}
+            disabled={isDisabled}
         >
             <Text
                 variant="medium"
@@ -81,7 +79,7 @@ export const ProgressCell: React.FC<IProgressCellProps> = (props) => {
             >{`${Math.round(props.node.getTask()?.Progress * 100)}%`}</Text>
             <div
                 className={`${styles['progress-bar']} ${
-                    props.node.Display === 'disabled' ? styles.disabled : ''
+                    isDisabled ? styles.disabled : ''
                 }`}
                 style={{ width: `${props.node.getTask().Progress * 100}%` }}
             />

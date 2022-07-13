@@ -1,4 +1,5 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
+$buttonSide: 30px;
 
 .round-button {
     border-radius: 20px;
@@ -6,9 +7,8 @@
     border: 1px solid;
     border-color: "[theme: neutralQuaternary, default: #666666]";
     outline: none;
-    margin-right: .8em;
-    width: 30px;
-    height: 30px;
+    width: $buttonSide;
+    height: $buttonSide;
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
@@ -43,6 +43,37 @@
     }
 }
 
+.title__front-buttons {
+    display: flex;
+    flex-flow: row nowrap;
+    position: relative;
+}
+
+.title__front-buttons_subtasks_none {
+    margin-right: .8em;
+}
+
+.title__subtask-counter {
+    line-height: $buttonSide;
+    display: flex;
+    flex-flow: row nowrap;
+    font-size: .9em;
+}
+
+.title__subtask-delimiter {
+    margin: 0 2px;
+}
+
+.title__text_finished {
+    text-decoration: line-through;
+}
+
+.title__text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+}
+
 .action-buttons-container {
     opacity: 0.5;
     transition: opacity .2s;
@@ -62,6 +93,10 @@
         
         i {
             font-size: 1em;
+        }
+
+        &:disabled {
+            background-color: transparent;
         }
     }
 }

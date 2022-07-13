@@ -3,6 +3,7 @@ import Pill from '../../components/Pill/Pill';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { TaskNode } from '../graph/TaskNode';
+import { TaskNodeContext } from '../TaskNodeContext';
 import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
 
@@ -32,6 +33,7 @@ export const StatusCellCallout: React.FC<IStatusCellProps> = ({ node }) => {
 };
 
 export const StatusCell: React.FC<IStatusCellProps> = (props) => {
+    const { isTaskFinished } = React.useContext(TaskNodeContext);
     const handleClick = React.useCallback((evt) => {
         calloutVisibility({
             target: evt.nativeEvent,
@@ -46,7 +48,7 @@ export const StatusCell: React.FC<IStatusCellProps> = (props) => {
             id={`task-status-pill-${props.node.Id}`}
             onClick={handleClick}
             value={props.node.getTask()?.Status}
-            disabled={props.node.Display === 'disabled'}
+            disabled={props.node.Display === 'disabled' || isTaskFinished}
         />
     );
 };

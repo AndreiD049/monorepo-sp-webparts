@@ -1,6 +1,5 @@
 import { Persona, PersonaSize, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import Pill from '../../components/Pill/Pill';
 import Timing from './Timing';
 import { TaskNode } from '../graph/TaskNode';
 import ActionsCell from './ActionsCell';
@@ -19,7 +18,6 @@ interface IRenderCellProps {
 
 export const RenderCell: React.FC<IRenderCellProps> = (props) => {
     const nestLevel = props.node.level || 0;
-    const task = props.node.getTask();
     switch (props.fieldName.toLowerCase()) {
         case 'title':
             return TitleCell(props.node, nestLevel);

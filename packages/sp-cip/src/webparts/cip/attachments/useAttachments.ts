@@ -9,10 +9,11 @@ const FILE_SELECT = ['Name', 'UniqueId'];
 
 export const useAttachments = () => {
     const { properties } = React.useContext(GlobalContext);
-    const { Cache, CachingTimeline } = IndexedDBCacher();
-    const sp = React.useMemo(() => CipWebPart.SPBuilder.getSP('Data'), []).using(
-        CachingTimeline
-    );
+    // const { Cache, CachingTimeline } = IndexedDBCacher();
+    // const sp = React.useMemo(() => CipWebPart.SPBuilder.getSP('Data'), []).using(
+    //     CachingTimeline
+    // );
+    const sp = React.useMemo(() => CipWebPart.SPBuilder.getSP('Data'), []);
     const folder = sp.web.getFolderByServerRelativePath(properties.attachmentsPath);
     const taskFolder = (id: number) => sp.web.getFolderByServerRelativePath(`${properties.attachmentsPath}/${id}`);
 
@@ -20,7 +21,7 @@ export const useAttachments = () => {
         await ensureFolder(task);
         for (const attachment of attachments) {
             await taskFolder(task.Id).files.addUsingPath(`${attachment.name}`, attachment, { Overwrite: true });
-            await onAttachmentsUpdated(task);
+            // await onAttachmentsUpdated(task);
         }
     };
 
@@ -35,12 +36,12 @@ export const useAttachments = () => {
 
     const removeAttachment = async (task: ITaskOverview, filename: string): Promise<void> => {
         await taskFolder(task.Id).files.getByUrl(filename).recycle();
-        await onAttachmentsUpdated(task);
+        // await onAttachmentsUpdated(task);
     }
 
-    const onAttachmentsUpdated = async (task: ITaskOverview) => {
-        await Cache.get(getAttachmentsRequest(task).toRequestUrl()).remove();
-    }
+    // const onAttachmentsUpdated = async (task: ITaskOverview) => {
+    //     await Cache.get(getAttachmentsRequest(task).toRequestUrl()).remove();
+    // }
 
     const ensureFolder = async (task: ITaskOverview) => {
         try {

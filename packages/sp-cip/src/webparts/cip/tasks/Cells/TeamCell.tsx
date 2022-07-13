@@ -5,6 +5,7 @@ import { calloutVisibility, nodeToggleOpen, taskUpdated } from '../../utils/dom-
 import { GlobalContext } from '../../utils/GlobalContext';
 import { TaskNode } from '../graph/TaskNode';
 import { ITaskOverview } from '../ITaskOverview';
+import { TaskNodeContext } from '../TaskNodeContext';
 import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
 
@@ -35,6 +36,7 @@ interface ITeamCellProps {
 }
 
 export const TeamCell: React.FC<ITeamCellProps> = (props) => {
+    const { isTaskFinished } = React.useContext(TaskNodeContext);
     const task: ITaskOverview = props.node.getTask();
     const teamRef = React.useRef(null);
 
@@ -51,7 +53,7 @@ export const TeamCell: React.FC<ITeamCellProps> = (props) => {
     );
 
     return (
-        <button disabled={props.node.Display === 'disabled'} ref={teamRef} onClick={handleClick} className={`${styles.teamCell} ${styles.button}`}>
+        <button disabled={props.node.Display === 'disabled' || isTaskFinished} ref={teamRef} onClick={handleClick} className={`${styles.teamCell} ${styles.button}`}>
             <Text variant="medium">{task.Team || ''}</Text>
         </button>
     );

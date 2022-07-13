@@ -8,6 +8,7 @@ import {
 import * as React from 'react';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
+import { TaskNodeContext } from '../TaskNodeContext';
 import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
 
@@ -71,6 +72,7 @@ export interface ITimingProps {
 }
 
 const Timing: React.FC<ITimingProps> = (props) => {
+    const { isTaskFinished } = React.useContext(TaskNodeContext);
     const task = props.node.getTask();
     const elemRef = React.useRef(null);
 
@@ -89,7 +91,7 @@ const Timing: React.FC<ITimingProps> = (props) => {
     return (
         <button
             className={styles.button}
-            disabled={props.node.Display === 'disabled'}
+            disabled={props.node.Display === 'disabled' || isTaskFinished}
             ref={elemRef}
             onClick={handleClick}
         >

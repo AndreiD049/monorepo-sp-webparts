@@ -5,8 +5,9 @@ import styles from './Task.module.scss';
 import { TaskNode } from './graph/TaskNode';
 import { nodeToggleOpenHandler, relinkParent } from '../utils/dom-events';
 import SubtasksProxy from './SubtasksProxy';
-import { GlobalContext } from '../utils/GlobalContext';
 import { RenderCell } from './Cells/render-cells';
+import { TaskNodeContext } from './TaskNodeContext';
+import { isFinished } from './task-utils';
 
 function initialOpen(node: TaskNode, isFiltered: boolean) {
     if (!isFiltered) return false;
@@ -31,7 +32,6 @@ export interface ITaskProps {
  * * subtasks are loading (https://developer.microsoft.com/en-us/fluentui#/controls/web/shimmer)
  */
 const Task: React.FC<ITaskProps> = (props) => {
-    const { theme } = React.useContext(GlobalContext);
     const [open, setOpen] = React.useState<boolean>(false);
 
     React.useEffect(() => {
@@ -48,6 +48,7 @@ const Task: React.FC<ITaskProps> = (props) => {
                 onLoad={(tasks) => {
                     const task = props.node.getTask();
                     // Only reset if node is a proxy
+                    console.log(props.node.getType());
                     if (props.node.getType() === 'proxy') {
                         props.setTasks((prev) => {
                             const filtered = prev.filter(
@@ -76,23 +77,34 @@ const Task: React.FC<ITaskProps> = (props) => {
         const removeOpenHandler = nodeToggleOpenHandler(props.node.Id, () =>
             setOpen((prev) => {
                 return !prev;
-            }));
-            setTimeout(() => {
-                let next = props.node;
-                while (next.getParent()) {
-                    relinkParent(next.getNextSibling()?.Id);
-                    next = next.getParent();
-                }
-            }, 0);
+            })
+        );
         return () => {
             removeOpenHandler();
         };
     }, []);
 
+    /**
+     * Relink parents when node is open/closed
+     */
+    React.useEffect(() => {
+        let next = props.node;
+        while (next.getParent()) {
+            relinkParent(next.getNextSibling()?.Id);
+            next = next.getParent();
+        }
+    }, [props.node, open]);
+
     if (props.node.Display === 'hidden') return null;
 
     return (
-        <>
+        <TaskNodeContext.Provider
+            value={{
+                open,
+                node: props.node,
+                isTaskFinished: isFinished(props.node.getTask())
+            }}
+        >
             <div
                 className={`${styles.task} ${
                     props.node.Display === 'disabled' ? styles.disabled : ''
@@ -116,7 +128,7 @@ const Task: React.FC<ITaskProps> = (props) => {
                 })}
             </div>
             {subtasksNode}
-        </>
+        </TaskNodeContext.Provider>
     );
 };
 

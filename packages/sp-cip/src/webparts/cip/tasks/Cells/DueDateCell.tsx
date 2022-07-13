@@ -3,6 +3,7 @@ import * as React from 'react';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
 import { ITaskOverview } from '../ITaskOverview';
+import { TaskNodeContext } from '../TaskNodeContext';
 import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
 
@@ -95,6 +96,7 @@ const DueDateCellCallout = (props) => {
 };
 
 export const DueDateCell = ({ node }: { node: TaskNode }) => {
+    const { isTaskFinished } = React.useContext(TaskNodeContext);
     const task = node.getTask();
     const textRef = React.useRef(null);
 
@@ -111,7 +113,7 @@ export const DueDateCell = ({ node }: { node: TaskNode }) => {
         <button
             ref={textRef}
             onClick={handleClick}
-            disabled={node.Display === 'disabled'}
+            disabled={node.Display === 'disabled' || isTaskFinished}
             className={styles.button}
         >
             <Text variant="medium">

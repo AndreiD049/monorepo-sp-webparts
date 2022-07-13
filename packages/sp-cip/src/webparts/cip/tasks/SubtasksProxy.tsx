@@ -22,21 +22,19 @@ const SubtasksProxy: React.FC<ISubtaskProxyProps> = ({
 
     React.useEffect(() => {
         async function run() {
-            const sub = await getSubtasks(node.Id);
-            onLoad(sub);
+            if (node.getType() === 'proxy') {
+                const sub = await getSubtasks(node.Id);
+                onLoad(sub);
+            }
         }
         run();
-    }, []);
+    }, [node]);
 
     if (node.getType() !== 'proxy') return <>{children}</>;
+    
+    const shimmers = new Array(node.getTask().Subtasks).fill(<TaskShimmer rowProps={rowProps} parentNode={node} />);
 
-    return (
-        <>
-            {new Array(node.getTask().Subtasks).map(() => (
-                <TaskShimmer rowProps={rowProps} parentNode={node} />
-            ))}
-        </>
-    );
+    return (<>{shimmers.map((sh) => sh)}</>);
 };
 
 export default SubtasksProxy;

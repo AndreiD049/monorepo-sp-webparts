@@ -1,69 +1,118 @@
-import { Icon, Text } from 'office-ui-fabric-react';
+import { Icon, IconButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { ICellRenderer } from './ICellRenderer';
-import styles from './Cells.module.scss';
 import useParentStroke from '../../components/ParentStroke';
 import { TaskNode } from '../graph/TaskNode';
 import { nodeToggleOpen, taskUpdated } from '../../utils/dom-events';
 import { useNavigate } from 'react-router';
 import { useTasks } from '../useTasks';
+import {
+    loadingStart,
+    loadingStop,
+} from '../../components/Utils/LoadingAnimation';
+import styles from './Cells.module.scss';
+import { TaskNodeContext } from '../TaskNodeContext';
+import { ITaskOverview } from '../ITaskOverview';
 import { isFinished } from '../task-utils';
-import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {
     node: TaskNode;
 }
 
+const SubtaskCounter: React.FC<{ item: ITaskOverview }> = ({ item }) => {
+    return (
+        <div className={styles['title__subtask-counter']}>
+            <span>{item.FinishedSubtasks}</span>
+            <span className={styles['title__subtask-delimiter']}>|</span>
+            <span>{item.Subtasks}</span>
+        </div>
+    );
+};
+
 const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
+    const { open, node, isTaskFinished } = React.useContext(TaskNodeContext);
     const button = React.useRef(null);
-    const item = props.node.getTask();
+    const item = node.getTask();
+    const parentStroke = useParentStroke(node);
+
+    const isButtonDisabled = React.useMemo(() => {
+        if (node.Display === 'disabled') return true;
+        const parent = node.getParent();
+        if (parent && parent.getTask()) {
+            return isFinished(parent.getTask());
+        }
+        return false;
+    }, [node]);
 
     let classNames = React.useMemo(() => {
         let result = styles['round-button'];
-        if (!item.Subtasks) {
+        if (!isButtonDisabled && item.Subtasks === item.FinishedSubtasks) {
             result += ` ${
-                isFinished(item)
+                isTaskFinished
                     ? styles['round-finished-button']
                     : styles['round-open-button']
             }`;
         }
         return result;
-    }, [props.node]);
+    }, [node, isButtonDisabled]);
 
     const content = React.useMemo(() => {
-        if (item.Subtasks) {
-            return <span>{item.Subtasks}</span>;
+        if (item.Subtasks > 0 && item.FinishedSubtasks !== item.Subtasks) {
+            return <SubtaskCounter item={item} />;
         } else {
             return (
                 <Icon
-                    iconName={`${isFinished(item) ? 'Cancel' : 'CheckMark'}`}
+                    iconName={`${isTaskFinished ? 'Cancel' : 'CheckMark'}`}
                     className={styles['round-button__icon']}
                 />
             );
         }
-    }, [props.node]);
+    }, [node]);
+
+    const expandButton = React.useMemo(() => {
+        if (item.Subtasks > 0) {
+            return (
+                <IconButton
+                    onClick={() => nodeToggleOpen(item.Id)}
+                    iconProps={{
+                        iconName: `${open ? 'ChevronDown' : 'ChevronRight'}`,
+                    }}
+                />
+            );
+        }
+        return null;
+    }, [open, node]);
 
     return (
-        <div style={{ position: 'relative' }}>
+        <div
+            className={`${styles['title__front-buttons']} ${
+                item.Subtasks > 0
+                    ? ''
+                    : styles['title__front-buttons_subtasks_none']
+            }`}
+            onDoubleClick={(evt) => evt.stopPropagation()}
+        >
             <button
-                disabled={props.node.Display === 'disabled'}
+                disabled={isButtonDisabled}
                 ref={button}
                 id={`task-${item.Id}`}
                 data-taskid={item.Id}
                 onClick={props.onClick}
-                onDoubleClick={(evt) => evt.stopPropagation()}
                 className={classNames}
             >
                 {content}
             </button>
-            {useParentStroke(props.node)}
+            {expandButton}
+            {parentStroke}
         </div>
     );
 };
 
 export const TitleCell: ICellRenderer = (node, nestLevel) => {
+    const { isTaskFinished } = React.useContext(TaskNodeContext);
     const navigate = useNavigate();
+    const item = node.getTask();
     const { finishTask, getTask, reopenTask } = useTasks();
 
     const handleFinishTask = async (node: TaskNode) => {
@@ -82,7 +131,7 @@ export const TitleCell: ICellRenderer = (node, nestLevel) => {
         if (newItem.ParentId) {
             taskUpdated(await getTask(newItem.ParentId));
         }
-    }
+    };
 
     return (
         <div
@@ -104,9 +153,9 @@ export const TitleCell: ICellRenderer = (node, nestLevel) => {
             <CheckExpandButton
                 node={node}
                 onClick={async () => {
-                    if (node.getTask().Subtasks === 0) {
+                    if (item.Subtasks === item.FinishedSubtasks) {
                         loadingStart();
-                        if (!isFinished(node.getTask())) {
+                        if (!isTaskFinished) {
                             await handleFinishTask(node);
                         } else {
                             await handleReopenTask(node);
@@ -120,15 +169,12 @@ export const TitleCell: ICellRenderer = (node, nestLevel) => {
             <Text
                 variant="medium"
                 block
-                style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'pre',
-                }}
+                className={`${styles['title__text']} ${
+                    isTaskFinished ? styles['title__text_finished'] : ''
+                }`}
             >
-                {node.getTask().Title}
+                {item.Title}
             </Text>
         </div>
     );
 };
-

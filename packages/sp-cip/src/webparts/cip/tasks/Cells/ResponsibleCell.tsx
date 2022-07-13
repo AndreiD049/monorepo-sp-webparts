@@ -1,4 +1,3 @@
-import { update } from '@microsoft/sp-lodash-subset';
 import {
     IPersonaProps,
     Persona,
@@ -6,12 +5,12 @@ import {
     SearchBox,
     Separator,
     Text,
-    updateT,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useUsers } from '../../users/useUsers';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
+import { TaskNodeContext } from '../TaskNodeContext';
 import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
 
@@ -36,17 +35,23 @@ const ResponsibleCellCallout: React.FC<IResponsibleCellProps> = (props) => {
         usersAPI.getPersonaProps().then((personas) => setUsers(personas));
     }, []);
 
-    const handleClick = React.useCallback((newId: number) => async () => {
-        calloutVisibility({visible: false});
-        await updateTask(props.node.Id, {
-            ResponsibleId: newId,
-        });
-        taskUpdated(await getTask(props.node.Id));
-    }, [props.node]);
+    const handleClick = React.useCallback(
+        (newId: number) => async () => {
+            calloutVisibility({ visible: false });
+            await updateTask(props.node.Id, {
+                ResponsibleId: newId,
+            });
+            taskUpdated(await getTask(props.node.Id));
+        },
+        [props.node]
+    );
 
     const userElements = React.useMemo(() => {
         return users.filter(filterUser(searchValue)).map((userProps) => (
-            <button className={styles.responsible_user} onClick={handleClick(+userProps.id)}>
+            <button
+                className={styles.responsible_user}
+                onClick={handleClick(+userProps.id)}
+            >
                 <Persona
                     text={userProps.text}
                     size={PersonaSize.size32}
@@ -88,6 +93,7 @@ type IResponsibleCellProps = {
 };
 
 const ResponsibleCell = (props: IResponsibleCellProps) => {
+    const { isTaskFinished } = React.useContext(TaskNodeContext);
     const task = props.node.getTask();
     const elemRef = React.useRef(null);
 
@@ -104,7 +110,12 @@ const ResponsibleCell = (props: IResponsibleCellProps) => {
     );
 
     return (
-        <button className={`${styles.button} ${styles.responsible_button}`} disabled={props.node.Display === 'disabled'} ref={elemRef} onClick={handleClick}>
+        <button
+            className={`${styles.button} ${styles.responsible_button}`}
+            disabled={props.node.Display === 'disabled' || isTaskFinished}
+            ref={elemRef}
+            onClick={handleClick}
+        >
             <Persona
                 text={task.Responsible.Title}
                 size={PersonaSize.size24}
