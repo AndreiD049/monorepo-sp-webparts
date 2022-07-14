@@ -12,6 +12,7 @@ import {
 import * as React from 'react';
 import { useLocation, useMatch, useNavigate, useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
+import { ActionLog } from '../../actionlog/ActionLog';
 import { Attachments } from '../../attachments/Attachments';
 import { Comments } from '../../comments/Comments';
 import { AlertDialog, getAlert } from '../../components/AlertDialog';
@@ -198,7 +199,7 @@ export const TaskDetails: React.FC = () => {
                                     <Comments task={task} />
                                 </PivotItem>
                                 <PivotItem headerText="Action log">
-                                    Actions
+                                    <ActionLog task={task} />
                                 </PivotItem>
                             </Pivot>
                         </StackItem>

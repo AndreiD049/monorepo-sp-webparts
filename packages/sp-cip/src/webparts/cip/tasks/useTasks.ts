@@ -18,6 +18,10 @@ export const useTasks = () => {
     const sp = CipWebPart.SPBuilder.getSP('Data');
     const list = sp.web.lists.getByTitle(ctx.properties.tasksListName);
 
+    const getTaskListId = async () => {
+        return (await list.select('Id')()).Id;
+    }
+
     const getAllRequest = () => {
         return list.items.select(...LIST_SELECT).expand(...LIST_EXPAND);
     };
@@ -236,5 +240,6 @@ export const useTasks = () => {
         updateTask,
         finishTask,
         reopenTask,
+        getTaskListId,
     };
 };
