@@ -1,9 +1,7 @@
-import { cloneDeep, cloneDeepWith } from '@microsoft/sp-lodash-subset';
 import { ColumnActionsMode, IColumn } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { calloutVisibility } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
-import { ITaskOverview } from '../ITaskOverview';
 import { ChoiceFacet, IChoiceFacetProps } from './ChoiceFacet';
 
 export const useColumns = (tree: TaskNode) => {

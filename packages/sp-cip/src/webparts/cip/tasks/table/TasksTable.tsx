@@ -6,7 +6,11 @@ import {
 import * as React from 'react';
 import CipCommandBar from '../../components/CipCommandBar';
 import { useCallout } from '../../components/useCallout';
-import { relinkParent, taskAddedHandler, taskUpdatedHandler } from '../../utils/dom-events';
+import {
+    relinkParent,
+    taskAddedHandler,
+    taskUpdatedHandler,
+} from '../../utils/dom-events';
 import { createTaskTree } from '../graph/factory';
 import { ITaskOverview } from '../ITaskOverview';
 import Task from '../Task';
@@ -14,7 +18,6 @@ import { useGroups } from './useGroups';
 import { useTasks } from '../useTasks';
 import { useColumns } from './useColumns';
 import { TaskNode } from '../graph/TaskNode';
-
 
 const TasksTable = () => {
     const { getNonFinishedMains, getAll } = useTasks();
@@ -25,10 +28,11 @@ const TasksTable = () => {
 
     React.useEffect(() => {
         if (tasks === null) getNonFinishedMains().then((t) => setTasks(t));
-        if (allTasks === null && search !== '') getAll().then((t) => {
-            setAllTasks(t);
-            setTasks(t);
-        });
+        if (allTasks === null && search !== '')
+            getAll().then((t) => {
+                setAllTasks(t);
+                setTasks(t);
+            });
     }, [tasks, setAllTasks, search]);
 
     // Dom events
@@ -40,7 +44,7 @@ const TasksTable = () => {
                 ...tasks,
             ]);
             // relink all tasks
-            relinkParent('all')
+            relinkParent('all');
         });
         const removeTaskUpdated = taskUpdatedHandler((task) => {
             setTasks((prev) => prev.map((t) => (t.Id === task.Id ? task : t)));
@@ -61,23 +65,31 @@ const TasksTable = () => {
 
     const filteredTree = React.useMemo(() => {
         const lowerSearch = search.toLowerCase();
-        return tree.clone().filter([
-            (node) => node.getTask().Title.toLowerCase().indexOf(lowerSearch) !== -1,
-            (node) => node.getTask().Responsible.Title.toLowerCase().indexOf(lowerSearch) !== -1,
-        ]);
+        return tree
+            .clone()
+            .filter([
+                (node) =>
+                    node.getTask().Title.toLowerCase().indexOf(lowerSearch) !==
+                    -1,
+                (node) =>
+                    node
+                        .getTask()
+                        .Responsible.Title.toLowerCase()
+                        .indexOf(lowerSearch) !== -1,
+            ]);
     }, [tree, search]);
 
     const rows = React.useMemo(() => {
         return filteredTree
             .getChildren()
             .filter((c) => c.Display !== 'hidden')
-            .sort((a, b) => a.Category < b.Category ? -1 : 1)
+            .sort((a, b) => (a.Category < b.Category ? -1 : 1))
             .map((item) => ({
                 key: item.Id,
                 data: item,
             }));
     }, [filteredTree]);
-    
+
     const { columns } = useColumns(filteredTree);
 
     const { groups, groupProps } = useGroups(rows);
@@ -89,7 +101,7 @@ const TasksTable = () => {
                 styles={{
                     root: {
                         overflow: 'visible',
-                    }
+                    },
                 }}
                 groups={groups}
                 groupProps={groupProps}

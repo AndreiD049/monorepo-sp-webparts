@@ -50,7 +50,7 @@ export const LoadingAnimation = () => {
                 width: '100%',
                 height: '100%',
                 zIndex: 1024,
-                backgroundColor: theme.palette.whiteTranslucent40,
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
                 top: 0,
                 left: 0,
                 display: 'flex',
