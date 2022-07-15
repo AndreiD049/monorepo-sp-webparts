@@ -8,6 +8,7 @@ import { IAttachment } from './IAttachment';
 import { useAttachments } from './useAttachments';
 import styles from './Attachments.module.scss';
 import { AlertDialog, getAlert } from '../components/AlertDialog';
+import { loadingStart, loadingStop } from '../components/Utils/LoadingAnimation';
 
 interface IAttachmentsProps {
     task: ITaskOverview;
@@ -152,8 +153,10 @@ export const Attachments: React.FC<IAttachmentsProps> = (props) => {
                 <FileInput
                     multiple
                     onFilesAdded={async (files) => {
+                        loadingStart('details');
                         await addAttachments(props.task, files);
                         setAttachments(await getAttachments(props.task));
+                        loadingStop('details');
                     }}
                 />
             </div>

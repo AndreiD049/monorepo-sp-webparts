@@ -6,6 +6,8 @@ import {
     Text,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { useActions } from '../../comments/useActions';
+import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
 import { TaskNodeContext } from '../TaskNodeContext';
@@ -15,14 +17,19 @@ import styles from './Cells.module.scss';
 const TimingCallout: React.FC<ITimingProps> = (props) => {
     const task = props.node.getTask();
     const { updateTask, getTask } = useTasks();
+    const { addAction } = useActions();
     const [value, setValue] = React.useState(task.EstimatedTime);
 
     const handleSave = React.useCallback(async () => {
+        loadingStart();
+        calloutVisibility({ visible: false });
         await updateTask(task.Id, {
             EstimatedTime: value,
         });
-        taskUpdated(await getTask(task.Id));
-        calloutVisibility({ visible: false });
+        const newTask = await getTask(task.Id);
+        await addAction(task.Id, 'Estimated time', `${task.EstimatedTime}|${newTask.EstimatedTime}`);
+        taskUpdated(newTask);
+        loadingStop();
     }, [props.node, value]);
 
     return (

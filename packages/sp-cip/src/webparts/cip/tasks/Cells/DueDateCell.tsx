@@ -1,5 +1,7 @@
 import { ActionButton, Calendar, Stack, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { useActions } from '../../comments/useActions';
+import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
 import { ITaskOverview } from '../ITaskOverview';
@@ -65,6 +67,7 @@ const defaultCalendarStrings = {
 const DueDateCellCallout = (props) => {
     const task: ITaskOverview = props.node.getTask();
     const { updateTask, getTask } = useTasks();
+    const { addAction } = useActions();
     const [selectedDate, setSelectedDate] = React.useState(
         new Date(task.DueDate)
     );
@@ -80,13 +83,17 @@ const DueDateCellCallout = (props) => {
             <ActionButton
                 iconProps={{ iconName: 'Save' }}
                 onClick={async () => {
-                    await updateTask(task.Id, {
-                        DueDate: selectedDate.toISOString(),
-                    });
-                    taskUpdated(await getTask(task.Id));
+                    loadingStart();
                     calloutVisibility({
                         visible: false,
                     });
+                    await updateTask(task.Id, {
+                        DueDate: selectedDate.toISOString(),
+                    });
+                    const newTask = await getTask(task.Id);
+                    await addAction(task.Id, 'Due date', `${task.DueDate}|${newTask.DueDate}`);
+                    taskUpdated(newTask);
+                    loadingStop();
                 }}
             >
                 Save

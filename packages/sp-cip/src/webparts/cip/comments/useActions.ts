@@ -3,7 +3,7 @@ import { IItems } from 'sp-preset';
 import CipWebPart from '../CipWebPart';
 import { GlobalContext } from '../utils/GlobalContext';
 
-export type ActionType = 'Time log' | 'Due date' | 'Progress' | 'Modify';
+export type ActionType = 'Time log' | 'Due date' | 'Progress' | 'Priority' | 'Responisble' | 'Status' | 'Estimated time' | 'Created' | 'Finished';
 
 export interface IAction {
     ListId: string;

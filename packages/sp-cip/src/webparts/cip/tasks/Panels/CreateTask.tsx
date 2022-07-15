@@ -19,6 +19,7 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { useActions } from '../../comments/useActions';
 import { useUsers } from '../../users/useUsers';
 import { tasksAdded, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
@@ -30,6 +31,7 @@ import { useTasks } from '../useTasks';
 const CreateTaskPanel: React.FC = () => {
     const { teams } = React.useContext(GlobalContext);
     const { createTask, createSubtask, getTask, getSubtasks } = useTasks();
+    const { addAction } = useActions();
     const navigate = useNavigate();
     const params = useParams();
 
@@ -146,7 +148,8 @@ const CreateTaskPanel: React.FC = () => {
             if (!validateData()) return;
             if (params.parentId) {
                 const parent = await getTask(+params.parentId);
-                await createSubtask(data, parent);
+                const subtaskId = await createSubtask(data, parent);
+                await addAction(subtaskId, 'Created', data.Title);
                 parent.Subtasks += 1;
                 // Refresh the parent task
                 const subtasks = await getSubtasks(+params.parentId);
@@ -154,6 +157,7 @@ const CreateTaskPanel: React.FC = () => {
                 tasksAdded(subtasks);
             } else {
                 const createdId = await createTask(data);
+                await addAction(createdId, 'Created', data.Title);
                 tasksAdded([await getTask(createdId)]);
             }
             handleDismissPanel();

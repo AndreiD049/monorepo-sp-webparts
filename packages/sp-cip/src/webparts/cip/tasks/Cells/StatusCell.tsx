@@ -1,5 +1,7 @@
 import * as React from 'react';
+import { useActions } from '../../comments/useActions';
 import Pill from '../../components/Pill/Pill';
+import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { TaskNode } from '../graph/TaskNode';
@@ -14,17 +16,22 @@ export interface IStatusCellProps {
 export const StatusCellCallout: React.FC<IStatusCellProps> = ({ node }) => {
     const { fieldInfo } = useChoiceFields('Status');
     const { updateTask, getTask } = useTasks();
+    const { addAction } = useActions();
     const choices = React.useMemo(() => {
         if (!fieldInfo?.Choices) return [];
         return fieldInfo.Choices.filter((choise) => choise !== node.getTask().Status);
     }, [fieldInfo]);
 
     const handleClick = React.useCallback((status: string) => async () => {
+        calloutVisibility({ visible: false });
+        loadingStart();
         await updateTask(node.Id, {
             Status: status
         });
-        taskUpdated(await getTask(node.Id));
-        calloutVisibility({ visible: false });
+        const newTask = await getTask(node.Id);
+        await addAction(node.Id, 'Status', `${node.getTask().Status}|${newTask.Status}`);
+        taskUpdated(newTask);
+        loadingStop();
     }, [node]);
 
     return (<div className={`${styles.callout} ${styles['center-content']}`}>

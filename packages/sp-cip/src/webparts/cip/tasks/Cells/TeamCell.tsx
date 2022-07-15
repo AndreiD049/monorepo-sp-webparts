@@ -1,7 +1,8 @@
 import { ActionButton } from '@microsoft/office-ui-fabric-react-bundle';
-import { DirectionalHint, Text } from 'office-ui-fabric-react';
+import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { calloutVisibility, nodeToggleOpen, taskUpdated } from '../../utils/dom-events';
+import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
+import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { TaskNode } from '../graph/TaskNode';
 import { ITaskOverview } from '../ITaskOverview';
@@ -9,17 +10,19 @@ import { TaskNodeContext } from '../TaskNodeContext';
 import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
 
-const TeamCellCallout = (props) => {
+const TeamCellCallout: React.FC<ITeamCellProps> = (props) => {
     const task = props.node.getTask();
     const { updateTask, getTask } = useTasks(); 
     const { teams } = React.useContext(GlobalContext);
 
     const handleClick = React.useCallback((team: string) => async () => {
+        loadingStart();
         calloutVisibility({ visible: false });
         await updateTask(task.Id, {
             Team: team,
         });
         taskUpdated(await getTask(task.Id));
+        loadingStop();
     }, []);
 
     return (

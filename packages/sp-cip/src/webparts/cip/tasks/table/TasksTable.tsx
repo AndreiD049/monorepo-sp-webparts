@@ -70,8 +70,7 @@ const TasksTable = () => {
             .filter([
                 (node) =>
                     node.getTask().Title.toLowerCase().indexOf(lowerSearch) !==
-                    -1,
-                (node) =>
+                        -1 ||
                     node
                         .getTask()
                         .Responsible.Title.toLowerCase()

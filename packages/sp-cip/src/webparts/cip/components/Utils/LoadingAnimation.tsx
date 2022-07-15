@@ -1,38 +1,51 @@
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { GlobalContext } from '../../utils/GlobalContext';
 
 const LOADING_ANIMATION_EVENT: string = 'SP_CIP_LOADING_ANIMATION';
 
 export interface ILoadingEventDetail {
     isVisible: boolean;
+    id: string;
 }
 
-const dispatch = (val: boolean) => {
+const dispatch = (id: string, val: boolean) => {
     document.dispatchEvent(
         new CustomEvent<ILoadingEventDetail>(LOADING_ANIMATION_EVENT, {
             detail: {
+                id,
                 isVisible: val,
             },
         })
     );
 };
 
-export const loadingStart = () => {
-    dispatch(true);
+export const loadingStart = (id: string = "default") => {
+    dispatch(id, true);
 };
 
-export const loadingStop = () => {
-    dispatch(false);
+export const loadingStop = (id: string = "default") => {
+    dispatch(id, false);
 };
 
-export const LoadingAnimation = () => {
-    const { theme } = React.useContext(GlobalContext);
-    const [visible, setVisible] = React.useState(false);
+export const withLoading = (id: string, func: () => any) => {
+    loadingStart();
+    func();
+    loadingStop();
+}
+
+export interface ILoadingAnimationProps {
+    elementId: string;
+    initialOpen?: true;
+}
+
+export const LoadingAnimation: React.FC<ILoadingAnimationProps> = (props) => {
+    const [visible, setVisible] = React.useState(props.initialOpen || false);
 
     React.useEffect(() => {
         function handler(e: CustomEvent<ILoadingEventDetail>) {
-            setVisible(e.detail.isVisible);
+            if (props.elementId === e.detail.id) {
+                setVisible(e.detail.isVisible);
+            }
         }
         document.addEventListener(LOADING_ANIMATION_EVENT, handler);
         return () =>

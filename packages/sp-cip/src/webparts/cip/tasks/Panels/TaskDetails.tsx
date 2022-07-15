@@ -10,12 +10,13 @@ import {
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { useLocation, useMatch, useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import { ActionLog } from '../../actionlog/ActionLog';
 import { Attachments } from '../../attachments/Attachments';
 import { Comments } from '../../comments/Comments';
 import { AlertDialog, getAlert } from '../../components/AlertDialog';
+import { LoadingAnimation, loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
 import { taskUpdated, taskUpdatedHandler } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
 import { useTasks } from '../useTasks';
@@ -30,20 +31,27 @@ export const TaskDetails: React.FC = () => {
     const params = useParams();
     const navigate = useNavigate();
     const location = useLocation();
+    const [searchParams, setSearchParams] = useSearchParams();
     const state = location.state as { editable: boolean };
     const [task, setTask] = React.useState(null);
     const { updateTask, getTask } = useTasks();
-    const [editable, setEditable] = React.useState(Boolean(state.editable));
+    const [editable, setEditable] = React.useState(Boolean(state?.editable));
     const [editData, setEditData] = React.useState({
         title: task?.Title,
         description: task?.Description,
     });
 
     React.useEffect(() => {
-        const id = +params.taskId;
-        if (Number.isInteger(id)) {
-            getTask(id).then((task) => setTask(task));
+        async function run() {
+            loadingStart('details');
+            const id = +params.taskId;
+            if (Number.isInteger(id)) {
+                const task = await getTask(id);
+                setTask(task);
+            }
+            loadingStop('details');
         }
+        run();
     }, [params]);
 
     React.useEffect(() => {
@@ -194,11 +202,11 @@ export const TaskDetails: React.FC = () => {
                         {editableInformation}
                         <Attachments task={task} />
                         <StackItem style={{ marginTop: '1em' }}>
-                            <Pivot>
-                                <PivotItem headerText="General">
+                            <Pivot selectedKey={searchParams.get('tab') || 'general'} onLinkClick={(item) => setSearchParams({ tab: item.props.itemKey })}>
+                                <PivotItem headerText="General" itemKey="general">
                                     <Comments task={task} />
                                 </PivotItem>
-                                <PivotItem headerText="Action log">
+                                <PivotItem headerText="Action log" itemKey="actionlog">
                                     <ActionLog task={task} />
                                 </PivotItem>
                             </Pivot>
@@ -207,6 +215,7 @@ export const TaskDetails: React.FC = () => {
                 )}
             </div>
             <AlertDialog alertId="DETAILS_PANEL" />
+            <LoadingAnimation elementId="details" initialOpen />
         </Panel>
     );
 };

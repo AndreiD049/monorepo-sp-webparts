@@ -1,0 +1,28 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.actionLogItem {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    padding: .4em 0;
+}
+
+.actionLogItem__content {
+    display: flex;
+    flex-flow: column nowrap;
+    row-gap: 4px;
+}
+
+.actionLogItem__icon {
+    min-width: 40px;
+    font-size: 2em;
+}
+
+.actionLogItem__signature {
+    font-size: .65em;
+}
+
+.actionLogItem__value_highlighted {
+    border-bottom: 1px solid $ms-color-neutralSecondary;
+}

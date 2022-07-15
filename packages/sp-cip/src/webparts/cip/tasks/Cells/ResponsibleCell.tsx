@@ -7,6 +7,8 @@ import {
     Text,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { useActions } from '../../comments/useActions';
+import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
 import { useUsers } from '../../users/useUsers';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
@@ -28,6 +30,7 @@ function filterUser(value: string) {
 const ResponsibleCellCallout: React.FC<IResponsibleCellProps> = (props) => {
     const usersAPI = useUsers();
     const { updateTask, getTask } = useTasks();
+    const { addAction } = useActions();
     const [users, setUsers] = React.useState<IPersonaProps[]>([]);
     const [searchValue, setSearchValue] = React.useState('');
 
@@ -37,11 +40,15 @@ const ResponsibleCellCallout: React.FC<IResponsibleCellProps> = (props) => {
 
     const handleClick = React.useCallback(
         (newId: number) => async () => {
+            loadingStart('default');
             calloutVisibility({ visible: false });
             await updateTask(props.node.Id, {
                 ResponsibleId: newId,
             });
-            taskUpdated(await getTask(props.node.Id));
+            const newTask = await getTask(props.node.Id);
+            await addAction(props.node.Id, 'Responisble', `${props.node.getTask().Responsible.Title}|${newTask.Responsible.Title}`);
+            taskUpdated(newTask);
+            loadingStop('default');
         },
         [props.node]
     );

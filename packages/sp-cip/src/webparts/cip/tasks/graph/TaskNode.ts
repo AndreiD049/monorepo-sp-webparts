@@ -137,7 +137,7 @@ export class TaskNode implements IClonable<TaskNode> {
             this.getChildren().forEach((child) => child.filter(filters));
             return this;
         }
-        if (filters.some((f) => f(this))) {
+        if (filters.every((f) => f(this))) {
             this.isFilterApplicable = true;
             this.Display = 'shown';
             this.unhideParent();

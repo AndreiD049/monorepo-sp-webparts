@@ -14,6 +14,7 @@ import styles from './Cells.module.scss';
 import { TaskNodeContext } from '../TaskNodeContext';
 import { ITaskOverview } from '../ITaskOverview';
 import { isFinished } from '../task-utils';
+import { useActions } from '../../comments/useActions';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {
@@ -114,10 +115,12 @@ export const TitleCell: ICellRenderer = (node, nestLevel) => {
     const navigate = useNavigate();
     const item = node.getTask();
     const { finishTask, getTask, reopenTask } = useTasks();
+    const { addAction } = useActions();
 
     const handleFinishTask = async (node: TaskNode) => {
         await finishTask(node.Id);
         const newItem = await getTask(node.Id);
+        await addAction(node.Id, 'Finished');
         taskUpdated(newItem);
         if (newItem.ParentId) {
             taskUpdated(await getTask(newItem.ParentId));
