@@ -14,11 +14,13 @@ import * as strings from 'CipWebPartStrings';
 import Cip from './components/Cip';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { initNotifications } from 'sp-react-notifications';
+import { getListId } from './utils/getListId';
 
 export interface ICipWebPartProps {
     headerText: string;
     rootDataSource: string;
     tasksListName: string;
+    taskListId: string;
     activitiesListName: string;
     attachmentsPath: string;
     teamsList: string;
@@ -47,6 +49,8 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
         CipWebPart.baseUrl = this.context.pageContext.web.absoluteUrl;
 
         initNotifications();
+
+        this.properties.taskListId = await getListId(this.properties.tasksListName);
 
         return super.onInit();
     }

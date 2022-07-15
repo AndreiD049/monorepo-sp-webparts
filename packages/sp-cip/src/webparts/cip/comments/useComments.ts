@@ -20,32 +20,14 @@ const COMMENTS_EXPAND = ['Author'];
 
 export const useComments = () => {
     const { properties } = useContext(GlobalContext);
+    const taskListId = properties.taskListId;
     // const { Cache, CachingTimeline } = IndexedDBCacher();
     // const sp = React.useMemo(
     //     () => CipWebPart.SPBuilder.getSP('Data').using(CachingTimeline),
     //     []
     // );
     const sp = React.useMemo(() => CipWebPart.SPBuilder.getSP('Data'), []);
-    const longCachedSP = useMemo(
-        () =>
-            CipWebPart.SPBuilder.getSP('Data').using(
-                IndexedDBCacher({
-                    expireFunction: () =>
-                        new Date(Date.now() + 1000 * 60 * 60 * 24),
-                }).CachingTimeline
-            ),
-        []
-    );
     const list = sp.web.lists.getByTitle(properties.activitiesListName);
-    const taskList = longCachedSP.web.lists.getByTitle(
-        properties.tasksListName
-    );
-
-    React.useEffect(() => {}, []);
-
-    const getListId = async () => {
-        return (await taskList.select('Id')()).Id;
-    };
 
     const getAllRequest = (listId: string) => {
         return list.items
@@ -54,14 +36,12 @@ export const useComments = () => {
     };
 
     const getAll = async (): Promise<ITaskComment[]> => {
-        const listId = await getListId();
-        return getAllRequest(listId)();
+        return getAllRequest(taskListId)();
     };
 
     const addComment = async (task: ITaskOverview, comment: string) => {
-        const listId = await getListId();
         const payload: ITaskComment = {
-            ListId: listId,
+            ListId: taskListId,
             ItemId: task.Id,
             ActivityType: 'Comment',
             Comment: comment,
@@ -78,7 +58,7 @@ export const useComments = () => {
         skip?: number
     ) => {
         let result = list.items
-            .filter(`ListId eq '${listId}' and ItemId eq ${taskId}`)
+            .filter(`ListId eq '${listId}' and ItemId eq ${taskId} and ActivityType eq 'Comment'`)
             .select(...COMMENTS_SELECT)
             .expand(...COMMENTS_EXPAND)
             .orderBy('Created', false);
@@ -96,7 +76,7 @@ export const useComments = () => {
         top?: number,
         skip?: number
     ): Promise<ITaskComment[]> => {
-        const listId = await getListId();
+        const listId = taskListId;
         return getByTaskRequest(listId, task.Id, top, skip)();
     };
 
@@ -106,6 +86,7 @@ export const useComments = () => {
             .select(...COMMENTS_SELECT)
             .expand(...COMMENTS_EXPAND);
     };
+
     const getComment = async (id: number): Promise<ITaskComment> => {
         return getCommentRequest(id)();
     };

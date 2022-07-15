@@ -98,11 +98,6 @@ const TasksTable = () => {
         <>
             <CipCommandBar onSearch={(val) => setSearch(val)} />
             <DetailsList
-                styles={{
-                    root: {
-                        overflow: 'visible',
-                    },
-                }}
                 groups={groups}
                 groupProps={groupProps}
                 layoutMode={DetailsListLayoutMode.fixedColumns}

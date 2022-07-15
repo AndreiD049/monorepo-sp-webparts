@@ -1,5 +1,7 @@
 import { ActionButton, Slider, StackItem, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { useActions } from '../../comments/useActions';
+import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
 import { TaskNodeContext } from '../TaskNodeContext';
@@ -12,16 +14,20 @@ export interface IProgressCellProps {
 
 const ProgressCellCallout: React.FC<IProgressCellProps> = (props) => {
     const { getTask, updateTask } = useTasks();
+    const { addAction } = useActions();
     const [value, setValue] = React.useState(props.node.getTask().Progress);
 
     const handleClick = React.useCallback(async () => {
-        await updateTask(props.node.Id, {
-            Progress: value,
-        });
-        taskUpdated(await getTask(props.node.Id));
         calloutVisibility({
             visible: false,
         });
+        loadingStart();
+        await updateTask(props.node.Id, {
+            Progress: value,
+        });
+        await addAction(props.node.Id, 'Progress', `${Math.round(value * 100)}%`)
+        taskUpdated(await getTask(props.node.Id));
+        loadingStop();
     }, [props.node, value]);
 
     return (

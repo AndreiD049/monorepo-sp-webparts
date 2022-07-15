@@ -11,6 +11,7 @@ import { HashRouter, Outlet, Route, Routes } from 'react-router-dom';
 import CreateTaskPanel from '../tasks/Panels/CreateTask';
 import { TaskDetails } from '../tasks/Panels/TaskDetails';
 import { LoadingAnimation } from './Utils/LoadingAnimation';
+import { getListId } from '../utils/getListId';
 
 interface ICipProps {
     properties: ICipWebPartProps;
@@ -18,11 +19,16 @@ interface ICipProps {
 }
 
 const Cip: React.FC<ICipProps> = (props) => {
-    const [teams, setTeams] = React.useState<string[]>([]);
+    const [info, setInfo] = React.useState({
+        teams: [],
+    });
     const users = useUsers({ properties: props.properties });
 
     React.useEffect(() => {
-        users.getTeams().then((teams) => setTeams(teams));
+        users.getTeams().then((teams) => setInfo((prev) => ({
+            ...prev,
+            teams,
+        })));
     }, []);
 
     return (
@@ -30,7 +36,7 @@ const Cip: React.FC<ICipProps> = (props) => {
             value={{
                 properties: props.properties,
                 theme: props.theme,
-                teams,
+                teams: info.teams,
             }}
         >
             <HashRouter>
