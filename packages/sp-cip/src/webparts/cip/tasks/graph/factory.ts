@@ -4,17 +4,16 @@ import { TaskNode } from "./TaskNode";
 export function createTaskTree(tasks: ITaskOverview[]) {
     const roots: ITaskOverview[] = [];
     const taskMap: Map<number, TaskNode> = new Map();
+    const rootNode = new TaskNode();
     tasks.forEach((task) => {
         if (!task.ParentId) {
             roots.push(task);
+            const node = new TaskNode(task);
+            rootNode.setChild(node);
+            taskMap.set(task.Id, node);
         } else {
             taskMap.set(task.Id, new TaskNode(task));
         }
-    });
-    const rootNode = new TaskNode()
-        .withChildren(roots);
-    rootNode.getChildren().forEach((root) => {
-        taskMap.set(root.getTask().Id, root);
     });
     // Distribute the subtasks
     tasks.forEach((subtask) => {

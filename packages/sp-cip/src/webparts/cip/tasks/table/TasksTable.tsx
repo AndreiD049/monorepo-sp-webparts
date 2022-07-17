@@ -4,57 +4,24 @@ import {
     SelectionMode,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import CipCommandBar from '../../components/CipCommandBar';
+import CipCommandBar, { AssigneeSelected, StatusSelected } from '../../components/CipCommandBar';
 import { useCallout } from '../../components/useCallout';
-import {
-    relinkParent,
-    taskAddedHandler,
-    taskUpdatedHandler,
-} from '../../utils/dom-events';
 import { createTaskTree } from '../graph/factory';
-import { ITaskOverview } from '../ITaskOverview';
 import Task from '../Task';
 import { useGroups } from './useGroups';
-import { useTasks } from '../useTasks';
 import { useColumns } from './useColumns';
-import { TaskNode } from '../graph/TaskNode';
+import { TaskNode } from '../graph/TaskNode'
+import { filtersReducer, SEARCH, STATUS } from './filters-reducer';
+import { useTasksFetch } from './useTasksFetch';
 
 const TasksTable = () => {
-    const { getNonFinishedMains, getAll } = useTasks();
-    const [tasks, setTasks] = React.useState<ITaskOverview[]>(null);
-    const [allTasks, setAllTasks] = React.useState<ITaskOverview[]>(null);
     const { CalloutComponent } = useCallout();
-    const [search, setSearch] = React.useState('');
-
-    React.useEffect(() => {
-        if (tasks === null) getNonFinishedMains().then((t) => setTasks(t));
-        if (allTasks === null && search !== '')
-            getAll().then((t) => {
-                setAllTasks(t);
-                setTasks(t);
-            });
-    }, [tasks, setAllTasks, search]);
-
-    // Dom events
-    React.useEffect(() => {
-        const removeTasksAdded = taskAddedHandler((tasks) => {
-            const set = new Set(tasks.map((t) => t.Id));
-            setTasks((prev) => [
-                ...prev.filter((x) => !set.has(x.Id)),
-                ...tasks,
-            ]);
-            // relink all tasks
-            relinkParent('all');
-        });
-        const removeTaskUpdated = taskUpdatedHandler((task) => {
-            setTasks((prev) => prev.map((t) => (t.Id === task.Id ? task : t)));
-        });
-
-        return () => {
-            removeTasksAdded();
-            removeTaskUpdated();
-        };
-    }, []);
+    const [filters, dispatch] = React.useReducer(filtersReducer, {
+        search: '',
+        assignedTo: AssigneeSelected.Single,
+        status: StatusSelected.Open,
+    });
+    const { tasks } = useTasksFetch(filters);
 
     const tree = React.useMemo(() => {
         if (tasks !== null) {
@@ -64,7 +31,7 @@ const TasksTable = () => {
     }, [tasks]);
 
     const filteredTree = React.useMemo(() => {
-        const lowerSearch = search.toLowerCase();
+        const lowerSearch = filters.search.toLowerCase();
         return tree
             .clone()
             .filter([
@@ -76,7 +43,7 @@ const TasksTable = () => {
                         .Responsible.Title.toLowerCase()
                         .indexOf(lowerSearch) !== -1,
             ]);
-    }, [tree, search]);
+    }, [tree, filters.search]);
 
     const rows = React.useMemo(() => {
         return filteredTree
@@ -95,7 +62,10 @@ const TasksTable = () => {
 
     return (
         <>
-            <CipCommandBar onSearch={(val) => setSearch(val)} />
+            <CipCommandBar 
+                onSearch={(val) => dispatch({type: SEARCH, value: val})} 
+                onStatusSelectedChange={(val) => dispatch({ type: STATUS, value: val })}
+            />
             <DetailsList
                 groups={groups}
                 groupProps={groupProps}
@@ -105,10 +75,9 @@ const TasksTable = () => {
                 items={rows}
                 onRenderRow={(props) => (
                     <Task
-                        isFiltered={search !== ''}
+                        isFiltered={filters.search !== ''}
                         rowProps={props}
                         node={props.item.data}
-                        setTasks={setTasks}
                     />
                 )}
             />

@@ -1,0 +1,39 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.asignee-selector {
+    align-items: center;
+    align-self: center;
+    border-color: "[theme: themePrimary, default: #a4262c]";
+    border-radius: 6px;
+    border: 1px solid;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    margin-right: 1em;
+    max-height: 30px;
+    overflow: hidden;
+}
+
+.assignee-selector__separator {
+    border-left: 1px solid;
+    border-color: "[theme: themePrimary, default: #a4262c]";
+}
+
+.asignee-selector__item {
+    border-radius: 0;
+
+    &:hover {
+        background-color: "[theme: themeTertiary, default: #a4262c]";
+        color: white;
+    }
+}
+
+.asignee-selector__item_selected {
+    background-color: "[theme: themePrimary, default: #a4262c]";
+    color: white;
+}
+
+.status-selector {
+    align-self: center;
+    margin-right: 1em;
+}

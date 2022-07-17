@@ -40,6 +40,7 @@ const Cip: React.FC<ICipProps> = (props) => {
             }}
         >
             <HashRouter>
+                <LoadingAnimation elementId="default" />
                 <Routes>
                     <Route
                         path="/"
@@ -66,7 +67,6 @@ const Cip: React.FC<ICipProps> = (props) => {
                     </Route>
                 </Routes>
                 <AlertDialog alertId="MAIN" />
-                <LoadingAnimation elementId="default" />
             </HashRouter>
         </GlobalContext.Provider>
     );

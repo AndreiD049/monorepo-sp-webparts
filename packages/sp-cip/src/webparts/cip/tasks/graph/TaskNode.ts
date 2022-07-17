@@ -1,4 +1,3 @@
-import { themeRulesStandardCreator } from 'office-ui-fabric-react';
 import { IClonable } from '../../utils/IClonable';
 import { ITaskOverview } from '../ITaskOverview';
 
@@ -9,7 +8,7 @@ export class TaskNode implements IClonable<TaskNode> {
     private children: Map<number, TaskNode>;
     private childrenArray: TaskNode[] = [];
     private parent?: TaskNode;
-    public index: number = 0;
+    private index: number = 0;
     public Id: number;
     public level: number;
     public Category: string;

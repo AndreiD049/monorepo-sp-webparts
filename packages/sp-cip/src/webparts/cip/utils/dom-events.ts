@@ -2,7 +2,6 @@ import {
     ButtonType,
     ICalloutProps,
     IDialogContentProps,
-    Target,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { ITaskOverview } from '../tasks/ITaskOverview';
@@ -14,6 +13,7 @@ import {
     RELINK_PARENT_EVT,
     TASKS_ADDED_EVT,
     TASK_UPDATED_EVT,
+    GET_SUBTASKS_EVT
 } from './constants';
 
 /**
@@ -106,6 +106,30 @@ export const taskUpdatedHandler = (func: (task: ITaskOverview) => void) => {
     };
     document.addEventListener(TASK_UPDATED_EVT, handler);
     return () => document.removeEventListener(TASK_UPDATED_EVT, handler);
+};
+
+export interface IGetSubtasksProps {
+    parentId: number;
+}
+
+export const getSubtasks = (parentId: number) => {
+    document.dispatchEvent(
+        new CustomEvent<IGetSubtasksProps>(GET_SUBTASKS_EVT, {
+            detail: {
+                parentId,
+            }
+        })
+    );
+};
+
+export const getSubtasksHandler = (func: (parentId: number) => void) => {
+    const handler = (evt: CustomEvent<IGetSubtasksProps>) => {
+        if (evt.detail && evt.detail.parentId) {
+            func(evt.detail.parentId);
+        }
+    };
+    document.addEventListener(GET_SUBTASKS_EVT, handler);
+    return () => document.removeEventListener(GET_SUBTASKS_EVT, handler);
 };
 
 /**

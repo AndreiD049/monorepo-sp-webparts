@@ -19,7 +19,6 @@ function initialOpen(node: TaskNode, isFiltered: boolean) {
 export interface ITaskProps {
     rowProps: IDetailsRowProps;
     node: TaskNode;
-    setTasks: React.Dispatch<React.SetStateAction<ITaskOverview[]>>;
     isFiltered?: boolean;
 }
 
@@ -45,19 +44,6 @@ const Task: React.FC<ITaskProps> = (props) => {
             <SubtasksProxy
                 rowProps={props.rowProps}
                 node={props.node}
-                onLoad={(tasks) => {
-                    const task = props.node.getTask();
-                    // Only reset if node is a proxy
-                    console.log(props.node.getType());
-                    if (props.node.getType() === 'proxy') {
-                        props.setTasks((prev) => {
-                            const filtered = prev.filter(
-                                (t) => t.ParentId !== task.Id
-                            );
-                            return [...filtered, ...tasks];
-                        });
-                    }
-                }}
             >
                 <div>
                     {props.node.getChildren().map((child) => (
@@ -65,7 +51,6 @@ const Task: React.FC<ITaskProps> = (props) => {
                             isFiltered={props.isFiltered}
                             node={child}
                             rowProps={props.rowProps}
-                            setTasks={props.setTasks}
                         />
                     ))}
                 </div>
