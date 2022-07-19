@@ -14,6 +14,8 @@ import {
     IDialogButtonProp,
 } from '../utils/dom-events';
 
+const DISMISS_DIALOG_EVT = 'sp-cip-dismiss-dialog';
+
 const defaultProps = {
     type: DialogType.normal,
     title: 'Dialog',
@@ -23,11 +25,12 @@ const defaultProps = {
 interface IGetAlertProps {
     alertId: string;
     title: string;
-    subText: string;
-    buttons: IDialogButtonProp[];
+    subText?: string;
+    buttons?: IDialogButtonProp[];
+    Component?: JSX.Element;
 }
 
-export const getAlert = async (props: IGetAlertProps) => {
+export const getDialog = async (props: IGetAlertProps) => {
     return new Promise<any>((resolve) => {
         dialogVisibility({
             alertId: props.alertId,
@@ -39,78 +42,103 @@ export const getAlert = async (props: IGetAlertProps) => {
             buttons: props.buttons,
             onBeforeDismiss: (answer) => resolve(answer),
             hidden: false,
+            Component: props.Component,
         });
     });
 };
 
+export const dismissDialog = (id: string) => {
+    document.dispatchEvent(
+        new CustomEvent(DISMISS_DIALOG_EVT, {
+            detail: {
+                id,
+            },
+        })
+    );
+};
+
 export interface IAlertDialogProps {
-    alertId: string
+    alertId: string;
 }
 
-export const AlertDialog: React.FC<IAlertDialogProps>= ({alertId}) => {
+export const AlertDialog: React.FC<IAlertDialogProps> = ({ alertId }) => {
     const [hidden, setHidden] = React.useState(true);
     const [contentProps, setContentProps] =
         React.useState<IDialogContentProps>(defaultProps);
     const [buttons, setButtons] = React.useState<IDialogButtonProp[]>([]);
     const [beforeDismiss, setBeforeDismiss] = React.useState(null);
-
-    React.useEffect(() => {
-        const removeEvent = dialogVisibilityHandler((props) => {
-            if (props.alertId === alertId) {
-                setHidden(props.hidden);
-                setContentProps(props.contentProps);
-                setButtons(props.buttons);
-                setBeforeDismiss((prev) => props.onBeforeDismiss);
-            } 
-        });
-        return () => removeEvent();
-    }, []);
+    const [Component, setComponent] = React.useState(<></>);
 
     const handleDismiss = React.useCallback(
         (answer) => () => {
+            console.log('dismiss');
             beforeDismiss && beforeDismiss(answer);
             setHidden(true);
         },
         [hidden]
     );
 
+    React.useEffect(() => {
+        const removeShow = dialogVisibilityHandler((props) => {
+            if (props.alertId === alertId) {
+                setHidden(props.hidden);
+                setContentProps(props.contentProps);
+                setButtons(props.buttons);
+                setBeforeDismiss((prev) => props.onBeforeDismiss);
+                setComponent(props.Component || <></>);
+            }
+        });
+        const dismissHanler = (evt: CustomEvent<{ id: string }>) => {
+            if (evt.detail.id === alertId) {
+                setHidden(true);
+            }
+        };
+        document.addEventListener(DISMISS_DIALOG_EVT, dismissHanler);
+        return () => {
+            removeShow();
+            document.removeEventListener(DISMISS_DIALOG_EVT, dismissHanler);
+        };
+    }, []);
+
     const buttonElements = React.useMemo(() => {
         if (hidden) return null;
+        if (!buttons) return null;
         return buttons.map((button) => {
-                    if (
-                        button.type === ButtonType.primary ||
-                        button.type === undefined
-                    ) {
-                        return (
-                            <PrimaryButton
-                                key={button.key}
-                                onClick={handleDismiss(button.key)}
-                            >
-                                {button.text}
-                            </PrimaryButton>
-                        );
-                    } else {
-                        return (
-                            <DefaultButton
-                                key={button.key}
-                                onClick={handleDismiss(button.key)}
-                            >
-                                {button.text}
-                            </DefaultButton>
-                        );
-                    }
-                });
+            if (
+                button.type === ButtonType.primary ||
+                button.type === undefined
+            ) {
+                return (
+                    <PrimaryButton
+                        key={button.key}
+                        onClick={handleDismiss(button.key)}
+                    >
+                        {button.text}
+                    </PrimaryButton>
+                );
+            } else {
+                return (
+                    <DefaultButton
+                        key={button.key}
+                        onClick={handleDismiss(button.key)}
+                    >
+                        {button.text}
+                    </DefaultButton>
+                );
+            }
+        });
     }, [buttons, hidden, beforeDismiss]);
 
     return (
         <Dialog
+            maxWidth="100vw"
             hidden={hidden}
-            onDismiss={() => handleDismiss(null)}
+            isBlocking
+            onDismiss={handleDismiss(null)}
             dialogContentProps={contentProps}
         >
-            <DialogFooter>
-                {buttonElements}
-            </DialogFooter>
+            {Component}
+            {buttons && <DialogFooter>{buttonElements}</DialogFooter>}
         </Dialog>
     );
 };

@@ -14,6 +14,7 @@ export class TaskNode implements IClonable<TaskNode> {
     public Category: string;
     public Display: 'shown' | 'hidden' | 'disabled';
     public isFilterApplicable: boolean;
+    public isOrphan: boolean = false;
 
     constructor(private task?: ITaskOverview) {
         this.children = new Map();
@@ -31,7 +32,7 @@ export class TaskNode implements IClonable<TaskNode> {
         }
     }
 
-    public withChildren(tasks: ITaskOverview[]) {
+    public withChildren(tasks: ITaskOverview[] | TaskNode[]) {
         if (tasks.length > 0) {
             if (this.type !== 'root') {
                 this.type = 'normal';
@@ -39,7 +40,11 @@ export class TaskNode implements IClonable<TaskNode> {
             this.children = new Map();
             this.childrenArray = [];
             for (const task of tasks) {
-                new TaskNode(task).withParent(this).withLevel(this.level + 1);
+                if (task instanceof TaskNode) {
+                    task.withParent(this).withLevel(this.level + 1)
+                } else {
+                    new TaskNode(task).withParent(this).withLevel(this.level + 1);
+                }
             }
         }
         return this;
@@ -57,13 +62,13 @@ export class TaskNode implements IClonable<TaskNode> {
     }
 
     public setChild(child: TaskNode) {
-        if (this.type === 'proxy') {
-            this.type = 'normal';
-        }
         child.parent = this;
         child.withIndex(this.children.size);
         this.children.set(child.task.Id, child.withLevel(this.level + 1));
         this.childrenArray.push(child);
+        if (this.type === 'proxy') {
+            this.type = 'normal';
+        }
     }
 
     public withParent(parent: TaskNode) {
@@ -131,31 +136,20 @@ export class TaskNode implements IClonable<TaskNode> {
         return result;
     }
 
-    public filter(filters: ((node: TaskNode) => boolean)[]) {
-        if (this.getType() === 'root') {
-            this.getChildren().forEach((child) => child.filter(filters));
-            return this;
-        }
-        if (filters.every((f) => f(this))) {
-            this.isFilterApplicable = true;
-            this.Display = 'shown';
-            this.unhideParent();
-        } else {
-            this.isFilterApplicable = false;
-            this.Display =
-                this.parent.type === 'root' || this.parent.Display !== 'shown'
-                    ? 'hidden'
-                    : 'shown';
-        }
-        this.getChildren().forEach((child) => child.filter(filters));
+    public filter(filter: ((node: TaskNode) => boolean)) {
+        const filtered = this.getChildren().filter((c: TaskNode) => filter(c));
+        this.withChildren(filtered);
         return this;
     }
 
-    private unhideParent() {
-        if (this.parent.getType() === 'root' || !this.parent) return;
-        if (this.parent.Display !== 'shown') {
-            this.parent.Display = 'disabled';
-            this.parent.unhideParent();
-        }
+    public hide(filters: ((node: TaskNode) => boolean)[]) {
+        this.getChildren().forEach((n) => {
+            if (filters.every((filter) => filter(n))) {
+                n.Display = 'shown';
+            } else {
+                n.Display = 'hidden';
+            }
+        })
+        return this;
     }
 }

@@ -1,6 +1,7 @@
 import { IPersonaProps, PersonaSize } from "office-ui-fabric-react";
 import { useContext } from "react";
 import { IndexedDBCacher } from "sp-indexeddb-caching";
+import { ISiteUserInfo } from "sp-preset";
 import CipWebPart, { ICipWebPartProps } from "../CipWebPart";
 import { GlobalContext } from "../utils/GlobalContext";
 
@@ -20,6 +21,10 @@ export const useUsers = (props?: { properties: ICipWebPartProps }) => {
 
     const getUser = async (id: number) => {
         return sp.web.siteUsers.getById(id)();
+    }
+
+    const getCurrentUser = async (): Promise<ISiteUserInfo> => {
+        return sp.web.currentUser();
     }
 
     const getTeams = async () => {
@@ -43,6 +48,7 @@ export const useUsers = (props?: { properties: ICipWebPartProps }) => {
     return {
         getAll,
         getUser,
+        getCurrentUser,
         getTeams,
         getPersonaProps,
     }

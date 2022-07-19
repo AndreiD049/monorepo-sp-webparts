@@ -42,7 +42,8 @@ const ResponsibleCellCallout: React.FC<IResponsibleCellProps> = (props) => {
         (newId: number) => async () => {
             loadingStart('default');
             calloutVisibility({ visible: false });
-            await updateTask(props.node.Id, {
+            const task = props.node.getTask();
+            await updateTask(task.Id, {
                 ResponsibleId: newId,
             });
             const newTask = await getTask(props.node.Id);

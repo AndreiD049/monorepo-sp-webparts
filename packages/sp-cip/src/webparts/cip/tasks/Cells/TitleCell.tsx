@@ -15,6 +15,7 @@ import { TaskNodeContext } from '../TaskNodeContext';
 import { ITaskOverview } from '../ITaskOverview';
 import { isFinished } from '../task-utils';
 import { useActions } from '../../comments/useActions';
+import Pill from '../../components/Pill/Pill';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {
@@ -169,6 +170,7 @@ export const TitleCell: ICellRenderer = (node, nestLevel) => {
                     }
                 }}
             />
+            {node.isOrphan && <Pill value="Subtask" />}
             <Text
                 variant="medium"
                 block

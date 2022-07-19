@@ -1,6 +1,5 @@
 import { IDetailsRowProps } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { ITaskOverview } from './ITaskOverview';
 import styles from './Task.module.scss';
 import { TaskNode } from './graph/TaskNode';
 import { nodeToggleOpenHandler, relinkParent } from '../utils/dom-events';

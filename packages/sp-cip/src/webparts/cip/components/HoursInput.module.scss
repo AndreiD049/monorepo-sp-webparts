@@ -1,0 +1,21 @@
+.input {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.input__button {
+    background-color: "[theme: themePrimary, default: #a4262c]";
+    border: 1px solid;
+    color: "[theme: neutralPrimary, default: #f4f4f4]";
+    color: "[theme: white, default: #ffffff]";
+    cursor: pointer;
+    padding: 6px 3px;
+    min-width: 45px;
+}
+
+.input__button-wrapper {
+    display: flex;
+    flex-flow: row nowrap;
+}

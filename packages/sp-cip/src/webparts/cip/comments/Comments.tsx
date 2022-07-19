@@ -102,7 +102,6 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
                 <div className={styles.comments}>
                     <ActivityItem
                         key={item.key}
-                        // activityIcon={item.activityIcon}
                         activityPersonas={item.activityPersonas}
                         activityDescription={item.activityDescription}
                         comments={item.comments}

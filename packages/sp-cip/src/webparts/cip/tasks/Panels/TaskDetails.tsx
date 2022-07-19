@@ -15,9 +15,14 @@ import { useSearchParams } from 'react-router-dom';
 import { ActionLog } from '../../actionlog/ActionLog';
 import { Attachments } from '../../attachments/Attachments';
 import { Comments } from '../../comments/Comments';
-import { AlertDialog, getAlert } from '../../components/AlertDialog';
-import { LoadingAnimation, loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
+import { AlertDialog, getDialog } from '../../components/AlertDialog';
+import {
+    LoadingAnimation,
+    loadingStart,
+    loadingStop,
+} from '../../components/Utils/LoadingAnimation';
 import { taskUpdated, taskUpdatedHandler } from '../../utils/dom-events';
+import { LogTime } from '../Dialogs/LogTime';
 import { TaskNode } from '../graph/TaskNode';
 import { useTasks } from '../useTasks';
 import styles from './Panels.module.scss';
@@ -163,11 +168,10 @@ export const TaskDetails: React.FC = () => {
                 iconName: 'Clock',
             },
             onClick: () =>
-                getAlert({
-                    alertId: "DETAILS_PANEL",
-                    title: 'Work in progress',
-                    subText: 'Work in progress',
-                    buttons: [{ key: 'ok', text: 'Ok' }],
+                getDialog({
+                    alertId: 'DETAILS_PANEL',
+                    title: 'Log time',
+                    Component: <LogTime task={task} dialogId="DETAILS_PANEL" />,
                 }),
         });
         return items;
@@ -202,11 +206,24 @@ export const TaskDetails: React.FC = () => {
                         {editableInformation}
                         <Attachments task={task} />
                         <StackItem style={{ marginTop: '1em' }}>
-                            <Pivot selectedKey={searchParams.get('tab') || 'general'} onLinkClick={(item) => setSearchParams({ tab: item.props.itemKey })}>
-                                <PivotItem headerText="General" itemKey="general">
+                            <Pivot
+                                selectedKey={
+                                    searchParams.get('tab') || 'general'
+                                }
+                                onLinkClick={(item) =>
+                                    setSearchParams({ tab: item.props.itemKey })
+                                }
+                            >
+                                <PivotItem
+                                    headerText="General"
+                                    itemKey="general"
+                                >
                                     <Comments task={task} />
                                 </PivotItem>
-                                <PivotItem headerText="Action log" itemKey="actionlog">
+                                <PivotItem
+                                    headerText="Action log"
+                                    itemKey="actionlog"
+                                >
                                     <ActionLog task={task} />
                                 </PivotItem>
                             </Pivot>

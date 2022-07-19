@@ -20,6 +20,8 @@ import {
 import * as React from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useActions } from '../../comments/useActions';
+import { HoursInput } from '../../components/HoursInput';
+import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
 import { useUsers } from '../../users/useUsers';
 import { tasksAdded, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
@@ -79,7 +81,7 @@ const CreateTaskPanel: React.FC = () => {
         }));
     }, [teams]);
 
-    const handleSetTextField = (field: keyof ICreateTask) => (_ev, val) => {
+    const handleSetTextField = (field: keyof ICreateTask) => (_ev: any, val: any) => {
         setData((prev) => ({
             ...prev,
             [field]: val,
@@ -99,7 +101,8 @@ const CreateTaskPanel: React.FC = () => {
 
     React.useEffect(() => {
         (async function () {
-            setUsers(await getPersonaProps());
+            const personas = await getPersonaProps();
+            setUsers(personas);
             /** If parent present, load it's data and set as default values */
             if (params.parentId) {
                 const parent = await getTask(+params.parentId);
@@ -113,6 +116,11 @@ const CreateTaskPanel: React.FC = () => {
                     Team: parent.Team,
                 }));
             } else {
+                setData((prev) => ({
+                    ...prev,
+                    ResponsibleId:
+                        +personas.find((p) => p.text === 'Everyone').id || 0,
+                }));
                 setParent(null);
             }
         })();
@@ -136,14 +144,13 @@ const CreateTaskPanel: React.FC = () => {
         }
     }, [data]);
 
-    const handleDismissPanel = React.useCallback(
-        () => navigate('/'),
-        []
-    );
+    const handleDismissPanel = React.useCallback(() => navigate('/'), []);
 
     /** Task creation */
     const handleCreateTask = React.useCallback(
         async (ev: React.FormEvent) => {
+            handleDismissPanel();
+            loadingStart('default');
             ev.preventDefault();
             if (!validateData()) return;
             if (params.parentId) {
@@ -152,7 +159,7 @@ const CreateTaskPanel: React.FC = () => {
                 await addAction(subtaskId, 'Created', data.Title);
                 parent.Subtasks += 1;
                 // Refresh the parent task
-                const subtasks = await getSubtasks(+params.parentId);
+                const subtasks = await getSubtasks(parent);
                 taskUpdated(parent);
                 tasksAdded(subtasks);
             } else {
@@ -160,7 +167,7 @@ const CreateTaskPanel: React.FC = () => {
                 await addAction(createdId, 'Created', data.Title);
                 tasksAdded([await getTask(createdId)]);
             }
-            handleDismissPanel();
+            loadingStop('default');
         },
         [data, validateData]
     );
@@ -345,32 +352,67 @@ const CreateTaskPanel: React.FC = () => {
 
                 {/* Estimated time */}
                 <Stack>
-                    <Label htmlFor="DurationSpinButton" required>
-                        Estimated duaration
-                    </Label>
-                    <SpinButton
-                        labelPosition={Position.top}
-                        min={0}
-                        inputProps={{ id: 'DurationSpinButton' }}
-                        value={data.EstimatedTime.toString()}
-                        onIncrement={(val) =>
+                    <HoursInput
+                        value={data.EstimatedTime}
+                        onChange={(val) =>
                             setData((prev) => ({
                                 ...prev,
-                                EstimatedTime: +val + 1,
+                                EstimatedTime: val,
                             }))
                         }
-                        onDecrement={(val) =>
-                            setData((prev) => ({
-                                ...prev,
-                                EstimatedTime: +val - 1,
-                            }))
-                        }
-                        onValidate={(val: string) =>
-                            setData((prev) => ({
-                                ...prev,
-                                EstimatedTime: +val,
-                            }))
-                        }
+                        label="Estimated duration"
+                        buttons={[
+                            {
+                                key: '+.25',
+                                value: 0.25,
+                                label: '+15m',
+                            },
+                            {
+                                key: '+.5',
+                                value: 0.5,
+                                label: '+30m',
+                            },
+                            {
+                                key: '+1',
+                                value: 1,
+                                label: '+1h',
+                            },
+                            {
+                                key: '+5',
+                                value: 5,
+                                label: '+5h',
+                            },
+                            {
+                                key: '+10',
+                                value: 10,
+                                label: '+10h',
+                            },
+                            {
+                                key: '-.25',
+                                value: -0.25,
+                                label: '-15m',
+                            },
+                            {
+                                key: '-.5',
+                                value: -0.5,
+                                label: '-30m',
+                            },
+                            {
+                                key: '-1',
+                                value: -1,
+                                label: '-1h',
+                            },
+                            {
+                                key: '-5',
+                                value: -5,
+                                label: '-5h',
+                            },
+                            {
+                                key: '-10',
+                                value: -10,
+                                label: '-10h',
+                            },
+                        ]}
                     />
                 </Stack>
                 {params.parentId && (

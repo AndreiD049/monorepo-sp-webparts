@@ -48,7 +48,7 @@ const ActionItemContent: React.FC<IActionLogItemProps> = (props) => {
             case 'Created':
                 return (
                     <span className={styles['actionLogItem__value_highlighted']}>
-                        <Text variant="medium">{'Task created 👍'}</Text>
+                        <Text variant="medium">{'Task created'}</Text>
                     </span>
                 );
             case 'Finished':
@@ -56,7 +56,7 @@ const ActionItemContent: React.FC<IActionLogItemProps> = (props) => {
                     <span
                         className={styles['actionLogItem__value_highlighted']}
                     >
-                        <Text variant="medium">{'Task finished 🎉'}</Text>
+                        <Text variant="medium">{'Task finished'}</Text>
                     </span>
                 );
             case 'Estimated time':

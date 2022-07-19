@@ -6,12 +6,11 @@ import TasksTable from '../tasks/table/TasksTable';
 import { ICipWebPartProps } from '../CipWebPart';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import { useUsers } from '../users/useUsers';
-import { AlertDialog } from './AlertDialog';
 import { HashRouter, Outlet, Route, Routes } from 'react-router-dom';
 import CreateTaskPanel from '../tasks/Panels/CreateTask';
 import { TaskDetails } from '../tasks/Panels/TaskDetails';
 import { LoadingAnimation } from './Utils/LoadingAnimation';
-import { getListId } from '../utils/getListId';
+import { AlertDialog } from './AlertDialog';
 
 interface ICipProps {
     properties: ICipWebPartProps;
@@ -25,10 +24,12 @@ const Cip: React.FC<ICipProps> = (props) => {
     const users = useUsers({ properties: props.properties });
 
     React.useEffect(() => {
-        users.getTeams().then((teams) => setInfo((prev) => ({
-            ...prev,
-            teams,
-        })));
+        users.getTeams().then((teams) =>
+            setInfo((prev) => ({
+                ...prev,
+                teams,
+            }))
+        );
     }, []);
 
     return (

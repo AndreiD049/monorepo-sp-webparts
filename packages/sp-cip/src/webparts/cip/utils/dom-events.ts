@@ -13,7 +13,8 @@ import {
     RELINK_PARENT_EVT,
     TASKS_ADDED_EVT,
     TASK_UPDATED_EVT,
-    GET_SUBTASKS_EVT
+    GET_SUBTASKS_EVT,
+    TASKS_DELETED_EVT
 } from './constants';
 
 /**
@@ -86,6 +87,29 @@ export const taskAddedHandler = (func: (tasks: ITaskOverview[]) => void) => {
 };
 
 /**
+ * Handle new tasks added
+ */
+export const taskDeleted = (taskId: number) => {
+    document.dispatchEvent(
+        new CustomEvent(TASKS_DELETED_EVT, {
+            detail: {
+                taskId: taskId,
+            },
+        })
+    );
+};
+
+export const taskDeletedHandler = (func: (taskId: number) => void) => {
+    const handler = (evt: CustomEvent) => {
+        if (evt.detail && evt.detail.taskId) {
+            func(evt.detail.taskId);
+        }
+    };
+    document.addEventListener(TASKS_DELETED_EVT, handler);
+    return () => document.removeEventListener(TASKS_ADDED_EVT, handler);
+};
+
+/**
  * Handle task details updated
  */
 export const taskUpdated = (task: ITaskOverview) => {
@@ -109,23 +133,23 @@ export const taskUpdatedHandler = (func: (task: ITaskOverview) => void) => {
 };
 
 export interface IGetSubtasksProps {
-    parentId: number;
+    parent: ITaskOverview;
 }
 
-export const getSubtasks = (parentId: number) => {
+export const getSubtasks = (parent: ITaskOverview) => {
     document.dispatchEvent(
         new CustomEvent<IGetSubtasksProps>(GET_SUBTASKS_EVT, {
             detail: {
-                parentId,
+                parent,
             }
         })
     );
 };
 
-export const getSubtasksHandler = (func: (parentId: number) => void) => {
+export const getSubtasksHandler = (func: (parent: ITaskOverview) => void) => {
     const handler = (evt: CustomEvent<IGetSubtasksProps>) => {
-        if (evt.detail && evt.detail.parentId) {
-            func(evt.detail.parentId);
+        if (evt.detail && evt.detail.parent) {
+            func(evt.detail.parent);
         }
     };
     document.addEventListener(GET_SUBTASKS_EVT, handler);
@@ -204,6 +228,7 @@ export interface IDialogVisibilityProps {
     onBeforeDismiss?: (answer: string) => void
     contentProps: IDialogContentProps;
     buttons: IDialogButtonProp[];
+    Component?: JSX.Element;
 }
 
 export const dialogVisibility = (props: IDialogVisibilityProps) => {

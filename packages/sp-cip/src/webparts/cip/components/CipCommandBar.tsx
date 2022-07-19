@@ -1,27 +1,40 @@
 import { debounce } from '@microsoft/sp-lodash-subset';
-import { CommandBar, IconButton, SearchBox } from 'office-ui-fabric-react';
+import {
+    CommandBar,
+    Dropdown,
+    IconButton,
+    IDropdownOption,
+    SearchBox,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate } from 'react-router';
+import useWebStorage from 'use-web-storage-api';
 import { relinkParent } from '../utils/dom-events';
 import styles from './CommandBar.module.scss';
 
 interface ICipCommandBarProps {
     onSearch: (val: string) => void;
     onStatusSelectedChange: (newStatus: StatusSelected) => void;
+    onAssignedToChange: (newAssigned: AssigneeSelected) => void;
 }
 
 export enum StatusSelected {
     Open,
     Finished,
-    All
-};
+    All,
+}
 
-const CipStatusSelector: React.FC<{ onSelectedChange: (val: StatusSelected) => void }> = (props) => {
-    const [selected, setSelected] = React.useState(StatusSelected.Open);
+const CipStatusSelector: React.FC<{
+    onSelectedChange: (val: StatusSelected) => void;
+}> = (props) => {
+    const [selected, setSelected] = useWebStorage<StatusSelected>(
+        StatusSelected.Open,
+        { key: 'sp-cip-status-selected' }
+    );
 
-    const handleSelectedChange = (ev) => {
-        setSelected(+ev.target.value);
-    }
+    const handleSelectedChange = (ev, opt: IDropdownOption) => {
+        setSelected(+opt.key);
+    };
 
     React.useEffect(() => {
         props.onSelectedChange(selected);
@@ -29,11 +42,24 @@ const CipStatusSelector: React.FC<{ onSelectedChange: (val: StatusSelected) => v
 
     return (
         <div className={styles['status-selector']}>
-            <select onChange={handleSelectedChange} value={selected}>
-                <option value={StatusSelected.Open}>Open tasks</option>
-                <option value={StatusSelected.Finished}>Finished tasks</option>
-                <option value={StatusSelected.All}>All tasks</option>
-            </select>
+            <Dropdown
+                options={[
+                    {
+                        key: StatusSelected.Open,
+                        text: 'Open tasks',
+                    },
+                    {
+                        key: StatusSelected.Finished,
+                        text: 'Finished tasks',
+                    },
+                    {
+                        key: StatusSelected.All,
+                        text: 'All tasks',
+                    },
+                ]}
+                selectedKey={selected}
+                onChange={handleSelectedChange}
+            />
         </div>
     );
 };
@@ -57,10 +83,17 @@ function isSelectedClassName(
     return '';
 }
 
-const CipAssigneeSelector: React.FC = () => {
-    const [selected, setSelected] = React.useState<AssigneeSelected>(
-        AssigneeSelected.Single
+const CipAssigneeSelector: React.FC<{
+    onAssignedToChange: (val: AssigneeSelected) => void;
+}> = (props) => {
+    const [selected, setSelected] = useWebStorage<AssigneeSelected>(
+        AssigneeSelected.Single,
+        { key: 'sp-cip-assigned-to' }
     );
+
+    React.useEffect(() => {
+        props.onAssignedToChange(selected);
+    }, [selected]);
 
     const handleClick = (value: AssigneeSelected) => () => {
         setSelected(value);
@@ -114,11 +147,19 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                 farItems={[
                     {
                         key: 'status',
-                        onRender: () => <CipStatusSelector onSelectedChange={props.onStatusSelectedChange} />
+                        onRender: () => (
+                            <CipStatusSelector
+                                onSelectedChange={props.onStatusSelectedChange}
+                            />
+                        ),
                     },
                     {
                         key: 'asignee',
-                        onRender: () => <CipAssigneeSelector />,
+                        onRender: () => (
+                            <CipAssigneeSelector
+                                onAssignedToChange={props.onAssignedToChange}
+                            />
+                        ),
                     },
                     {
                         key: 'search',

@@ -1,14 +1,20 @@
-import { IconButton } from 'office-ui-fabric-react';
+import { ButtonType, IconButton } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { ICellRenderer } from './ICellRenderer';
-import { getAlert } from '../../components/AlertDialog';
+import { getDialog } from '../../components/AlertDialog';
 import { useNavigate } from 'react-router';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
+import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
+import { useTasks } from '../useTasks';
+import { taskDeleted } from '../../utils/dom-events';
+import { AddCommentDialog } from '../Dialogs/AddCommentDialog';
+import { LogTime } from '../Dialogs/LogTime';
 
 const ActionsCell: ICellRenderer = (node) => {
     const { isTaskFinished } = React.useContext(TaskNodeContext);
     const navigate = useNavigate();
+    const { deleteTaskAndSubtasks } = useTasks();
     const isDisabled = React.useMemo(() => {
         if (node.Display === 'disabled') return true;
         if (node.getTask() && isTaskFinished) return true;
@@ -37,11 +43,10 @@ const ActionsCell: ICellRenderer = (node) => {
                 title="Add comment"
                 disabled={isDisabled}
                 onClick={() =>
-                    getAlert({
+                    getDialog({
                         alertId: 'MAIN',
-                        title: 'Work in progress',
-                        subText: 'Work in progress',
-                        buttons: [{ key: 'ok', text: 'Ok' }],
+                        title: 'Add comment',
+                        Component: (<AddCommentDialog task={node.getTask()} />)
                     })
                 }
             />
@@ -60,11 +65,10 @@ const ActionsCell: ICellRenderer = (node) => {
                 title="Log time"
                 disabled={isDisabled}
                 onClick={() =>
-                    getAlert({
+                    getDialog({
                         alertId: 'MAIN',
-                        title: 'Work in progress',
-                        subText: 'Work in progress',
-                        buttons: [{ key: 'ok', text: 'Ok' }],
+                        title: 'Log time',
+                        Component: (<LogTime task={node.getTask()} dialogId="MAIN" />),
                     })
                 }
             />
@@ -81,13 +85,19 @@ const ActionsCell: ICellRenderer = (node) => {
                             iconProps: {
                                 iconName: 'Delete',
                             },
-                            onClick: () => {
-                                getAlert({
+                            onClick: async () => {
+                                const confirm = await getDialog({
                                     alertId: 'MAIN',
-                                    title: 'Work in progress',
-                                    subText: 'Work in progress',
-                                    buttons: [{ key: 'ok', text: 'Ok' }],
+                                    title: 'Delete tasks',
+                                    subText: 'All subtasks will be deleted as well. Are you sure',
+                                    buttons: [{ key: 'yes', text: 'Yes' }, { key: 'no', text: 'No', type: ButtonType.default }],
                                 });
+                                loadingStart('default');
+                                if (confirm === 'yes') {
+                                    await deleteTaskAndSubtasks(node.getTask())
+                                    taskDeleted(node.Id);
+                                }
+                                loadingStop('default');
                             },
                         },
                         {
@@ -97,7 +107,7 @@ const ActionsCell: ICellRenderer = (node) => {
                                 iconName: 'SIPMove',
                             },
                             onClick: () => {
-                                getAlert({
+                                getDialog({
                                     alertId: 'MAIN',
                                     title: 'Work in progress',
                                     subText: 'Work in progress',

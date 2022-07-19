@@ -121,7 +121,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         );
         notifyOnFieldCreation(priority);
 
-        const responsible = await list.fields.createFieldAsXml(`<Field Description='Users responsible for executing current task' DisplayName='Responsible' Format='Dropdown' IsModern='TRUE' List='UserInfo' Mult='FALSE' Name='Responsible' Title='Responsible' Type='User' UserDisplayOptions='NamePhoto' UserSelectionMode='1' UserSelectionScope='0'></Field>`);
+        const responsible = await list.fields.createFieldAsXml(`<Field Description='Users responsible for executing current task' Indexed="TRUE" DisplayName='Responsible' Format='Dropdown' IsModern='TRUE' List='UserInfo' Mult='FALSE' Name='Responsible' Title='Responsible' Type='User' UserDisplayOptions='NamePhoto' UserSelectionMode='1' UserSelectionScope='0'></Field>`);
         notifyOnFieldCreation(responsible);
 
         const team = await list.fields.createFieldAsXml(
@@ -165,12 +165,12 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         notifyOnFieldCreation(effective);
 
         const parent = await list.fields.createFieldAsXml(
-            `<Field Description='Link to parent task' DisplayName='Parent' Format='Dropdown' Indexed='TRUE' IsModern='TRUE' IsRelationship='TRUE' List='${taskList.data.Id}' Name='Parent' RelationshipDeleteBehavior='Restrict' ShowField='Title' Title='Parent' Type='Lookup'></Field>`
+            `<Field Description='Link to parent task' DisplayName='Parent' Format='Dropdown' Indexed='TRUE' IsModern='TRUE' IsRelationship='TRUE' List='${taskList.data.Id}' Name='Parent' RelationshipDeleteBehavior='Cascade' ShowField='Title' Title='Parent' Type='Lookup'></Field>`
         );
         notifyOnFieldCreation(parent)
 
         const main = await list.fields.createFieldAsXml(
-            `<Field Description='Link to main (top) task' DisplayName='MainTask' Format='Dropdown' Indexed='TRUE' IsModern='TRUE' IsRelationship='TRUE' List='${taskList.data.Id}' Name='MainTask' RelationshipDeleteBehavior='Restrict' ShowField='Title' Title='MainTask' Type='Lookup'></Field>`
+            `<Field Description='Link to main (top) task' DisplayName='MainTask' Format='Dropdown' Indexed='TRUE' IsModern='TRUE' IsRelationship='TRUE' List='${taskList.data.Id}' Name='MainTask' RelationshipDeleteBehavior='Cascade' ShowField='Title' Title='MainTask' Type='Lookup'></Field>`
         );
         notifyOnFieldCreation(main)
 
@@ -183,7 +183,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
             `<Field CommaSeparator='FALSE' CustomUnitOnRight='TRUE' Decimals='0' Description='Number of finished subtasks' DisplayName='FinishedSubtasks' Format='Dropdown' IsModern='TRUE' Name='FinishedSubtasks' Percentage='FALSE' Title='FinishedSubtasks' Type='Number' Unit='None'><Default>0</Default></Field>`
         );
         notifyOnFieldCreation(finishedSubtasks);
-
+        
         /**
          * Adjust default view
          */
