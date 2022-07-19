@@ -8,7 +8,7 @@ import { ICipFilters, IFilterAction } from './filters-reducer';
 export const useColumns = (tree: TaskNode, filters: ICipFilters, dispatch: React.Dispatch<IFilterAction>) => {
     const nodes = React.useMemo(() => tree.getChildren(), [tree])
 
-    const columns: IColumn[] = [
+    const columns: IColumn[] = React.useMemo(() => [
         {
             key: 'Title',
             name: 'Title',
@@ -158,7 +158,7 @@ export const useColumns = (tree: TaskNode, filters: ICipFilters, dispatch: React
             minWidth: 200,
             onColumnContextMenu: () => null,
         },
-    ];
+    ], []);
 
     return { columns };
 };

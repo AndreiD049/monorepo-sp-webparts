@@ -10,8 +10,9 @@ import { useTasks } from '../useTasks';
 import { taskDeleted } from '../../utils/dom-events';
 import { AddCommentDialog } from '../Dialogs/AddCommentDialog';
 import { LogTime } from '../Dialogs/LogTime';
+import { TaskNode } from '../graph/TaskNode';
 
-const ActionsCell: ICellRenderer = (node) => {
+const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
     const { isTaskFinished } = React.useContext(TaskNodeContext);
     const navigate = useNavigate();
     const { deleteTaskAndSubtasks } = useTasks();

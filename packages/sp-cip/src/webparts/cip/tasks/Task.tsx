@@ -40,10 +40,7 @@ const Task: React.FC<ITaskProps> = (props) => {
         if (!open) return null;
         if (props.node.Display === 'hidden') return null;
         return (
-            <SubtasksProxy
-                rowProps={props.rowProps}
-                node={props.node}
-            >
+            <SubtasksProxy rowProps={props.rowProps} node={props.node}>
                 <div>
                     {props.node.getChildren().map((child) => (
                         <Task
@@ -55,7 +52,17 @@ const Task: React.FC<ITaskProps> = (props) => {
                 </div>
             </SubtasksProxy>
         );
-    }, [open, props.rowProps.columns, props.node]);
+    }, [open, props.node]);
+
+    const cells = React.useMemo(() => {
+        const result = {};
+        props.rowProps.columns.forEach((column) => {
+            result[column.key] = (
+                <RenderCell fieldName={column.fieldName} node={props.node} />
+            );
+        });
+        return result;
+    }, [props.node]);
 
     React.useEffect(() => {
         const removeOpenHandler = nodeToggleOpenHandler(props.node.Id, () =>
@@ -86,7 +93,7 @@ const Task: React.FC<ITaskProps> = (props) => {
             value={{
                 open,
                 node: props.node,
-                isTaskFinished: isFinished(props.node.getTask())
+                isTaskFinished: isFinished(props.node.getTask()),
             }}
         >
             <div
@@ -103,10 +110,7 @@ const Task: React.FC<ITaskProps> = (props) => {
                                 width: column.calculatedWidth,
                             }}
                         >
-                            <RenderCell
-                                fieldName={column.fieldName}
-                                node={props.node}
-                            />
+                            {cells[column.key]}
                         </div>
                     );
                 })}

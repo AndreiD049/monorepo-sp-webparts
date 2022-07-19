@@ -18,17 +18,18 @@ interface IRenderCellProps {
 
 export const RenderCell: React.FC<IRenderCellProps> = (props) => {
     const nestLevel = props.node.level || 0;
+
     switch (props.fieldName.toLowerCase()) {
         case 'title':
-            return TitleCell(props.node, nestLevel);
+            return <TitleCell node={props.node} nestLevel={nestLevel} />;
         case 'responsible':
-            return <ResponsibleCell node={props.node} />
+            return <ResponsibleCell node={props.node} />;
         case 'status':
             return <StatusCell node={props.node} />;
         case 'priority':
             return <PriorityCell node={props.node} />;
         case 'actions':
-            return ActionsCell(props.node, nestLevel);
+            return <ActionsCell node={props.node} />
         case 'progress':
             return <ProgressCell node={props.node} />;
         case 'duedate':
@@ -40,7 +41,7 @@ export const RenderCell: React.FC<IRenderCellProps> = (props) => {
         default:
             return (
                 <Text variant="medium" block>
-                    {props.node.getTask()[props.fieldName]}
+                    {props.node.getTask()[props.fieldName] + ''}
                 </Text>
             );
     }

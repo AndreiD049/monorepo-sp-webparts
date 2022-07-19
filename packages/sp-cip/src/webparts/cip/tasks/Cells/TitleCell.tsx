@@ -111,7 +111,7 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
     );
 };
 
-export const TitleCell: ICellRenderer = (node, nestLevel) => {
+export const TitleCell: React.FC<{node: TaskNode, nestLevel: number}> = ({node, nestLevel}) => {
     const { isTaskFinished } = React.useContext(TaskNodeContext);
     const navigate = useNavigate();
     const item = node.getTask();
