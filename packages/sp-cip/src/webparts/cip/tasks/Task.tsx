@@ -52,7 +52,7 @@ const Task: React.FC<ITaskProps> = (props) => {
                 </div>
             </SubtasksProxy>
         );
-    }, [open, props.node]);
+    }, [open, props.node, props.rowProps.columns]);
 
     const cells = React.useMemo(() => {
         const result = {};

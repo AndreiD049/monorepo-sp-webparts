@@ -158,7 +158,7 @@ export const useColumns = (tree: TaskNode, filters: ICipFilters, dispatch: React
             minWidth: 200,
             onColumnContextMenu: () => null,
         },
-    ], []);
+    ], [tree]);
 
     return { columns };
 };
