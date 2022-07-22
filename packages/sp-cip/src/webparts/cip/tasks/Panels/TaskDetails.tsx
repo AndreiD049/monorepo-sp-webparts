@@ -14,6 +14,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import { ActionLog } from '../../actionlog/ActionLog';
 import { Attachments } from '../../attachments/Attachments';
+import { useAttachments } from '../../attachments/useAttachments';
 import { Comments } from '../../comments/Comments';
 import { AlertDialog, getDialog } from '../../components/AlertDialog';
 import {
@@ -24,6 +25,7 @@ import {
 import { taskUpdated, taskUpdatedHandler } from '../../utils/dom-events';
 import { LogTime } from '../Dialogs/LogTime';
 import { TaskNode } from '../graph/TaskNode';
+import { ITaskOverview } from '../ITaskOverview';
 import { useTasks } from '../useTasks';
 import styles from './Panels.module.scss';
 
@@ -38,9 +40,10 @@ export const TaskDetails: React.FC = () => {
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
     const state = location.state as { editable: boolean };
-    const [task, setTask] = React.useState(null);
-    const { updateTask, getTask } = useTasks();
+    const [task, setTask] = React.useState<ITaskOverview>(null);
+    const { updateTask, getTask, attachmentsUpdated } = useTasks();
     const [editable, setEditable] = React.useState(Boolean(state?.editable));
+    const { addAttachments } = useAttachments();
     const [editData, setEditData] = React.useState({
         title: task?.Title,
         description: task?.Description,
@@ -204,7 +207,13 @@ export const TaskDetails: React.FC = () => {
                 {task && (
                     <Stack>
                         {editableInformation}
-                        <Attachments task={task} />
+                        <Attachments task={task} onAttachments={async (files: File[]) => {
+                            loadingStart('details');
+                            await addAttachments(task, files);
+                            const latest = await attachmentsUpdated(task.Id, files.length);
+                            taskUpdated(latest);
+                            loadingStop('details');
+                        }} />
                         <StackItem style={{ marginTop: '1em' }}>
                             <Pivot
                                 selectedKey={

@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import CipWebPart from '../CipWebPart';
+import { taskUpdated } from '../utils/dom-events';
 import { GlobalContext } from '../utils/GlobalContext';
 import { ICreateTask } from './ICreateTask';
 import { ITaskOverview, LIST_EXPAND, LIST_SELECT } from './ITaskOverview';
@@ -137,6 +138,33 @@ export const useTasks = () => {
         await list.items.getById(id).update(details);
     };
 
+    /**
+     * @param taskId id of the task where comment was added
+     * @returns the latest version of the task
+     */
+    const commentAdded = async (taskId: number) => {
+        const latest = await getTask(taskId);
+        latest.CommentsCount += 1;
+        await updateTask(taskId, {
+            CommentsCount: latest.CommentsCount,
+        });
+        return latest;
+    };
+
+    /**
+     * @param taskId task to be updated
+     * @param attachments How many attachments were adde/removed (can be newgative)
+     * @returns the latest attachment
+     */
+    const attachmentsUpdated = async (taskId: number, attachments: number) => {
+        const latest = await getTask(taskId);
+        latest.AttachmentsCount = Math.max(latest.AttachmentsCount + attachments, 0);
+        await updateTask(taskId, {
+            AttachmentsCount: latest.AttachmentsCount,
+        });
+        return latest;
+    };
+
     const finishTask = async (id: number) => {
         const item = await getTask(id);
         // Already finished
@@ -185,6 +213,8 @@ export const useTasks = () => {
         createTask,
         createSubtask,
         updateTask,
+        commentAdded,
+        attachmentsUpdated,
         finishTask,
         reopenTask,
         getTaskListId,

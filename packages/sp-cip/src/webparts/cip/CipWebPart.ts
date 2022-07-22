@@ -13,8 +13,9 @@ import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import * as strings from 'CipWebPartStrings';
 import Cip from './components/Cip';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
-import { initNotifications } from 'sp-react-notifications';
+import { initNotifications, SPnotify } from 'sp-react-notifications';
 import { getListId } from './utils/getListId';
+import { MessageBarType } from 'office-ui-fabric-react';
 
 export interface ICipWebPartProps {
     headerText: string;
@@ -34,35 +35,39 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
     private theme: IReadonlyTheme;
 
     protected async onInit(): Promise<void> {
-        CipWebPart.SPBuilder = new SPBuilder(this.context)
-            .withRPM(600)
-            .withTennants({
-                Data: this.properties.rootDataSource,
-            })
-            .withAdditionalTimelines([
-                InjectHeaders({
-                    UserAgent: `NONISV|Katoen Natie|Cip/${this.dataVersion.toString()}`,
-                    Accept: 'application/json;odata=nometadata',
-                }),
-            ]);
-
-        CipWebPart.baseUrl = this.context.pageContext.web.absoluteUrl;
-
         initNotifications();
+        try {
+            CipWebPart.SPBuilder = new SPBuilder(this.context)
+                .withRPM(600)
+                .withTennants({
+                    Data: this.properties.rootDataSource,
+                })
+                .withAdditionalTimelines([
+                    InjectHeaders({
+                        UserAgent: `NONISV|Katoen Natie|Cip/${this.dataVersion.toString()}`,
+                        Accept: 'application/json;odata=nometadata',
+                    }),
+                ]);
 
-        this.properties.taskListId = await getListId(this.properties.tasksListName);
+            CipWebPart.baseUrl = this.context.pageContext.web.absoluteUrl;
+            this.properties.taskListId = await getListId(
+                this.properties.tasksListName
+            );
+        } catch (err) {
+            SPnotify({
+                message: err.toString(),
+                messageType: MessageBarType.severeWarning
+            });
+        }
 
         return super.onInit();
     }
 
     public async render(): Promise<void> {
-        const element: React.ReactElement = React.createElement(
-            Cip,
-            {
-                properties: this.properties,
-                theme: this.theme,
-            }
-        );
+        const element: React.ReactElement = React.createElement(Cip, {
+            properties: this.properties,
+            theme: this.theme,
+        });
 
         ReactDom.render(element, this.domElement);
     }
@@ -95,9 +100,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
         return Version.parse('1.0');
     }
 
-    protected onPropertyPaneFieldChanged(
-        propertyPath: string,
-    ): void {
+    protected onPropertyPaneFieldChanged(propertyPath: string): void {
         if (propertyPath === 'rootDataSource') {
             CipWebPart.SPBuilder = new SPBuilder(this.context)
                 .withRPM(600)
@@ -145,17 +148,18 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                                 }),
                                 PropertyPaneTextField('activitiesListName', {
                                     label: strings.CipCommentListLabel,
-                                    description: strings.CipCommentListDescription,
+                                    description:
+                                        strings.CipCommentListDescription,
                                 }),
                                 PropertyPaneTextField('attachmentsPath', {
                                     label: strings.AttachmentsListLabel,
-                                    description: strings.AttachmentsListDescription,
+                                    description:
+                                        strings.AttachmentsListDescription,
                                 }),
                                 PropertyPaneTextField('teamsList', {
                                     label: strings.TeamsList,
                                 }),
                                 PropertyPaneTextField('teamsField', {
-
                                     label: strings.TeamsListField,
                                 }),
                                 PropertyPaneButton('', {

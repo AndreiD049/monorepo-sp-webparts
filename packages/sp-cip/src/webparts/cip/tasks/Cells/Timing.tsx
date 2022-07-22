@@ -103,7 +103,7 @@ const Timing: React.FC<ITimingProps> = (props) => {
             onClick={handleClick}
         >
             <div>Estimated: {task.EstimatedTime} hour(s)</div>
-            <div>Effective: {task.EffectiveTime} hour(s)</div>
+            <div style={{fontWeight: 'bold'}} >Effective: {task.EffectiveTime} hour(s)</div>
         </button>
     );
 };

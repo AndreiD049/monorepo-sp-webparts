@@ -1,7 +1,6 @@
-import { reduceRight } from "lodash";
-import { Icon, Text } from "office-ui-fabric-react";
-import * as React from "react";
-import styles from '../Cip.module.scss';
+import { Icon, Text } from 'office-ui-fabric-react';
+import * as React from 'react';
+import styles from './FileInput.module.scss';
 
 export interface IFileInputProps extends React.HTMLAttributes<HTMLElement> {
     multiple?: boolean;
@@ -12,13 +11,20 @@ export const FileInput: React.FC<IFileInputProps> = (props) => {
     const [files, setFiles] = React.useState<File[]>([]);
     const [dragOver, setDragover] = React.useState(false);
     const ref = React.useRef<HTMLDivElement>(null);
+    const inputRef = React.useRef<HTMLInputElement>(null);
 
     React.useEffect(() => {
         function ondrag() {
-            setDragover(true)
+            setDragover(true);
         }
-        function ondragend() {
-            setDragover(false)
+        function ondragend(ev: DragEvent) {
+            const related = ev.relatedTarget;
+            if (
+                ref.current !== related &&
+                !ref.current.contains(related as Node)
+            ) {
+                setDragover(false);
+            }
         }
         if (ref.current) {
             ref.current.addEventListener('dragover', ondrag);
@@ -28,45 +34,60 @@ export const FileInput: React.FC<IFileInputProps> = (props) => {
                 ref.current.removeEventListener('dragover', ondrag);
                 ref.current.removeEventListener('dragleave', ondragend);
                 ref.current.removeEventListener('drop', ondragend);
-            }
+            };
         }
     }, []);
 
-    const handleChange = React.useCallback(async (evt: React.ChangeEvent<HTMLInputElement>) => {
-        const input = evt.target;
-        const files = [];
-        for (let i = 0; i < input.files.length; i++) {
-            files.push(input.files.item(i));
-        }
-        setFiles(files);
-        props.onFilesAdded && await props.onFilesAdded(files);
-        setFiles([]);
-    }, []);
+    const handleChange = React.useCallback(
+        async (evt: React.ChangeEvent<HTMLInputElement>) => {
+            const input = evt.target;
+            const files = [];
+            for (let i = 0; i < input.files.length; i++) {
+                files.push(input.files.item(i));
+            }
+            setFiles(files);
+            props.onFilesAdded && (await props.onFilesAdded(files));
+            setFiles([]);
+        },
+        []
+    );
 
     const fileNames = React.useMemo(() => {
         return files.map((file) => file.name);
     }, [files]);
 
     const label = React.useMemo(() => {
-        if (fileNames.length) {
-            return <Text variant='smallPlus'><Icon iconName='AlarmClock' /> Uploading files. Please wait...</Text>
-        }
-        if (dragOver) {
-            return <Text variant='smallPlus'><Icon iconName='Attach' /> Upload files...</Text>
-        } else {
-            return <Text variant='smallPlus'><Icon iconName='Attach' /> Click or drop files to attach...</Text>
-        }
-    }, [fileNames, dragOver]);
+        return (
+            <div className={styles['file-input__label']} role='button' onClick={() => {
+                if (inputRef.current) {
+                    inputRef.current.click();
+                }
+            }}>
+                <Text variant="smallPlus">
+                    <Icon iconName="Attach" /> Click or drop files to attach...
+                </Text>
+            </div>
+        );
+    }, [fileNames, dragOver, inputRef]);
 
     const defaultClass = React.useMemo(() => {
-        return `${styles['file-input']} ${dragOver ? styles['file-input__input_dragover'] : ''} ${props.className || ''}`;
-    }, [dragOver, props])
+        return `${styles['file-input']} ${
+            dragOver ? styles['file-input__input_dragover'] : ''
+        } ${props.className || ''}`;
+    }, [dragOver, props]);
 
     return (
         <div ref={ref} className={defaultClass}>
-            {props.children}
-            <input onChange={handleChange} className={styles['file-input__input']} type="file" multiple={props.multiple || false} />
+            <input
+                ref={inputRef}
+                onChange={handleChange}
+                style={{ zIndex: dragOver ? 1 : -1 }}
+                className={styles['file-input__input']}
+                type="file"
+                multiple={props.multiple || false}
+            />
             {label}
+            {props.children}
         </div>
     );
 };

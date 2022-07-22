@@ -3,6 +3,8 @@ import { useContext, useMemo } from 'react';
 import { IndexedDBCacher } from 'sp-indexeddb-caching';
 import CipWebPart from '../CipWebPart';
 import { ITaskOverview } from '../tasks/ITaskOverview';
+import { useTasks } from '../tasks/useTasks';
+import { taskUpdated } from '../utils/dom-events';
 import { GlobalContext } from '../utils/GlobalContext';
 import { ITaskComment } from './ITaskComment';
 
@@ -15,17 +17,20 @@ const COMMENTS_SELECT = [
     'Created',
     'Author/Title',
     'Author/EMail',
+    'Author/Id',
 ];
 const COMMENTS_EXPAND = ['Author'];
+
+export interface IPagedCollection<T> {
+    hasNext: boolean;
+    getNext: () => Promise<IPagedCollection<T | null>>;
+    results: T;
+}
 
 export const useComments = () => {
     const { properties } = useContext(GlobalContext);
     const taskListId = properties.taskListId;
-    // const { Cache, CachingTimeline } = IndexedDBCacher();
-    // const sp = React.useMemo(
-    //     () => CipWebPart.SPBuilder.getSP('Data').using(CachingTimeline),
-    //     []
-    // );
+    const { commentAdded } = useTasks();
     const sp = React.useMemo(() => CipWebPart.SPBuilder.getSP('Data'), []);
     const list = sp.web.lists.getByTitle(properties.activitiesListName);
 
@@ -46,9 +51,17 @@ export const useComments = () => {
             ActivityType: 'Comment',
             Comment: comment,
         };
+
         const added = await list.items.add(payload);
-        // await onCommentAdded(added.data.Id);
+
+        const latest = await commentAdded(task.Id);
+        await taskUpdated(latest);
+
         return added;
+    };
+
+    const editComment = async (id: number, content: Partial<ITaskComment>) => {
+        return list.items.getById(id).update(content);
     };
 
     const getByTaskRequest = (
@@ -58,7 +71,9 @@ export const useComments = () => {
         skip?: number
     ) => {
         let result = list.items
-            .filter(`ListId eq '${listId}' and ItemId eq ${taskId} and ActivityType eq 'Comment'`)
+            .filter(
+                `ListId eq '${listId}' and ItemId eq ${taskId} and ActivityType eq 'Comment'`
+            )
             .select(...COMMENTS_SELECT)
             .expand(...COMMENTS_EXPAND)
             .orderBy('Created', false);
@@ -80,6 +95,21 @@ export const useComments = () => {
         return getByTaskRequest(listId, task.Id, top, skip)();
     };
 
+    const getByTaskPaged = async (
+        task: ITaskOverview,
+        pageSize: number
+    ): Promise<IPagedCollection<ITaskComment[]>> => {
+        return list.items
+            .filter(
+                `ListId eq '${taskListId}' and ItemId eq ${task.Id} and ActivityType eq 'Comment'`
+            )
+            .select(...COMMENTS_SELECT)
+            .expand(...COMMENTS_EXPAND)
+            .orderBy('Created', false)
+            .top(pageSize)
+            .getPaged<ITaskComment[]>();
+    };
+
     const getCommentRequest = (id: number) => {
         return list.items
             .getById(id)
@@ -91,27 +121,12 @@ export const useComments = () => {
         return getCommentRequest(id)();
     };
 
-    /**
-     * Adjust cached when a comment is added
-     */
-    // const onCommentAdded = async (id: number) => {
-    //     await Cache.get(getCommentRequest(id).toRequestUrl()).remove();
-    //     const comment = await getComment(id);
-    //     await Cache.get(getAllRequest(comment.ListId).toRequestUrl()).set(
-    //         (prev: ITaskComment[]) => [comment, ...prev]
-    //     );
-    //     await Cache.get(
-    //         getByTaskRequest(comment.ListId, comment.ItemId).toRequestUrl()
-    //     ).set((prev: ITaskComment[]) => [comment, ...prev]);
-    //     await Cache.get(
-    //         getByTaskRequest(
-    //             comment.ListId,
-    //             comment.ItemId,
-    //             3,
-    //             0
-    //         ).toRequestUrl()
-    //     ).set((prev: ITaskComment[]) => [comment, ...prev.slice(0, 2)]);
-    // };
-
-    return { getComment, getAll, addComment, getByTask };
+    return {
+        getComment,
+        getAll,
+        addComment,
+        getByTask,
+        getByTaskPaged,
+        editComment,
+    };
 };

@@ -1,6 +1,14 @@
+.attachments__container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: stretch;
+    align-items: stretch;
+}
+
 .attachments {
     display: flex;
     flex-flow: row wrap;
+    flex-grow: 1;
 }
 
 .attachments__label {

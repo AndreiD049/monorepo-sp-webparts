@@ -20,16 +20,21 @@ interface ICipProps {
 const Cip: React.FC<ICipProps> = (props) => {
     const [info, setInfo] = React.useState({
         teams: [],
+        currentUser: null,
     });
     const users = useUsers({ properties: props.properties });
 
     React.useEffect(() => {
-        users.getTeams().then((teams) =>
+        async function run() {
+            const teams = await users.getTeams();
+            const currentUser = await users.getCurrentUser();
             setInfo((prev) => ({
                 ...prev,
                 teams,
-            }))
-        );
+                currentUser,
+            }));
+        }
+        run();
     }, []);
 
     return (
@@ -38,6 +43,7 @@ const Cip: React.FC<ICipProps> = (props) => {
                 properties: props.properties,
                 theme: props.theme,
                 teams: info.teams,
+                currentUser: info.currentUser,
             }}
         >
             <HashRouter>

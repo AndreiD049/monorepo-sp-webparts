@@ -12,8 +12,10 @@ import {
 import * as React from 'react';
 import styles from './Comments.module.scss';
 import { ITaskOverview } from '../tasks/ITaskOverview';
-import { useComments } from './useComments';
+import { IPagedCollection, useComments } from './useComments';
 import { ITaskComment } from './ITaskComment';
+import { Comment } from './Comment';
+import { taskUpdated } from '../utils/dom-events';
 
 interface ICommentsProps {
     task: ITaskOverview;
@@ -22,57 +24,36 @@ interface ICommentsProps {
 export const Comments: React.FC<ICommentsProps> = (props) => {
     const commentsAPI = useComments();
     const [newComment, setNewComment] = React.useState('');
-    const [allLoaded, setAllLoaded] = React.useState(false);
     const [taskComments, setTaskComments] = React.useState<ITaskComment[]>([]);
+    const [commentPager, setCommentPager] = React.useState<IPagedCollection<ITaskComment[]>>(null);
 
     const onLoadMore = React.useCallback(async () => {
-        const all = await commentsAPI.getByTask(props.task);
-        setTaskComments(all);
-        setAllLoaded(true);
-    }, []);
+        if (commentPager?.hasNext) {
+            const nextPager = await commentPager.getNext();
+            setTaskComments((prev) => [...prev, ...nextPager.results]);
+            setCommentPager(nextPager);
+        }
+    }, [commentPager]);
 
     const handleNewComment = React.useCallback(async () => {
         if (!newComment.trim()) return;
         const added = await commentsAPI.addComment(props.task, newComment);
         setNewComment('');
         const synced = await commentsAPI.getComment(added.data.Id);
-        console.log(synced);
         setTaskComments((prev) => [synced, ...prev]);
     }, [newComment]);
 
+    const handleEditComment = async (id: number) => {
+        const updated = await commentsAPI.getComment(id);
+        setTaskComments((prev) => prev.map((p) => p.Id === id ? updated : p));
+    }
+
     React.useEffect(() => {
-        commentsAPI.getByTask(props.task, 3, 0).then((c) => {
-            setTaskComments(c);
-            if (c.length < 3) {
-                setAllLoaded(true);
-            }
+        commentsAPI.getByTaskPaged(props.task, 5).then((p) => {
+            setTaskComments(p.results);
+            setCommentPager(p)
         });
     }, []);
-
-    const data = React.useMemo(() => {
-        return taskComments.map((comment) => ({
-            key: comment.Id,
-            activityDescription: [
-                <Link>{comment.Author.Title}</Link>,
-                <span key={2}> commented</span>,
-            ],
-            activityIcon: (
-                <Icon
-                    iconName="Comment"
-                    styles={{ root: { fontSize: '16px' } }}
-                />
-            ),
-            activityPersonas: [{
-                imageUrl: `/_layouts/15/userphoto.aspx?accountname=${comment.Author.EMail}&Size=M`
-            }],
-            comments: (
-                <div className={styles['comments__content']}>
-                    {comment.Comment}
-                </div>
-            ),
-            timeStamp: new Date(comment.Created).toLocaleString(),
-        }));
-    }, [taskComments]);
 
     return (
         <div style={{ overflowX: 'hidden', wordBreak: 'break-all' }}>
@@ -98,18 +79,10 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
                     onClick={handleNewComment}
                 />
             </Stack>
-            {data.map((item) => (
-                <div className={styles.comments}>
-                    <ActivityItem
-                        key={item.key}
-                        activityPersonas={item.activityPersonas}
-                        activityDescription={item.activityDescription}
-                        comments={item.comments}
-                        timeStamp={item.timeStamp}
-                    />
-                </div>
+            {taskComments.map((comment) => (
+                <Comment key={comment.Id} comment={comment} onEdit={handleEditComment} />
             ))}
-            {!allLoaded && taskComments.length >= 3 && (
+            {commentPager?.hasNext && (
                 <ActionButton
                     iconProps={{ iconName: 'More' }}
                     onClick={onLoadMore}

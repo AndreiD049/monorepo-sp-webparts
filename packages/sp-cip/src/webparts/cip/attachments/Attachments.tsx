@@ -7,11 +7,14 @@ import { GlobalContext } from '../utils/GlobalContext';
 import { IAttachment } from './IAttachment';
 import { useAttachments } from './useAttachments';
 import styles from './Attachments.module.scss';
-import { AlertDialog, getDialog } from '../components/AlertDialog';
-import { loadingStart, loadingStop } from '../components/Utils/LoadingAnimation';
+import { getDialog } from '../components/AlertDialog';
+import { useTasks } from '../tasks/useTasks';
+import { taskUpdated } from '../utils/dom-events';
 
-interface IAttachmentsProps {
-    task: ITaskOverview;
+interface IAttachmentsProps extends React.HTMLAttributes<HTMLDivElement> {
+    task?: ITaskOverview;
+    onAttachments: (files: File[]) => void;
+    label?: string;
 }
 
 const getFileIconName = (name: string) => {
@@ -20,9 +23,11 @@ const getFileIconName = (name: string) => {
     switch (extension) {
         case 'xls':
         case 'xlsx':
+        case 'xltx':
         case 'xlsm':
             return 'ExcelDocument'
         case 'docx':
+        case 'doc':
         case 'rtf':
             return 'WordDocument'
         case 'pdf':
@@ -50,7 +55,8 @@ export interface IAttachmentProps {
 }
 
 const Attachment: React.FC<IAttachmentProps> = (props) => {
-    const { properties, theme } = React.useContext(GlobalContext);
+    const { properties } = React.useContext(GlobalContext);
+    const { attachmentsUpdated } = useTasks();
     const {
         getAttachmentsRequest,
         removeAttachment,
@@ -111,6 +117,8 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
                         });
                         if (alert === 'Yes') {
                             await removeAttachment(props.task, props.attachment.Name);
+                            const latest = await attachmentsUpdated(props.task.Id, -1);
+                            taskUpdated(latest);
                             props.setAttachments((prev) =>
                                 prev.filter((pa) => pa.Name !== props.attachment.Name)
                             );
@@ -129,37 +137,38 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
 export const Attachments: React.FC<IAttachmentsProps> = (props) => {
     const { theme } = React.useContext(GlobalContext);
     const [attachments, setAttachments] = React.useState([]);
-    const {
-        addAttachments,
-        getAttachments,
-    } = useAttachments();
+    const { getAttachments } = useAttachments();
 
     React.useEffect(() => {
-        getAttachments(props.task).then((r) => setAttachments(r));
-    }, []);
+        if (props.task) {
+            getAttachments(props.task).then((r) => setAttachments(r));
+        }
+    }, [props.task]);
 
     return (
-        <>
-            <Label className={styles.attachments__label}>Files</Label>
+        <div style={props.style} className={styles.attachments__container}>
+            <Label className={styles.attachments__label}>{props.label || 'Files'}</Label>
             <div
                 style={{
                     backgroundColor: theme.palette.themeLighterAlt,
                     padding: '.5em',
+                    height: '100%',
                 }}
             >
-                <div className={styles.attachments} style={{ borderColor: theme.palette.themeLight }} >
-                    {attachments.map((a) => (<Attachment key={a.Name} attachment={a} task={props.task} setAttachments={setAttachments} />))}
-                </div>
                 <FileInput
                     multiple
                     onFilesAdded={async (files) => {
-                        loadingStart('details');
-                        await addAttachments(props.task, files);
-                        setAttachments(await getAttachments(props.task));
-                        loadingStop('details');
+                        await props.onAttachments(files);
+                        if (props.task) {
+                            setAttachments(await getAttachments(props.task));
+                        }
                     }}
-                />
+                >
+                    <div className={styles.attachments} style={{ borderColor: theme.palette.themeLight }} >
+                        {attachments.map((a) => (<Attachment key={a.Name} attachment={a} task={props.task} setAttachments={setAttachments} />))}
+                    </div>
+                </FileInput>
             </div>
-        </>
+        </div>
     );
 };

@@ -1,3 +1,4 @@
+import { uniqBy } from '@microsoft/sp-lodash-subset';
 import {
     ComboBox,
     CompactPeoplePicker,
@@ -9,16 +10,17 @@ import {
     MessageBarType,
     Panel,
     PanelType,
-    Position,
     PrimaryButton,
     Separator,
-    SpinButton,
     Stack,
     StackItem,
+    Text,
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { Attachments } from '../../attachments/Attachments';
+import { useAttachments } from '../../attachments/useAttachments';
 import { useActions } from '../../comments/useActions';
 import { HoursInput } from '../../components/HoursInput';
 import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
@@ -36,6 +38,10 @@ const CreateTaskPanel: React.FC = () => {
     const { addAction } = useActions();
     const navigate = useNavigate();
     const params = useParams();
+
+    /** Attachments */
+    const [attachments, setAttachments] = React.useState<File[]>([]);
+    const { addAttachments } = useAttachments();
 
     /** Group labels */
     const { groupLabels, setGroupLabels } = useGroups();
@@ -71,6 +77,7 @@ const CreateTaskPanel: React.FC = () => {
         Team: '',
         Subtasks: 0,
         FinishedSubtasks: 0,
+        AttachmentsCount: 0,
     });
 
     /** Team options */
@@ -152,10 +159,12 @@ const CreateTaskPanel: React.FC = () => {
             handleDismissPanel();
             loadingStart('default');
             ev.preventDefault();
+            let createdId: number;
             if (!validateData()) return;
             if (params.parentId) {
                 const parent = await getTask(+params.parentId);
                 const subtaskId = await createSubtask(data, parent);
+                createdId = subtaskId;
                 await addAction(subtaskId, 'Created', data.Title);
                 parent.Subtasks += 1;
                 // Refresh the parent task
@@ -163,13 +172,17 @@ const CreateTaskPanel: React.FC = () => {
                 taskUpdated(parent);
                 tasksAdded(subtasks);
             } else {
-                const createdId = await createTask(data);
+                createdId = await createTask(data);
                 await addAction(createdId, 'Created', data.Title);
                 tasksAdded([await getTask(createdId)]);
             }
+            if (attachments.length > 0 && createdId) {
+                const createdTask = await getTask(createdId);
+                await addAttachments(createdTask, attachments);
+            }
             loadingStop('default');
         },
-        [data, validateData]
+        [data, validateData, attachments]
     );
 
     return (
@@ -422,6 +435,16 @@ const CreateTaskPanel: React.FC = () => {
                         readOnly
                     />
                 )}
+                <Attachments style={{ height: '100px' }} onAttachments={(files) => {
+                    setAttachments(files);
+                    setData((prev) => ({
+                        ...prev,
+                        AttachmentsCount: files.length,
+                    }));
+                }} label="Attachments" />
+                {
+                    attachments.map((a) => <Text block variant='medium'>{a.name}</Text>)
+                }
             </form>
         </Panel>
     );

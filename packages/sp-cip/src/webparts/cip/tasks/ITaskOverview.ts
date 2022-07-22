@@ -18,6 +18,8 @@ export const LIST_SELECT = [
     'MainTaskId',
     'Subtasks',
     'FinishedSubtasks',
+    'CommentsCount',
+    'AttachmentsCount'
 ];
 
 export const LIST_EXPAND = ['Responsible'];
@@ -44,4 +46,6 @@ export interface ITaskOverview {
     MainTaskId?: number;
     Subtasks: number;
     FinishedSubtasks: number;
+    CommentsCount?: number;
+    AttachmentsCount?: number;
 }

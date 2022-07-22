@@ -70,8 +70,22 @@ $buttonSide: 30px;
 
 .title__text {
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: pre;
+}
+
+.title-cell {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 1em;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.title-cell__count-icons {
+    min-width: 50px;
+    display: flex;
+    flex-flow: row nowrap;
+    gap: .5em;
 }
 
 .action-buttons-container {

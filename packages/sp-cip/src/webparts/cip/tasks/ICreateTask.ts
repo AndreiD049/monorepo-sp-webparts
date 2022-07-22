@@ -15,4 +15,6 @@ export interface ICreateTask {
     MainTaskId?: number;
     Subtasks: number;
     FinishedSubtasks: number;
+    CommentsCount?: number;
+    AttachmentsCount?: number;
 }

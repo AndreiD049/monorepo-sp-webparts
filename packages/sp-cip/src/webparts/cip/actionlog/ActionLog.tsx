@@ -24,7 +24,7 @@ export const ActionLog: React.FC<IActionLogProps> = (props) => {
             }
             result[dateString].push(action);
         });
-        dates.sort().reverse();
+        dates.sort((a, b) => a < b ? 1 : -1);
         return [result, dates.map((d) => d.toLocaleDateString())];
     }, [actions]);
 

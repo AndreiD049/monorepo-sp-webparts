@@ -16,6 +16,7 @@ import { ITaskOverview } from '../ITaskOverview';
 import { isFinished } from '../task-utils';
 import { useActions } from '../../comments/useActions';
 import Pill from '../../components/Pill/Pill';
+import { Items } from 'sp-preset';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {
@@ -171,15 +172,22 @@ export const TitleCell: React.FC<{node: TaskNode, nestLevel: number}> = ({node, 
                 }}
             />
             {node.isOrphan && <Pill value="Subtask" />}
-            <Text
-                variant="medium"
-                block
-                className={`${styles['title__text']} ${
-                    isTaskFinished ? styles['title__text_finished'] : ''
-                }`}
-            >
-                {item.Title}
-            </Text>
+            <div className={styles['title-cell']}>
+                <Text
+                    variant="medium"
+                    block
+                    className={`${styles['title__text']} ${
+                        isTaskFinished ? styles['title__text_finished'] : ''
+                    }`}
+                    title={item.Title}
+                >
+                    {item.Title}
+                </Text>
+                <div className={styles['title-cell__count-icons']}>
+                    <div><Icon iconName='Comment' /> {item.CommentsCount}</div>
+                    <div><Icon iconName='Attach' /> {item.AttachmentsCount}</div>
+                </div>
+            </div>
         </div>
     );
 };

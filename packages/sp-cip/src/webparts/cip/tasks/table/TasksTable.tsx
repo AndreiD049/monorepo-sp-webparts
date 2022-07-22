@@ -52,6 +52,7 @@ const TasksTable = () => {
                 styles={{
                     root: {
                         overflowY: 'hidden',
+                        paddingBottom: '2em',
                     },
                 }}
                 groups={groups}

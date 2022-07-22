@@ -183,6 +183,16 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
             `<Field CommaSeparator='FALSE' CustomUnitOnRight='TRUE' Decimals='0' Description='Number of finished subtasks' DisplayName='FinishedSubtasks' Format='Dropdown' IsModern='TRUE' Name='FinishedSubtasks' Percentage='FALSE' Title='FinishedSubtasks' Type='Number' Unit='None'><Default>0</Default></Field>`
         );
         notifyOnFieldCreation(finishedSubtasks);
+
+        const commentsCount = await list.fields.createFieldAsXml(
+            `<Field CommaSeparator='FALSE' CustomUnitOnRight='TRUE' Decimals='0' Description='Number of comments' DisplayName='CommentsCount' Format='Dropdown' IsModern='TRUE' Min='0' Name='CommentsCount' Percentage='FALSE' Title='CommentsCount' Type='Number' Unit='None'><Default>0</Default></Field>`
+        );
+        notifyOnFieldCreation(commentsCount);
+
+        const attachmentsCount = await list.fields.createFieldAsXml(
+            `<Field CommaSeparator='FALSE' CustomUnitOnRight='TRUE' Decimals='0' Description='Number of attachments' DisplayName='AttachmentsCount' Format='Dropdown' IsModern='TRUE' Min='0' Name='AttachmentsCount' Percentage='FALSE' Title='AttachmentsCount' Type='Number' Unit='None'><Default>0</Default></Field>`
+        );
+        notifyOnFieldCreation(attachmentsCount);
         
         /**
          * Adjust default view
