@@ -96,12 +96,12 @@ export const getColumnSortingFunc = (
     showCategories: boolean
 ): ((a: TaskNode, b: TaskNode) => number) => {
     if (!sorting && showCategories) {
-        return columnSortFunctionsAsc['Category'].get(SortDirection.Ascending);
+        return columnSortFunctionsAsc.Category.get(SortDirection.Ascending);
     } else if (sorting && !showCategories) {
         return columnSortFunctionsAsc[sorting.column]?.get(sorting.direction) || ((_a, _b) => 0);
     } else if (sorting && showCategories) {
         return (a: TaskNode, b: TaskNode) => {
-            const categorySortValue = columnSortFunctionsAsc['Category'].get(SortDirection.Ascending)(a, b);
+            const categorySortValue = columnSortFunctionsAsc.Category.get(SortDirection.Ascending)(a, b);
             if (categorySortValue != 0) return categorySortValue;
             return columnSortFunctionsAsc[sorting.column].get(sorting.direction)(a, b);
         };
