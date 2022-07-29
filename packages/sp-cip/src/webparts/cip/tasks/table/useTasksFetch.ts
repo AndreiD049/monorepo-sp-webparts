@@ -1,9 +1,7 @@
 import { uniqBy } from 'lodash';
 import * as React from 'react';
-import {
-    AssigneeSelected,
-    StatusSelected,
-} from '../../components/CipCommandBar';
+import { AssigneeSelected } from '../../components/command-bar/CipAssigneeSelector';
+import { StatusSelected } from '../../components/command-bar/StatusSelector';
 import {
     loadingStart,
     loadingStop,

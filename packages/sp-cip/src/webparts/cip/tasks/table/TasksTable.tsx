@@ -4,7 +4,7 @@ import {
     SelectionMode,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import CipCommandBar from '../../components/CipCommandBar';
+import CipCommandBar from '../../components/command-bar/CipCommandBar';
 import { useCallout } from '../../components/useCallout';
 import Task from '../Task';
 import { useGroups } from './useGroups';
@@ -12,6 +12,7 @@ import { useColumns } from './useColumns';
 import { filtersReducer } from './filters-reducer';
 import { useTasksFetch } from './useTasksFetch';
 import { useFilteredTree } from './useFilteredTree';
+import { useShowCategories } from './useShowCategories';
 
 const TasksTable = () => {
     const { CalloutComponent } = useCallout();
@@ -21,6 +22,7 @@ const TasksTable = () => {
         status: null,
         facetFilters: {},
     });
+    const {showCategories, handleToggleShowCategories} = useShowCategories();
 
     const { tasks } = useTasksFetch(filters);
 
@@ -35,7 +37,7 @@ const TasksTable = () => {
 
     const { columns } = useColumns(tree, filters, dispatch);
 
-    const { groups, groupProps } = useGroups(items);
+    const { groups, groupProps } = useGroups(items, showCategories);
 
     return (
         <>
@@ -47,6 +49,7 @@ const TasksTable = () => {
                 onAssignedToChange={(val) =>
                     dispatch({ type: 'ASSIGNED', value: val })
                 }
+                onShowCategoriesToggle={handleToggleShowCategories}
             />
             <DetailsList
                 styles={{
@@ -66,6 +69,7 @@ const TasksTable = () => {
                         isFiltered={filters.search !== ''}
                         rowProps={props}
                         node={props.item.data}
+                        style={{ marginLeft: showCategories ? '36px' : '0px' }}
                     />
                 )}
             />

@@ -1,7 +1,5 @@
-import {
-    AssigneeSelected,
-    StatusSelected,
-} from '../../components/CipCommandBar';
+import { AssigneeSelected } from '../../components/command-bar/CipAssigneeSelector';
+import { StatusSelected } from '../../components/command-bar/StatusSelector';
 import { TaskNode } from '../graph/TaskNode';
 
 export interface ICipFilters {

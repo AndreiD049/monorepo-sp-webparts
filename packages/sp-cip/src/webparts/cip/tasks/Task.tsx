@@ -15,7 +15,7 @@ function initialOpen(node: TaskNode, isFiltered: boolean) {
     return node.getChildren().some((c) => initialOpen(c, isFiltered));
 }
 
-export interface ITaskProps {
+export interface ITaskProps extends React.HTMLAttributes<HTMLDivElement> {
     rowProps: IDetailsRowProps;
     node: TaskNode;
     isFiltered?: boolean;
@@ -47,6 +47,7 @@ const Task: React.FC<ITaskProps> = (props) => {
                             isFiltered={props.isFiltered}
                             node={child}
                             rowProps={props.rowProps}
+                            style={{...props.style}}
                         />
                     ))}
                 </div>
@@ -100,6 +101,7 @@ const Task: React.FC<ITaskProps> = (props) => {
                 className={`${styles.task} ${
                     props.node.Display === 'disabled' ? styles.disabled : ''
                 }`}
+                style={{...props.style}}
             >
                 {props.rowProps.columns.map((column) => {
                     return (

@@ -9,7 +9,7 @@ import useWebStorage from 'use-web-storage-api';
 import { GROUP_LABELS_KEY } from '../../utils/constants';
 import { TaskNode } from '../graph/TaskNode';
 
-export const useGroups = (tasks?: { key: number; data: TaskNode }[]) => {
+export const useGroups = (tasks?: { key: number; data: TaskNode }[], showCategories: boolean = true) => {
     const [allCollapsed, setAllCollapsed] = useState(false);
     const [groupStatus, setGroupStatus] = useState({});
     const [groupLabels, setGroupLabels] = useWebStorage([], {
@@ -17,7 +17,8 @@ export const useGroups = (tasks?: { key: number; data: TaskNode }[]) => {
     });
 
     const groups: IGroup[] = React.useMemo(() => {
-        if (!tasks) return;
+        if (!tasks) return null;
+        if (!showCategories) return null;
         const groups = {};
         tasks.forEach((node, idx) => {
             const category = node.data.Category || 'Other';
@@ -35,10 +36,11 @@ export const useGroups = (tasks?: { key: number; data: TaskNode }[]) => {
         });
         setGroupLabels(Object.keys(groups));
         return Object.values(groups);
-    }, [tasks, groupStatus]);
+    }, [tasks, groupStatus, showCategories]);
 
     const groupProps: IDetailsGroupRenderProps = React.useMemo(() => {
-        if (!tasks) return;
+        if (!tasks) return null;
+        if (!showCategories) return null;
         return {
             isAllGroupsCollapsed: allCollapsed,
             onToggleCollapseAll: () => {
@@ -59,7 +61,7 @@ export const useGroups = (tasks?: { key: number; data: TaskNode }[]) => {
                     })),
             },
         };
-    }, [allCollapsed, groupLabels]);
+    }, [allCollapsed, groupLabels, showCategories]);
 
     return { groups, groupProps, groupLabels, setGroupLabels };
 };
