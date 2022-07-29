@@ -1,7 +1,7 @@
 import { ActionButton } from '@microsoft/office-ui-fabric-react-bundle';
 import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
+import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { TaskNode } from '../graph/TaskNode';

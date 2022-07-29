@@ -9,13 +9,13 @@ import { useTasks } from '../useTasks';
 import {
     loadingStart,
     loadingStop,
-} from '../../components/Utils/LoadingAnimation';
+} from '../../components/utils/LoadingAnimation';
 import styles from './Cells.module.scss';
 import { TaskNodeContext } from '../TaskNodeContext';
 import { ITaskOverview } from '../ITaskOverview';
 import { isFinished } from '../task-utils';
 import { useActions } from '../../comments/useActions';
-import Pill from '../../components/Pill/Pill';
+import Pill from '../../components/pill/Pill';
 import { Items } from 'sp-preset';
 
 interface ICheckExpandButtonProps

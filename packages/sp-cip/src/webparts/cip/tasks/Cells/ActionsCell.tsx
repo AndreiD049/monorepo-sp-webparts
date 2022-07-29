@@ -5,11 +5,11 @@ import { getDialog } from '../../components/AlertDialog';
 import { useNavigate } from 'react-router';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
-import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
+import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
 import { useTasks } from '../useTasks';
 import { taskDeleted } from '../../utils/dom-events';
-import { AddCommentDialog } from '../Dialogs/AddCommentDialog';
-import { LogTime } from '../Dialogs/LogTime';
+import { AddCommentDialog } from '../dialogs/AddCommentDialog';
+import { LogTime } from '../dialogs/LogTime';
 import { TaskNode } from '../graph/TaskNode';
 
 const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {

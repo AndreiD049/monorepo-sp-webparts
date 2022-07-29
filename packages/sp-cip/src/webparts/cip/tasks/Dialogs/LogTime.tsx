@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useActions } from '../../comments/useActions';
 import { dismissDialog } from '../../components/AlertDialog';
 import { HoursInput } from '../../components/HoursInput';
-import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
+import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
 import { taskUpdated } from '../../utils/dom-events';
 import { ITaskOverview } from '../ITaskOverview';
 import { useTasks } from '../useTasks';

@@ -1,8 +1,8 @@
 import { useConst } from '@uifabric/react-hooks';
 import * as React from 'react';
 import { useActions } from '../../comments/useActions';
-import Pill from '../../components/Pill/Pill';
-import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
+import Pill from '../../components/pill/Pill';
+import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { TaskNode } from '../graph/TaskNode';

@@ -8,7 +8,7 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useActions } from '../../comments/useActions';
-import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
+import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
 import { useUsers } from '../../users/useUsers';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';

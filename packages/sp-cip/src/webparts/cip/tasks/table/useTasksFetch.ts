@@ -5,7 +5,7 @@ import { StatusSelected } from '../../components/command-bar/StatusSelector';
 import {
     loadingStart,
     loadingStop,
-} from '../../components/Utils/LoadingAnimation';
+} from '../../components/utils/LoadingAnimation';
 import { useUsers } from '../../users/useUsers';
 import {
     getSubtasksHandler,
@@ -16,7 +16,7 @@ import {
 } from '../../utils/dom-events';
 import { ITaskOverview } from '../ITaskOverview';
 import { useTasks } from '../useTasks';
-import { ICipFilters } from './filters-reducer';
+import { ICipFilters } from './sort-filter/filters-reducer';
 
 export const useTasksFetch = (filters: ICipFilters) => {
     const { getCurrentUser } = useUsers();

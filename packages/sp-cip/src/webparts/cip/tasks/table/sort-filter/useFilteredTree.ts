@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { createTaskTree } from '../graph/factory';
-import { TaskNode } from '../graph/TaskNode';
-import { ITaskOverview } from '../ITaskOverview';
+import { createTaskTree } from '../../graph/factory';
+import { TaskNode } from '../../graph/TaskNode';
+import { ITaskOverview } from '../../ITaskOverview';
 import { ICipFilters } from './filters-reducer';
+import { getColumnSortingFunc } from './sorting';
 
 const searchFunc = (node: TaskNode, search: string) => {
     const task = node.getTask();
@@ -15,7 +16,8 @@ const searchFunc = (node: TaskNode, search: string) => {
 
 export const useFilteredTree = (
     tasks: ITaskOverview[],
-    filters: ICipFilters
+    filters: ICipFilters,
+    showCategories: boolean
 ) => {
     const tree = React.useMemo(() => {
         return createTaskTree(tasks);
@@ -35,11 +37,10 @@ export const useFilteredTree = (
 
 
     const sortedTree = React.useMemo(() => {
-        const children = filteredTree
-            .getChildren()
-            .sort((a, b) => (a.Category < b.Category) ? -1 : 1);
+        const children = filteredTree.getChildren()
+        children.sort(getColumnSortingFunc(filters.sorting, showCategories));
         return filteredTree.clone().withChildren(children);
-    }, [filteredTree]);
+    }, [filteredTree, filters, showCategories]);
 
     return {
         tree: sortedTree,

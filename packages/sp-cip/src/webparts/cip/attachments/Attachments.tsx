@@ -1,7 +1,6 @@
-import { ButtonType, DefaultButton, Icon, Label, Link, Stack, Text, themeRulesStandardCreator } from 'office-ui-fabric-react';
-import { useControlledState } from 'office-ui-fabric-react/lib/Foundation';
+import { ButtonType, Icon, Label, Link, Stack, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { FileInput } from '../components/Utils/FileInput';
+import { FileInput } from '../components/utils/FileInput';
 import { ITaskOverview } from '../tasks/ITaskOverview';
 import { GlobalContext } from '../utils/GlobalContext';
 import { IAttachment } from './IAttachment';

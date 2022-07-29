@@ -6,8 +6,8 @@ import {
     SearchBox,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { calloutVisibility } from '../../utils/dom-events';
-import { TaskNode } from '../graph/TaskNode';
+import { calloutVisibility } from '../../../utils/dom-events';
+import { TaskNode } from '../../graph/TaskNode';
 import styles from './Facet.module.scss';
 
 export interface IChoiceFacetProps {

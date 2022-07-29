@@ -23,7 +23,7 @@ import { Attachments } from '../../attachments/Attachments';
 import { useAttachments } from '../../attachments/useAttachments';
 import { useActions } from '../../comments/useActions';
 import { HoursInput } from '../../components/HoursInput';
-import { loadingStart, loadingStop } from '../../components/Utils/LoadingAnimation';
+import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
 import { useUsers } from '../../users/useUsers';
 import { tasksAdded, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';

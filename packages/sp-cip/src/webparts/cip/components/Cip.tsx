@@ -7,9 +7,9 @@ import { ICipWebPartProps } from '../CipWebPart';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import { useUsers } from '../users/useUsers';
 import { HashRouter, Outlet, Route, Routes } from 'react-router-dom';
-import CreateTaskPanel from '../tasks/Panels/CreateTask';
-import { TaskDetails } from '../tasks/Panels/TaskDetails';
-import { LoadingAnimation } from './Utils/LoadingAnimation';
+import CreateTaskPanel from '../tasks/panels/CreateTask';
+import { TaskDetails } from '../tasks/panels/TaskDetails';
+import { LoadingAnimation } from './utils/LoadingAnimation';
 import { AlertDialog } from './AlertDialog';
 
 interface ICipProps {

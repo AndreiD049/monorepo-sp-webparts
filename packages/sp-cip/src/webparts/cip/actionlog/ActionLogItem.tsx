@@ -1,7 +1,7 @@
 import { Icon, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { ActionType, IAction } from '../comments/useActions';
-import Pill from '../components/Pill/Pill';
+import Pill from '../components/pill/Pill';
 import { GlobalContext } from '../utils/GlobalContext';
 import styles from './ActionLog.module.scss';
 

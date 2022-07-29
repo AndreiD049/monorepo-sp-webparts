@@ -9,9 +9,9 @@ import { useCallout } from '../../components/useCallout';
 import Task from '../Task';
 import { useGroups } from './useGroups';
 import { useColumns } from './useColumns';
-import { filtersReducer } from './filters-reducer';
+import { filtersReducer } from './sort-filter/filters-reducer';
 import { useTasksFetch } from './useTasksFetch';
-import { useFilteredTree } from './useFilteredTree';
+import { useFilteredTree } from './sort-filter/useFilteredTree';
 import { useShowCategories } from './useShowCategories';
 
 const TasksTable = () => {
@@ -26,7 +26,7 @@ const TasksTable = () => {
 
     const { tasks } = useTasksFetch(filters);
 
-    const { tree } = useFilteredTree(tasks, filters);
+    const { tree } = useFilteredTree(tasks, filters, showCategories);
 
     const items = React.useMemo(() => {
         return tree.getChildren().filter((n) => n.Display !== 'hidden').map((n) => ({

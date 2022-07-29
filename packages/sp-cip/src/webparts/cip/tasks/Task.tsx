@@ -4,7 +4,7 @@ import styles from './Task.module.scss';
 import { TaskNode } from './graph/TaskNode';
 import { nodeToggleOpenHandler, relinkParent } from '../utils/dom-events';
 import SubtasksProxy from './SubtasksProxy';
-import { RenderCell } from './Cells/render-cells';
+import { RenderCell } from './cells/render-cells';
 import { TaskNodeContext } from './TaskNodeContext';
 import { isFinished } from './task-utils';
 

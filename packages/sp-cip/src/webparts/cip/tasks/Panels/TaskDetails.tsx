@@ -21,9 +21,9 @@ import {
     LoadingAnimation,
     loadingStart,
     loadingStop,
-} from '../../components/Utils/LoadingAnimation';
+} from '../../components/utils/LoadingAnimation';
 import { taskUpdated, taskUpdatedHandler } from '../../utils/dom-events';
-import { LogTime } from '../Dialogs/LogTime';
+import { LogTime } from '../dialogs/LogTime';
 import { TaskNode } from '../graph/TaskNode';
 import { ITaskOverview } from '../ITaskOverview';
 import { useTasks } from '../useTasks';
@@ -207,13 +207,19 @@ export const TaskDetails: React.FC = () => {
                 {task && (
                     <Stack>
                         {editableInformation}
-                        <Attachments task={task} onAttachments={async (files: File[]) => {
-                            loadingStart('details');
-                            await addAttachments(task, files);
-                            const latest = await attachmentsUpdated(task.Id, files.length);
-                            taskUpdated(latest);
-                            loadingStop('details');
-                        }} />
+                        <Attachments
+                            task={task}
+                            onAttachments={async (files: File[]) => {
+                                loadingStart('details');
+                                await addAttachments(task, files);
+                                const latest = await attachmentsUpdated(
+                                    task.Id,
+                                    files.length
+                                );
+                                taskUpdated(latest);
+                                loadingStop('details');
+                            }}
+                        />
                         <StackItem style={{ marginTop: '1em' }}>
                             <Pivot
                                 selectedKey={

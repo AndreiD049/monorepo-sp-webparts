@@ -20,12 +20,11 @@ export const CipCategoriesToggle: React.FC<ICipCategoriesToggleProps> = (props) 
             styles={{
                 root: {
                     marginBottom: 0,
-                    minWidth: '175px',
+                    marginRight: '.5em',
                 },
             }}
-            label="Categories"
-            onText="Show"
-            offText="Hide"
+            onText="Categories"
+            offText="Categories"
             inlineLabel
             checked={value}
             onChange={(ev: any, checked: boolean) => setValue(checked)}
