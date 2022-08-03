@@ -20,7 +20,9 @@ export default class ImageList extends React.Component<IImageListProps, {}> {
     return (
       <LightgalleryProvider lightgallerySettings={
         {
-          counter: false
+          counter: false,
+          thumbnail: false,
+          download: false,
         }
       }>
         <div className={styles.imageList}>

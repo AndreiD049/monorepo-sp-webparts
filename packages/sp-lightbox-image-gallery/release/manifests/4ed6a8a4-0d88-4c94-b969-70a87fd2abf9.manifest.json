@@ -1,5 +1,5 @@
 {
-  "id": "4ed6a8a4-0d88-4c94-b969-70a87fd2abb8",
+  "id": "4ed6a8a4-0d88-4c94-b969-70a87fd2abf9",
   "alias": "LightboxImageGalleryWebPart",
   "componentType": "WebPart",
   "version": "1.0.0",
@@ -14,30 +14,30 @@
     {
       "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
       "group": {
-        "default": "SPFx WebParts"
+        "default": "Other"
       },
       "title": {
-        "default": "Lightbox Image Gallery"
+        "default": "SP Image Gallery"
       },
       "description": {
         "default": "Display a good looking image gallery using lightbox effects"
       },
       "officeFabricIconFontName": "PhotoCollection",
       "properties": {
-        "webPartTitle": "Lightbox Image Gallery",
+        "webPartTitle": "Image Gallery",
         "imageLibraryRootFolderUniqueId": ""
       }
     }
   ],
   "loaderConfig": {
     "internalModuleBaseUrls": [
-      "https://localhost:4321/dist/"
+      "<!-- PATH TO CDN -->"
     ],
     "entryModuleId": "images-gallery-web-part",
     "scriptResources": {
       "images-gallery-web-part": {
         "type": "path",
-        "path": "images-gallery-web-part_4aa961fe1d3531279b92.js"
+        "path": "images-gallery-web-part_10d7d188ef8fec873300.js"
       },
       "@microsoft/sp-property-pane": {
         "type": "component",

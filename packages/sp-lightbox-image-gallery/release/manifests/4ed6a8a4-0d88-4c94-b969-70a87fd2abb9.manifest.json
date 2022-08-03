@@ -1,5 +1,5 @@
 {
-  "id": "4ed6a8a4-0d88-4c94-b969-70a87fd2abb8",
+  "id": "4ed6a8a4-0d88-4c94-b969-70a87fd2abb9",
   "alias": "LightboxImageGalleryWebPart",
   "componentType": "WebPart",
   "version": "1.0.0",
@@ -17,7 +17,7 @@
         "default": "Other"
       },
       "title": {
-        "default": "SPFX Image Gallery"
+        "default": "SP Image Gallery"
       },
       "description": {
         "default": "Display a good looking image gallery using lightbox effects"
@@ -37,7 +37,7 @@
     "scriptResources": {
       "images-gallery-web-part": {
         "type": "path",
-        "path": "images-gallery-web-part_4aa961fe1d3531279b92.js"
+        "path": "images-gallery-web-part_a678e605bd6eb1e4ac9a.js"
       },
       "@microsoft/sp-property-pane": {
         "type": "component",
