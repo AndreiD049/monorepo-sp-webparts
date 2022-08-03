@@ -1,16 +1,20 @@
 import { IDataService } from '../models/IDataService';
-import { IFolderInfo, IFolder } from '@pnp/sp/folders';
-import { IFileInfo } from '@pnp/sp/files';
-import { IListInfo } from '@pnp/sp/lists';
 import { IFolderData } from '../models/IFolderData';
-import { SPFI } from 'sp-preset';
+import { getHashCode, IFileInfo, IFolder, IFolderInfo, IListInfo, SPFI } from 'sp-preset';
 import ImagesGalleryWebPart from '../webparts/imagesgallery/ImagesGalleryWebPart';
+import { IndexedDBCacher } from 'sp-indexeddb-caching';
 
+const MINUTE = 1000 * 60;
 export default class DataService implements IDataService {
   private sp: SPFI;
 
   constructor() {
-    this.sp = ImagesGalleryWebPart.SPBuilder.getSP();
+    const { CachingTimeline } = IndexedDBCacher({
+      expireFunction: () => new Date(Date.now() + 15 * MINUTE),
+      keyFactory: (url) => url,
+    });
+
+    this.sp = ImagesGalleryWebPart.SPBuilder.getSP().using(CachingTimeline);
   }
 
   public async getLists(): Promise<IListInfo[]> {
@@ -24,10 +28,10 @@ export default class DataService implements IDataService {
   }
 
   public async getFolderData(folderUniqueId: string): Promise<IFolderData> {
-    let folder = await this.sp.web.getFolderById(folderUniqueId);
-    let folderInfo = await folder();
-    let subFolders = await this.getSubFolders(folder);
-    let files = await this.getFilesFromFolder(folder);
+    let folder = () => this.sp.web.getFolderById(folderUniqueId);
+    let folderInfo = await folder()();
+    let subFolders = await this.getSubFolders(folder());
+    let files = await this.getFilesFromFolder(folder());
 
     return {
       folder: folderInfo,

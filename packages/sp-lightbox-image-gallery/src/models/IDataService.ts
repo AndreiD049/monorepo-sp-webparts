@@ -1,5 +1,5 @@
-import { IListInfo } from "@pnp/sp/lists";
 import { IFolderData } from "./IFolderData";
+import { IListInfo } from 'sp-preset';
 
 export interface IDataService {
  getFolderData(folderUniqueId: string): Promise<IFolderData>;

@@ -6,6 +6,7 @@ declare interface IImagesGalleryWebPartStrings {
   PlaceholderDescription: string;
   PlaceholderButton: string;
   ShowBlankEditInfoMessage: string;
+  NumberOfElementsPerPageLabel: string;
 }
 
 declare module 'ImagesGalleryWebPartStrings' {

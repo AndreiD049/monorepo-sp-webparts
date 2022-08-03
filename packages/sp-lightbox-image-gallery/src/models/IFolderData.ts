@@ -1,5 +1,4 @@
-import { IFileInfo } from "@pnp/sp/files";
-import { IFolderInfo } from "@pnp/sp/folders";
+import { IFileInfo, IFolderInfo } from "sp-preset";
 
 export interface IFolderData {
     folder: IFolderInfo;

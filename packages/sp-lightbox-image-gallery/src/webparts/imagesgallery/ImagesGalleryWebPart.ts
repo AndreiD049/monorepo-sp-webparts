@@ -15,6 +15,7 @@ import {
   IPropertyPaneConfiguration,
   PropertyPaneDropdown,
   PropertyPaneSlider,
+  PropertyPaneTextField,
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { isEqual, isEmpty } from '@microsoft/sp-lodash-subset';
@@ -27,9 +28,8 @@ import {
 import { IDataService } from '../../models/IDataService';
 import DataService from '../../services/DataService';
 import { IImagesGalleryWebPartProps } from './IImagesGalleryWebPartProps';
-import { IListInfo } from '@pnp/sp/lists';
 import { PropertyPaneHelpers } from '@pnp/spfx-property-controls/lib/helpers';
-import SPBuilder, { InjectHeaders } from 'sp-preset';
+import SPBuilder, { IListInfo, InjectHeaders } from 'sp-preset';
 
 export default class ImagesGalleryWebPart extends BaseClientSideWebPart<IImagesGalleryWebPartProps> {
   private _dataService: IDataService;
@@ -69,6 +69,7 @@ export default class ImagesGalleryWebPart extends BaseClientSideWebPart<IImagesG
         imageLibraryRootFolderUniqueId:
           this.properties.imageLibraryRootFolderUniqueId,
         rootUrl: this.context.pageContext.web.serverRelativeUrl,
+        itemsPerPage: this.properties.numberOfElementsPerPage || 10,
         themeVariant: this._themeVariant,
         dataService: this._dataService,
         displayMode: this.displayMode,
@@ -104,7 +105,7 @@ export default class ImagesGalleryWebPart extends BaseClientSideWebPart<IImagesG
     this._initThemeVariant();
 
     ImagesGalleryWebPart.SPBuilder = new SPBuilder(this.context)
-      .withRPM(600)
+      .withRPM(100)
       .withAdditionalTimelines([
         InjectHeaders({
           UserAgent: `NONISV|Katoen Natie|Gallery/${this.dataVersion.toString()}`,
@@ -143,6 +144,12 @@ export default class ImagesGalleryWebPart extends BaseClientSideWebPart<IImagesG
                       index: i,
                     };
                   }),
+                }),
+                PropertyPaneSlider('numberOfElementsPerPage', {
+                  label: strings.NumberOfElementsPerPageLabel,
+                  min: 10,
+                  max: 30,
+                  step: 10,
                 }),
               ],
             },

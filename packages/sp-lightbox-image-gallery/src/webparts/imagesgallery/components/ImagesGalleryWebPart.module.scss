@@ -118,6 +118,17 @@
             }
         }
     }
+
+    .pager {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+        
+        .pagerText {
+            padding: 0 2em;
+        }
+    }
 }
 
 .overlay {

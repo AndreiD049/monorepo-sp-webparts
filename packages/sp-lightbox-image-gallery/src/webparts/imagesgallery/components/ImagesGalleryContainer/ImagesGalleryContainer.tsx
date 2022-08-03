@@ -5,9 +5,8 @@ import * as strings from 'ImagesGalleryWebPartStrings';
 import styles from '../ImagesGalleryWebPart.module.scss';
 
 import { IImagesGalleryContainerProps } from './IImagesGalleryContainerProps';
-import { IImagesGalleryContainerState } from './IImagesGalleryContainerState';
 
-import { isEqual, isEmpty, findIndex } from "@microsoft/sp-lodash-subset";
+import { isEmpty, findIndex } from '@microsoft/sp-lodash-subset';
 
 import {
   Spinner,
@@ -17,140 +16,207 @@ import {
   Breadcrumb,
   IBreadcrumbItem,
   Overlay,
-  ITheme
-} from "office-ui-fabric-react";
-import { WebPartTitle } from "@pnp/spfx-controls-react/lib/WebPartTitle";
+  ITheme,
+  Separator,
+} from 'office-ui-fabric-react';
+import { WebPartTitle } from '@pnp/spfx-controls-react/lib/WebPartTitle';
 
-import ImageList from '../ImageList/ImageList';
-import { IFolderInfo } from '@pnp/sp/folders';
-import FolderList from '../FolderList/FolderList';
+import { ImageList } from '../ImageList/ImageList';
+import { FolderList } from '../FolderList/FolderList';
+import { IFolderInfo, Items } from 'sp-preset';
+import { Pager } from '../Pager/Pager';
 
-export class ImagesGalleryContainer extends React.Component<IImagesGalleryContainerProps, IImagesGalleryContainerState> {
-  
-  constructor(props: IImagesGalleryContainerProps){
-    super(props);  
-  
-    this.state = {  
-      hasError: false,
-      areResultsLoading: false,
-      errorMessage: '',
-      folderData: {
-        folder: null,
-        files: [],
-        subFolders: []
-      },
-      breadCrumb: [],
-    };
-  }  
+export const ImagesGalleryContainer: React.FC<IImagesGalleryContainerProps> = (
+  props
+) => {
+  const [hasError, setHasError] = React.useState(false);
+  const [areResultsLoading, setAreResultsLoading] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const [folderData, setFolderData] = React.useState({
+    folder: null,
+    files: [],
+    subFolders: [],
+  });
+  const [breadCrumb, setBreadCrumb] = React.useState<IFolderInfo[]>([]);
+  const [page, setPage] = React.useState(0);
 
-  public async componentDidMount() {
-    await this._fetchDocumentLibraryItems(this.props.imageLibraryRootFolderUniqueId, true);
-  }
+  React.useEffect(() => {
+    _fetchDocumentLibraryItems(props.imageLibraryRootFolderUniqueId, true);
+  }, [props]);
 
-  public async componentDidUpdate(prevProps: IImagesGalleryContainerProps, prevState: IImagesGalleryContainerState) {
-    if (!isEqual(this.props, prevProps)) {
-      await this._fetchDocumentLibraryItems(this.props.imageLibraryRootFolderUniqueId, true);
+  React.useEffect(() => {
+    if (breadCrumb.length > 0) {
+      const last = breadCrumb[breadCrumb.length - 1].Name;
+      const lastPage = localStorage.getItem('spGalleryPage' + last);
+      console.log(lastPage);
+      if (lastPage) {
+        setPage(+lastPage);
+      }
     }
-  }
+  }, [breadCrumb]);
 
-  public render(): React.ReactElement<IImagesGalleryContainerProps> {
-    const areResultsLoading = this.state.areResultsLoading;
-    const hasError = this.state.hasError;
-    const errorMessage = this.state.errorMessage;
-    const subFolders = this.state.folderData.subFolders;
-    const images = this.state.folderData.files;
+  const _fetchDocumentLibraryItems = async (
+    uniqueFolderId: string,
+    reset: boolean = false
+  ): Promise<void> => {
+    try {
+      setAreResultsLoading(true);
+      setHasError(false);
+      setErrorMessage('');
 
-    const { semanticColors }: IReadonlyTheme = this.props.themeVariant;
+      let folderData = await props.dataService.getFolderData(uniqueFolderId);
 
-    let renderWebPartTitle: JSX.Element = null;
-    let renderWebPartContent: JSX.Element = null;
-    let renderWebPartEmptyMessage: JSX.Element = null;
-    let renderOverlay: JSX.Element = null;
-    let renderLightbox: JSX.Element = null;
-
-    // Loading behavior
-    if (areResultsLoading) {
-      renderOverlay = <React.Fragment>
-          <Overlay isDarkThemed={false} theme={this.props.themeVariant as ITheme} className={styles.overlay}>
-              <Spinner size={SpinnerSize.medium} />
-          </Overlay>
-      </React.Fragment>;
+      setAreResultsLoading(false);
+      setFolderData(folderData);
+      setBreadCrumb((prev) =>
+        _getBreadCrumbState(prev, folderData.folder, reset)
+      );
+      setPage(0);
+    } catch (error) {
+      setAreResultsLoading(false);
+      setHasError(true);
+      setErrorMessage(error.message);
     }
+  };
 
-    // WebPart title
-    renderWebPartTitle = <WebPartTitle displayMode={this.props.displayMode} title={this.props.webPartTitle} updateProperty={(value: string) => this.props.updateWebPartTitle(value)} />;
-
-    if (isEmpty(subFolders) && isEmpty(images)) {
-      renderWebPartEmptyMessage = <MessageBar messageBarType={MessageBarType.info}>{strings.ShowBlankEditInfoMessage}</MessageBar>;
-    }
-    renderWebPartContent =
-        <React.Fragment>
-          {renderOverlay}
-          <Breadcrumb items={this._getBreadCrumbData()} maxDisplayedItems={5} theme={this.props.themeVariant as ITheme} />
-          {renderWebPartEmptyMessage}
-          <FolderList foldersInfo={subFolders} onClick={async (folderInfo) => await this._fetchDocumentLibraryItems(folderInfo.UniqueId)} />
-          {renderLightbox}
-          <ImageList rootUrl={this.props.rootUrl} imagesInfo={images} />
-        </React.Fragment>;
-    
-    // Error Message
-    if (hasError) {
-      renderWebPartContent = <MessageBar messageBarType={MessageBarType.error}>{errorMessage}</MessageBar>;
-    }
-
-    return (
-      <div style={{backgroundColor: semanticColors.bodyBackground}}>
-        <div className={styles.imagesGalleryWebpart}>
-          {renderWebPartTitle}
-          {renderWebPartContent}
-        </div>
-      </div>
+  const breadCrumbData = React.useMemo(() => {
+    return breadCrumb.map(
+      (f) =>
+        ({
+          text: f.Name,
+          key: f.UniqueId,
+          onClick: async (ev, item) =>
+            await _fetchDocumentLibraryItems(item.key),
+        } as IBreadcrumbItem)
     );
-  }
-  
-  private _getBreadCrumbData(): IBreadcrumbItem[] {
-    return this.state.breadCrumb.map(f => ({
-      text: f.Name,
-      key: f.UniqueId,
-      onClick: async (ev, item) => await this._fetchDocumentLibraryItems(item.key)
-    } as IBreadcrumbItem));
-  }
+  }, [breadCrumb]);
 
-  private _getBreadCrumbState(prevBreadCrumbState: IFolderInfo[], folder: IFolderInfo, reset: boolean): IFolderInfo[] {
+  const _getBreadCrumbState = (
+    prevBreadCrumbState: IFolderInfo[],
+    folder: IFolderInfo,
+    reset: boolean
+  ): IFolderInfo[] => {
     if (reset) {
       return [folder];
     }
 
-    let existingItemIndex = findIndex(prevBreadCrumbState, f => f.UniqueId === folder.UniqueId);
+    let existingItemIndex = findIndex(
+      prevBreadCrumbState,
+      (f) => f.UniqueId === folder.UniqueId
+    );
     if (existingItemIndex > -1) {
       return prevBreadCrumbState.slice(0, existingItemIndex + 1);
     }
 
     return [...prevBreadCrumbState, folder];
-  }
+  };
 
-  private async _fetchDocumentLibraryItems(uniqueFolderId: string, reset: boolean = false): Promise<void> {
-    try {
-      this.setState({
-        areResultsLoading: true,
-        hasError: false,
-        errorMessage: ""
-      });
+  const onPageChange = (num: number) => () => {
+    setAreResultsLoading(() => {
+      setTimeout(
+        () =>
+          setPage((page) => {
+            setAreResultsLoading(false);
+            const nextPage = page + num;
+            localStorage.setItem('spGalleryPage' + breadCrumb[breadCrumb.length - 1].Name, nextPage.toString());
+            return nextPage;
+          }),
+        1000
+      );
+      return true;
+    });
+  };
 
-      let folderData = await this.props.dataService.getFolderData(uniqueFolderId);
-
-      this.setState((prevState) => ({
-        areResultsLoading: false,
-        folderData: folderData,
-        breadCrumb: this._getBreadCrumbState(prevState.breadCrumb, folderData.folder, reset)
-      }));
-
-    } catch (error) {
-      this.setState({
-          areResultsLoading: false,
-          hasError: true,
-          errorMessage: error.message
-      });
+  const pagedItems = React.useMemo(() => {
+    if (folderData.files.length < props.itemsPerPage) {
+      return folderData.files;
     }
+    const start = page * props.itemsPerPage;
+    return folderData.files.slice(start, start + props.itemsPerPage);
+  }, [page, folderData.files]);
+
+  const { semanticColors }: IReadonlyTheme = props.themeVariant;
+
+  let renderWebPartTitle: JSX.Element = null;
+  let renderWebPartContent: JSX.Element = null;
+  let renderWebPartEmptyMessage: JSX.Element = null;
+  let renderOverlay: JSX.Element = null;
+  let renderLightbox: JSX.Element = null;
+
+  // Loading behavior
+  if (areResultsLoading) {
+    renderOverlay = (
+      <React.Fragment>
+        <Overlay
+          isDarkThemed={false}
+          theme={props.themeVariant as ITheme}
+          className={styles.overlay}
+        >
+          <Spinner size={SpinnerSize.medium} />
+        </Overlay>
+      </React.Fragment>
+    );
   }
-}
+
+  // WebPart title
+  renderWebPartTitle = (
+    <WebPartTitle
+      displayMode={props.displayMode}
+      title={props.webPartTitle}
+      updateProperty={(value: string) => props.updateWebPartTitle(value)}
+    />
+  );
+
+  if (isEmpty(folderData.subFolders) && isEmpty(folderData.files)) {
+    renderWebPartEmptyMessage = (
+      <MessageBar messageBarType={MessageBarType.info}>
+        {strings.ShowBlankEditInfoMessage}
+      </MessageBar>
+    );
+  }
+
+  renderWebPartContent = (
+    <React.Fragment>
+      {renderOverlay}
+      <Breadcrumb
+        items={breadCrumbData}
+        maxDisplayedItems={5}
+        theme={props.themeVariant as ITheme}
+      />
+      {renderWebPartEmptyMessage}
+      <FolderList
+        foldersInfo={folderData.subFolders}
+        onClick={async (folderInfo) =>
+          await _fetchDocumentLibraryItems(folderInfo.UniqueId)
+        }
+      />
+      {renderLightbox}
+      <ImageList rootUrl={props.rootUrl} imagesInfo={pagedItems} />
+      <Separator />
+      <Pager
+        pages={Math.ceil(folderData.files.length / props.itemsPerPage)}
+        currentPage={page + 1}
+        onNextPage={onPageChange(1)}
+        onPrevPage={onPageChange(-1)}
+      />
+    </React.Fragment>
+  );
+
+  // Error Message
+  if (hasError) {
+    renderWebPartContent = (
+      <MessageBar messageBarType={MessageBarType.error}>
+        {errorMessage}
+      </MessageBar>
+    );
+  }
+
+  return (
+    <div style={{ backgroundColor: semanticColors.bodyBackground }}>
+      <div className={styles.imagesGalleryWebpart}>
+        {renderWebPartTitle}
+        {renderWebPartContent}
+      </div>
+    </div>
+  );
+};

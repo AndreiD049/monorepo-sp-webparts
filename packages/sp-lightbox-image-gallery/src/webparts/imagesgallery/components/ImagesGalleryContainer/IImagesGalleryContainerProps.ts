@@ -5,6 +5,7 @@ import { IDataService } from '../../../../models/IDataService';
 export interface IImagesGalleryContainerProps {
   imageLibraryRootFolderUniqueId: string;
   rootUrl: string;
+  itemsPerPage: number;
   dataService: IDataService;
   webPartTitle: string;
   displayMode: DisplayMode;

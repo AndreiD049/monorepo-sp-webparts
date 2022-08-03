@@ -18,6 +18,8 @@ interface CssExports {
   'imageList': string;
   'imagesGalleryWebpart': string;
   'overlay': string;
+  'pager': string;
+  'pagerText': string;
 }
 const cssExports: CssExports;
 export default cssExports;

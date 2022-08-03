@@ -1,4 +1,4 @@
-import { IFileInfo } from "@pnp/sp/files";
+import { IFileInfo } from "sp-preset";
 
 export interface IImageProps {
   imageInfo: IFileInfo;

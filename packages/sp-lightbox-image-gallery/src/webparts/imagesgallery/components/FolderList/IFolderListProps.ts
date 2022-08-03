@@ -1,4 +1,4 @@
-import { IFolderInfo } from "@pnp/sp/folders";
+import { IFolderInfo } from "sp-preset";
 
 export interface IFolderListProps {
   foldersInfo: IFolderInfo[];
