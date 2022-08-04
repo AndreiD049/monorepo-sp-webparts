@@ -37,7 +37,7 @@
     "scriptResources": {
       "images-gallery-web-part": {
         "type": "path",
-        "path": "images-gallery-web-part_aecec06368915f8bbb32.js"
+        "path": "images-gallery-web-part_da11c2ca9cfc45ff7b30.js"
       },
       "@microsoft/sp-property-pane": {
         "type": "component",

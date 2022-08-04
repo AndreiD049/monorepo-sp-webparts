@@ -3,7 +3,7 @@
   "solution": {
     "name": "sp-image-gallery",
     "id": "a7d34cfc-bc45-4910-9ec5-3e2ca97a5d28",
-    "version": "1.0.0.6",
+    "version": "1.0.0.7",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false

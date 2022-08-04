@@ -118,7 +118,10 @@ export const ImagesGalleryContainer: React.FC<IImagesGalleryContainerProps> = (
           setPage((page) => {
             setAreResultsLoading(false);
             const nextPage = page + num;
-            localStorage.setItem('spGalleryPage' + breadCrumb[breadCrumb.length - 1].Name, nextPage.toString());
+            localStorage.setItem(
+              'spGalleryPage' + breadCrumb[breadCrumb.length - 1].Name,
+              nextPage.toString()
+            );
             return nextPage;
           }),
         1000
@@ -142,6 +145,7 @@ export const ImagesGalleryContainer: React.FC<IImagesGalleryContainerProps> = (
   let renderWebPartEmptyMessage: JSX.Element = null;
   let renderOverlay: JSX.Element = null;
   let renderLightbox: JSX.Element = null;
+  let renderPager: JSX.Element = null;
 
   // Loading behavior
   if (areResultsLoading) {
@@ -175,6 +179,21 @@ export const ImagesGalleryContainer: React.FC<IImagesGalleryContainerProps> = (
     );
   }
 
+  // If there are no items, don't generate the Pager
+  if (folderData.files.length > 0) {
+    renderPager = (
+      <>
+        <Separator />
+        <Pager
+          pages={Math.ceil(folderData.files.length / props.itemsPerPage)}
+          currentPage={page + 1}
+          onNextPage={onPageChange(1)}
+          onPrevPage={onPageChange(-1)}
+        />
+      </>
+    );
+  }
+
   renderWebPartContent = (
     <React.Fragment>
       {renderOverlay}
@@ -192,13 +211,7 @@ export const ImagesGalleryContainer: React.FC<IImagesGalleryContainerProps> = (
       />
       {renderLightbox}
       <ImageList rootUrl={props.rootUrl} imagesInfo={pagedItems} />
-      <Separator />
-      <Pager
-        pages={Math.ceil(folderData.files.length / props.itemsPerPage)}
-        currentPage={page + 1}
-        onNextPage={onPageChange(1)}
-        onPrevPage={onPageChange(-1)}
-      />
+      {renderPager}
     </React.Fragment>
   );
 
