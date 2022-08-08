@@ -35,6 +35,7 @@ export default interface ITask {
         EMail: string;
     };
     Time: string;
+    DaysDuration: number;
     Type: TaskType;
     WeeklyDays: WeekDay[];
     MonthlyDay?: number;

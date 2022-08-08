@@ -61,6 +61,13 @@ export const setupLists = async (properties: ITasksWebPartProps) => {
             Required: true,
         });
 
+	await taskExists.list.fields.addNumber('DaysDuration', {
+	    Description: 'Number of days to finish the task',
+	    Required: false,
+	    DefaultFormula: '0',
+	    MinimumValue: 0,
+	});
+
         await taskExists.list.fields.addBoolean('Transferable', {
             Description: 'Whether task should be transferred to next day if it was not completed',
             Indexed: true,

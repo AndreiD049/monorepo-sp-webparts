@@ -78,7 +78,7 @@ const Task: FC<ITaskProps> = (props) => {
                 description: props.task.Description,
                 title: props.task.Title,
                 user: props.task.AssignedTo,
-                date: DateTime.fromJSDate(props.date).toLocaleString(DateTime.DATE_SHORT),
+                date: DateTime.fromJSDate(props.date).plus({ days: props.task.DaysDuration }).toLocaleString(DateTime.DATE_SHORT),
                 time: DateTime.fromISO(props.task.Time).toLocaleString(DateTime.TIME_24_SIMPLE),
                 status: 'Open',
             };
@@ -88,7 +88,7 @@ const Task: FC<ITaskProps> = (props) => {
             remark: props.task.Remark,
             title: props.task.Title,
             user: props.task.User,
-            date: DateTime.fromISO(props.task.Date).toLocaleString(DateTime.DATE_SHORT),
+            date: DateTime.fromISO(props.task.Time || props.task.Date).toLocaleString(DateTime.DATE_SHORT),
             time: DateTime.fromISO(props.task.Time || props.task.Task?.Time).toLocaleString(
                 DateTime.TIME_24_SIMPLE
             ),
@@ -100,7 +100,7 @@ const Task: FC<ITaskProps> = (props) => {
         function checkExpired() {
             const dt = isTask(props.task)
                 ? DateTime.fromJSDate(props.date)
-                : DateTime.fromISO(props.task.Date);
+                : DateTime.fromISO(props.task.Time);
             const time = DateTime.fromISO(info.time).set({
                 day: dt.day,
                 month: dt.month,

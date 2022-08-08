@@ -188,7 +188,7 @@ export default class TaskLogsService {
             Title: task.Title,
             Date: dt,
             Status: 'Open',
-            Time: task.Time,
+            Time: DateTime.fromISO(task.Time).plus({ days: task.DaysDuration }).toISO(),
             TaskId: task.ID,
             UserId: task.AssignedTo.ID,
             UniqueValidation: `${task.ID}-${task.AssignedTo.ID}-${dt}`,

@@ -12,6 +12,7 @@ const TASK_SELECT = [
     'AssignedTo/Title',
     'AssignedTo/EMail',
     'Time',
+    'DaysDuration',
     'Type',
     'WeeklyDays',
     'MonthlyDay',
