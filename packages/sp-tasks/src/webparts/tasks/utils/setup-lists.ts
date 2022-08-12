@@ -61,17 +61,29 @@ export const setupLists = async (properties: ITasksWebPartProps) => {
             Required: true,
         });
 
-	await taskExists.list.fields.addNumber('DaysDuration', {
-	    Description: 'Number of days to finish the task',
-	    Required: false,
-	    DefaultFormula: '0',
-	    MinimumValue: 0,
-	});
+        await taskExists.list.fields.addNumber('DaysDuration', {
+            Description: 'Number of days to finish the task',
+            Required: false,
+            DefaultFormula: '0',
+            MinimumValue: 0,
+        });
 
         await taskExists.list.fields.addBoolean('Transferable', {
             Description: 'Whether task should be transferred to next day if it was not completed',
             Indexed: true,
         });
+
+        await taskExists.list.fields.createFieldAsXml(
+            `<Field DisplayName='ActiveFrom' Indexed='TRUE' FriendlyDisplayFormat='Disabled' Format='DateOnly' IsModern='TRUE' Name='ActiveFrom' Required='TRUE' Title='ActiveFrom' Type='DateTime'><Default>[today]</Default></Field>`
+        );
+
+        await taskExists.list.fields.createFieldAsXml(
+            `<Field DisplayName='ActiveTo' Indexed='TRUE' FriendlyDisplayFormat='Disabled' Format='DateOnly' IsModern='TRUE' Name='ActiveTo' Required='TRUE' Title='ActiveTo' Type='DateTime'><DefaultFormula>=DATE(2099,1,1)</DefaultFormula></Field>`
+        );
+
+        await taskExists.list.fields.createFieldAsXml(
+            `<Field CommaSeparator='FALSE' Indexed='TRUE' CustomUnitOnRight='TRUE' Decimals='0' DisplayName='OriginalTaskId' Format='Dropdown' IsModern='TRUE' Name='OriginalTaskId' Percentage='FALSE' Required='FALSE' Title='OriginalTaskId' Type='Number' Unit='None'></Field>`
+        )
     }
 
     let taskList = await sp.web.lists.getByTitle(properties.tasksListTitle)();

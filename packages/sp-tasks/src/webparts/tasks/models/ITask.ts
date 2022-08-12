@@ -40,4 +40,7 @@ export default interface ITask {
     WeeklyDays: WeekDay[];
     MonthlyDay?: number;
     Transferable: boolean;
+    ActiveFrom: string;
+    ActiveTo: string;
+    OriginalTaskId?: number;
 }

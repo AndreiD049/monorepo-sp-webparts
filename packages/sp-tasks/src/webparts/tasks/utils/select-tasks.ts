@@ -3,6 +3,11 @@ import { Info } from "luxon";
 import ITask, { TaskType } from "../models/ITask";
 import { getDateStatistics, getNthWorkday, getWeekDaySet, IDateStatistics } from "./utils";
 
+/**
+ * @param list list of tasks
+ * @param date date that is being analyzed
+ * @returns A list of tasks that are valid for that date
+ */
 export function selectTasks(list: ITask[], date: Date): ITask[] {
     const stats = getDateStatistics(date);
     return list.filter((task) => isTaskValid(task, stats));

@@ -1,5 +1,12 @@
 import { DateTime } from 'luxon';
-import { DefaultButton, MaskedTextField, MessageBar, MessageBarType, PrimaryButton, TextField } from 'office-ui-fabric-react';
+import {
+    DatePicker,
+    DefaultButton,
+    MaskedTextField,
+    PrimaryButton,
+    Separator,
+    TextField,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
 import { closePanel, setPanelProperties } from '../../../hooks/usePanel';
 import { updateTask } from '../../../hooks/useTasks';
@@ -20,6 +27,10 @@ export const EditTask: React.FC<IEditTaskProps> = (props) => {
         Description: '',
         AssignedToId: 0,
         Time: '',
+    });
+    const [effectiveDates, setEffectiveDates] = React.useState({
+        from: null,
+        to: null,
     });
 
     React.useEffect(() => {
@@ -72,11 +83,19 @@ export const EditTask: React.FC<IEditTaskProps> = (props) => {
         }));
     };
 
+    const handleSelectDate = (prop: 'from' | 'to') => (date: Date | null | undefined) => {
+        const result = {
+            ...effectiveDates,
+            [prop]: date,
+        };
+        if (prop === 'from' && (result.to && date > result.to || !date)) {
+            result.to = null;
+        }
+        setEffectiveDates(result);
+    };
+
     return (
         <div>
-            <MessageBar messageBarType={MessageBarType.info}>
-                <b>Important</b>: all modifications will be applied only to <b>tasks created in the future</b>. If you need to modify a task that was already created, use option <b>Edit task (current date only)</b>
-            </MessageBar>
             <TextField label="Title" value={info.Title} onChange={handleEdit('Title')} />
             <TextField
                 label="Description"
@@ -103,6 +122,21 @@ export const EditTask: React.FC<IEditTaskProps> = (props) => {
                 mask="hH:mM"
                 maskFormat={maskFormat}
                 onChange={handleEdit('Time')}
+            />
+            <Separator />
+            <DatePicker
+                label="Effective from"
+                value={effectiveDates.from}
+                minDate={new Date()}
+                onSelectDate={handleSelectDate('from')}
+                allowTextInput
+            />
+            <DatePicker
+                label="Effective until"
+                value={effectiveDates.to}
+                minDate={effectiveDates.from ? effectiveDates.from : new Date()}
+                onSelectDate={handleSelectDate('to')}
+                allowTextInput
             />
         </div>
     );

@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import { DefaultButton, MaskedTextField, MessageBar, MessageBarType, PrimaryButton, TextField } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { closePanel, setPanelProperties } from '../../../hooks/usePanel';
-import { updateTask, updateTaskLog } from '../../../hooks/useTasks';
+import { updateTaskLog } from '../../../hooks/useTasks';
 import ITaskLog from '../../../models/ITaskLog';
 import GlobalContext from '../../../utils/GlobalContext';
 import { maskFormat } from '../../../utils/utils';
