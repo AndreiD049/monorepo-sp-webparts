@@ -76,6 +76,22 @@ export default class TaskLogsService {
         return this._wrap(this.list.items.filter(filter))();
     }
 
+    async getTaskLogsByTaskId(taskId: number, fromDate: Date): Promise<ITaskLog[]> {
+        const filter = `TaskId eq ${taskId} and Date ge '${fromDate.toISOString()}'`;
+        return this._wrap(this.list.items.filter(filter))();   
+    }
+
+    async clearTaskLogsByTaskId(taskId: number, fromDate: Date) {
+        const [batchedSP, execute] = this.sp.batched();
+        const dt = DateTime.fromJSDate(fromDate).startOf('day');
+        const tasklogs = await this.getTaskLogsByTaskId(taskId, dt.toJSDate());
+        const list = batchedSP.web.lists.getByTitle(this.listName);
+        tasklogs.forEach((log) => {
+            list.items.getById(log.ID).delete();
+        });
+        await execute();
+    }
+
     async getTaskLogsByUserIds(date: Date, userIds: number[]): Promise<ITaskLog[]> {
         let res: ITaskLog[] = [];
         const [batchedSP, execute] = this.sp.batched();

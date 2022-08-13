@@ -87,6 +87,10 @@ class TaskService {
         return result;
     }
 
+    async deleteTask(taskId) {
+        return this.list.items.getById(taskId).delete();
+    }
+
     /**
      * This is a rather strange method, but as long as it works
      * CAML queries should be used here

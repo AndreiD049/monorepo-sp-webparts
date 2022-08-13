@@ -1,4 +1,5 @@
 import { DateTime, Interval } from 'luxon';
+import { IPersonaProps, PersonaSize } from 'office-ui-fabric-react';
 import ITask, { WeekDay, WeekDayMap } from '../models/ITask';
 import ITaskLog from '../models/ITaskLog';
 import { IUser } from '../models/IUser';
@@ -226,4 +227,14 @@ export function isCurrentWorkday(dt: DateTime) {
         if (interval.length('day') < 1 && today.hour < 6) return true;
     }
     return false;
+}
+
+export function userToPeoplePickerOption(user: IUser): IPersonaProps {
+    return {
+        id: user.User.ID.toString(),
+        text: user.User.Title,
+        secondaryText: user.User.EMail,
+        size: PersonaSize.size24,
+        imageUrl: `/_layouts/15/userphoto.aspx?AccountName=${user.User.EMail}&Size=M`,
+    }
 }

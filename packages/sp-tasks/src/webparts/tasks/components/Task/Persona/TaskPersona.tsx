@@ -37,7 +37,7 @@ export const TaskPersona: React.FC<ITaskPersona> = (props): JSX.Element => {
             },
             {
                 key: 'editTask',
-                text: 'Edit tasks',
+                text: 'Edit task',
                 onClick: () =>
                     createPanel('SP_TASKS', {
                         isOpen: true,

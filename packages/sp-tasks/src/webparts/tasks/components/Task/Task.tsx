@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { Dropdown, Icon, IconButton, IDropdownOption, Separator, Text } from 'office-ui-fabric-react';
+import { Dropdown, Icon, IconButton, IDropdownOption, MessageBarType, Separator, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { FC } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
@@ -13,6 +13,7 @@ import { getTaskUniqueId, isTask } from '../../utils/utils';
 import { TaskPersona } from './Persona/TaskPersona';
 import styles from './Task.module.scss';
 import colors from './Colors.module.scss';
+import { SPnotify } from 'sp-react-notifications';
 
 const CLOSED_ICON = 'ChevronDown';
 const OPEN_ICON = 'ChevronUp';
@@ -178,8 +179,15 @@ const Task: FC<ITaskProps> = (props) => {
                 update.Completed = true;
                 break;
         }
-        const updated = await TaskLogsService.updateTaskLog(log.ID, update);
-        updateTaskLog(updated);
+        try {
+            const updated = await TaskLogsService.updateTaskLog(log.ID, update);
+            updateTaskLog(updated);
+        } catch (err) {
+            SPnotify({
+                message: err.message,
+                messageType: MessageBarType.error,
+            });
+        }
     };
 
     const handleHover = (hovering: boolean) => () => {
