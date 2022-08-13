@@ -158,6 +158,7 @@ export {
     ILists,
     List,
     IList,
+    IListInfo,
     Lists,
     IListAddResult,
     IListUpdateResult,
