@@ -1,4 +1,4 @@
-import { Button, IPanelProps, Panel, PrimaryButton } from 'office-ui-fabric-react';
+import { IPanelProps, Panel, PanelType } from 'office-ui-fabric-react';
 import * as React from 'react';
 
 export const EVENT_NAME = (id: string) => `USE_PANEL_EVENT_${id}`;
@@ -33,11 +33,12 @@ export const setPanelProperties = (id: string, props: IUsePanelProps) => {
     );
 }
 
-export const usePanel = (id: string) => {
+export const usePanel = (id: string, panelProps?: IPanelProps) => {
     const [state, setState] = React.useState<IUsePanelProps>({
         isOpen: false,
         headerText: 'Panel',
         PanelContents: null,
+        ...panelProps
     });
 
     const handleDismiss = () =>
@@ -45,6 +46,7 @@ export const usePanel = (id: string) => {
             isOpen: false,
             headerText: 'Panel',
             PanelContents: null,
+            ...panelProps,
         });
 
     React.useEffect(() => {

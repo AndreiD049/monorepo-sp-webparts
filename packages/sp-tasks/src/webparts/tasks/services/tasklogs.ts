@@ -183,15 +183,22 @@ export default class TaskLogsService {
     }
 
     private castTaskToTaskLog(task: ITask, date: Date): Partial<ITaskLog> {
-        const dt = DateTime.fromJSDate(date).toISODate();
+        const dt = DateTime.fromJSDate(date);
+        const time = DateTime.fromISO(task.Time);
+        const dateString = dt.toISODate();
+        const dateTime = dt.set({
+            hour: time.hour,
+            minute: time.minute,
+            second: time.second,
+        });
         return {
             Title: task.Title,
-            Date: dt,
+            Date: dateString,
             Status: 'Open',
-            Time: task.Time,
+            Time: dateTime.plus({ days: task.DaysDuration }).toISO(),
             TaskId: task.ID,
             UserId: task.AssignedTo.ID,
-            UniqueValidation: `${task.ID}-${task.AssignedTo.ID}-${dt}`,
+            UniqueValidation: `${task.ID}-${task.AssignedTo.ID}-${dateString}`,
             Description: task.Description,
             // If task is not transferable, log is set to default completed
             // meaning it will not appear tomorrow if it's not on the list

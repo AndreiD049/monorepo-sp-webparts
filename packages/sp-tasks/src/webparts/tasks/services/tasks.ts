@@ -1,3 +1,5 @@
+import { create } from 'lodash';
+import { DateTime } from 'luxon';
 import { SPFI, IList, IItems, Caching, getHashCode } from 'sp-preset';
 import ITask from '../models/ITask';
 import TasksWebPart, { ITasksWebPartProps } from '../TasksWebPart';
@@ -12,10 +14,14 @@ const TASK_SELECT = [
     'AssignedTo/Title',
     'AssignedTo/EMail',
     'Time',
+    'DaysDuration',
     'Type',
     'WeeklyDays',
     'MonthlyDay',
     'Transferable',
+    'ActiveFrom',
+    'ActiveTo',
+    'OriginalTaskId',
 ];
 
 const TASK_EXPAND = ['AssignedTo'];
@@ -23,7 +29,6 @@ const TASK_EXPAND = ['AssignedTo'];
 class TaskService {
     userService: UserService;
     sp: SPFI;
-    spNoCache: SPFI;
     list: IList;
     listTitle: string;
     lastToken: string;
@@ -31,10 +36,7 @@ class TaskService {
 
 
     constructor(public props: ITasksWebPartProps) {
-        this.sp = TasksWebPart.SPBuilder.getSP('Data').using(Caching({
-            keyFactory: (url) => this.id + getHashCode(url),
-        }));
-        this.spNoCache = TasksWebPart.SPBuilder.getSP('Data');
+        this.sp = TasksWebPart.SPBuilder.getSP('Data');
         this.list = this.sp.web.lists.getByTitle(props.tasksListTitle);
         this.listTitle = props.tasksListTitle;
         this.userService = new UserService();
@@ -46,12 +48,34 @@ class TaskService {
     }
 
     async getTask(id: number): Promise<ITask> {
-        return this.spNoCache.web.lists.getByTitle(this.listTitle).items.getById(id).select(...TASK_SELECT).expand(...TASK_EXPAND)();
+        return this.sp.web.lists.getByTitle(this.listTitle).items.getById(id).select(...TASK_SELECT).expand(...TASK_EXPAND)();
     }
 
     async getTasksByUserId(userId: number) {
         return this._wrap(this.list.items
             .filter(`AssignedToId eq ${userId}`))();
+    }
+
+    async getTasksByOriginalId(originalId): Promise<ITask[]> {
+        return this._wrap(this.list.items
+            .filter(`ID eq ${originalId} or OriginalTaskId eq ${originalId}`))();
+    }
+
+    async createTask(createdTask: Partial<ITask>) {
+        return this.list.items.add({
+            Title: createdTask.Title,
+            Description: createdTask.Description,
+            AssignedToId: createdTask.AssignedTo.ID,
+            Type: createdTask.Type,
+            MonthlyDay: createdTask.MonthlyDay,
+            WeeklyDays: createdTask.WeeklyDays || [],
+            Transferable: createdTask.Transferable,
+            DaysDuration: createdTask.DaysDuration,
+            Time: createdTask.Time,
+            ActiveFrom: createdTask.ActiveFrom,
+            ActiveTo: createdTask.ActiveTo,
+            OriginalTaskId: createdTask.OriginalTaskId
+        });
     }
 
     /**
@@ -60,7 +84,6 @@ class TaskService {
      */
     async updateTask(taskId: number, update: Partial<ITask>) {
         var result = this.list.items.getById(taskId).update(update);
-        this.clearCache();
         return result;
     }
 
@@ -87,12 +110,13 @@ class TaskService {
         return processChangeResult(result, this);
     }
 
-    async getTasksByMultipleUserIds(userIds: number[]) {
+    async getTasksByMultipleUserIds(userIds: number[], date: Date) {
+        const isoDate = DateTime.fromJSDate(date).toISODate();
         let res: ITask[] = [];
         const [batchedSP, execute] = this.sp.batched();
         const list = batchedSP.web.lists.getByTitle(this.listTitle);
         userIds.forEach((id) => this._wrap(list.items
-            .filter(`AssignedToId eq ${id}`))()
+            .filter(`AssignedToId eq ${id} and ActiveFrom le '${isoDate}' and ActiveTo ge '${isoDate}'`))()
             .then(r => res = res.concat(r)));
         await execute();
         return res;
@@ -101,18 +125,6 @@ class TaskService {
     async getTasksByUserTitle(userTitle: string) {
         const user = await this.userService.getUser(userTitle);
         return this.getTasksByUserId(user.Id);
-    }
-
-    /**
-     * Clears the cached items
-     */
-    clearCache() {
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key.startsWith(this.id)) {
-                localStorage.removeItem(key);
-            }
-        }
     }
 
     private _wrap(items: IItems) {

@@ -47,7 +47,7 @@ export function useTasks(
     React.useEffect(() => {
         async function run() {
             // Select only valid tasks on that day
-            const tasks = selectTasks(await TaskService.getTasksByMultipleUserIds(userIds), date);
+            const tasks = selectTasks(await TaskService.getTasksByMultipleUserIds(userIds, date), date);
             let logs: ITaskLog[] = [];
             if (isSameDay) {
                 logs = await TaskLogsService.getTaskLogsByUserIds(date, userIds);

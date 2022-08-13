@@ -22,7 +22,6 @@ export default function useSyncTasks(date: Date, userIds: number[]) {
                 userIds
             );
             const tasksChanged = await TaskService.didTasksChanged(userIds);
-            tasksChanged && TaskService.clearCache();
             if (logsChanged || tasksChanged) {
                 setUpdate((prev) => !prev);
             }

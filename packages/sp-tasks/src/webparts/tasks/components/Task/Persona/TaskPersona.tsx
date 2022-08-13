@@ -1,18 +1,10 @@
-import {
-    Persona,
-    PersonaSize,
-    IconButton,
-    DirectionalHint,
-    PanelType,
-    PrimaryButton,
-} from 'office-ui-fabric-react';
+import { Persona, PersonaSize, IconButton, DirectionalHint } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { createPanel } from '../../../hooks/usePanel';
 import GlobalContext from '../../../utils/GlobalContext';
-import { EditTask } from '../panels/EditTask';
-import { EditTaskLog } from '../panels/EditTaskLog';
 import styles from './TaskPersona.module.scss';
 import colors from './../Colors.module.scss';
+import { EditTasks } from '../panels/EditTasks';
 
 export interface ITaskPersona extends React.HTMLAttributes<HTMLDivElement> {
     title: string;
@@ -37,36 +29,21 @@ export const TaskPersona: React.FC<ITaskPersona> = (props): JSX.Element => {
     const editButtonMenuItems = React.useMemo(
         () => [
             {
-                key: 'editTaskLog',
-                text: 'Edit task (current only)',
+                key: 'addRemark',
+                text: 'Add remark',
                 onClick: async () => {
-                    // If tasklog doesn't exists, create it
-                    let id = props.taskLogId;
-                    if (id === null) {
-                        const task = await TaskService.getTask(props.taskId);
-                        const created = await TaskLogsService.createTaskLogFromTask(
-                            task,
-                            props.date
-                        );
-                        id = created.ID;
-                    }
-                    createPanel('SP_TASKS', {
-                        isOpen: true,
-                        isLightDismiss: true,
-                        headerText: 'Edit task',
-                        PanelContents: <EditTaskLog taskId={id} />,
-                    });
+                    alert('ADDING REMARK...');
                 },
             },
             {
                 key: 'editTask',
-                text: 'Edit task (new tasks)',
+                text: 'Edit tasks',
                 onClick: () =>
                     createPanel('SP_TASKS', {
                         isOpen: true,
                         isLightDismiss: true,
                         headerText: 'Edit task',
-                        PanelContents: <EditTask taskId={props.taskId} />,
+                        PanelContents: <EditTasks taskId={props.taskId} />,
                     }),
             },
         ],
