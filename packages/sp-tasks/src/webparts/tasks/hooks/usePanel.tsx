@@ -31,14 +31,14 @@ export const setPanelProperties = (id: string, props: IUsePanelProps) => {
             detail: props,
         })
     );
-}
+};
 
 export const usePanel = (id: string, panelProps?: IPanelProps) => {
     const [state, setState] = React.useState<IUsePanelProps>({
         isOpen: false,
         headerText: 'Panel',
         PanelContents: null,
-        ...panelProps
+        ...panelProps,
     });
 
     const handleDismiss = () =>
@@ -63,7 +63,11 @@ export const usePanel = (id: string, panelProps?: IPanelProps) => {
     }, []);
 
     return (
-        <Panel {...state} onDismiss={handleDismiss}>
+        <Panel
+            {...state}
+            onDismiss={handleDismiss}
+            allowTouchBodyScroll
+        >
             {state.PanelContents}
         </Panel>
     );

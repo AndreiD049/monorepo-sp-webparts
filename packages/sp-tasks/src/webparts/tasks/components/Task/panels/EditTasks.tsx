@@ -7,6 +7,7 @@ import {
     DetailsList,
     DetailsListLayoutMode,
     DetailsRow,
+    enableBodyScroll,
     IColumn,
     IComboBoxOption,
     IconButton,
@@ -525,16 +526,24 @@ export const EditTasks: React.FC<IEditTasksProps> = (props) => {
         errorMessage = <MessageBar messageBarType={MessageBarType.error}>Overlapping periods!</MessageBar>
     }
 
+    enableBodyScroll();
+
     return (
         <div>
             {errorMessage}
             <DetailsList
+                styles={{
+                    root: {
+                        overflow: 'unset'
+                    }
+                }}
                 items={taskWrappers}
                 layoutMode={DetailsListLayoutMode.fixedColumns}
                 selectionMode={SelectionMode.none}
                 compact
                 columns={columns}
                 onRenderRow={onRenderRow}
+                enterModalSelectionOnTouch
             />
         </div>
     );
