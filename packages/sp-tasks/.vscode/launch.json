@@ -5,6 +5,14 @@
    */
   "version": "0.2.0",
   "configurations": [
+  {
+    "name": "Launch Chrome",
+    "request": "launch",
+    "type": "chrome",
+    "url": "https://devadmintools.sharepoint.com/sites/Admin-tools/SitePages/Tasks.aspx?loadSPFX=true&debugManifestsFile=https%3A%2F%2Flocalhost%3A4321%2Ftemp%2Fmanifests.js",
+    "sourceMaps": true,
+    "webRoot": "${workspaceFolder}/lib"
+  },
     {
       "name": "Hosted workbench",
       "type": "chrome",

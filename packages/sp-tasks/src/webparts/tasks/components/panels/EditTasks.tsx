@@ -303,10 +303,13 @@ export const EditTasks: React.FC<IEditTasksProps> = (props) => {
                 const copyTask = cloneDeep(foundTask);
                 const today = DateTime.now();
                 foundTask.item.ActiveTo = today.plus({ days: -1 }).toISODate();
+                foundTask.touchedFields.add('ActiveTo');
                 foundTask.status = nextStatus(foundTask.status);
                 copyTask.item.ActiveFrom = today.toISODate();
+                copyTask.touchedFields.add('ActiveFrom');
                 if (copyTask.item.ActiveTo < copyTask.item.ActiveFrom) {
                     copyTask.item.ActiveTo = copyTask.item.ActiveFrom;
+                    copyTask.touchedFields.add('ActiveTo');
                 }
                 copyTask.editable = true;
                 copyTask.status = 'new';
