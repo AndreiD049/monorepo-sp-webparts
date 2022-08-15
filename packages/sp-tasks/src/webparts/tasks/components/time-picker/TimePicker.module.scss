@@ -1,0 +1,42 @@
+.timePicker {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.timePickerTimeContainer {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.timePickerTimeDelimiter {
+    padding: 0 .5em;
+}
+
+.timePickerDayContainer {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+}
+
+.container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.daysLabel {
+    margin-left: .5em;
+    margin-top: 4px;
+    padding: 2px;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+    line-height: 18px;
+    font-size: .7em;
+    color: white;
+    background-color: "[theme: themePrimary, default: #a4262c]";
+}

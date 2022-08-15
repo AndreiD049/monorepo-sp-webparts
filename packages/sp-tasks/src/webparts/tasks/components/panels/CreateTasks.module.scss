@@ -1,0 +1,60 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 5px;
+}
+
+.taskWrapper {
+    box-shadow: $ms-depth-shadow-4;
+    border: 1px solid $ms-color-neutralLight;
+}
+
+.taskWrapperIncomplete {
+    background-color: rgba(218, 59, 1, .2);
+    &:hover {
+        background-color: rgba(218, 59, 1, .1);
+    }
+}
+
+.taskSteps {
+    display: flex;
+    flex-flow: row wrap;
+    padding: 0 1.5em 1em 1.5em;
+    row-gap: 1em;
+}
+
+.taskWrapperStep {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.taskWrapperStepText {
+    margin-right: .5em;
+    margin-top: 4px;
+}
+
+.taskWrapperStepInputBlock {
+    padding: 0 2px;
+}
+
+.taskWrapperStepTitleDescription {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 2px;
+    padding: 0 2px;
+}
+
+.addNewButton {
+    align-self: flex-start;
+}
+
+.tasksTopHeader {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    border-bottom: 1px solid $ms-color-neutralLight;
+    margin-bottom: .5em;
+    padding: 0 .5em;
+}

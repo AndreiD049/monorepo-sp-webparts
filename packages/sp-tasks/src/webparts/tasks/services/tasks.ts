@@ -78,6 +78,13 @@ class TaskService {
         });
     }
 
+    async createTasks(tasks: (Partial<ITask & { AssignedToId: number }>)[]) {
+        const [batchedSP, execute] = this.sp.batched();
+        const batchedList = batchedSP.web.lists.getByTitle(this.listTitle);
+        tasks.forEach((task) => batchedList.items.add(task));
+        await execute();
+    }
+
     /**
      * Update task.
      * Return just the result of update, if user will need the updated task
