@@ -136,9 +136,7 @@ const Tasks: React.FC = () => {
     /**
      * Define panel placeholder
      */
-    const panel = usePanel('SP_TASKS', {
-        type: PanelType.large,
-    });
+    const panel = usePanel('SP_TASKS');
 
     const body = React.useMemo(() => {
         if (loading) return <Spinner size={SpinnerSize.large} />;

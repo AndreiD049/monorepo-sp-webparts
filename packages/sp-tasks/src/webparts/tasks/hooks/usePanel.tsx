@@ -66,7 +66,6 @@ export const usePanel = (id: string, panelProps?: IPanelProps) => {
         <Panel
             {...state}
             onDismiss={handleDismiss}
-            allowTouchBodyScroll
         >
             {state.PanelContents}
         </Panel>

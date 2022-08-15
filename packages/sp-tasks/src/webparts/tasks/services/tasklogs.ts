@@ -172,12 +172,16 @@ export default class TaskLogsService {
         return res;
     }
 
-    async createTaskLogFromTask(task: ITask, date?: Date): Promise<ITaskLog> {
+    async createTaskLogFromTask(task: ITask, date?: Date, additionalProps?: Partial<ITaskLog>): Promise<ITaskLog> {
         if (date === undefined) {
             date = new Date();
         }
 
-        const result = await this.list.items.add(this.castTaskToTaskLog(task, date));
+        const log = this.castTaskToTaskLog(task, date);
+        const result = await this.list.items.add({
+            ...log,
+            ...additionalProps
+        });
         return result.item.select(...LOG_SELECT).expand(...LOG_EXPAND)();
     }
 

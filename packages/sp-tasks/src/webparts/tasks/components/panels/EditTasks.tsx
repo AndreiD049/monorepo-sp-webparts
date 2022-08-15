@@ -24,11 +24,11 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { SPnotify } from 'sp-react-notifications';
-import { closePanel, setPanelProperties } from '../../../hooks/usePanel';
-import ITask from '../../../models/ITask';
-import GlobalContext from '../../../utils/GlobalContext';
-import { userToPeoplePickerOption } from '../../../utils/utils';
-import { UserPicker } from '../../user-selector/UserPicker';
+import { closePanel, setPanelProperties } from '../../hooks/usePanel';
+import ITask from '../../models/ITask';
+import GlobalContext from '../../utils/GlobalContext';
+import { userToPeoplePickerOption } from '../../utils/utils';
+import { UserPicker } from '../user-selector/UserPicker';
 
 export interface IEditTasksProps {
     taskId: number;
@@ -532,11 +532,6 @@ export const EditTasks: React.FC<IEditTasksProps> = (props) => {
         <div>
             {errorMessage}
             <DetailsList
-                styles={{
-                    root: {
-                        overflow: 'unset'
-                    }
-                }}
                 items={taskWrappers}
                 layoutMode={DetailsListLayoutMode.fixedColumns}
                 selectionMode={SelectionMode.none}

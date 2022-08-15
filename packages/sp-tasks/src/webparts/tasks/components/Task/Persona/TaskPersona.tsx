@@ -1,10 +1,11 @@
-import { Persona, PersonaSize, IconButton, DirectionalHint } from 'office-ui-fabric-react';
+import { Persona, PersonaSize, IconButton, DirectionalHint, PanelType } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { createPanel } from '../../../hooks/usePanel';
 import GlobalContext from '../../../utils/GlobalContext';
 import styles from './TaskPersona.module.scss';
 import colors from './../Colors.module.scss';
-import { EditTasks } from '../panels/EditTasks';
+import { AddRemark } from '../../panels/AddRemark';
+import { EditTasks } from '../../panels/EditTasks';
 
 export interface ITaskPersona extends React.HTMLAttributes<HTMLDivElement> {
     title: string;
@@ -31,8 +32,15 @@ export const TaskPersona: React.FC<ITaskPersona> = (props): JSX.Element => {
             {
                 key: 'addRemark',
                 text: 'Add remark',
-                onClick: async () => {
-                    alert('ADDING REMARK...');
+                onClick: () => {
+                    createPanel('SP_TASKS', {
+                        isOpen: true,
+                        isLightDismiss: true,
+                        headerText: 'Add remark',
+                        allowTouchBodyScroll: true,
+                        type: PanelType.smallFixedFar,
+                        PanelContents: <AddRemark taskId={props.taskId} taskLogId={props.taskLogId} date={props.date} />,
+                    });
                 },
             },
             {
@@ -43,6 +51,8 @@ export const TaskPersona: React.FC<ITaskPersona> = (props): JSX.Element => {
                         isOpen: true,
                         isLightDismiss: true,
                         headerText: 'Edit task',
+                        allowTouchBodyScroll: true,
+                        type: PanelType.large,
                         PanelContents: <EditTasks taskId={props.taskId} />,
                     }),
             },

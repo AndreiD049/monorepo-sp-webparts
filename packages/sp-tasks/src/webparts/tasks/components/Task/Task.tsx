@@ -10,7 +10,7 @@ import { ITaskInfo } from '../../models/ITaskProperties';
 import { MINUTE } from '../../utils/constants';
 import GlobalContext from '../../utils/GlobalContext';
 import { getTaskUniqueId, isTask } from '../../utils/utils';
-import { TaskPersona } from './Persona/TaskPersona';
+import { TaskPersona } from './persona/TaskPersona';
 import styles from './Task.module.scss';
 import colors from './Colors.module.scss';
 import { SPnotify } from 'sp-react-notifications';

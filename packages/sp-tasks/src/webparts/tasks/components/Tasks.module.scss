@@ -19,7 +19,6 @@ $break: 750px;
         }
 
         &_left {
-            visibility: hidden;
             @media screen and (min-width: $break) {
                 flex: 1 2;
             }
