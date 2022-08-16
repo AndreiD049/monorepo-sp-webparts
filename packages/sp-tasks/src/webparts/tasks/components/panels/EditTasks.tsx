@@ -313,7 +313,7 @@ export const EditTasks: React.FC<IEditTasksProps> = (props) => {
                 }
                 copyTask.editable = true;
                 copyTask.status = 'new';
-                copyTask.item.ID += 1;
+                copyTask.item.ID = null;
                 return [...prev.slice(0, idx), foundTask, copyTask, ...prev.slice(idx + 1)];
             }
             return prev;
