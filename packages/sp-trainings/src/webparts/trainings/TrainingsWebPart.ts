@@ -1,26 +1,32 @@
-import * as React from 'react';
-import * as ReactDom from 'react-dom';
-import { Version } from '@microsoft/sp-core-library';
+import * as React from "react";
+import * as ReactDom from "react-dom";
+import { Version } from "@microsoft/sp-core-library";
 import {
   IPropertyPaneConfiguration,
-  PropertyPaneTextField
-} from '@microsoft/sp-property-pane';
-import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import { IReadonlyTheme } from '@microsoft/sp-component-base';
+  PropertyPaneButton,
+  PropertyPaneTextField,
+} from "@microsoft/sp-property-pane";
+import { BaseClientSideWebPart } from "@microsoft/sp-webpart-base";
+import { IReadonlyTheme } from "@microsoft/sp-component-base";
 
-import * as strings from 'TrainingsWebPartStrings';
-import Trainings from './components/Trainings';
-import { ITrainingsProps } from './components/ITrainingsProps';
+import * as strings from "TrainingsWebPartStrings";
+import Trainings from "./components/Trainings";
+import { ITrainingsProps } from "./components/ITrainingsProps";
+import SPBuilder from "sp-preset";
+import { createTables } from "../../setup/tables/create-lists";
 
 export interface ITrainingsWebPartProps {
   description: string;
   listsRootUrl: string;
+  sessionsListTitle: string;
+  eventsListTitle: string;
+  usersListTitle: string;
+  trainingsListTitle: string;
 }
 
 export default class TrainingsWebPart extends BaseClientSideWebPart<ITrainingsWebPartProps> {
-
   private _isDarkTheme: boolean = false;
-  private _environmentMessage: string = '';
+  private _environmentMessage: string = "";
 
   protected onInit(): Promise<void> {
     this._environmentMessage = this._getEnvironmentMessage();
@@ -36,7 +42,7 @@ export default class TrainingsWebPart extends BaseClientSideWebPart<ITrainingsWe
         isDarkTheme: this._isDarkTheme,
         environmentMessage: this._environmentMessage,
         hasTeamsContext: !!this.context.sdks.microsoftTeams,
-        userDisplayName: this.context.pageContext.user.displayName
+        userDisplayName: this.context.pageContext.user.displayName,
       }
     );
 
@@ -44,11 +50,16 @@ export default class TrainingsWebPart extends BaseClientSideWebPart<ITrainingsWe
   }
 
   private _getEnvironmentMessage(): string {
-    if (!!this.context.sdks.microsoftTeams) { // running in Teams
-      return this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentTeams : strings.AppTeamsTabEnvironment;
+    if (!!this.context.sdks.microsoftTeams) {
+      // running in Teams
+      return this.context.isServedFromLocalhost
+        ? strings.AppLocalEnvironmentTeams
+        : strings.AppTeamsTabEnvironment;
     }
 
-    return this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentSharePoint : strings.AppSharePointEnvironment;
+    return this.context.isServedFromLocalhost
+      ? strings.AppLocalEnvironmentSharePoint
+      : strings.AppSharePointEnvironment;
   }
 
   protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {
@@ -57,13 +68,13 @@ export default class TrainingsWebPart extends BaseClientSideWebPart<ITrainingsWe
     }
 
     this._isDarkTheme = !!currentTheme.isInverted;
-    const {
-      semanticColors
-    } = currentTheme;
-    this.domElement.style.setProperty('--bodyText', semanticColors.bodyText);
-    this.domElement.style.setProperty('--link', semanticColors.link);
-    this.domElement.style.setProperty('--linkHovered', semanticColors.linkHovered);
-
+    const { semanticColors } = currentTheme;
+    this.domElement.style.setProperty("--bodyText", semanticColors.bodyText);
+    this.domElement.style.setProperty("--link", semanticColors.link);
+    this.domElement.style.setProperty(
+      "--linkHovered",
+      semanticColors.linkHovered
+    );
   }
 
   protected onDispose(): void {
@@ -71,7 +82,7 @@ export default class TrainingsWebPart extends BaseClientSideWebPart<ITrainingsWe
   }
 
   protected get dataVersion(): Version {
-    return Version.parse('1.0');
+    return Version.parse("1.0");
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
@@ -79,29 +90,48 @@ export default class TrainingsWebPart extends BaseClientSideWebPart<ITrainingsWe
       pages: [
         {
           header: {
-            description: strings.PropertyPaneDescription
+            description: strings.PropertyPaneDescription,
           },
           groups: [
             {
               groupName: strings.BasicGroupName,
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
-                })
-              ]
+                PropertyPaneTextField("description", {
+                  label: strings.DescriptionFieldLabel,
+                }),
+              ],
             },
             {
               groupName: strings.listsRootUrl,
               groupFields: [
-                PropertyPaneTextField('listsRootUrl', {
+                PropertyPaneTextField("listsRootUrl", {
                   label: strings.listsRootUrlLabel,
                 }),
                 /** hygen-lists */
-              ]
-            }
+                PropertyPaneTextField("sessionsListTitle", {
+                  label: "Sessions list",
+                }),
+                PropertyPaneTextField("trainingsListTitle", {
+                  label: "Trainings list",
+                }),
+                PropertyPaneButton("", {
+                  text: "Create list",
+                  onClick: function () {
+                    const spBuilder = new SPBuilder(this.context).withTennants({
+                      Root: this.properties.listsRootUrl,
+                    });
+                    createTables(
+                      spBuilder.getSP("Root"),
+                      this.properties.sessionsListTitle,
+                      this.properties.trainingsListTitle,
+                    );
+                  }.bind(this),
+                }),
+              ],
+            },
           ],
-        }
-      ]
+        },
+      ],
     };
   }
 }
