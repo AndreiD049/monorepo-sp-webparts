@@ -1,14 +1,13 @@
 import { debounce } from '@microsoft/sp-lodash-subset';
 import {
     CommandBar,
-    IconButton,
     SearchBox,
-    Toggle,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate } from 'react-router';
-import useWebStorage from 'use-web-storage-api';
 import { relinkParent } from '../../utils/dom-events';
+import { DIALOG_IDS, getDialog } from '../AlertDialog';
+import { TimeLogGeneral } from '../TimeLogGeneral';
 import { AssigneeSelected, CipAssigneeSelector } from './CipAssigneeSelector';
 import { CipCategoriesToggle } from './CipCategoriesToggle';
 import { CipStatusSelector, StatusSelected } from './StatusSelector';
@@ -41,6 +40,18 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                             iconName: 'Add',
                         },
                         onClick: () => navigate('new'),
+                    },
+                    {
+                        key: 'log',
+                        text: 'Log time',
+                        iconProps: {
+                            iconName: 'Clock',
+                        },
+                        onClick: () => getDialog({
+                            alertId: DIALOG_IDS.MAIN,
+                            title: 'Log time',
+                            Component: (<TimeLogGeneral dialogId={DIALOG_IDS.MAIN} />)
+                        }),
                     },
                 ]}
                 farItems={[

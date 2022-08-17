@@ -34,7 +34,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
 
         /** Comment contents */
         const comment = await commentList.list.fields.createFieldAsXml(
-            `<Field AppendOnly='FALSE' Description='Comment contents' DisplayName='Comment' Format='Dropdown' IsModern='TRUE' IsolateStyles='FALSE' Name='Comment' Required='TRUE' RichText='FALSE' RichTextMode='Compatible' Title='Comment' Type='Note'></Field>`
+            `<Field AppendOnly='FALSE' Description='Comment contents' DisplayName='Comment' Format='Dropdown' IsModern='TRUE' IsolateStyles='FALSE' Name='Comment' Required='FALSE' RichText='FALSE' RichTextMode='Compatible' Title='Comment' Type='Note'></Field>`
         );
         notifyOnFieldCreation(comment);
 

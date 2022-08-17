@@ -34,6 +34,20 @@ export const HoursInput: React.FC<IHoursInputProps> = (props) => {
         }
     }
 
+    const handleValidate = (val: string) => {
+        const valNumber = Number.parseFloat(val);
+        if (!valNumber) {
+            props.onChange(0);
+            return '0 hour(s)'
+        };
+        if (valNumber < 0) {
+            props.onChange(0);
+            return '0 hour(s)'
+        };
+        props.onChange(valNumber);
+        return val;
+    }
+
     return (
         <div className={styles['input']}>
             <SpinButton
@@ -41,9 +55,9 @@ export const HoursInput: React.FC<IHoursInputProps> = (props) => {
                 label={props.label}
                 min={0}
                 value={`${props.value.toString()} hour(s)`}
-                onIncrement={(val) => props.onChange(+val + 1)}
-                onDecrement={(val) => props.onChange(+val - 1)}
-                onValidate={(val: string) => props.onChange(+val)}
+                onIncrement={(val) => props.onChange(Number.parseFloat(val) + 1)}
+                onDecrement={(val) => props.onChange(Number.parseFloat(val) - 1)}
+                onValidate={handleValidate}
             />
             <div className={styles['input__button-wrapper']}>
                 {props.buttons.filter((b) => b.value > 0).map((button) => (

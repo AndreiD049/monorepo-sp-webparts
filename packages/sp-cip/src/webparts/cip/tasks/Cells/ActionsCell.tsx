@@ -1,7 +1,6 @@
 import { ButtonType, IconButton } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { ICellRenderer } from './ICellRenderer';
-import { getDialog } from '../../components/AlertDialog';
+import { DIALOG_IDS, getDialog } from '../../components/AlertDialog';
 import { useNavigate } from 'react-router';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
@@ -9,8 +8,8 @@ import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimati
 import { useTasks } from '../useTasks';
 import { taskDeleted } from '../../utils/dom-events';
 import { AddCommentDialog } from '../dialogs/AddCommentDialog';
-import { LogTime } from '../dialogs/LogTime';
 import { TaskNode } from '../graph/TaskNode';
+import { TimeLogGeneral } from '../../components/TimeLogGeneral';
 
 const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
     const { isTaskFinished } = React.useContext(TaskNodeContext);
@@ -69,7 +68,7 @@ const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
                     getDialog({
                         alertId: 'MAIN',
                         title: 'Log time',
-                        Component: (<LogTime task={node.getTask()} dialogId="MAIN" />),
+                        Component: (<TimeLogGeneral task={node.getTask()} dialogId={DIALOG_IDS.MAIN} />),
                     })
                 }
             />

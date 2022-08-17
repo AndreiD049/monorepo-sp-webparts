@@ -12,10 +12,8 @@ export interface ISortedColumn {
     direction: SortDirection;
 }
 
-type SortingMap<T> = Map<SortDirection, (a: T, b: T) => number>;
-
 type SortingFunctionsDict<T> = {
-    [key: string]: SortingMap<T>;
+    [key: string]: (dir: SortDirection) => (a: T, b: T) => number;
 };
 
 const textSort = (a: string, b: string) => {
@@ -34,61 +32,98 @@ const numericSort = (a: number | Date, b: number | Date) => {
     return 0;
 };
 
-
-/**
- * Creates a map with sorting functions for both sorting directions (asc and desc)
- * For Descendant sorting, just swaps the arguments
- * @param sortFunction sorting function
- * @returns a Map containing a sorting function for both Ascending and Descending sorting
- */
-const createMap = <T>(sortFunction: (a: T, b: T) => number): SortingMap<T> => {
-    const result = new Map();
-    result.set(SortDirection.Ascending, (a, b) => sortFunction(a, b));
-    result.set(SortDirection.Descending, (a, b) => sortFunction(b, a));
-    return result;
-};
-
-export const columnSortFunctionsAsc: SortingFunctionsDict<TaskNode> = {
-    Category: createMap((a, b) =>
-        textSort(a.getTask().Category, b.getTask().Category)
-    ),
-    Title: createMap((a, b) => textSort(a.getTask().Title, b.getTask().Title)),
-    Priority: createMap((a, b) => {
+export const columnSortFunctions: SortingFunctionsDict<TaskNode> = {
+    Category: (dir) => (a, b) => {
+        if (dir === SortDirection.Descending) {
+            return textSort(b.getTask().Category, a.getTask().Category);
+        }
+        return textSort(a.getTask().Category, b.getTask().Category);
+    },
+    Title: (dir) => (a, b) => {
+        if (dir === SortDirection.Descending) {
+            return textSort(b.getTask().Title, a.getTask().Title);
+        }
+        return textSort(a.getTask().Title, b.getTask().Title);
+    },
+    Priority: (dir) => (a, b) => {
         const priorityMap = {
             None: 0,
             Low: 1,
             Medium: 2,
             High: 3,
         };
+        const isAsc = dir === SortDirection.Ascending;
         if (
             priorityMap[a.getTask().Priority] <
             priorityMap[b.getTask().Priority]
         )
-            return -1;
+            return isAsc ? -1 : 1;
         else if (
             priorityMap[a.getTask().Priority] >
             priorityMap[b.getTask().Priority]
         )
-            return 1;
+            return isAsc ? 1 : -1;
         return 0;
-    }),
-    Responsible: createMap((a, b) =>
-        textSort(a.getTask().Responsible.Title, b.getTask().Responsible.Title)),
-    Status: createMap((a, b) => textSort(a.getTask().Status, b.getTask().Status)),
-    Progress: createMap((a, b) => numericSort(a.getTask().Progress, b.getTask().Progress)),
-    DueDate: createMap((a, b) =>
-        numericSort(
+    },
+    Responsible: (dir) => (a, b) => {
+        if (dir === SortDirection.Descending) {
+            return textSort(
+                b.getTask().Responsible.Title,
+                a.getTask().Responsible.Title
+            );
+        }
+        return textSort(
+            a.getTask().Responsible.Title,
+            b.getTask().Responsible.Title
+        );
+    },
+    Status: (dir) => (a, b) => {
+        if (dir === SortDirection.Descending) {
+            return textSort(b.getTask().Status, a.getTask().Status);
+        }
+        return textSort(a.getTask().Status, b.getTask().Status);
+    },
+    Progress: (dir) => (a, b) => {
+        if (dir === SortDirection.Descending) {
+            return numericSort(b.getTask().Progress, a.getTask().Progress);
+        }
+        return numericSort(a.getTask().Progress, b.getTask().Progress);
+    },
+    DueDate: (dir) => (a, b) => {
+        if (dir === SortDirection.Descending) {
+            return numericSort(
+                new Date(b.getTask().DueDate),
+                new Date(a.getTask().DueDate)
+            );
+        }
+        return numericSort(
             new Date(a.getTask().DueDate),
             new Date(b.getTask().DueDate)
-        )),
-    Team: createMap((a, b) => textSort(a.getTask().Team, b.getTask().Team)),
-    Timing: createMap((a, b) =>
-        numericSort(a.getTask().EffectiveTime, b.getTask().EffectiveTime)),
+        );
+    },
+    Team: (dir) => {
+        if (dir === SortDirection.Descending) {
+            return (a, b) => textSort(b.getTask().Team, a.getTask().Team);
+        }
+        return (a, b) => textSort(a.getTask().Team, b.getTask().Team);
+    },
+    Timing: (dir) => (a, b) => {
+        if (dir === SortDirection.Descending) {
+            return numericSort(
+                b.getTask().EffectiveTime,
+                a.getTask().EffectiveTime
+            );
+        }
+        return numericSort(
+            a.getTask().EffectiveTime,
+            b.getTask().EffectiveTime
+        );
+    },
 };
 
 /**
  * @param sorting current column sorting (contains the column and direction)
- * @param showCategories whether rows are greouped by category 
+ * @param showCategories whether rows are greouped by category
  * @returns a function that can be passed to `sort`
  */
 export const getColumnSortingFunc = (
@@ -96,14 +131,20 @@ export const getColumnSortingFunc = (
     showCategories: boolean
 ): ((a: TaskNode, b: TaskNode) => number) => {
     if (!sorting && showCategories) {
-        return columnSortFunctionsAsc.Category.get(SortDirection.Ascending);
+        return columnSortFunctions.Category(SortDirection.Ascending);
     } else if (sorting && !showCategories) {
-        return columnSortFunctionsAsc[sorting.column]?.get(sorting.direction) || ((_a, _b) => 0);
+        return (
+            (columnSortFunctions[sorting.column] &&
+                columnSortFunctions[sorting.column](sorting.direction)) ||
+            ((_a, _b) => 0)
+        );
     } else if (sorting && showCategories) {
         return (a: TaskNode, b: TaskNode) => {
-            const categorySortValue = columnSortFunctionsAsc.Category.get(SortDirection.Ascending)(a, b);
+            const categorySortValue = columnSortFunctions.Category(
+                SortDirection.Ascending
+            )(a, b);
             if (categorySortValue != 0) return categorySortValue;
-            return columnSortFunctionsAsc[sorting.column].get(sorting.direction)(a, b);
+            return columnSortFunctions[sorting.column](sorting.direction)(a, b);
         };
     }
     // leave the sorting as it is

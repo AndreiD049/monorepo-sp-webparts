@@ -41,7 +41,7 @@ export const CipAssigneeSelector: React.FC<ICipAssigneeSelectorProps> = (props) 
     };
 
     return (
-        <div className={styles['asignee-selector']}>
+        <div className={styles['asignee-selector']} data-task-asignee={selected}>
             <IconButton
                 className={`${
                     styles['asignee-selector__item']

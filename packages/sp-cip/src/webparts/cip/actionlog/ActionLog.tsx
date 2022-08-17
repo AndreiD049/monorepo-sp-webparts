@@ -49,7 +49,7 @@ export const ActionLog: React.FC<IActionLogProps> = (props) => {
                             {date}
                         </Text>
                         {grouped[date].map((a: IAction) => (
-                            <ActionLogItem key={a.ActivityType + a.Created} action={a} />
+                            <ActionLogItem key={a.ActivityType + a.Created} task={props.task} action={a} />
                         ))}
                     </div>
                 );

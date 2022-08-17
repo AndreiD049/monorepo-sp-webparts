@@ -3,9 +3,19 @@ import { IItems } from 'sp-preset';
 import CipWebPart from '../CipWebPart';
 import { GlobalContext } from '../utils/GlobalContext';
 
-export type ActionType = 'Time log' | 'Due date' | 'Progress' | 'Priority' | 'Responisble' | 'Status' | 'Estimated time' | 'Created' | 'Finished';
+export type ActionType =
+    | 'Time log'
+    | 'Due date'
+    | 'Progress'
+    | 'Priority'
+    | 'Responisble'
+    | 'Status'
+    | 'Estimated time'
+    | 'Created'
+    | 'Finished';
 
 export interface IAction {
+    Id: number;
     ListId: string;
     ItemId: number;
     ActivityType: ActionType;
@@ -25,6 +35,7 @@ export interface IAction {
 }
 
 export const LIST_SELECT = [
+    'Id',
     'ListId',
     'ItemId',
     'ActivityType',
@@ -54,6 +65,13 @@ export const useActions = () => {
     const taskListId = properties.taskListId;
     const list = sp.web.lists.getByTitle(properties.activitiesListName);
 
+    const getAction = async (id: number): Promise<IAction> => {
+        return list.items
+            .getById(id)
+            .select(...LIST_SELECT)
+            .expand(...LIST_EXPAND)();
+    };
+
     const getActions = async (taskId: number): Promise<IAction[]> => {
         return wrap(
             list.items.filter(
@@ -63,7 +81,7 @@ export const useActions = () => {
     };
 
     const addAction = async (
-        taskId: number,
+        taskId: number | null,
         type: ActionType,
         comment?: string
     ) => {
@@ -75,8 +93,17 @@ export const useActions = () => {
         });
     };
 
+    const updateAction = async(
+        id: number,
+        body: Partial<IAction>
+    ) => {
+        return list.items.getById(id).update(body);
+    };
+
     return {
+        getAction,
         getActions,
         addAction,
+        updateAction,
     };
 };

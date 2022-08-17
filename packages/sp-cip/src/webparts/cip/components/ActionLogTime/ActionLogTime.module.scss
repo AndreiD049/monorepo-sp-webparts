@@ -1,0 +1,18 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    width: 100%;
+}
+
+.topHeader {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.comment {
+    padding: .2em 0;
+    text-decoration: underline;
+    font-style: italic;
+}

@@ -2,6 +2,13 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Chrome",
+      "request": "launch",
+      "type": "chrome",
+      "url": "https://devadmintools.sharepoint.com/sites/Admin-tools/SitePages/CIP.aspx?debug=true&noredir=true&debugManifestsFile=https://localhost:4321/temp/manifests.js",
+      "webRoot": "${workspaceFolder}/lib"
+    },
+    {
       "name": "Attach to Chrome",
       "port": 9222,
       "request": "attach",

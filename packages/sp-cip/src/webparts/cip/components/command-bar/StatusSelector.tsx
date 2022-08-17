@@ -28,7 +28,7 @@ export const CipStatusSelector: React.FC<ICipStatusSelectorProps> = (props) => {
     }, [selected]);
 
     return (
-        <div className={styles['status-selector']}>
+        <div className={styles['status-selector']} data-task-status={selected}>
             <Dropdown
                 options={[
                     {

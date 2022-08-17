@@ -16,23 +16,18 @@ import { ActionLog } from '../../actionlog/ActionLog';
 import { Attachments } from '../../attachments/Attachments';
 import { useAttachments } from '../../attachments/useAttachments';
 import { Comments } from '../../comments/Comments';
-import { AlertDialog, getDialog } from '../../components/AlertDialog';
+import { AlertDialog, DIALOG_IDS, getDialog } from '../../components/AlertDialog';
+import { TimeLogGeneral } from '../../components/TimeLogGeneral';
 import {
     LoadingAnimation,
     loadingStart,
     loadingStop,
 } from '../../components/utils/LoadingAnimation';
 import { taskUpdated, taskUpdatedHandler } from '../../utils/dom-events';
-import { LogTime } from '../dialogs/LogTime';
 import { TaskNode } from '../graph/TaskNode';
 import { ITaskOverview } from '../ITaskOverview';
 import { useTasks } from '../useTasks';
 import styles from './Panels.module.scss';
-
-export interface ITaskDetailsProps {
-    node: TaskNode;
-    editable: boolean;
-}
 
 export const TaskDetails: React.FC = () => {
     const params = useParams();
@@ -174,7 +169,7 @@ export const TaskDetails: React.FC = () => {
                 getDialog({
                     alertId: 'DETAILS_PANEL',
                     title: 'Log time',
-                    Component: <LogTime task={task} dialogId="DETAILS_PANEL" />,
+                    Component: <TimeLogGeneral task={task} dialogId={DIALOG_IDS.DETAILS_PANEL}/>,
                 }),
         });
         return items;

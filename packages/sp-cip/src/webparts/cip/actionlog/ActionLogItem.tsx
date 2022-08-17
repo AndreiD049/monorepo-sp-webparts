@@ -1,12 +1,15 @@
 import { Icon, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { ActionType, IAction } from '../comments/useActions';
+import { ActionLogTime } from '../components/ActionLogTime';
 import Pill from '../components/pill/Pill';
+import { ITaskOverview } from '../tasks/ITaskOverview';
 import { GlobalContext } from '../utils/GlobalContext';
 import styles from './ActionLog.module.scss';
 
 export interface IActionLogItemProps {
     action: IAction;
+    task: ITaskOverview;
 }
 
 const ActionIcon: React.FC<{ type: ActionType }> = (props) => {
@@ -128,8 +131,7 @@ const ActionItemContent: React.FC<IActionLogItemProps> = (props) => {
                         </Text>
                     </span>
                 );
-            case 'Time log':
-                return <>Logged {props.action.Comment}</>;
+            case 'Time log': return <ActionLogTime action={props.action} task={props.task} />
             case 'Progress':
                 return (
                     <span
