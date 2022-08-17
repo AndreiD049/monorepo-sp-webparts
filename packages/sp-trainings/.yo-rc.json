@@ -1,0 +1,16 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.14.0",
+    "libraryName": "sp-trainings",
+    "libraryId": "72d08e25-f5c0-47c6-8a5a-8563b7305f58",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "sp-trainings",
+    "solutionShortDescription": "sp-trainings description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
