@@ -1,6 +1,5 @@
 import { useContext } from 'react';
 import CipWebPart from '../CipWebPart';
-import { taskUpdated } from '../utils/dom-events';
 import { GlobalContext } from '../utils/GlobalContext';
 import { ICreateTask } from './ICreateTask';
 import { ITaskOverview, LIST_EXPAND, LIST_SELECT } from './ITaskOverview';
@@ -9,9 +8,9 @@ import { isFinished } from './task-utils';
 /**
  * Tasks service
  */
-export const useTasks = () => {
+export const useTasks = (tennantKey: string = 'Data') => {
     const ctx = useContext(GlobalContext);
-    const sp = CipWebPart.SPBuilder.getSP('Data');
+    const sp = CipWebPart.SPBuilder.getSP(tennantKey);
     const list = sp.web.lists.getByTitle(ctx.properties.tasksListName);
 
     const getTaskListId = async () => {

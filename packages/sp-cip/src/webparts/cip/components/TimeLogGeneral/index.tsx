@@ -6,6 +6,7 @@ import {
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { actionUpdated } from '../../actionlog/ActionLog';
 import { IAction, useActions } from '../../comments/useActions';
 import { ITaskOverview } from '../../tasks/ITaskOverview';
 import { useTasks } from '../../tasks/useTasks';
@@ -46,11 +47,12 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
 
     // New action - has selected task
     const handleLogNew = async () => {
-        const selId = selected.Id || null;
+        const selId = selected?.Id || null;
         await addAction(selId, 'Time log', `${time}|${comment}`);
         if (selId) {
-            await updateTask(props.task.Id, {
-                EffectiveTime: props.task.EffectiveTime + time,
+            const task = props.task || (await getTask(selId));
+            await updateTask(selId, {
+                EffectiveTime: task.EffectiveTime + time,
             });
             taskUpdated(await getTask(selId));
         }
@@ -67,6 +69,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
         const updateTaskAction = await updateTask(props.task.Id, {
             EffectiveTime: props.task.EffectiveTime - delta,
         });
+        actionUpdated(await getAction(props.action.Id));
         taskUpdated(await getTask(props.task.Id));
 
         return Promise.all([action, updateTaskAction]);

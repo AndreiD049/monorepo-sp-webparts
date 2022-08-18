@@ -193,6 +193,11 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
             `<Field CommaSeparator='FALSE' CustomUnitOnRight='TRUE' Decimals='0' Description='Number of attachments' DisplayName='AttachmentsCount' Format='Dropdown' IsModern='TRUE' Min='0' Name='AttachmentsCount' Percentage='FALSE' Title='AttachmentsCount' Type='Number' Unit='None'><Default>0</Default></Field>`
         );
         notifyOnFieldCreation(attachmentsCount);
+
+        const remoteInfo = await list.fields.createFieldAsXml(
+            `<Field DisplayName='RemoteInfo' Format='Dropdown' IsModern='TRUE' MaxLength='255' Name='RemoteInfo' Title='RemoteInfo' Type='Text'></Field>`
+        );
+        notifyOnFieldCreation(remoteInfo);
         
         /**
          * Adjust default view
@@ -232,6 +237,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
                         <FieldRef Name=\"${category.data.InternalName}\"/>
                         <FieldRef Name=\"${parent.data.InternalName}\"/>
                         <FieldRef Name=\"${main.data.InternalName}\"/>
+                        <FieldRef Name=\"${remoteInfo.data.InternalName}\"/>
                     </ViewFields>
                     <RowLimit Paged=\"TRUE\">30</RowLimit>
                     <JSLink>clienttemplates.js</JSLink>

@@ -8,6 +8,18 @@ export interface IActionLogProps {
     task: ITaskOverview;
 }
 
+export const UPDATE_ACTION_EVENT = 'SP-CIP-UPDATE-ACTION';
+
+export const actionUpdated = (a: IAction) => {
+    document.dispatchEvent(
+        new CustomEvent(UPDATE_ACTION_EVENT, {
+            detail: {
+                action: a,
+            },
+        })
+    );
+};
+
 export const ActionLog: React.FC<IActionLogProps> = (props) => {
     const { getActions } = useActions();
     const [actions, setActions] = React.useState<IAction[]>([]);
@@ -24,7 +36,7 @@ export const ActionLog: React.FC<IActionLogProps> = (props) => {
             }
             result[dateString].push(action);
         });
-        dates.sort((a, b) => a < b ? 1 : -1);
+        dates.sort((a, b) => (a < b ? 1 : -1));
         return [result, dates.map((d) => d.toLocaleDateString())];
     }, [actions]);
 
@@ -34,8 +46,20 @@ export const ActionLog: React.FC<IActionLogProps> = (props) => {
         }
     }, [props.task]);
 
+    /** Dom event to update actions */
+    React.useEffect(() => {
+        function handler(ev: CustomEvent) {
+            const { action } = ev.detail;
+            setActions((prev) =>
+                prev.map((a) => a.Id === action.Id ? action : a)
+            );
+        }
+        document.addEventListener(UPDATE_ACTION_EVENT, handler);
+        return () => document.removeEventListener(UPDATE_ACTION_EVENT, handler);
+    }, []);
+
     return (
-        <div style={{marginTop: '1em'}}>
+        <div style={{ marginTop: '1em' }}>
             {dates.map((date) => {
                 return (
                     <div key={date}>
@@ -49,7 +73,11 @@ export const ActionLog: React.FC<IActionLogProps> = (props) => {
                             {date}
                         </Text>
                         {grouped[date].map((a: IAction) => (
-                            <ActionLogItem key={a.ActivityType + a.Created} task={props.task} action={a} />
+                            <ActionLogItem
+                                key={a.ActivityType + a.Created + a.Comment}
+                                task={props.task}
+                                action={a}
+                            />
                         ))}
                     </div>
                 );

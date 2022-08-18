@@ -1,11 +1,9 @@
 import { debounce } from '@microsoft/sp-lodash-subset';
-import {
-    CommandBar,
-    SearchBox,
-} from 'office-ui-fabric-react';
+import { CommandBar, ICommandBarItemProps, SearchBox } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate } from 'react-router';
 import { relinkParent } from '../../utils/dom-events';
+import { GlobalContext } from '../../utils/GlobalContext';
 import { DIALOG_IDS, getDialog } from '../AlertDialog';
 import { TimeLogGeneral } from '../TimeLogGeneral';
 import { AssigneeSelected, CipAssigneeSelector } from './CipAssigneeSelector';
@@ -20,6 +18,7 @@ interface ICipCommandBarProps {
 }
 
 const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
+    const { properties } = React.useContext(GlobalContext);
     const handleSearch = React.useCallback(
         debounce((_ev: any, value: string) => {
             props.onSearch(value);
@@ -29,31 +28,56 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
     );
     const navigate = useNavigate();
 
+    const items: ICommandBarItemProps[] = React.useMemo(() => {
+        const result = [
+            {
+                key: 'new',
+                text: 'New task',
+                iconProps: {
+                    iconName: 'Add',
+                },
+                onClick: () => navigate('new'),
+            },
+            {
+                key: 'log',
+                text: 'Log time',
+                iconProps: {
+                    iconName: 'Clock',
+                },
+                onClick: () =>
+                    getDialog({
+                        alertId: DIALOG_IDS.MAIN,
+                        title: 'Log time',
+                        Component: (
+                            <TimeLogGeneral dialogId={DIALOG_IDS.MAIN} />
+                        ),
+                    }),
+            },
+        ];
+        if (properties.remoteSources.length > 0) {
+            result.push({
+                key: 'linkRemote',
+                text: 'Link remote',
+                iconProps: {
+                    iconName: 'Link12',
+                },
+                onClick: () =>
+                    getDialog({
+                        alertId: DIALOG_IDS.MAIN,
+                        title: 'Link task',
+                        Component: (
+                            <TimeLogGeneral dialogId={DIALOG_IDS.MAIN} />
+                        ),
+                    }),
+            });
+        }
+        return result;
+    }, []);
+
     return (
         <>
             <CommandBar
-                items={[
-                    {
-                        key: 'new',
-                        text: 'New task',
-                        iconProps: {
-                            iconName: 'Add',
-                        },
-                        onClick: () => navigate('new'),
-                    },
-                    {
-                        key: 'log',
-                        text: 'Log time',
-                        iconProps: {
-                            iconName: 'Clock',
-                        },
-                        onClick: () => getDialog({
-                            alertId: DIALOG_IDS.MAIN,
-                            title: 'Log time',
-                            Component: (<TimeLogGeneral dialogId={DIALOG_IDS.MAIN} />)
-                        }),
-                    },
-                ]}
+                items={items}
                 farItems={[
                     {
                         key: 'toggle_category',

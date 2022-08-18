@@ -15,7 +15,7 @@ import Cip from './components/Cip';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { initNotifications, SPnotify } from 'sp-react-notifications';
 import { getListId } from './utils/getListId';
-import { MessageBarType } from 'office-ui-fabric-react';
+import { MessageBarType, TeachingBubbleContent } from 'office-ui-fabric-react';
 
 export interface ICipWebPartProps {
     headerText: string;
@@ -26,6 +26,8 @@ export interface ICipWebPartProps {
     attachmentsPath: string;
     teamsList: string;
     teamsField: string;
+    remoteSourcesString: string;
+    remoteSources: IRemoteSource[];
 }
 
 export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> {
@@ -36,11 +38,17 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
 
     protected async onInit(): Promise<void> {
         initNotifications();
+        this.processProperties();
+
+        const tennats = {} 
+        this.properties.remoteSources.forEach((s) => tennats[s.name] = s.ListRoot);
+
         try {
             CipWebPart.SPBuilder = new SPBuilder(this.context)
                 .withRPM(600)
                 .withTennants({
                     Data: this.properties.rootDataSource,
+                    ...tennats
                 })
                 .withAdditionalTimelines([
                     InjectHeaders({
@@ -61,6 +69,14 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
         }
 
         return super.onInit();
+    }
+
+    private processProperties() {
+        try {
+            this.properties.remoteSources = JSON.parse(this.properties.remoteSourcesString);
+        } catch {
+            this.properties.remoteSources = [];
+        }
     }
 
     public async render(): Promise<void> {
@@ -185,6 +201,18 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                         },
                     ],
                 },
+                {
+                    groups: [
+                        {
+                            groupName: 'Remote sources',
+                            groupFields: [
+                                PropertyPaneTextField('remoteSourcesString', {
+                                    multiline: true,
+                                })
+                            ]
+                        }
+                    ]
+                }
             ],
         };
     }
