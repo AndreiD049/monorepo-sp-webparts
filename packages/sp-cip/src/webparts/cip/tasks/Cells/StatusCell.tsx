@@ -1,13 +1,12 @@
 import * as React from 'react';
-import { useActions } from '../../comments/useActions';
 import Pill from '../../components/pill/Pill';
 import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { TaskNode } from '../graph/TaskNode';
 import { TaskNodeContext } from '../TaskNodeContext';
-import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
+import MainService from '../../services/main-service';
 
 export interface IStatusCellProps {
     node: TaskNode;
@@ -15,8 +14,8 @@ export interface IStatusCellProps {
 
 export const StatusCellCallout: React.FC<IStatusCellProps> = ({ node }) => {
     const { fieldInfo } = useChoiceFields('Status');
-    const { updateTask, getTask } = useTasks();
-    const { addAction } = useActions();
+    const taskService = MainService.getTaskService();
+    const actionService = MainService.getActionService();
     const choices = React.useMemo(() => {
         if (!fieldInfo?.Choices) return [];
         return fieldInfo.Choices.filter((choise) => choise !== node.getTask().Status);
@@ -25,11 +24,11 @@ export const StatusCellCallout: React.FC<IStatusCellProps> = ({ node }) => {
     const handleClick = React.useCallback((status: string) => async () => {
         calloutVisibility({ visible: false });
         loadingStart();
-        await updateTask(node.Id, {
+        await taskService.updateTask(node.Id, {
             Status: status
         });
-        const newTask = await getTask(node.Id);
-        await addAction(node.Id, 'Status', `${node.getTask().Status}|${newTask.Status}`);
+        const newTask = await taskService.getTask(node.Id);
+        await actionService.addAction(node.Id, 'Status', `${node.getTask().Status}|${newTask.Status}`);
         taskUpdated(newTask);
         loadingStop();
     }, [node]);

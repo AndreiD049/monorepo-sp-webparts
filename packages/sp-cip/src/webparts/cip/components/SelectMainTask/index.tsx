@@ -1,13 +1,14 @@
 import {
     ITag,
-    PrimaryButton,
     TagPicker,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { ITaskOverview } from '../../tasks/ITaskOverview';
-import { useTasks } from '../../tasks/useTasks';
+import { TaskService } from '../../services/task-service';
+import { GlobalContext } from '../../utils/GlobalContext';
 import { StatusSelected } from '../command-bar/StatusSelector';
 import styles from './SelectMainTask.module.scss';
+import MainService from '../../services/main-service';
 
 export interface ISelectMainTaskProps extends React.HTMLAttributes<HTMLElement> {
     tasks?: ITaskOverview[];
@@ -17,7 +18,7 @@ export interface ISelectMainTaskProps extends React.HTMLAttributes<HTMLElement> 
 
 export const SelectMainTask: React.FC<ISelectMainTaskProps> = (props) => {
     const [tasks, setTasks] = React.useState<ITaskOverview[]>([]);
-    const { getAllMains, getFinishedMains, getNonFinishedMains } = useTasks();
+    const taskService = MainService.getTaskService();
 
     /** Fetch tasks if not provided */
     React.useEffect(() => {
@@ -25,13 +26,13 @@ export const SelectMainTask: React.FC<ISelectMainTaskProps> = (props) => {
             let result: ITaskOverview[] = [];
             switch (status) {
                 case StatusSelected.All:
-                    result = await getAllMains();
+                    result = await taskService.getAllMains();
                     break;
                 case StatusSelected.Finished:
-                    result = await getFinishedMains();
+                    result = await taskService.getFinishedMains();
                     break;
                 case StatusSelected.Open:
-                    result = await getNonFinishedMains();
+                    result = await taskService.getNonFinishedMains();
                     break;
             }
             setTasks(result);

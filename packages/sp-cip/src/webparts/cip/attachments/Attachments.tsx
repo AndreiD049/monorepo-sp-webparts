@@ -4,11 +4,10 @@ import { FileInput } from '../components/utils/FileInput';
 import { ITaskOverview } from '../tasks/ITaskOverview';
 import { GlobalContext } from '../utils/GlobalContext';
 import { IAttachment } from './IAttachment';
-import { useAttachments } from './useAttachments';
 import styles from './Attachments.module.scss';
 import { getDialog } from '../components/AlertDialog';
-import { useTasks } from '../tasks/useTasks';
 import { taskUpdated } from '../utils/dom-events';
+import MainService from '../services/main-service';
 
 interface IAttachmentsProps extends React.HTMLAttributes<HTMLDivElement> {
     task?: ITaskOverview;
@@ -55,14 +54,11 @@ export interface IAttachmentProps {
 
 const Attachment: React.FC<IAttachmentProps> = (props) => {
     const { properties } = React.useContext(GlobalContext);
-    const { attachmentsUpdated } = useTasks();
-    const {
-        getAttachmentsRequest,
-        removeAttachment,
-    } = useAttachments();
+    const taskService = MainService.getTaskService();
+    const attachmentService = MainService.getAttachmentService();
 
     const linkHref = React.useCallback((file: string) => {
-        const url = getAttachmentsRequest(props.task).toRequestUrl();
+        const url = attachmentService.getAttachmentsRequest(props.task).toRequestUrl();
         const re = /sharepoint.com(\/(sites|teams).*)\/_api/;
         const match = url.match(re);
         const site = match ? match[1] : '';
@@ -70,7 +66,7 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
     }, []);
 
     const downloadLinkHref = React.useCallback((file: string) => {
-        const url = getAttachmentsRequest(props.task).toRequestUrl();
+        const url = attachmentService.getAttachmentsRequest(props.task).toRequestUrl();
         const re = /sharepoint.com(\/(sites|teams).*)\/_api/;
         const match = url.match(re);
         const site = match ? match[1] : '';
@@ -115,8 +111,8 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
                             ]
                         });
                         if (alert === 'Yes') {
-                            await removeAttachment(props.task, props.attachment.Name);
-                            const latest = await attachmentsUpdated(props.task.Id, -1);
+                            await attachmentService.removeAttachment(props.task, props.attachment.Name);
+                            const latest = await taskService.attachmentsUpdated(props.task.Id, -1);
                             taskUpdated(latest);
                             props.setAttachments((prev) =>
                                 prev.filter((pa) => pa.Name !== props.attachment.Name)
@@ -136,11 +132,11 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
 export const Attachments: React.FC<IAttachmentsProps> = (props) => {
     const { theme } = React.useContext(GlobalContext);
     const [attachments, setAttachments] = React.useState([]);
-    const { getAttachments } = useAttachments();
+    const attachmentService = MainService.getAttachmentService();
 
     React.useEffect(() => {
         if (props.task) {
-            getAttachments(props.task).then((r) => setAttachments(r));
+            attachmentService.getAttachments(props.task).then((r) => setAttachments(r));
         }
     }, [props.task]);
 
@@ -159,7 +155,7 @@ export const Attachments: React.FC<IAttachmentsProps> = (props) => {
                     onFilesAdded={async (files) => {
                         await props.onAttachments(files);
                         if (props.task) {
-                            setAttachments(await getAttachments(props.task));
+                            setAttachments(await attachmentService.getAttachments(props.task));
                         }
                     }}
                 >

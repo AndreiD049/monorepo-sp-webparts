@@ -20,28 +20,25 @@ import {
 import * as React from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Attachments } from '../../attachments/Attachments';
-import { useAttachments } from '../../attachments/useAttachments';
-import { useActions } from '../../comments/useActions';
 import { HoursInput } from '../../components/HoursInput';
 import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
-import { useUsers } from '../../users/useUsers';
 import { tasksAdded, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { ICreateTask } from '../ICreateTask';
 import { useGroups } from '../table/useGroups';
-import { useTasks } from '../useTasks';
+import MainService from '../../services/main-service';
 
 const CreateTaskPanel: React.FC = () => {
     const { teams } = React.useContext(GlobalContext);
-    const { createTask, createSubtask, getTask, getSubtasks } = useTasks();
-    const { addAction } = useActions();
+    const taskService = MainService.getTaskService();
+    const actionService = MainService.getActionService();
     const navigate = useNavigate();
     const params = useParams();
 
     /** Attachments */
     const [attachments, setAttachments] = React.useState<File[]>([]);
-    const { addAttachments } = useAttachments();
+    const attachmentService = MainService.getAttachmentService();
 
     /** Group labels */
     const { groupLabels, setGroupLabels } = useGroups();
@@ -103,16 +100,16 @@ const CreateTaskPanel: React.FC = () => {
     };
 
     /** Responsible */
-    const { getPersonaProps } = useUsers();
+    const userService = MainService.getUserService();
     const [users, setUsers] = React.useState([]);
 
     React.useEffect(() => {
         (async function () {
-            const personas = await getPersonaProps();
+            const personas = await userService.getPersonaProps();
             setUsers(personas);
             /** If parent present, load it's data and set as default values */
             if (params.parentId) {
-                const parent = await getTask(+params.parentId);
+                const parent = await taskService.getTask(+params.parentId);
                 setParent(parent);
                 setData((prev) => ({
                     ...prev,
@@ -162,23 +159,23 @@ const CreateTaskPanel: React.FC = () => {
             let createdId: number;
             if (!validateData()) return;
             if (params.parentId) {
-                const parent = await getTask(+params.parentId);
-                const subtaskId = await createSubtask(data, parent);
+                const parent = await taskService.getTask(+params.parentId);
+                const subtaskId = await taskService.createSubtask(data, parent);
                 createdId = subtaskId;
-                await addAction(subtaskId, 'Created', data.Title);
+                await actionService.addAction(subtaskId, 'Created', data.Title);
                 parent.Subtasks += 1;
                 // Refresh the parent task
-                const subtasks = await getSubtasks(parent);
+                const subtasks = await taskService.getSubtasks(parent);
                 taskUpdated(parent);
                 tasksAdded(subtasks);
             } else {
-                createdId = await createTask(data);
-                await addAction(createdId, 'Created', data.Title);
-                tasksAdded([await getTask(createdId)]);
+                createdId = await taskService.createTask(data);
+                await actionService.addAction(createdId, 'Created', data.Title);
+                tasksAdded([await taskService.getTask(createdId)]);
             }
             if (attachments.length > 0 && createdId) {
-                const createdTask = await getTask(createdId);
-                await addAttachments(createdTask, attachments);
+                const createdTask = await taskService.getTask(createdId);
+                await attachmentService.addAttachments(createdTask, attachments);
             }
             loadingStop('default');
         },

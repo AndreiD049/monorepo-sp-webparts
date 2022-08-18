@@ -1,6 +1,6 @@
 import { IconButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { IAction } from '../../comments/useActions';
+import { IAction } from '../../services/action-service';
 import { ITaskOverview } from '../../tasks/ITaskOverview';
 import { DIALOG_IDS, getDialog } from '../AlertDialog';
 import { TimeLogGeneral } from '../TimeLogGeneral';

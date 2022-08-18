@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 import { relinkParent } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { DIALOG_IDS, getDialog } from '../AlertDialog';
+import { LinkRemoteDialog } from '../LinkRemoteDialog';
 import { TimeLogGeneral } from '../TimeLogGeneral';
 import { AssigneeSelected, CipAssigneeSelector } from './CipAssigneeSelector';
 import { CipCategoriesToggle } from './CipCategoriesToggle';
@@ -66,7 +67,7 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                         alertId: DIALOG_IDS.MAIN,
                         title: 'Link task',
                         Component: (
-                            <TimeLogGeneral dialogId={DIALOG_IDS.MAIN} />
+                            <LinkRemoteDialog />
                         ),
                     }),
             });

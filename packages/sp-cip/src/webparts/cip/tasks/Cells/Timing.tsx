@@ -6,28 +6,27 @@ import {
     Text,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { useActions } from '../../comments/useActions';
 import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
 import { TaskNodeContext } from '../TaskNodeContext';
-import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
+import MainService from '../../services/main-service';
 
 const TimingCallout: React.FC<ITimingProps> = (props) => {
     const task = props.node.getTask();
-    const { updateTask, getTask } = useTasks();
-    const { addAction } = useActions();
+    const taskService = MainService.getTaskService();
+    const actionService = MainService.getActionService();
     const [value, setValue] = React.useState(task.EstimatedTime);
 
     const handleSave = React.useCallback(async () => {
         loadingStart();
         calloutVisibility({ visible: false });
-        await updateTask(task.Id, {
+        await taskService.updateTask(task.Id, {
             EstimatedTime: value,
         });
-        const newTask = await getTask(task.Id);
-        await addAction(task.Id, 'Estimated time', `${task.EstimatedTime}|${newTask.EstimatedTime}`);
+        const newTask = await taskService.getTask(task.Id);
+        await actionService.addAction(task.Id, 'Estimated time', `${task.EstimatedTime}|${newTask.EstimatedTime}`);
         taskUpdated(newTask);
         loadingStop();
     }, [props.node, value]);

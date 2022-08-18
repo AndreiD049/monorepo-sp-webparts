@@ -7,21 +7,22 @@ import { GlobalContext } from '../../utils/GlobalContext';
 import { TaskNode } from '../graph/TaskNode';
 import { ITaskOverview } from '../ITaskOverview';
 import { TaskNodeContext } from '../TaskNodeContext';
-import { useTasks } from '../useTasks';
+import { TaskService } from '../../services/task-service';
 import styles from './Cells.module.scss';
+import MainService from '../../services/main-service';
 
 const TeamCellCallout: React.FC<ITeamCellProps> = (props) => {
     const task = props.node.getTask();
-    const { updateTask, getTask } = useTasks(); 
     const { teams } = React.useContext(GlobalContext);
+    const taskService = MainService.getTaskService();
 
     const handleClick = React.useCallback((team: string) => async () => {
         loadingStart();
         calloutVisibility({ visible: false });
-        await updateTask(task.Id, {
+        await taskService.updateTask(task.Id, {
             Team: team,
         });
-        taskUpdated(await getTask(task.Id));
+        taskUpdated(await taskService.getTask(task.Id));
         loadingStop();
     }, []);
 

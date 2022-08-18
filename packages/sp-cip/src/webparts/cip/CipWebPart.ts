@@ -16,6 +16,7 @@ import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { initNotifications, SPnotify } from 'sp-react-notifications';
 import { getListId } from './utils/getListId';
 import { MessageBarType, TeachingBubbleContent } from 'office-ui-fabric-react';
+import MainService from './services/main-service';
 
 export interface ICipWebPartProps {
     headerText: string;
@@ -40,15 +41,17 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
         initNotifications();
         this.processProperties();
 
-        const tennats = {} 
-        this.properties.remoteSources.forEach((s) => tennats[s.name] = s.ListRoot);
+        const tennats = {};
+        this.properties.remoteSources.forEach(
+            (s) => (tennats[s.Name] = s.ListRoot)
+        );
 
         try {
             CipWebPart.SPBuilder = new SPBuilder(this.context)
                 .withRPM(600)
                 .withTennants({
                     Data: this.properties.rootDataSource,
-                    ...tennats
+                    ...tennats,
                 })
                 .withAdditionalTimelines([
                     InjectHeaders({
@@ -57,6 +60,8 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                     }),
                 ]);
 
+            MainService.InitServices('Data', this.properties);
+
             CipWebPart.baseUrl = this.context.pageContext.web.absoluteUrl;
             this.properties.taskListId = await getListId(
                 this.properties.tasksListName
@@ -64,7 +69,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
         } catch (err) {
             SPnotify({
                 message: err.toString(),
-                messageType: MessageBarType.severeWarning
+                messageType: MessageBarType.severeWarning,
             });
         }
 
@@ -73,7 +78,9 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
 
     private processProperties() {
         try {
-            this.properties.remoteSources = JSON.parse(this.properties.remoteSourcesString);
+            this.properties.remoteSources = JSON.parse(
+                this.properties.remoteSourcesString
+            );
         } catch {
             this.properties.remoteSources = [];
         }
@@ -208,11 +215,11 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                             groupFields: [
                                 PropertyPaneTextField('remoteSourcesString', {
                                     multiline: true,
-                                })
-                            ]
-                        }
-                    ]
-                }
+                                }),
+                            ],
+                        },
+                    ],
+                },
             ],
         };
     }

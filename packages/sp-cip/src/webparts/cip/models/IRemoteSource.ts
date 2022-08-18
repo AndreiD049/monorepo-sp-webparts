@@ -1,5 +1,5 @@
 interface IRemoteSource {
-    name: string;
+    Name: string;
     ListRoot: string;
     ListTitle: string;
     ActivitiesListTitle: string;

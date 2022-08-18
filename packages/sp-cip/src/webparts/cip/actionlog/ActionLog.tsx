@@ -1,6 +1,7 @@
 import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { IAction, useActions } from '../comments/useActions';
+import { IAction } from '../services/action-service';
+import MainService from '../services/main-service';
 import { ITaskOverview } from '../tasks/ITaskOverview';
 import { ActionLogItem } from './ActionLogItem';
 
@@ -21,7 +22,7 @@ export const actionUpdated = (a: IAction) => {
 };
 
 export const ActionLog: React.FC<IActionLogProps> = (props) => {
-    const { getActions } = useActions();
+    const actionService = MainService.getActionService();
     const [actions, setActions] = React.useState<IAction[]>([]);
 
     const [grouped, dates] = React.useMemo(() => {
@@ -42,7 +43,7 @@ export const ActionLog: React.FC<IActionLogProps> = (props) => {
 
     React.useEffect(() => {
         if (props.task?.Id) {
-            getActions(props.task.Id).then((a) => setActions(a));
+            actionService.getActions(props.task.Id).then((a) => setActions(a));
         }
     }, [props.task]);
 

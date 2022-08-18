@@ -1,6 +1,6 @@
 import { Icon, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { ActionType, IAction } from '../comments/useActions';
+import { ActionType, IAction } from '../services/action-service';
 import { ActionLogTime } from '../components/ActionLogTime';
 import Pill from '../components/pill/Pill';
 import { ITaskOverview } from '../tasks/ITaskOverview';

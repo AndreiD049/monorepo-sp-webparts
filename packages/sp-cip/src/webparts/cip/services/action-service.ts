@@ -1,7 +1,5 @@
-import * as React from 'react';
-import { IItems } from 'sp-preset';
-import CipWebPart from '../CipWebPart';
-import { GlobalContext } from '../utils/GlobalContext';
+import { IItems, IList, SPFI } from 'sp-preset';
+import CipWebPart, { ICipWebPartProps } from '../CipWebPart';
 
 export type ActionType =
     | 'Time log'
@@ -59,51 +57,49 @@ const wrap = (item: IItems) => {
         .orderBy('Created', false)();
 };
 
-export const useActions = () => {
-    const sp = React.useMemo(() => CipWebPart.SPBuilder.getSP('Data'), []);
-    const { properties } = React.useContext(GlobalContext);
-    const taskListId = properties.taskListId;
-    const list = sp.web.lists.getByTitle(properties.activitiesListName);
+export class ActionService {
+    private sp: SPFI;
+    private taskListId: string;
+    private list: IList;
 
-    const getAction = async (id: number): Promise<IAction> => {
-        return list.items
+    constructor(defaultKey: string, properties: ICipWebPartProps) {
+        this.sp = CipWebPart.SPBuilder.getSP(defaultKey);
+        this.taskListId = properties.taskListId;
+        this.list = this.sp.web.lists.getByTitle(properties.activitiesListName);
+    }
+
+    async getAction(id: number): Promise<IAction> {
+        return this.list.items
             .getById(id)
             .select(...LIST_SELECT)
             .expand(...LIST_EXPAND)();
     };
 
-    const getActions = async (taskId: number): Promise<IAction[]> => {
+    async getActions(taskId: number): Promise<IAction[]> {
         return wrap(
-            list.items.filter(
-                `ListId eq '${taskListId}' and ItemId eq ${taskId} and ActivityType ne 'Comment'`
+            this.list.items.filter(
+                `ListId eq '${this.taskListId}' and ItemId eq ${taskId} and ActivityType ne 'Comment'`
             )
         );
     };
 
-    const addAction = async (
+    async addAction(
         taskId: number | null,
         type: ActionType,
         comment?: string
-    ) => {
-        return list.items.add({
-            ListId: taskListId,
+    ) {
+        return this.list.items.add({
+            ListId: this.taskListId,
             ItemId: taskId,
             ActivityType: type,
             Comment: comment,
         });
     };
 
-    const updateAction = async(
+    async updateAction(
         id: number,
         body: Partial<IAction>
-    ) => {
-        return list.items.getById(id).update(body);
+    ) {
+        return this.list.items.getById(id).update(body);
     };
-
-    return {
-        getAction,
-        getActions,
-        addAction,
-        updateAction,
-    };
-};
+}

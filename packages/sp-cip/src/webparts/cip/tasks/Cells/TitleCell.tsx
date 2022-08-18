@@ -1,11 +1,9 @@
 import { Icon, IconButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { ICellRenderer } from './ICellRenderer';
 import useParentStroke from '../../components/ParentStroke';
 import { TaskNode } from '../graph/TaskNode';
 import { nodeToggleOpen, taskUpdated } from '../../utils/dom-events';
 import { useNavigate } from 'react-router';
-import { useTasks } from '../useTasks';
 import {
     loadingStart,
     loadingStop,
@@ -14,9 +12,8 @@ import styles from './Cells.module.scss';
 import { TaskNodeContext } from '../TaskNodeContext';
 import { ITaskOverview } from '../ITaskOverview';
 import { isFinished } from '../task-utils';
-import { useActions } from '../../comments/useActions';
 import Pill from '../../components/pill/Pill';
-import { Items } from 'sp-preset';
+import MainService from '../../services/main-service';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {
@@ -116,25 +113,25 @@ export const TitleCell: React.FC<{node: TaskNode, nestLevel: number}> = ({node, 
     const { isTaskFinished } = React.useContext(TaskNodeContext);
     const navigate = useNavigate();
     const item = node.getTask();
-    const { finishTask, getTask, reopenTask } = useTasks();
-    const { addAction } = useActions();
+    const taskService = MainService.getTaskService();
+    const actionService = MainService.getActionService();
 
     const handleFinishTask = async (node: TaskNode) => {
-        await finishTask(node.Id);
-        const newItem = await getTask(node.Id);
-        await addAction(node.Id, 'Finished');
+        await taskService.finishTask(node.Id);
+        const newItem = await taskService.getTask(node.Id);
+        await actionService.addAction(node.Id, 'Finished');
         taskUpdated(newItem);
         if (newItem.ParentId) {
-            taskUpdated(await getTask(newItem.ParentId));
+            taskUpdated(await taskService.getTask(newItem.ParentId));
         }
     };
 
     const handleReopenTask = async (node: TaskNode) => {
-        await reopenTask(node.Id);
-        const newItem = await getTask(node.Id);
+        await taskService.reopenTask(node.Id);
+        const newItem = await taskService.getTask(node.Id);
         taskUpdated(newItem);
         if (newItem.ParentId) {
-            taskUpdated(await getTask(newItem.ParentId));
+            taskUpdated(await taskService.getTask(newItem.ParentId));
         }
     };
 

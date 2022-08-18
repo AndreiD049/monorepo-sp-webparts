@@ -1,5 +1,4 @@
 import {
-    CollapseAllVisibility,
     IDetailsGroupRenderProps,
     IGroup,
 } from 'office-ui-fabric-react';

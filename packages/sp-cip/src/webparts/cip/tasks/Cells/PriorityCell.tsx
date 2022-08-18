@@ -1,31 +1,30 @@
 import { useConst } from '@uifabric/react-hooks';
 import * as React from 'react';
-import { useActions } from '../../comments/useActions';
 import Pill from '../../components/pill/Pill';
 import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { TaskNode } from '../graph/TaskNode';
 import { TaskNodeContext } from '../TaskNodeContext';
-import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
+import MainService from '../../services/main-service';
 
 const PriorityCellCallout: React.FC<IPriorityCellProps> = (props) => {
     const task = useConst(props.node.getTask());
-    const { updateTask, getTask } = useTasks();
-    const { addAction } = useActions();
+    const taskService = MainService.getTaskService();
+    const actionService = MainService.getActionService();
     const priority = useChoiceFields('Priority');
 
     const handleClick = React.useCallback(
         (prio: any) => async () => {
             loadingStart();
             calloutVisibility({ visible: false });
-            await updateTask(task.Id, {
+            await taskService.updateTask(task.Id, {
                 Priority: prio,
             });
-            const newTask = await getTask(task.Id);
+            const newTask = await taskService.getTask(task.Id);
             taskUpdated(newTask);
-            await addAction(task.Id, 'Priority', `${task.Priority}|${newTask.Priority}`);
+            await actionService.addAction(task.Id, 'Priority', `${task.Priority}|${newTask.Priority}`);
             loadingStop();
         },
         [task]

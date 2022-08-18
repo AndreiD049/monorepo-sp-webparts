@@ -5,16 +5,18 @@ import { useNavigate } from 'react-router';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
 import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
-import { useTasks } from '../useTasks';
+import { TaskService } from '../../services/task-service';
 import { taskDeleted } from '../../utils/dom-events';
 import { AddCommentDialog } from '../dialogs/AddCommentDialog';
 import { TaskNode } from '../graph/TaskNode';
 import { TimeLogGeneral } from '../../components/TimeLogGeneral';
+import { GlobalContext } from '../../utils/GlobalContext';
+import MainService from '../../services/main-service';
 
 const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
     const { isTaskFinished } = React.useContext(TaskNodeContext);
     const navigate = useNavigate();
-    const { deleteTaskAndSubtasks } = useTasks();
+    const taskService = MainService.getTaskService();
     const isDisabled = React.useMemo(() => {
         if (node.Display === 'disabled') return true;
         if (node.getTask() && isTaskFinished) return true;
@@ -94,7 +96,7 @@ const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
                                 });
                                 loadingStart('default');
                                 if (confirm === 'yes') {
-                                    await deleteTaskAndSubtasks(node.getTask())
+                                    await taskService.deleteTaskAndSubtasks(node.getTask())
                                     taskDeleted(node.Id);
                                 }
                                 loadingStop('default');

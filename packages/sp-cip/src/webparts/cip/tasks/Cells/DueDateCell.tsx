@@ -1,13 +1,12 @@
 import { ActionButton, Calendar, Stack, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { useActions } from '../../comments/useActions';
 import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
 import { ITaskOverview } from '../ITaskOverview';
 import { TaskNodeContext } from '../TaskNodeContext';
-import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
+import MainService from '../../services/main-service';
 
 const defaultCalendarStrings = {
     months: [
@@ -66,8 +65,8 @@ const defaultCalendarStrings = {
 
 const DueDateCellCallout = (props) => {
     const task: ITaskOverview = props.node.getTask();
-    const { updateTask, getTask } = useTasks();
-    const { addAction } = useActions();
+    const taskService = MainService.getTaskService();
+    const actionService = MainService.getActionService();
     const [selectedDate, setSelectedDate] = React.useState(
         new Date(task.DueDate)
     );
@@ -87,11 +86,11 @@ const DueDateCellCallout = (props) => {
                     calloutVisibility({
                         visible: false,
                     });
-                    await updateTask(task.Id, {
+                    await taskService.updateTask(task.Id, {
                         DueDate: selectedDate.toISOString(),
                     });
-                    const newTask = await getTask(task.Id);
-                    await addAction(task.Id, 'Due date', `${task.DueDate}|${newTask.DueDate}`);
+                    const newTask = await taskService.getTask(task.Id);
+                    await actionService.addAction(task.Id, 'Due date', `${task.DueDate}|${newTask.DueDate}`);
                     taskUpdated(newTask);
                     loadingStop();
                 }}

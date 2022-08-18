@@ -7,13 +7,11 @@ import {
     Text,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { useActions } from '../../comments/useActions';
 import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
-import { useUsers } from '../../users/useUsers';
+import MainService from '../../services/main-service';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
 import { TaskNodeContext } from '../TaskNodeContext';
-import { useTasks } from '../useTasks';
 import styles from './Cells.module.scss';
 
 function filterUser(value: string) {
@@ -28,14 +26,14 @@ function filterUser(value: string) {
 }
 
 const ResponsibleCellCallout: React.FC<IResponsibleCellProps> = (props) => {
-    const usersAPI = useUsers();
-    const { updateTask, getTask } = useTasks();
-    const { addAction } = useActions();
+    const userService = MainService.getUserService();
+    const taskService = MainService.getTaskService();
+    const actionService = MainService.getActionService();
     const [users, setUsers] = React.useState<IPersonaProps[]>([]);
     const [searchValue, setSearchValue] = React.useState('');
 
     React.useEffect(() => {
-        usersAPI.getPersonaProps().then((personas) => setUsers(personas));
+        userService.getPersonaProps().then((personas) => setUsers(personas));
     }, []);
 
     const handleClick = React.useCallback(
@@ -43,11 +41,11 @@ const ResponsibleCellCallout: React.FC<IResponsibleCellProps> = (props) => {
             loadingStart('default');
             calloutVisibility({ visible: false });
             const task = props.node.getTask();
-            await updateTask(task.Id, {
+            await taskService.updateTask(task.Id, {
                 ResponsibleId: newId,
             });
-            const newTask = await getTask(props.node.Id);
-            await addAction(props.node.Id, 'Responisble', `${props.node.getTask().Responsible.Title}|${newTask.Responsible.Title}`);
+            const newTask = await taskService.getTask(props.node.Id);
+            await actionService.addAction(props.node.Id, 'Responisble', `${props.node.getTask().Responsible.Title}|${newTask.Responsible.Title}`);
             taskUpdated(newTask);
             loadingStop('default');
         },

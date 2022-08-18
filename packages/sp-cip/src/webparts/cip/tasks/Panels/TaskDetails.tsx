@@ -14,7 +14,6 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import { ActionLog } from '../../actionlog/ActionLog';
 import { Attachments } from '../../attachments/Attachments';
-import { useAttachments } from '../../attachments/useAttachments';
 import { Comments } from '../../comments/Comments';
 import { AlertDialog, DIALOG_IDS, getDialog } from '../../components/AlertDialog';
 import { TimeLogGeneral } from '../../components/TimeLogGeneral';
@@ -24,10 +23,12 @@ import {
     loadingStop,
 } from '../../components/utils/LoadingAnimation';
 import { taskUpdated, taskUpdatedHandler } from '../../utils/dom-events';
+import { GlobalContext } from '../../utils/GlobalContext';
 import { TaskNode } from '../graph/TaskNode';
 import { ITaskOverview } from '../ITaskOverview';
-import { useTasks } from '../useTasks';
+import { TaskService } from '../../services/task-service';
 import styles from './Panels.module.scss';
+import MainService from '../../services/main-service';
 
 export const TaskDetails: React.FC = () => {
     const params = useParams();
@@ -36,9 +37,9 @@ export const TaskDetails: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const state = location.state as { editable: boolean };
     const [task, setTask] = React.useState<ITaskOverview>(null);
-    const { updateTask, getTask, attachmentsUpdated } = useTasks();
+    const taskService = MainService.getTaskService();
     const [editable, setEditable] = React.useState(Boolean(state?.editable));
-    const { addAttachments } = useAttachments();
+    const attachmentService = MainService.getAttachmentService();
     const [editData, setEditData] = React.useState({
         title: task?.Title,
         description: task?.Description,
@@ -49,7 +50,7 @@ export const TaskDetails: React.FC = () => {
             loadingStart('details');
             const id = +params.taskId;
             if (Number.isInteger(id)) {
-                const task = await getTask(id);
+                const task = await taskService.getTask(id);
                 setTask(task);
             }
             loadingStop('details');
@@ -136,11 +137,11 @@ export const TaskDetails: React.FC = () => {
                     iconName: 'Save',
                 },
                 onClick: async () => {
-                    await updateTask(task.Id, {
+                    await taskService.updateTask(task.Id, {
                         Title: editData.title,
                         Description: editData.description,
                     });
-                    taskUpdated(await getTask(task.Id));
+                    taskUpdated(await taskService.getTask(task.Id));
                     setEditable(false);
                 },
             });
@@ -206,8 +207,8 @@ export const TaskDetails: React.FC = () => {
                             task={task}
                             onAttachments={async (files: File[]) => {
                                 loadingStart('details');
-                                await addAttachments(task, files);
-                                const latest = await attachmentsUpdated(
+                                await attachmentService.addAttachments(task, files);
+                                const latest = await taskService.attachmentsUpdated(
                                     task.Id,
                                     files.length
                                 );

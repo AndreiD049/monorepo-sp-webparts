@@ -6,7 +6,7 @@ import {
     loadingStart,
     loadingStop,
 } from '../../components/utils/LoadingAnimation';
-import { useUsers } from '../../users/useUsers';
+import MainService from '../../services/main-service';
 import {
     getSubtasksHandler,
     relinkParent,
@@ -15,37 +15,35 @@ import {
     taskUpdatedHandler,
 } from '../../utils/dom-events';
 import { ITaskOverview } from '../ITaskOverview';
-import { useTasks } from '../useTasks';
 import { ICipFilters } from './sort-filter/filters-reducer';
 
 export const useTasksFetch = (filters: ICipFilters) => {
-    const { getCurrentUser } = useUsers();
+    const userService = MainService.getUserService();
     const [tasks, setTasks] = React.useState<ITaskOverview[]>([]);
-    const { getUserTasks, getNonFinishedMains, getFinishedMains, getAllMains, getSubtasks, getTask, updateTask } =
-        useTasks();
+    const taskService = MainService.getTaskService();
 
     const getAll = React.useCallback(async () => {
         if (filters.assignedTo === AssigneeSelected.Single) {
-            const currentUser = await getCurrentUser();
-            return getUserTasks(currentUser.Id, 'All');
+            const currentUser = await userService.getCurrentUser();
+            return taskService.getUserTasks(currentUser.Id, 'All');
         }
-        return getAllMains();
+        return taskService.getAllMains();
     }, [filters])
 
     const getOpen = React.useCallback(async () => {
         if (filters.assignedTo === AssigneeSelected.Single) {
-            const currentUser = await getCurrentUser();
-            return getUserTasks(currentUser.Id, 'Open');
+            const currentUser = await userService.getCurrentUser();
+            return taskService.getUserTasks(currentUser.Id, 'Open');
         }
-        return getNonFinishedMains();
+        return taskService.getNonFinishedMains();
     }, [filters])
 
     const getFinished = React.useCallback(async () => {
         if (filters.assignedTo === AssigneeSelected.Single) {
-            const currentUser = await getCurrentUser();
-            return getUserTasks(currentUser.Id, 'Finished');
+            const currentUser = await userService.getCurrentUser();
+            return taskService.getUserTasks(currentUser.Id, 'Finished');
         }
-        return getFinishedMains();
+        return taskService.getFinishedMains();
     }, [filters])
 
     React.useEffect(() => {
@@ -89,7 +87,7 @@ export const useTasksFetch = (filters: ICipFilters) => {
 
         // When subtasks are loaded
         const removeGetSubtasks = getSubtasksHandler((parent: ITaskOverview) => {
-            getSubtasks(parent).then(async (subtasks) => {
+            taskService.getSubtasks(parent).then(async (subtasks) => {
                 setTasks((prev) => uniqBy([...prev, ...subtasks], (t) => t.Id));
             });
         });

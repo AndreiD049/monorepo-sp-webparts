@@ -5,12 +5,12 @@ import styles from './Cip.module.scss';
 import TasksTable from '../tasks/table/TasksTable';
 import { ICipWebPartProps } from '../CipWebPart';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
-import { useUsers } from '../users/useUsers';
 import { HashRouter, Outlet, Route, Routes } from 'react-router-dom';
 import CreateTaskPanel from '../tasks/panels/CreateTask';
 import { TaskDetails } from '../tasks/panels/TaskDetails';
 import { LoadingAnimation } from './utils/LoadingAnimation';
 import { AlertDialog } from './AlertDialog';
+import MainService from '../services/main-service';
 
 interface ICipProps {
     properties: ICipWebPartProps;
@@ -22,12 +22,12 @@ const Cip: React.FC<ICipProps> = (props) => {
         teams: [],
         currentUser: null,
     });
-    const users = useUsers({ properties: props.properties });
+    const userService = MainService.getUserService();
 
     React.useEffect(() => {
         async function run() {
-            const teams = await users.getTeams();
-            const currentUser = await users.getCurrentUser();
+            const teams = await userService.getTeams();
+            const currentUser = await userService.getCurrentUser();
             setInfo((prev) => ({
                 ...prev,
                 teams,

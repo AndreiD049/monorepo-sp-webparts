@@ -12,17 +12,18 @@ import {
 import * as React from 'react';
 import styles from './Comments.module.scss';
 import { ITaskOverview } from '../tasks/ITaskOverview';
-import { IPagedCollection, useComments } from './useComments';
+import { IPagedCollection } from '../services/comment-service';
 import { ITaskComment } from './ITaskComment';
 import { Comment } from './Comment';
 import { taskUpdated } from '../utils/dom-events';
+import MainService from '../services/main-service';
 
 interface ICommentsProps {
     task: ITaskOverview;
 }
 
 export const Comments: React.FC<ICommentsProps> = (props) => {
-    const commentsAPI = useComments();
+    const commentService = MainService.getCommentService();
     const [newComment, setNewComment] = React.useState('');
     const [taskComments, setTaskComments] = React.useState<ITaskComment[]>([]);
     const [commentPager, setCommentPager] = React.useState<IPagedCollection<ITaskComment[]>>(null);
@@ -37,19 +38,19 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
 
     const handleNewComment = React.useCallback(async () => {
         if (!newComment.trim()) return;
-        const added = await commentsAPI.addComment(props.task, newComment);
+        const added = await commentService.addComment(props.task, newComment);
         setNewComment('');
-        const synced = await commentsAPI.getComment(added.data.Id);
+        const synced = await commentService.getComment(added.data.Id);
         setTaskComments((prev) => [synced, ...prev]);
     }, [newComment]);
 
     const handleEditComment = async (id: number) => {
-        const updated = await commentsAPI.getComment(id);
+        const updated = await commentService.getComment(id);
         setTaskComments((prev) => prev.map((p) => p.Id === id ? updated : p));
     }
 
     React.useEffect(() => {
-        commentsAPI.getByTaskPaged(props.task, 5).then((p) => {
+        commentService.getByTaskPaged(props.task, 5).then((p) => {
             setTaskComments(p.results);
             setCommentPager(p)
         });

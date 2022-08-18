@@ -9,8 +9,8 @@ import {
     Text,
     TextField,
 } from 'office-ui-fabric-react';
-import { useComments } from './useComments';
 import { GlobalContext } from '../utils/GlobalContext';
+import MainService from '../services/main-service';
 
 export interface ICommentProps {
     comment: ITaskComment;
@@ -88,12 +88,12 @@ const CommentBody: React.FC<ICommentBodyProps> = (props) => {
 };
 
 export const Comment: React.FC<ICommentProps> = (props) => {
-    const { editComment } = useComments();
+    const commentService = MainService.getCommentService();
     const [edit, setEdit] = React.useState(false);
     const [newValue, setNewValue] = React.useState(props.comment.Comment);
 
     const handleEdit = React.useCallback(async () => {
-        await editComment(props.comment.Id, {
+        await commentService.editComment(props.comment.Id, {
             Comment: newValue,
         });
         props.onEdit(props.comment.Id);

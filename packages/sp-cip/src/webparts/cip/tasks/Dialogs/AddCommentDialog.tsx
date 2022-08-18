@@ -9,18 +9,18 @@ import {
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { useComments } from '../../comments/useComments';
 import { dismissDialog } from '../../components/AlertDialog';
 import { ITaskOverview } from '../ITaskOverview';
 import styles from '../../comments/Comments.module.scss';
+import MainService from '../../services/main-service';
 
 export const AddCommentDialog: React.FC<{ task: ITaskOverview }> = (props) => {
-    const { getByTask, addComment, getComment } = useComments();
+    const commentService = MainService.getCommentService();
     const [newComment, setNewComment] = React.useState('');
     const [comments, setComments] = React.useState([]);
 
     React.useEffect(() => {
-        getByTask(props.task, 3, 0).then((c) => {
+        commentService.getByTask(props.task, 3, 0).then((c) => {
             setComments(c);
         });
     }, [props.task]);
@@ -54,7 +54,7 @@ export const AddCommentDialog: React.FC<{ task: ITaskOverview }> = (props) => {
 
     const handleNewComment = React.useCallback(async () => {
         if (!newComment.trim()) return;
-        await addComment(props.task, newComment);
+        await commentService.addComment(props.task, newComment);
         dismissDialog('MAIN');
     }, [newComment]);
 

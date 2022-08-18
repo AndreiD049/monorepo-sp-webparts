@@ -7,15 +7,15 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { actionUpdated } from '../../actionlog/ActionLog';
-import { IAction, useActions } from '../../comments/useActions';
+import { IAction } from '../../services/action-service';
 import { ITaskOverview } from '../../tasks/ITaskOverview';
-import { useTasks } from '../../tasks/useTasks';
 import { taskUpdated } from '../../utils/dom-events';
 import { DIALOG_IDS, dismissDialog } from '../AlertDialog';
 import { HoursInput } from '../HoursInput';
 import { SelectMainTask } from '../SelectMainTask';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
 import styles from './TimeLogGeneral.module.scss';
+import MainService from '../../services/main-service';
 
 export interface ITimeLogGeneralProps {
     dialogId: DIALOG_IDS;
@@ -24,8 +24,8 @@ export interface ITimeLogGeneralProps {
 }
 
 export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
-    const { getTask, updateTask } = useTasks();
-    const { getAction, addAction, updateAction } = useActions();
+    const taskService = MainService.getTaskService();
+    const actionService = MainService.getActionService();
     const [selected, setSelected] = React.useState<ITaskOverview>(props.task);
     const [time, setTime] = React.useState(0);
     const [comment, setComment] = React.useState('');
@@ -34,7 +34,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     React.useEffect(() => {
         async function checkAction() {
             if (props.action) {
-                const action = await getAction(props.action.Id);
+                const action = await actionService.getAction(props.action.Id);
                 const indexPipe = action.Comment.indexOf('|');
                 setTime(
                     Number.parseFloat(action.Comment.substring(0, indexPipe))
@@ -48,13 +48,13 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     // New action - has selected task
     const handleLogNew = async () => {
         const selId = selected?.Id || null;
-        await addAction(selId, 'Time log', `${time}|${comment}`);
+        await actionService.addAction(selId, 'Time log', `${time}|${comment}`);
         if (selId) {
-            const task = props.task || (await getTask(selId));
-            await updateTask(selId, {
+            const task = props.task || (await taskService.getTask(selId));
+            await taskService.updateTask(selId, {
                 EffectiveTime: task.EffectiveTime + time,
             });
-            taskUpdated(await getTask(selId));
+            taskUpdated(await taskService.getTask(selId));
         }
     }
     
@@ -63,14 +63,14 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     const handleLogUpdate = async () => {
         const indexOfPipe = props.action.Comment.indexOf('|');
         const delta = Number.parseFloat(props.action.Comment.substring(0, indexOfPipe)) - time;
-        const action = await updateAction(props.action.Id, {
+        const action = await actionService.updateAction(props.action.Id, {
             Comment: `${time}|${comment}`,
         });
-        const updateTaskAction = await updateTask(props.task.Id, {
+        const updateTaskAction = await taskService.updateTask(props.task.Id, {
             EffectiveTime: props.task.EffectiveTime - delta,
         });
-        actionUpdated(await getAction(props.action.Id));
-        taskUpdated(await getTask(props.task.Id));
+        actionUpdated(await actionService.getAction(props.action.Id));
+        taskUpdated(await taskService.getTask(props.task.Id));
 
         return Promise.all([action, updateTaskAction]);
     };
