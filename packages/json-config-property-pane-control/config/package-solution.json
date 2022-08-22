@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "json-configuration-client-side-solution",
+    "id": "f1b9f13c-2a71-4dc4-9896-c48bfd87f2a9",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.15.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "JSON Configuration description"
+      },
+      "longDescription": {
+        "default": "JSON Configuration description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "json-configuration Feature",
+        "description": "The feature that activates elements of the json-configuration solution.",
+        "id": "e601d897-0c44-42c9-9f08-badbb1614ed1",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/json-configuration.sppkg"
+  }
+}
