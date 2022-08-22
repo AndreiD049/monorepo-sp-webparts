@@ -4,6 +4,5 @@ export interface IJsonConfigurationProps {
     /** props for the react component are defined here */
     // sample
     value: IJsonConfig<{}>;
-    onFilenameChange: (newValue: string) => void;
-    onChange: (newValue: string) => void;
+    onChange: (fileName: string, newValue: string) => void;
 }

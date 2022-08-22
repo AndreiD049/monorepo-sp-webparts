@@ -60,7 +60,6 @@ export class PropertyPaneJsonConfiguration implements IPropertyPaneField<IProper
 
         const element: React.ReactElement<IJsonConfigurationProps> = React.createElement(JsonConfiguration, {
             value: this.properties.value,
-            onFilenameChange: this.onFilenameChanged.bind(this),
             onChange: this.onChanged.bind(this),
         });
         ReactDom.render(element, elem);
@@ -70,18 +69,10 @@ export class PropertyPaneJsonConfiguration implements IPropertyPaneField<IProper
         }
     }
 
-    private onChanged(newValue: object): void {
+    private onChanged(fileName: string, newValue: object): void {
         const result: IJsonConfig<{}> = {
-            ...this.properties.value,
             value: newValue,
-        };
-        this._onChangeCallback(this.targetProperty, result);
-    }
-
-    private onFilenameChanged(newFilename: string): void {
-        const result: IJsonConfig<{}> = {
-            ...this.properties.value,
-            sourcePath: newFilename,
+            sourcePath: fileName,
         };
         this._onChangeCallback(this.targetProperty, result);
     }

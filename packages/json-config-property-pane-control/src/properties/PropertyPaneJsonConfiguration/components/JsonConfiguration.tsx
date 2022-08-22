@@ -1,5 +1,5 @@
-import { debounce } from "@microsoft/sp-lodash-subset";
-import { MessageBar, MessageBarType, TextField } from "office-ui-fabric-react";
+import { update } from "@microsoft/sp-lodash-subset";
+import { DefaultButton, MessageBar, MessageBarType, TextField } from "office-ui-fabric-react";
 import * as React from "react";
 import JsonConfigurationService from "../services/JsonConfigurationService";
 import { IJsonConfigurationProps } from "./IJsonConfigurationProps";
@@ -11,59 +11,59 @@ export const JsonConfiguration: React.FC<IJsonConfigurationProps> = (props) => {
   const [value, setValue] = React.useState(
     JSON.stringify(props.value?.value, null, 4) || ""
   );
+  const [unsaved, setUnsaved] = React.useState(false);
+  const [isJsonValid, setIsJsonValid] = React.useState(true);
 
-  const changeContents = (content: string) => {
-    setValue(content);
+  const updateContents = (content: JSON) => {
     try {
-      const val = JSON.parse(content);
-      props.onChange(val);
-      setErrorMessage("");
+      const str = JSON.stringify(content, null, 4);
+      const json = JSON.parse(str);
+      setValue(str);
+      setUnsaved(false);
+      props.onChange(fileName, json);
     } catch (err) {
-      setErrorMessage("JSON is invalid");
+      setIsJsonValid(false);
     }
-  };
+  }
 
-  const fetchFileContents = async (path: string) => {
+  const handleLoad = React.useCallback(async () => {
     try {
-      const contents = await JsonConfigurationService.getFileContents(path);
-      changeContents(JSON.stringify(contents, null, 4));
-      setErrorMessage("");
-    } catch (err) {
-      setErrorMessage(err);
+      const content = await JsonConfigurationService.getFileContents(fileName);
+      updateContents(content);
+      setErrorMessage('');
+    } catch (e) {
+      setErrorMessage(e);
+    }
+  }, [fileName]);
+
+  const handleChange = (ev: {}, val: string) => {
+    try {
+      setValue(val);
+      setUnsaved(true);
+      const json = JSON.parse(val);
+      setIsJsonValid(true);
+    } catch {
+      setIsJsonValid(false);
     }
   };
 
-  React.useEffect(() => {
-    async function run(): Promise<void> {
-      if (fileName) {
-        await fetchFileContents(fileName);
-      }
-    }
-    run().catch((err) => console.error(err));
-  }, []);
-
-  const updateContents = async (filename: string) =>
-    await fetchFileContents(filename);
-
-  const handleChangeFilename = (_ev: {}, newValue: string): void => {
-    setFileName(newValue);
-    props.onFilenameChange(newValue);
-    void updateContents(newValue);
-  };
-
-  const handleChange = (ev: React.ChangeEvent<HTMLTextAreaElement>): void => {
-    const newVal = ev.target.value;
-    changeContents(newVal);
-  };
+  const handleSave = async () => {
+    props.onChange(fileName, JSON.parse(value));
+    await JsonConfigurationService.updateFileContents(fileName, value);
+  }
 
   return (
     <div>
-      <TextField
-        label="File path"
-        value={fileName}
-        onChange={handleChangeFilename}
-        autoComplete="off"
-      />
+      <div className={styles.fileName}>
+        <TextField
+          className={styles.fileNameInput}
+          label="File path"
+          value={fileName}
+          onChange={(ev, val) => setFileName(val)}
+          autoComplete="off"
+        />
+        <DefaultButton onClick={handleLoad}>Load</DefaultButton>
+      </div>
       <TextField
         label="File contents"
         onChange={handleChange}
@@ -76,6 +76,16 @@ export const JsonConfiguration: React.FC<IJsonConfigurationProps> = (props) => {
           {errorMessage}
         </MessageBar>
       )}
+      {!isJsonValid && (
+        <MessageBar messageBarType={MessageBarType.error}>
+          JSON is invalid
+        </MessageBar>
+      )}
+      {
+        unsaved && (
+          <DefaultButton onClick={handleSave} className={styles.saveButton} disabled={!isJsonValid}>Save</DefaultButton>
+        )
+      }
     </div>
   );
 };

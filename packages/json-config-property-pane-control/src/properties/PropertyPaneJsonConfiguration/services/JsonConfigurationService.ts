@@ -26,4 +26,13 @@ export default class JsonConfigurationService {
             throw (await result.json()).error.message;
         }
     }
+
+    public static async updateFileContents(path: string, data: string): Promise<void> {
+        await this._spHttpClient.post(`${this._currentWebUrl}/_api/web/GetFileByServerRelativeUrl('${path}')/$value`, SPHttpClient.configurations.v1, {
+            body: data,
+            headers: {
+                "X-HTTP-Method": "PUT"
+            }
+        });
+    }
 }

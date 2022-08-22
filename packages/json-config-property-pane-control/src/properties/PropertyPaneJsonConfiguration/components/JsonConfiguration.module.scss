@@ -1,1 +1,16 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.fileName {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.fileNameInput {
+    flex-grow: 2;
+}
+
+.saveButton {
+    margin-top: .5em;
+}
