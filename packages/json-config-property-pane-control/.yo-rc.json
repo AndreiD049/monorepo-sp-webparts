@@ -1,0 +1,16 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.15.2",
+    "libraryName": "json-configuration",
+    "libraryId": "f1b9f13c-2a71-4dc4-9896-c48bfd87f2a9",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "JSON Configuration",
+    "solutionShortDescription": "JSON Configuration description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
