@@ -62,7 +62,7 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
         const re = /sharepoint.com(\/(sites|teams).*)\/_api/;
         const match = url.match(re);
         const site = match ? match[1] : '';
-        return `${site}/${properties.attachmentsPath}/Forms/AllItems.aspx?id=${site}/${properties.attachmentsPath}/${props.task.Id}/${file}&parent=${site}/${props.task.Id}`;
+        return `${site}/${properties.config.attachmentsPath}/Forms/AllItems.aspx?id=${site}/${properties.config.attachmentsPath}/${props.task.Id}/${file}&parent=${site}/${props.task.Id}`;
     }, []);
 
     const downloadLinkHref = React.useCallback((file: string) => {
@@ -70,7 +70,7 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
         const re = /sharepoint.com(\/(sites|teams).*)\/_api/;
         const match = url.match(re);
         const site = match ? match[1] : '';
-        return `${site}/_layouts/download.aspx?SourceUrl=${site}/${properties.attachmentsPath}/${props.task.Id}/${file}`;
+        return `${site}/_layouts/download.aspx?SourceUrl=${site}/${properties.config.attachmentsPath}/${props.task.Id}/${file}`;
     }, []);
 
     const fileIcon = React.useMemo(() => getFileIconName(props.attachment.Name), []);

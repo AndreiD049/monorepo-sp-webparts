@@ -35,7 +35,7 @@ export class CommentService {
         this.taskListId = properties.taskListId;
         this.taskService = MainService.getTaskService();
         this.sp = CipWebPart.SPBuilder.getSP(key);
-        this.list = this.sp.web.lists.getByTitle(properties.activitiesListName);
+        this.list = this.sp.web.lists.getByTitle(properties.config.commentListName);
     }
 
     getAllRequest = (listId: string) => {

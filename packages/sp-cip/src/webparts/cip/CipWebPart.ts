@@ -15,20 +15,26 @@ import Cip from './components/Cip';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { initNotifications, SPnotify } from 'sp-react-notifications';
 import { getListId } from './utils/getListId';
-import { MessageBarType, TeachingBubbleContent } from 'office-ui-fabric-react';
+import { MessageBarType } from 'office-ui-fabric-react';
 import MainService from './services/main-service';
+import { IJsonConfig, PropertyPaneJsonConfiguration } from 'json-configuration';
+
+interface IConfiguration {
+    rootSite: string;
+    listName: string;
+    commentListName: string;
+    attachmentsPath: string;
+    teamsList: {
+        name: string;
+        fieldName: string;
+    }
+    remotes: IRemoteSource[];
+}
 
 export interface ICipWebPartProps {
     headerText: string;
-    rootDataSource: string;
-    tasksListName: string;
     taskListId: string;
-    activitiesListName: string;
-    attachmentsPath: string;
-    teamsList: string;
-    teamsField: string;
-    remoteSourcesString: string;
-    remoteSources: IRemoteSource[];
+    config: IJsonConfig<IConfiguration>;
 }
 
 export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> {
@@ -39,10 +45,9 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
 
     protected async onInit(): Promise<void> {
         initNotifications();
-        this.processProperties();
 
         const tennats = {};
-        this.properties.remoteSources.forEach(
+        this.properties.config?.remotes?.forEach(
             (s) => (tennats[s.Name] = s.ListRoot)
         );
 
@@ -50,7 +55,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
             CipWebPart.SPBuilder = new SPBuilder(this.context)
                 .withRPM(600)
                 .withTennants({
-                    Data: this.properties.rootDataSource,
+                    Data: this.properties.config.rootSite,
                     ...tennats,
                 })
                 .withAdditionalTimelines([
@@ -64,7 +69,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
 
             CipWebPart.baseUrl = this.context.pageContext.web.absoluteUrl;
             this.properties.taskListId = await getListId(
-                this.properties.tasksListName
+                this.properties.config.listName
             );
         } catch (err) {
             SPnotify({
@@ -74,16 +79,6 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
         }
 
         return super.onInit();
-    }
-
-    private processProperties() {
-        try {
-            this.properties.remoteSources = JSON.parse(
-                this.properties.remoteSourcesString
-            );
-        } catch {
-            this.properties.remoteSources = [];
-        }
     }
 
     public async render(): Promise<void> {
@@ -128,7 +123,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
             CipWebPart.SPBuilder = new SPBuilder(this.context)
                 .withRPM(600)
                 .withTennants({
-                    Data: this.properties.rootDataSource,
+                    Data: this.properties.config.rootSite,
                 })
                 .withAdditionalTimelines([
                     InjectHeaders({
@@ -159,31 +154,9 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                         {
                             groupName: strings.BasicGroupName,
                             groupFields: [
-                                PropertyPaneTextField('rootDataSource', {
-                                    label: strings.RootDataSourceLabel,
-                                    description:
-                                        strings.RootDataSourceDescription,
-                                }),
-                                PropertyPaneTextField('tasksListName', {
-                                    label: strings.CipTasksListLabel,
-                                    description:
-                                        strings.CipTasksListDescription,
-                                }),
-                                PropertyPaneTextField('activitiesListName', {
-                                    label: strings.CipCommentListLabel,
-                                    description:
-                                        strings.CipCommentListDescription,
-                                }),
-                                PropertyPaneTextField('attachmentsPath', {
-                                    label: strings.AttachmentsListLabel,
-                                    description:
-                                        strings.AttachmentsListDescription,
-                                }),
-                                PropertyPaneTextField('teamsList', {
-                                    label: strings.TeamsList,
-                                }),
-                                PropertyPaneTextField('teamsField', {
-                                    label: strings.TeamsListField,
+                                new PropertyPaneJsonConfiguration('config', {
+                                    ctx: this.context,
+                                    value: this.properties.config,
                                 }),
                                 PropertyPaneButton('', {
                                     text: 'Create list',
@@ -203,18 +176,6 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                                         );
                                     },
                                     icon: 'Add',
-                                }),
-                            ],
-                        },
-                    ],
-                },
-                {
-                    groups: [
-                        {
-                            groupName: 'Remote sources',
-                            groupFields: [
-                                PropertyPaneTextField('remoteSourcesString', {
-                                    multiline: true,
                                 }),
                             ],
                         },

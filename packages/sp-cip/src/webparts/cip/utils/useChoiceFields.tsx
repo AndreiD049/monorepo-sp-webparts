@@ -11,7 +11,7 @@ export const useChoiceFields = (fieldName: keyof ITaskOverview, customSP?: SPFI)
         []
     );
     const list = React.useMemo(
-        () => sp.web.lists.getByTitle(ctx.properties.tasksListName),
+        () => sp.web.lists.getByTitle(ctx.properties.config.listName),
         [sp]
     );
     const [fieldInfo, setFieldInfo] = React.useState<IFieldInfo>(null);

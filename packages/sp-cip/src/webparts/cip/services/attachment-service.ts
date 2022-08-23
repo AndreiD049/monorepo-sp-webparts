@@ -13,9 +13,9 @@ export class AttachmentService {
 
     constructor(defaultKey: string, properties: ICipWebPartProps) {
         this.sp = CipWebPart.SPBuilder.getSP(defaultKey);
-        this.folder = this.sp.web.getFolderByServerRelativePath(properties.attachmentsPath);
-        this.taskFolder = (id: number) => this.sp.web.getFolderByServerRelativePath(`${properties.attachmentsPath}/${id}`);
-        this.attachmentsPath = properties.attachmentsPath;
+        this.folder = this.sp.web.getFolderByServerRelativePath(properties.config.attachmentsPath);
+        this.taskFolder = (id: number) => this.sp.web.getFolderByServerRelativePath(`${properties.config.attachmentsPath}/${id}`);
+        this.attachmentsPath = properties.config.attachmentsPath;
     }
 
     async addAttachments(task: ITaskOverview, attachments: File[]) {

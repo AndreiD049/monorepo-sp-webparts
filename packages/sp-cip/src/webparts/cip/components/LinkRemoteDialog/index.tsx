@@ -15,7 +15,7 @@ export const LinkRemoteDialog: React.FC<ILinkRemoteDialogProps> = (props) => {
     const [remoteItems, setRemoteItems] = React.useState([]);
 
     const options = React.useMemo(() => {
-        return properties.remoteSources.map((source) => ({
+        return properties.config.remotes.map((source) => ({
             key: source.Name,
             text: source.Name,
             data: source

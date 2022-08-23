@@ -1,16 +1,18 @@
-import { update } from "@microsoft/sp-lodash-subset";
 import { DefaultButton, MessageBar, MessageBarType, TextField } from "office-ui-fabric-react";
 import * as React from "react";
+import { getConfigValue } from "../PropertyPaneJsonConfiguration";
 import JsonConfigurationService from "../services/JsonConfigurationService";
 import { IJsonConfigurationProps } from "./IJsonConfigurationProps";
-import styles from "./JsonConfiguration.module.scss";
+// @ts-nocheck
+import styles from './JsonConfiguration.module.scss'
 
 export const JsonConfiguration: React.FC<IJsonConfigurationProps> = (props) => {
   const [errorMessage, setErrorMessage] = React.useState("");
-  const [fileName, setFileName] = React.useState(props.value?.sourcePath || "");
+  const [fileName, setFileName] = React.useState(props.value?.__source || "");
   const [value, setValue] = React.useState(
-    JSON.stringify(props.value?.value, null, 4) || ""
+    JSON.stringify(getConfigValue(props.value), null, 4) || ""
   );
+  const parentFolder = React.useMemo(() => fileName.split('/').slice(0, -1).join('/'), [fileName])
   const [unsaved, setUnsaved] = React.useState(false);
   const [isJsonValid, setIsJsonValid] = React.useState(true);
 
@@ -52,6 +54,12 @@ export const JsonConfiguration: React.FC<IJsonConfigurationProps> = (props) => {
     await JsonConfigurationService.updateFileContents(fileName, value);
   }
 
+  const handleClickLink = (ev: React.MouseEvent) => {
+    ev.preventDefault();
+    window.open(`${parentFolder}/Forms/AllItems.aspx?id=${fileName}&parent=${parentFolder}&p=5`, '_blank');
+    return false;
+  }
+
   return (
     <div>
       <div className={styles.fileName}>
@@ -64,6 +72,7 @@ export const JsonConfiguration: React.FC<IJsonConfigurationProps> = (props) => {
         />
         <DefaultButton onClick={handleLoad}>Load</DefaultButton>
       </div>
+      <a onClick={handleClickLink} href="#">Edit</a>
       <TextField
         label="File contents"
         onChange={handleChange}

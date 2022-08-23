@@ -17,8 +17,8 @@ export class UserService {
             expireFunction: () => new Date(Date.now() + HOUR),
         });
         this.sp = CipWebPart.SPBuilder.getSP().using(CachingTimeline);
-        this.usersList = this.sp.web.lists.getByTitle(properties.teamsList);
-        this.teamsField = properties.teamsField;
+        this.usersList = this.sp.web.lists.getByTitle(properties.config?.teamsList.name);
+        this.teamsField = properties.config?.teamsList.fieldName;
     }
 
     async getAll() {

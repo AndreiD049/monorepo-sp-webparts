@@ -1,7 +1,7 @@
 /** Source: https://www.vrdmn.com/2019/03/using-service-scopes-to-decouple.html */
 
 import { ServiceScope } from '@microsoft/sp-core-library';
-import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
+import { SPHttpClient } from '@microsoft/sp-http';
 import { PageContext } from '@microsoft/sp-page-context';
 
 export default class JsonConfigurationService {

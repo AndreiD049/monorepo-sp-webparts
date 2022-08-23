@@ -65,7 +65,7 @@ export class ActionService {
     constructor(defaultKey: string, properties: ICipWebPartProps) {
         this.sp = CipWebPart.SPBuilder.getSP(defaultKey);
         this.taskListId = properties.taskListId;
-        this.list = this.sp.web.lists.getByTitle(properties.activitiesListName);
+        this.list = this.sp.web.lists.getByTitle(properties.config.commentListName);
     }
 
     async getAction(id: number): Promise<IAction> {

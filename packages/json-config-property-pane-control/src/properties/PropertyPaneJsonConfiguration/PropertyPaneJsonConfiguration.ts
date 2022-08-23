@@ -10,10 +10,17 @@ import { JsonConfiguration } from './components/JsonConfiguration';
 import { IJsonConfigurationProps } from './components/IJsonConfigurationProps';
 import JsonConfigurationService from './services/JsonConfigurationService';
 
-export interface IJsonConfig<T> {
-    sourcePath: string;
-    value: T;
+export function getConfigValue(conf: IJsonConfig<any>) {
+    try {
+        const copy = {...conf};
+        delete copy.__source;
+        return copy;
+    } catch {
+        return {};
+    }
 }
+
+export type IJsonConfig<T> = T & { __source: string }
 
 export class PropertyPaneJsonConfiguration implements IPropertyPaneField<IPropertyPaneJsonConfigurationProps> {
     public type: PropertyPaneFieldType = PropertyPaneFieldType.Custom;
@@ -71,8 +78,8 @@ export class PropertyPaneJsonConfiguration implements IPropertyPaneField<IProper
 
     private onChanged(fileName: string, newValue: object): void {
         const result: IJsonConfig<{}> = {
-            value: newValue,
-            sourcePath: fileName,
+            __source: fileName,
+            ...newValue,
         };
         this._onChangeCallback(this.targetProperty, result);
     }

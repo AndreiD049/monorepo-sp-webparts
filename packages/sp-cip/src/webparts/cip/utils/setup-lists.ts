@@ -10,7 +10,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
     /**
      * Comment list
      */
-    const commentList = await sp.web.lists.ensure(props.activitiesListName);
+    const commentList = await sp.web.lists.ensure(props.config.commentListName);
 
     if (commentList.created) {
         /** Set title not required */
@@ -96,7 +96,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
     /**
      * Task list
      */
-    const taskList = await sp.web.lists.ensure(props.tasksListName);
+    const taskList = await sp.web.lists.ensure(props.config.listName);
     
     if (taskList.created) {
         SPnotify({
@@ -104,7 +104,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
             messageType: MessageBarType.warning,
         });
 
-        const list = sp.web.lists.getByTitle(props.tasksListName);
+        const list = sp.web.lists.getByTitle(props.config.listName);
         
         const description = await list.fields.createFieldAsXml(
             `<Field AppendOnly='FALSE' Description='Task description' DisplayName='Description' Format='Dropdown' IsModern='TRUE' IsolateStyles='FALSE' Name='Description' RichText='FALSE' RichTextMode='Compatible' Title='Description' Type='Note'></Field>`
@@ -257,7 +257,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         });
     }
 
-    const attachmentsLibrary = await sp.web.lists.ensure(props.attachmentsPath, 'CIP Attachments', 101, false, { OnQuickLaunch: false });
+    const attachmentsLibrary = await sp.web.lists.ensure(props.config.attachmentsPath, 'CIP Attachments', 101, false, { OnQuickLaunch: false });
 
     if (attachmentsLibrary.created) {
         const taskName = await attachmentsLibrary.list.fields.createFieldAsXml(

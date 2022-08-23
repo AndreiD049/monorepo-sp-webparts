@@ -55,7 +55,7 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                     }),
             },
         ];
-        if (properties.remoteSources.length > 0) {
+        if (properties.config.remotes.length > 0) {
             result.push({
                 key: 'linkRemote',
                 text: 'Link remote',

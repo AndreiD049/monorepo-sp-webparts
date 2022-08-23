@@ -31,9 +31,9 @@ export default class MainService {
         this.taskServices = new Map();
         this.taskServices.set(
             defaultKey,
-            new TaskService(defaultKey, properties.tasksListName)
+            new TaskService(defaultKey, properties.config.listName)
         );
-        properties.remoteSources.forEach((remote) =>
+        properties.config.remotes.forEach((remote) =>
             this.taskServices.set(
                 remote.Name,
                 new TaskService(remote.Name, remote.ListTitle)
@@ -50,7 +50,7 @@ export default class MainService {
             defaultKey,
             new UserService(defaultKey, properties)
         );
-        properties.remoteSources.forEach((remote) =>
+        properties.config.remotes.forEach((remote) =>
             this.userServices.set(
                 remote.Name,
                 new UserService(remote.Name, properties)
@@ -67,7 +67,7 @@ export default class MainService {
             defaultKey,
             new CommentService(defaultKey, properties)
         );
-        properties.remoteSources.forEach((remote) =>
+        properties.config.remotes.forEach((remote) =>
             this.commentServices.set(
                 remote.Name,
                 new CommentService(remote.Name, properties)
@@ -84,7 +84,7 @@ export default class MainService {
             defaultKey,
             new ActionService(defaultKey, properties)
         );
-        properties.remoteSources.forEach((remote) =>
+        properties.config.remotes.forEach((remote) =>
             this.actionServices.set(
                 remote.Name,
                 new ActionService(remote.Name, properties)
@@ -101,7 +101,7 @@ export default class MainService {
             defaultKey,
             new AttachmentService(defaultKey, properties)
         );
-        properties.remoteSources.forEach((remote) =>
+        properties.config.remotes.forEach((remote) =>
             this.attachmentServices.set(
                 remote.Name,
                 new AttachmentService(remote.Name, properties)
