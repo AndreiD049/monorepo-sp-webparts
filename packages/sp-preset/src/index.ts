@@ -68,7 +68,10 @@ export default class SPBuilder {
         if (!key) {
             return this.usingDefault(spfi());
         }
-        return this.usingDefault(spfi(this.tennants[key]));
+        if (key in this.tennants) {
+            return this.usingDefault(spfi(this.tennants[key]));
+        }
+        return this.usingDefault(spfi(key));
     }
 
     private usingDefault(sp: SPFI) {

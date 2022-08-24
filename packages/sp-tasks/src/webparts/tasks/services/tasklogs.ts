@@ -204,13 +204,9 @@ export default class TaskLogsService {
 
     private castTaskToTaskLog(task: ITask, date: Date): Partial<ITaskLog> {
         const dt = DateTime.fromJSDate(date);
-        const time = DateTime.fromISO(task.Time);
+        const time = DateTime.fromISO(task.Time).toUTC();
         const dateString = dt.toISODate();
-        const dateTime = dt.set({
-            hour: time.hour,
-            minute: time.minute,
-            second: time.second,
-        });
+        const dateTime = DateTime.utc(dt.year, dt.month, dt.day, time.hour, time.minute, 0);
         return {
             Title: task.Title,
             Date: dateString,
