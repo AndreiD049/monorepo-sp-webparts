@@ -21,7 +21,7 @@ const parseText = (text: string): JSX.Element => {
         // Everything from startPivot to token is simple text
         result.push(<>{text.slice(startPivot, token.index)}</>)
         // token becomes copy on click
-        result.push(<CopyOnClickText variant='smallPlus'>{token[1]}</CopyOnClickText>)
+        result.push(<CopyOnClickText text={token[1]} variant='smallPlus' />)
         startPivot = token.index + token[0].length;
     })
     // If there is any text left after startPivot, just include it as simple text
