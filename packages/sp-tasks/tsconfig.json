@@ -27,7 +27,8 @@
       "dom",
       "es2015.collection",
       "es2015.promise",
-      "ES2015.Core"
+      "ES2015.Core",
+      "ES2020.String"
     ]
   },
   "include": [

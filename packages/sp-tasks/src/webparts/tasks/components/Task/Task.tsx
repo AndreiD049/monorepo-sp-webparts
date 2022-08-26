@@ -11,9 +11,10 @@ import { MINUTE } from '../../utils/constants';
 import GlobalContext from '../../utils/GlobalContext';
 import { getTaskUniqueId, isTask } from '../../utils/utils';
 import { TaskPersona } from './persona/TaskPersona';
-import styles from './Task.module.scss';
 import colors from './Colors.module.scss';
 import { SPnotify } from 'sp-react-notifications';
+import styles from './Task.module.scss';
+import { TaskBody } from '../TaskBody';
 
 const CLOSED_ICON = 'ChevronDown';
 const OPEN_ICON = 'ChevronUp';
@@ -123,30 +124,7 @@ const Task: FC<ITaskProps> = (props) => {
 
     const body = React.useMemo(() => {
         if (!open) return null;
-        return (
-            <>
-                {info.remark && (
-                    <>
-                        <Text className={styles['Task__remark-label']} variant="smallPlus">
-                            Remark:
-                        </Text>
-                        <Text className={styles.description} variant="smallPlus">
-                            {info.remark}
-                        </Text>
-                    </>
-                )}
-                {info.description && (
-                    <>
-                        <Text className={styles['Task__remark-label']} variant="smallPlus">
-                            Description:
-                        </Text>
-                        <Text className={styles.description} variant="smallPlus">
-                            {info.description}
-                        </Text>
-                    </>
-                )}
-            </>
-        );
+        return (<TaskBody remark={info.remark} description={info.description} />);
     }, [open]);
 
     const toggleOpen = React.useCallback(() => {

@@ -1,0 +1,13 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    color: "[theme: black, default: #000]";
+    background-color: "[theme: neutralLighterAlt, default: #f8f8f8]";
+    font-weight: bold;
+    padding: 0 2px;
+    cursor: pointer;
+}
+
+.icon {
+    margin-left: .4em;
+}

@@ -59,12 +59,6 @@
                 background-color: '[theme: neutralLight, default: #eaeaea]';
             }
         }
-
-        .description {
-            align-self: flex-start;
-            white-space: break-spaces;
-            margin-bottom: 4px;
-        }
     }
 }
 
@@ -77,11 +71,6 @@
 
 .Task__title {
     flex-grow: 1;
-}
-
-.Task__remark-label {
-    align-self: flex-start;
-    font-weight: bold;
 }
 
 .Task_person {
