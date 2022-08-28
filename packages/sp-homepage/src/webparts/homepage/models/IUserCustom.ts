@@ -1,5 +1,8 @@
 export default interface IUserCustom {
-    UserId: number;
+    User: {
+        Id: number;
+        Title: string;
+    };
     Role: string;
     Teams: string[];
 }

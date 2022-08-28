@@ -10,6 +10,6 @@ export interface I<%= Name %>Props {
 
 export const <%= Name %>: React.FC<I<%= Name %>Props> = (props) => {
     return (
-        <div><%= Name %></div>
+        <div className={styles.container}><%= Name %></div>
     );
 };
