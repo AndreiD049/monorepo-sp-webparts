@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "Cache data in index db. Manual means that items can be manuall invalidated when needed, ex when items are updated.",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "rollup -c -w",
+    "build": "rollup -c --environment INCLUDE_DEPS,BUILD:production"
   },
   "author": "Andrei Dimitrascu",
   "license": "MIT",

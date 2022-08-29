@@ -2,10 +2,33 @@
 
 .container {
     border: 1px solid;
-    border-color: "[theme: themeLighter, default: #eaeaea]";
+    border-color: '[theme: themeLighter, default: #eaeaea]';
+    overflow: hidden;
 
     .content {
-        padding: .2em .5em;
+        padding: 0.2em 0.5em;
+        overflow: auto;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+    
+        /* Track */
+        &::-webkit-scrollbar-track {
+            background: '[theme: neutralLighter, default: #f4f4f4]';
+        }
+    
+        /* Handle */
+        &::-webkit-scrollbar-thumb {
+            background: '[theme: neutralSecondary, default: #212121]';
+            border-radius: 6px;
+        }
+    
+        /* Handle on hover */
+        &::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
     }
 }
 
@@ -14,12 +37,13 @@
 }
 
 .header {
-    background-color: "[theme: themeLighter, default: #eaeaea]";
-    color: "[theme: white, default: #eaeaea]";
-    padding: .2em 0;
-    
+    background-color: '[theme: themeLighter, default: #eaeaea]';
+    color: '[theme: white, default: #eaeaea]';
+    padding: 0.2em 0;
+    height: 32px;
+
     .headerContent {
-        margin-left: .5em;
+        margin-left: 0.5em;
         display: flex;
         flex-flow: row nowrap;
         align-items: center;

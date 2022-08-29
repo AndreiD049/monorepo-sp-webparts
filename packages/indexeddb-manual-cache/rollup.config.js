@@ -12,7 +12,7 @@ export default defineConfig({
     output: [
         {
             file: 'dist/index.js',
-            format: 'iife',
+            format: 'es',
         }
     ],
     plugins: [

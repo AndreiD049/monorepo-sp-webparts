@@ -36,7 +36,7 @@ export const Section: React.FC<ISectionProps> = React.forwardRef(
         return (
             <div className={classes.join(' ')} {...props} style={{ ...style }} ref={ref}>
                 <SectionHeader section={props.section} />
-                <div className={styles.content}>
+                <div className={styles.content} style={{ height: props.section.header ? 'calc(100% - 44px)' : '100%' }}>
                     {props.children}
                 </div>
             </div>

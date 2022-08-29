@@ -1,5 +1,6 @@
-import IndexedDb from "./IndexedDb";
+import IndexedDbCache, { KeyAccessor } from "./IndexedDbCache";
 
 export {
-    IndexedDb
+    IndexedDbCache,
+    KeyAccessor
 }

@@ -13,9 +13,7 @@ import styles from './AppraisalsSection.module.scss';
 const select = ['Id', 'Content', 'ItemType', 'ItemStatus', 'PlannedIn/Id', 'PlannedIn/Title'];
 const expand = ['PlannedIn'];
 
-export interface IAppraisalsSectionProps extends ISectionProps {
-    // Props go here
-}
+export interface IAppraisalsSectionProps extends ISectionProps { }
 
 const pillColors: { [key: string]: string } = {
     Objective: '#ffebc0',
@@ -80,10 +78,9 @@ export const AppraisalsSection: React.FC<IAppraisalsSectionProps> = (props) => {
     }, [props.section]);
 
     const handleItemUpdate = async (id: number, status: AppraisalItemStatus): Promise<void> => {
-        await service.updateItem<IAppraisalItem>(id, {
+        const newItem = await service.updateItem<IAppraisalItem>(id, {
             ItemStatus: status,
         });
-        const newItem = await service.getItemById<IAppraisalItem>(id);
         setData((prev) => prev.map((i) => (i.Id === newItem.Id ? newItem : i)));
     };
 

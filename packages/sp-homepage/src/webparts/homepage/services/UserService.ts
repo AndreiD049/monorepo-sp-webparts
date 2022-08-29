@@ -1,5 +1,5 @@
-import { uniqBy } from '@microsoft/sp-lodash-subset';
-import SPBuilder, { Caching, InjectHeaders, ISiteUserInfo, SPFI } from 'sp-preset';
+import { IndexedDbCache, KeyAccessor } from 'indexeddb-manual-cache';
+import SPBuilder, { InjectHeaders, ISiteUserInfo, SPFI } from 'sp-preset';
 import IConfig from '../models/IConfig';
 import IUser from '../models/IUser';
 import IUserCustom from '../models/IUserCustom';
@@ -11,6 +11,16 @@ export default class UserService {
     private static sp: SPFI;
     private static rootSp: SPFI;
     private static config: IConfig;
+    private static db: IndexedDbCache;
+    private static cache: {
+        userByTeam: (team: string) => KeyAccessor;
+        siteUsers: KeyAccessor;
+        customUser: (id: number) => KeyAccessor;
+        currentUser: KeyAccessor;
+        user: (id: number) => KeyAccessor;
+        userByEmail: (email: string) => KeyAccessor;
+        userGroups: (id: number) => KeyAccessor;
+    };
 
     public static Init(context: {}, config: IConfig): void {
         this.spBuilder = new SPBuilder(context).withRPM(600).withAdditionalTimelines([
@@ -20,33 +30,21 @@ export default class UserService {
         ]);
 
         // Cache for an hour
-        this.sp = this.spBuilder.getSP().using(
-            Caching({
-                expireFunc: () => new Date(Date.now() + MINUTE * 60),
-            })
-        );
-        this.rootSp = this.spBuilder.getSP().using(
-            Caching({
-                expireFunc: () => new Date(Date.now() + MINUTE * 60),
-            })
-        );
+        this.db = new IndexedDbCache('SPFX_Cache', location.href + location.pathname, {
+            expiresIn: MINUTE * 60,
+        });
+        this.cache = {
+            userByTeam: (team: string) => this.db.key(`getCustomUsersByTeam${team}`),
+            siteUsers: this.db.key(`getSiteUsers`),
+            customUser: (id: number) => this.db.key(`customUser${id}`),
+            currentUser: this.db.key(`getCurrentUser`),
+            user: (id: number) => this.db.key(`getUser${id}`),
+            userGroups: (id: number) => this.db.key(`getUserGroups${id}`),
+            userByEmail: (email: string) => this.db.key(`getUserByEmail${email}`),
+        };
+        this.sp = this.spBuilder.getSP();
+        this.rootSp = this.spBuilder.getSP();
         this.config = config;
-    }
-
-    public static async getCurrentUserTeamMembers(): Promise<IUserCustom[]> {
-        const current = await this.getCurrentUser();
-        const result: IUserCustom[] = [];
-        if (current.teams.length === 1) {
-            return this.getCustomUsersByTeam(current.teams[0]);
-        } else if (current.teams.length > 1) {
-            const [batchedSP, execute] = this.rootSp.batched();
-            current.teams.forEach(async (team) => {
-                const users = await this.getCustomUsersByTeam(team, batchedSP)
-                result.push(...users);
-            });
-            await execute();
-        }
-        return uniqBy(result, (u) => u.User.Id);
     }
 
     public static async getCustomUsersByTeam(
@@ -54,15 +52,19 @@ export default class UserService {
         sp: SPFI = this.rootSp
     ): Promise<IUserCustom[]> {
         const list = sp.web.lists.getByTitle(this.config.users?.listName);
-        const users = await list.items
-            .filter(`${this.config?.users.teamsColumn} eq '${team}'`)
-            .select('User/Id', 'User/Title', 'Role', this.config.users?.teamsColumn)
-            .expand('User')();
+        const users = await this.cache
+            .userByTeam(team)
+            .get(async () =>
+                list.items
+                    .filter(`${this.config?.users.teamsColumn} eq '${team}'`)
+                    .select('User/Id', 'User/Title', 'Role', this.config.users?.teamsColumn)
+                    .expand('User')()
+            );
         return users;
     }
 
     public static async getSiteUsers(): Promise<ISiteUserInfo[]> {
-        return this.sp.web.siteUsers();
+        return this.cache.siteUsers.get(async () => this.sp.web.siteUsers());
     }
 
     /**
@@ -72,14 +74,19 @@ export default class UserService {
      */
     private static async getCustomUser(id: number): Promise<IUserCustom | null> {
         const list = this.rootSp.web.lists.getByTitle(this.config.users?.listName);
-        const users = await list.items
-            .filter(`UserId eq ${id}`)
-            .select('Role', this.config.users?.teamsColumn)();
+        const users = await this.cache
+            .customUser(id)
+            .get(
+                async () =>
+                    await list.items
+                        .filter(`UserId eq ${id}`)
+                        .select('Role', this.config.users?.teamsColumn)()
+            );
         return users[0] || null;
     }
 
     private static async getCurrentUserId(): Promise<number> {
-        return (await this.sp.web.currentUser()).Id;
+        return (await this.cache.currentUser.get(async () => this.sp.web.currentUser())).Id;
     }
 
     public static async getCurrentUser(): Promise<IUser> {
@@ -87,9 +94,12 @@ export default class UserService {
     }
 
     public static async getUser(id: number): Promise<IUser> {
-        const userRequest = this.sp.web.siteUsers.getById(id);
-        const user: IUser = await userRequest();
-        user.groups = await this.sp.web.siteUsers.getById(id).groups();
+        const user: IUser = await this.cache
+            .user(id)
+            .get(async () => this.sp.web.siteUsers.getById(id)());
+        user.groups = await this.cache
+            .userGroups(id)
+            .get(async () => this.sp.web.siteUsers.getById(id).groups());
         const teamsInfo = await this.getCustomUser(user.Id);
         user.role = teamsInfo?.Role;
         user.teams = teamsInfo?.Teams;
@@ -97,8 +107,13 @@ export default class UserService {
     }
 
     public static async getUserByEmail(email: string): Promise<IUser> {
-        const user: IUser = await this.sp.web.siteUsers.getByEmail(email)();
-        user.groups = await this.sp.web.siteUsers.getByEmail(email).groups();
+        const user: IUser = await this.cache
+            .userByEmail(email)
+            .get(async () => this.sp.web.siteUsers.getByEmail(email)());
+        const id = user.Id;
+        user.groups = await this.cache.userGroups(id).get(async () =>
+            this.sp.web.siteUsers.getById(id).groups()
+        );
         const teamsInfo = await this.getCustomUser(user.Id);
         user.role = teamsInfo?.Role;
         user.teams = teamsInfo?.Teams;
