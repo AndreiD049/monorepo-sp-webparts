@@ -32,6 +32,7 @@
     "ajv": "~5.2.2",
     "duplicate-package-checker-webpack-plugin": "^3.0.0",
     "gulp": "~4.0.2",
+    "rollup-plugin-clear": "^2.0.7",
     "spfx-fast-serve-helpers": "~1.14.0"
   }
 }

@@ -1,0 +1,15 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.text {
+    color: "[theme: neutralTertiary, default: #3c3c3c]";
+    font-size: 1.5em;
+}

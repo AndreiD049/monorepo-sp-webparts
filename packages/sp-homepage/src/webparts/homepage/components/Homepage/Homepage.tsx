@@ -37,7 +37,7 @@ export const Homepage: React.FC<IHomepageProps> = (props) => {
 
     const body = React.useMemo(() => {
         return sections.map((s) => (
-            <Section key={s.name} editable={!locked}>
+            <Section key={s.name} section={s} editable={!locked}>
                 <SectionFactory section={s} />
             </Section>
         ));

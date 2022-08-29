@@ -1,0 +1,116 @@
+import { Checkbox, MessageBarType, Text } from 'office-ui-fabric-react';
+import * as React from 'react';
+import { SPnotify } from 'sp-react-notifications';
+import { ExpandHeader } from '../../components/ExpandHeader';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { NoData } from '../../components/NoData';
+import { Pill } from '../../components/Pill';
+import IAppraisalItem, { AppraisalItemStatus } from '../../models/IAppraisalItem';
+import ISectionProps from '../../models/ISectionProps';
+import SourceService from '../../services/SourceService';
+import styles from './AppraisalsSection.module.scss';
+
+const select = ['Id', 'Content', 'ItemType', 'ItemStatus', 'PlannedIn/Id', 'PlannedIn/Title'];
+const expand = ['PlannedIn'];
+
+export interface IAppraisalsSectionProps extends ISectionProps {
+    // Props go here
+}
+
+const pillColors: { [key: string]: string } = {
+    Objective: '#ffebc0',
+    Training: '#caf0cc',
+};
+
+const AppraisalItem: React.FC<{
+    item: IAppraisalItem;
+    handleUpdate: (id: number, status: AppraisalItemStatus) => void;
+}> = ({ item, handleUpdate }) => {
+    return (
+        <div className={styles.item}>
+            <Checkbox
+                checked={item.ItemStatus === 'Achieved'}
+                onChange={(_ev, checked) => handleUpdate(item.Id, checked ? 'Achieved' : 'Planned')}
+            />
+            {/* Status */}
+            <Pill style={{ backgroundColor: pillColors[item.ItemType] }} className={styles.pill}>
+                <Text variant="medium">{item.ItemType}</Text>
+            </Pill>
+            {/* Content */}
+            <span className={item.ItemStatus === 'Achieved' ? styles.contentAchieved : null}>{item.Content}</span>
+        </div>
+    );
+};
+
+export const AppraisalsSection: React.FC<IAppraisalsSectionProps> = (props) => {
+    const [loading, setLoading] = React.useState(true);
+    const service = React.useMemo(
+        () => new SourceService(props.section.sources[0], select, expand),
+        [props.section]
+    );
+    const [data, setData] = React.useState<IAppraisalItem[]>([]);
+
+    const grouped = React.useMemo(() => {
+        const sorted = [...data];
+        sorted.sort((a, b) => a.PlannedIn.Id - b.PlannedIn.Id);
+        const result: { [period: string]: IAppraisalItem[] } = {};
+        sorted.forEach((item) => {
+            if (!(item.PlannedIn.Title in result)) {
+                result[item.PlannedIn.Title] = [];
+            }
+            result[item.PlannedIn.Title].push(item);
+        });
+        return result;
+    }, [data]);
+
+    React.useEffect(() => {
+        async function run(): Promise<void> {
+            try {
+                setData(await service.getSourceData());
+            } finally {
+                setLoading(false);
+            }
+        }
+        run().catch((err) =>
+            SPnotify({
+                message: err.message,
+                messageType: MessageBarType.error,
+            })
+        );
+    }, [props.section]);
+
+    const handleItemUpdate = async (id: number, status: AppraisalItemStatus): Promise<void> => {
+        await service.updateItem<IAppraisalItem>(id, {
+            ItemStatus: status,
+        });
+        const newItem = await service.getItemById<IAppraisalItem>(id);
+        setData((prev) => prev.map((i) => (i.Id === newItem.Id ? newItem : i)));
+    };
+
+    let body;
+    if (data.length > 0) {
+        body = Object.keys(grouped).map((k) => (
+            <ExpandHeader key={k} header={k}>
+                {grouped[k].map((item) => (
+                    <AppraisalItem key={item.Content} item={item} handleUpdate={async (id, status) => {
+                        try {
+                            setLoading(true);
+                            await handleItemUpdate(id, status);
+                        } finally {
+                            setLoading(false);
+                        }
+                    }} />
+                ))}
+            </ExpandHeader>
+        ));
+    } else {
+        body = <NoData />;
+    }
+
+    return (
+        <div className={styles.container}>
+            {loading ? <LoadingSpinner /> : null }
+            {body}
+        </div>
+    );
+};

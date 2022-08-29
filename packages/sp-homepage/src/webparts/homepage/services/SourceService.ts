@@ -1,4 +1,4 @@
-import SPBuilder, { SPFI } from 'sp-preset';
+import SPBuilder, { IItemUpdateResult, IList, SPFI } from 'sp-preset';
 import HomepageWebPart from '../HomepageWebPart';
 import ISource from '../models/ISource';
 import IUser from '../models/IUser';
@@ -41,22 +41,37 @@ export const preprocessSourceFilter = (source: ISource, context: ISourceUserCont
 export default class SourceService {
     private spBuilder: SPBuilder;
     private sp: SPFI;
+    private list: IList;
 
-    public constructor(private source: ISource) {
+    public constructor(private source: ISource, private select?: string[], private expand?: string[]) {
         this.spBuilder = HomepageWebPart.spBuilder;
         this.sp = this.spBuilder.getSP(this.source.rootUrl);
+        this.list = this.sp.web.lists.getByTitle(this.source.listName);
     }
 
-    public async getSourceData<T>(): Promise<T> {
-        let filter = this.sp.web.lists
-            .getByTitle(this.source.listName)
-            .items.filter(this.source.filter);
-        if (this.source.select && this.source.select.length > 0) {
-            filter = filter.select(...this.source.select);
+    public async getSourceData<T>(): Promise<T[]> {
+        let filter = this.list.items.filter(this.source.filter);
+        if (this.select && this.select.length > 0) {
+            filter = filter.select(...this.select);
         }
-        if (this.source.expand && this.source.expand.length > 0) {
-            filter = filter.expand(...this.source.expand);
+        if (this.expand && this.expand.length > 0) {
+            filter = filter.expand(...this.expand);
         }
         return filter();
+    }
+
+    public async getItemById<T>(id: number): Promise<T> {
+        const req = this.list.items.getById(id);
+        if (this.select && this.select.length > 0) {
+            req.select(...this.select);
+        }
+        if (this.expand && this.expand.length > 0) {
+            req.expand(...this.expand);
+        }
+        return req();
+    }
+
+    public async updateItem<T>(id: number, update: Partial<T>): Promise<IItemUpdateResult> {
+        return this.list.items.getById(id).update(update);
     }
 }

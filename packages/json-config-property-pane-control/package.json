@@ -17,16 +17,16 @@
     "tslib": "2.3.1"
   },
   "peerDependencies": {
-    "react": "*",
-    "react-dom": "*",
-    "office-ui-fabric-react": "*",
     "@microsoft/sp-core-library": "*",
     "@microsoft/sp-http": "*",
+    "@microsoft/sp-lodash-subset": "*",
+    "@microsoft/sp-office-ui-fabric-core": "*",
     "@microsoft/sp-page-context": "*",
     "@microsoft/sp-property-pane": "*",
     "@microsoft/sp-webpart-base": "*",
-    "@microsoft/sp-lodash-subset": "*",
-    "@microsoft/sp-office-ui-fabric-core": "*"
+    "office-ui-fabric-react": "*",
+    "react": "*",
+    "react-dom": "*"
   },
   "devDependencies": {
     "@microsoft/eslint-config-spfx": "1.15.2",
@@ -54,6 +54,7 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "rollup": "^2.78.1",
+    "rollup-plugin-clear": "^2.0.7",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-scss": "^3.0.0",

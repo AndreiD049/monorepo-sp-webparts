@@ -1,6 +1,8 @@
 import * as React from 'react';
 import ISection from '../../models/ISection';
-import { AppraisalsSection } from '../AppraisalsSection';
+import { AppraisalsSection } from '../../sections/AppraisalsSection';
+import { CipSection } from '../../sections/CipSection';
+import { TaskSection } from '../../sections/TaskSection';
 import { UserInfo } from '../UserInfo';
 
 export interface ISectionFactoryProps {
@@ -8,11 +10,16 @@ export interface ISectionFactoryProps {
 }
 
 export const SectionFactory: React.FC<ISectionFactoryProps> = (props) => {
-    if (props.section.name === 'Appraisals') {
-        return (<AppraisalsSection section={props.section} />);
+    switch (props.section.name) {
+        case 'Appraisals':
+            return (<AppraisalsSection section={props.section} />);
+        case "Tasks":
+            return (<TaskSection section={props.section} />);
+        case "Cip":
+            return (<CipSection section={props.section} />);
+        case 'UserInfo':
+            return (<UserInfo />);
+        default:
+            return <div>NA</div>
     }
-    if (props.section.name === 'UserInfo') {
-        return (<UserInfo />);
-    }
-    return null;
 };

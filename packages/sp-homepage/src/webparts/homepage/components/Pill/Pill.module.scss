@@ -1,0 +1,9 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    display: inline-block;
+    border: 1px solid;
+    border-color: "[theme: neutralDark, default: #212121]";
+    border-radius: 13px;
+    padding: .1em .5em .2em .5em;
+}

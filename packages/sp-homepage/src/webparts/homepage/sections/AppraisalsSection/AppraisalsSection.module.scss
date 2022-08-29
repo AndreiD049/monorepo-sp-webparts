@@ -1,0 +1,23 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    min-width: 1px;
+}
+
+.item {
+    margin-bottom: 4px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+
+    .pill {
+        min-width: 70px;
+        text-align: center;
+        margin: 0 .8em 0 .8em;
+    }
+}
+
+.contentAchieved {
+    text-decoration: line-through;
+}
