@@ -25,6 +25,9 @@ export default class IndexedDbCache {
      * Else, just return the cached value
      */
     public async getCached<T>(key: string, getter: () => T): Promise<T> {
+        if (this.config.expiresIn === 0) {
+            return getter();
+        }
         const cachedValue = await this.get<T>(key);
         if (!cachedValue || isExpired(cachedValue)) {
             const newValue = await getter();
@@ -42,6 +45,9 @@ export default class IndexedDbCache {
      * Don't update the expiry date
      */
     public async updateCached<T>(key: string, setter: (prev: T) => T) {
+        if (this.config.expiresIn === 0) {
+            return null;
+        }
         const value = await this.get<T>(key);
         if (!value || isExpired(value)) {
             return null;
@@ -67,6 +73,9 @@ export default class IndexedDbCache {
     }
 
     private async remove(key: string) {
+        if (this.config.expiresIn === 0) {
+            return null;
+        }
         return removeValue(this.dbName, this.storeName, key);
     }
 

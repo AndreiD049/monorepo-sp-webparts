@@ -16,7 +16,6 @@ export default class UserService {
         userByTeam: (team: string) => KeyAccessor;
         siteUsers: KeyAccessor;
         customUser: (id: number) => KeyAccessor;
-        currentUser: KeyAccessor;
         user: (id: number) => KeyAccessor;
         userByEmail: (email: string) => KeyAccessor;
         userGroups: (id: number) => KeyAccessor;
@@ -30,14 +29,13 @@ export default class UserService {
         ]);
 
         // Cache for an hour
-        this.db = new IndexedDbCache('SPFX_Cache', location.href + location.pathname, {
+        this.db = new IndexedDbCache('Homepage_Cache', location.host + location.pathname, {
             expiresIn: MINUTE * 60,
         });
         this.cache = {
             userByTeam: (team: string) => this.db.key(`getCustomUsersByTeam${team}`),
             siteUsers: this.db.key(`getSiteUsers`),
             customUser: (id: number) => this.db.key(`customUser${id}`),
-            currentUser: this.db.key(`getCurrentUser`),
             user: (id: number) => this.db.key(`getUser${id}`),
             userGroups: (id: number) => this.db.key(`getUserGroups${id}`),
             userByEmail: (email: string) => this.db.key(`getUserByEmail${email}`),
@@ -86,7 +84,7 @@ export default class UserService {
     }
 
     private static async getCurrentUserId(): Promise<number> {
-        return (await this.cache.currentUser.get(async () => this.sp.web.currentUser())).Id;
+        return (await this.sp.web.currentUser()).Id;
     }
 
     public static async getCurrentUser(): Promise<IUser> {

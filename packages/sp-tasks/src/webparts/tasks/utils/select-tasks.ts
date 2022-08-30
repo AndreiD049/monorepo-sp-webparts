@@ -1,5 +1,3 @@
-import { truncate } from "@microsoft/sp-lodash-subset";
-import { Info } from "luxon";
 import ITask, { TaskType } from "../models/ITask";
 import { getDateStatistics, getNthWorkday, getWeekDaySet, IDateStatistics } from "./utils";
 

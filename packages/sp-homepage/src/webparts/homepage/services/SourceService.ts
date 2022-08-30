@@ -12,6 +12,7 @@ export interface ISourceUserContext {
 
 const tagMap: { [key: string]: (ctx: ISourceUserContext) => string } = {
     '@currentUserId': (context: ISourceUserContext) => context.user.Id.toString(),
+    '@today': (context: ISourceUserContext) => new Date().toISOString().split('T')[0],
 };
 
 const getTagFromMap = (tag: string): ((ctx: ISourceUserContext) => string) => {
@@ -32,7 +33,7 @@ export const preprocessSourceFilter = (source: ISource, context: ISourceUserCont
 
     if (matches.size > 0) {
         matches.forEach((tag) => {
-            filter = filter.replaceAll(tag, getTagFromMap(tag)(context));
+            filter = getTagFromMap(tag) && filter.replaceAll(tag, getTagFromMap(tag)(context));
         });
         copy.filter = filter;
     }
@@ -51,7 +52,7 @@ export default class SourceService {
         this.spBuilder = HomepageWebPart.spBuilder;
         this.sp = this.spBuilder.getSP(this.source.rootUrl);
         this.list = this.sp.web.lists.getByTitle(this.source.listName);
-        this.db = new IndexedDbCache('SPFX_Cache', location.href + location.pathname, {
+        this.db = new IndexedDbCache('Homepage_Cache', location.host + location.pathname, {
             expiresIn: MINUTE * source.ttlMinutes,
         })
         this.cache = {
@@ -89,6 +90,6 @@ export default class SourceService {
     }
 
     private getUniqueKey(): string {
-        return `${this.source.rootUrl}${this.source.listName}${this.source.filter}`;
+        return `${this.source.rootUrl}${this.source.listName}${this.select ? this.select.join(',') : ''}${this.expand ? this.expand.join(',') : ''}`;
     }
 }

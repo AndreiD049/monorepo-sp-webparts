@@ -89,7 +89,7 @@ export const AppraisalsSection: React.FC<IAppraisalsSectionProps> = (props) => {
         body = Object.keys(grouped).map((k) => (
             <ExpandHeader key={k} header={k}>
                 {grouped[k].map((item) => (
-                    <AppraisalItem key={item.Content} item={item} handleUpdate={async (id, status) => {
+                    <AppraisalItem key={item.Id + item.Content + item.ItemStatus} item={item} handleUpdate={async (id, status) => {
                         try {
                             setLoading(true);
                             await handleItemUpdate(id, status);
