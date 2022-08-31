@@ -1,6 +1,7 @@
 import ISourceCondition from "./ISourceCondition";
 
 export default interface ISource {
+    type?: string;
     rootUrl: string;
     listName: string;
     filter: string;

@@ -3,3 +3,22 @@
 .container {
     min-width: 1px;
 }
+
+.weeklyDay {
+    .weeklyLabel {
+        color: "[theme: neutralTertiary, default: #eaeaea]";
+        text-decoration: underline;
+        margin-bottom: 4px;
+    }
+}
+
+.task {
+
+    & > * {
+        margin-right: 4px;
+    }
+
+    .taskTitle {
+        min-width: 150px;
+    }
+}

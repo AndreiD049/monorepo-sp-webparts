@@ -3,7 +3,7 @@ import * as React from 'react';
 import styles from './ExpandHeader.module.scss';
 
 export interface IExpandHeaderProps {
-    header: string;
+    header: string | JSX.Element;
 }
 
 export const ExpandHeader: React.FC<IExpandHeaderProps> = (props) => {

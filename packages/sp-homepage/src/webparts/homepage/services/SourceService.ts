@@ -48,16 +48,20 @@ export default class SourceService {
     private db: IndexedDbCache;
     private cache;
 
-    public constructor(private source: ISource, private select?: string[], private expand?: string[]) {
+    public constructor(
+        private source: ISource,
+        private select?: string[],
+        private expand?: string[]
+    ) {
         this.spBuilder = HomepageWebPart.spBuilder;
         this.sp = this.spBuilder.getSP(this.source.rootUrl);
         this.list = this.sp.web.lists.getByTitle(this.source.listName);
         this.db = new IndexedDbCache('Homepage_Cache', location.host + location.pathname, {
             expiresIn: MINUTE * source.ttlMinutes,
-        })
+        });
         this.cache = {
             all: this.db.key(`all-${this.getUniqueKey()}`),
-        }
+        };
     }
 
     public async getSourceData<T>(): Promise<T[]> {
@@ -82,14 +86,16 @@ export default class SourceService {
         return req();
     }
 
-    public async updateItem<T extends {Id: number}>(id: number, update: Partial<T>): Promise<T> {
+    public async updateItem<T extends { Id: number }>(id: number, update: Partial<T>): Promise<T> {
         await this.list.items.getById(id).update(update);
         const updated = await this.getItemById<T>(id);
-        await this.cache.all.update<T[]>((prev) => prev.map((i) => i.Id === id ? updated : i));
+        await this.cache.all.update<T[]>((prev) => prev.map((i) => (i.Id === id ? updated : i)));
         return updated;
     }
 
     private getUniqueKey(): string {
-        return `${this.source.rootUrl}${this.source.listName}${this.select ? this.select.join(',') : ''}${this.expand ? this.expand.join(',') : ''}`;
+        return `${this.source.rootUrl}${this.source.listName}-${this.source.filter}-${
+            this.select ? this.select.join(',') : ''
+        }${this.expand ? this.expand.join(',') : ''}`;
     }
 }

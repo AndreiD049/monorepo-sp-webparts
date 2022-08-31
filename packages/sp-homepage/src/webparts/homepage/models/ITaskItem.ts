@@ -1,8 +1,15 @@
-export type TaskStatus = 'Open' | 'Pending' | 'Finished' | 'Cancelled';
+type TaskType = 'Daily' | 'Weekly' | 'Monthly';
 
 export default interface ITaskItem {
     Id: number;
     Title: string;
-    Status: TaskStatus;
+    AssignedToId: number;
+    Type: TaskType;
+    WeeklyDays: string[];
+    MonthlyDay: number;
     Time: string;
+    DaysDuration: number;
+    Transferable: boolean;
+    ActiveFrom: string;
+    ActiveTo: string;
 }

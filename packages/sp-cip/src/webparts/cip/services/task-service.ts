@@ -28,6 +28,11 @@ export class TaskService {
         return this.getAllRequest()();
     };
 
+    async getAllCategories(): Promise<string[]> {
+        const all = await this.list.items.select('Category')();
+        return Array.from(new Set(all.map((i) => i.Category).filter((c) => c !== 'NA')));
+    }
+
     async getUserTasks(
         userId: number,
         status: 'Open' | 'Finished' | 'All'

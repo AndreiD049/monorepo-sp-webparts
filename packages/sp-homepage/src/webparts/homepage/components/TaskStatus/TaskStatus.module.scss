@@ -1,0 +1,33 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    width: 10px;
+    height: 10px;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 50%;
+    border: 1px solid;
+    border-color: "[theme: neutralSecondary, default: #666666]";
+    display: inline-block;
+    cursor: pointer;
+}
+
+.pending {
+    background-color: hsla(44, 100%, 80%, 0.7);
+}
+
+.finished {
+    background-color: hsla(151, 100%, 65%, 0.7);
+}
+
+.cancelled {
+    background-color: hsla(355, 77%, 64%, 0.7);
+}
+
+.open {
+    background-color: hsla(10, 3%, 75%, 0.7);
+}
+
+.unknown {
+    background-color: hsla(10, 3%, 75%, 0.7);
+}

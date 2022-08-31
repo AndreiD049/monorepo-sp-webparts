@@ -41,7 +41,12 @@ const CreateTaskPanel: React.FC = () => {
     const attachmentService = MainService.getAttachmentService();
 
     /** Group labels */
-    const { groupLabels, setGroupLabels } = useGroups();
+    // const { groupLabels, setGroupLabels } = useGroups();
+    const [groupLabels, setGroupLabels] = React.useState([]);
+    React.useEffect(() => {
+        taskService.getAllCategories().then((categories) => setGroupLabels(categories));
+    }, []);
+
     const groupOptions = React.useMemo(() => {
         if (!groupLabels) return [];
         return ['NA', ...groupLabels].map((label) => ({

@@ -11,7 +11,12 @@
       ]
     }
   },
-  "externals": {},
+  "externals": {
+    "luxon": {
+      "path": "https://cdn.jsdelivr.net/npm/luxon@2.3.1/build/global/luxon.min.js",
+      "globalName": "luxon"
+    }
+  },
   "localizedResources": {
     "HomepageWebPartStrings": "lib/webparts/homepage/loc/{locale}.js"
   }
