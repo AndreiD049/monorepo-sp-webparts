@@ -1,4 +1,5 @@
 import { IndexedDbCache } from 'indexeddb-manual-cache';
+import { DateTime } from 'luxon';
 import SPBuilder, { IList, SPFI } from 'sp-preset';
 import HomepageWebPart from '../HomepageWebPart';
 import ISource from '../models/ISource';
@@ -12,7 +13,14 @@ export interface ISourceUserContext {
 
 const tagMap: { [key: string]: (ctx: ISourceUserContext) => string } = {
     '@currentUserId': (context: ISourceUserContext) => context.user.Id.toString(),
-    '@today': (context: ISourceUserContext) => new Date().toISOString().split('T')[0],
+    '@today': (_context: ISourceUserContext) => DateTime.now().toISODate(),
+    '@monday': (_context: ISourceUserContext) => DateTime.now().set({ 'weekday': 1 }).toISODate(),
+    '@tuesday': (_context: ISourceUserContext) => DateTime.now().set({ 'weekday': 2 }).toISODate(),
+    '@wednesday': (_context: ISourceUserContext) => DateTime.now().set({ 'weekday': 3 }).toISODate(),
+    '@thursday': (_context: ISourceUserContext) => DateTime.now().set({ 'weekday': 4 }).toISODate(),
+    '@friday': (_context: ISourceUserContext) => DateTime.now().set({ 'weekday': 5 }).toISODate(),
+    "@startOfMonth": (_context: ISourceUserContext) => DateTime.now().startOf('month').toISODate(),
+    "@endOfMonth": (_context: ISourceUserContext) => DateTime.now().endOf('month').toISODate(),
 };
 
 const getTagFromMap = (tag: string): ((ctx: ISourceUserContext) => string) => {

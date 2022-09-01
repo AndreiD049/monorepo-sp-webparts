@@ -22,7 +22,7 @@ export const GridWrapper: React.FC<IGridWrapperProps> = (props) => {
 
     React.useEffect(() => {
         if (currentUserInfo) {
-            props.handleTeamSelect(currentUserInfo.teams[0] || null);
+            props.handleTeamSelect(currentUserInfo?.teams[0] || null);
         }
     }, [currentUserInfo]);
 

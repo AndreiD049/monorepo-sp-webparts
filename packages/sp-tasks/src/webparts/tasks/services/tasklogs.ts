@@ -24,7 +24,7 @@ const LOG_SELECT = [
     'Remark',
     'OriginalUser/ID',
     'Completed',
-    'Transferable',
+    'Transferable'
 ];
 
 const LOG_EXPAND = ['Task', 'User', 'OriginalUser'];
@@ -220,6 +220,7 @@ export default class TaskLogsService {
             // meaning it will not appear tomorrow if it's not on the list
             Completed: !Boolean(task.Transferable),
             Transferable: task.Transferable,
+            TaskType: task.Type,
         };
     }
 

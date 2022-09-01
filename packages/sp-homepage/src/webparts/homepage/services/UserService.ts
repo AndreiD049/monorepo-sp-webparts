@@ -80,7 +80,11 @@ export default class UserService {
                         .filter(`UserId eq ${id}`)
                         .select('Role', this.config.users?.teamsColumn)()
             );
-        return users[0] || null;
+        const result: IUserCustom = users[0] || null;
+        if (result) {
+            result.Teams = users[0][this.config.users.teamsColumn] || [];
+        }
+        return result;
     }
 
     private static async getCurrentUserId(): Promise<number> {

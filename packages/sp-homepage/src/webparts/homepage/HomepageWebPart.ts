@@ -23,6 +23,9 @@ export default class HomepageWebPart extends BaseClientSideWebPart<IHomepageWebP
     private _environmentMessage: string = '';
 
     public render(): void {
+        if (!this.properties.config) {
+            return null;
+        }
         const element: React.ReactElement<IHomepageProps> = React.createElement(Homepage, {
             properties: this.properties,
         });
@@ -39,7 +42,7 @@ export default class HomepageWebPart extends BaseClientSideWebPart<IHomepageWebP
                 }),
             ]);
         this._environmentMessage = this._getEnvironmentMessage();
-        if (this.properties.config.users) {
+        if (this.properties.config?.users) {
             UserService.Init(this.context, this.properties.config);
         }
 

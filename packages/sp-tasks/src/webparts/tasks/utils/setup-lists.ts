@@ -180,6 +180,13 @@ export const setupLists = async (properties: ITasksWebPartProps) => {
             DisplayFormat: DateTimeFieldFormatType.DateTime,
             Description: 'Time when task needs to be performed',
         });
+
+        await taskLogsExists.list.fields.addText('TaskType', {
+            Required: false,
+            Indexed: true,
+            MaxLength: 15,
+            Title: 'TaskType',
+        })
     }
     
     SPnotify({

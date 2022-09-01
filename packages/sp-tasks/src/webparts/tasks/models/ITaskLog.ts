@@ -30,4 +30,5 @@ export default interface ITaskLog {
     };
     Completed: boolean;
     Transferable: boolean;
+    TaskType?: string;
 }

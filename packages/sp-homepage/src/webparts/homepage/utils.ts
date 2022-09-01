@@ -1,4 +1,4 @@
-export function getMonthDayLabel(day: number, suffix: string = 'day') {
+export function getMonthDayLabel(day: number, suffix: string = 'day'): string {
     switch (day) {
         case 1:
             return `1st ${suffix}`;
