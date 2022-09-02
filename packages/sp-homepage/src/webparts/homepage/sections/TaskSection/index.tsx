@@ -148,10 +148,11 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
 
     /** Listen events */
     React.useEffect(() => {
-        listenSectionEvent(props.section.name, 'REFRESH', async () => {
+        const listenHandlerRemove = listenSectionEvent(props.section.name, 'REFRESH', async () => {
             console.log('fetch');
             await fetchData()
         });
+        () => listenHandlerRemove();
     }, []);
 
 

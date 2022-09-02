@@ -34,14 +34,14 @@ export const dispatchSectionHandler = (
     );
 };
 
-export const listenSectionEvent = (sectionName: string, action: SectionActions, handler: () => void): (ev: {}) => void => {
+export const listenSectionEvent = (sectionName: string, action: SectionActions, handler: () => void): () => void => {
     const resultHandler = (ev: CustomEvent<ISectionEventDetails>): void => {
         if (ev.detail.sectionName === sectionName && ev.detail.action === action) {
             handler();
         }
     }
     document.addEventListener(SECTION_EVENT, resultHandler);
-    return resultHandler;
+    return () => document.removeEventListener(SECTION_EVENT, resultHandler);
 }
 
 const SectionHeader: React.FC<{
