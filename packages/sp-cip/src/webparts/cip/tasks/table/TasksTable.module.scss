@@ -1,0 +1,25 @@
+.table {
+    max-width: 100vw;
+    overflow: auto;
+
+    &::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+        background: '[theme: neutralLighter, default: #f4f4f4]';
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+        background: '[theme: neutralTertiary, default: #212121]';
+        border-radius: 6px;
+    }
+
+    /* Handle on hover */
+    &::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+}

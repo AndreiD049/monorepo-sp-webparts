@@ -1,7 +1,6 @@
 import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { GlobalContext } from '../utils/GlobalContext';
-import styles from './Cip.module.scss';
 import TasksTable from '../tasks/table/TasksTable';
 import { ICipWebPartProps } from '../CipWebPart';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
@@ -11,6 +10,7 @@ import { TaskDetails } from '../tasks/panels/TaskDetails';
 import { LoadingAnimation } from './utils/LoadingAnimation';
 import { AlertDialog } from './AlertDialog';
 import MainService from '../services/main-service';
+import styles from './Cip.module.scss';
 
 interface ICipProps {
     properties: ICipWebPartProps;

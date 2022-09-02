@@ -1,12 +1,16 @@
 import { ActionButton, Calendar, Stack, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
+import {
+    loadingStart,
+    loadingStop,
+} from '../../components/utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
 import { ITaskOverview } from '../ITaskOverview';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
 import MainService from '../../services/main-service';
+import { DAY } from '../../utils/constants';
 
 const defaultCalendarStrings = {
     months: [
@@ -90,7 +94,11 @@ const DueDateCellCallout = (props) => {
                         DueDate: selectedDate.toISOString(),
                     });
                     const newTask = await taskService.getTask(task.Id);
-                    await actionService.addAction(task.Id, 'Due date', `${task.DueDate}|${newTask.DueDate}`);
+                    await actionService.addAction(
+                        task.Id,
+                        'Due date',
+                        `${task.DueDate}|${newTask.DueDate}`
+                    );
                     taskUpdated(newTask);
                     loadingStop();
                 }}
@@ -115,6 +123,34 @@ export const DueDateCell = ({ node }: { node: TaskNode }) => {
         });
     }, [node, textRef]);
 
+    const dateClassName = React.useMemo(() => {
+        const due = new Date(node.getTask().DueDate);
+        const today = new Date();
+        const diff =
+            new Date(
+                due.getFullYear(),
+                due.getMonth(),
+                due.getDate(),
+                0,
+                0,
+                0
+            ).getTime() -
+            new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                today.getDate(),
+                0,
+                0,
+                0
+            ).getTime();
+        if (diff <= 0) {
+            return styles.dueDateExpired;
+        } else if (diff <= DAY * 2) {
+            return styles.dueDateAboutToExpire;
+        }
+        return '';
+    }, [node]);
+
     return (
         <button
             ref={textRef}
@@ -122,7 +158,7 @@ export const DueDateCell = ({ node }: { node: TaskNode }) => {
             disabled={node.Display === 'disabled' || isTaskFinished}
             className={styles.button}
         >
-            <Text variant="medium">
+            <Text variant="medium" className={dateClassName}>
                 {new Date(task.DueDate).toLocaleDateString()}
             </Text>
         </button>

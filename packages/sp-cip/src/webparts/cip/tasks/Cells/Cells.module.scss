@@ -205,3 +205,12 @@ $buttonSide: 30px;
     cursor: pointer;
     text-align: start;
 }
+
+.dueDateExpired {
+    color: $ms-color-red;
+    font-weight: bold;
+}
+
+.dueDateAboutToExpire {
+    font-weight: bold;
+}

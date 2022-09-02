@@ -1,41 +1,41 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
 
 .cip {
-  padding: 1em 2em;
+    padding: 1em 2em;
 }
 
 .header {
-  text-align: center;
+    text-align: center;
 }
 
 .parent-stroke {
-  fill: none;
-  stroke: "[theme: neutralTertiaryAlt, default: #005a9e]";
-  stroke-width: 2px;
-  stroke-dasharray: 3,3;
-  position: absolute;
-  overflow: visible;
+    fill: none;
+    stroke: '[theme: neutralTertiaryAlt, default: #005a9e]';
+    stroke-width: 2px;
+    stroke-dasharray: 3, 3;
+    position: absolute;
+    overflow: visible;
 }
 
 .callout {
-  padding: .5em;
+    padding: 0.5em;
 }
 
 .description-editor {
-  display: flex;
-  flex-flow: column nowrap;
-  background-color: "[theme: neutralLighterAlt, default: #fff]";
-  border-color: $ms-color-neutralTertiaryAlt;
+    display: flex;
+    flex-flow: column nowrap;
+    background-color: '[theme: neutralLighterAlt, default: #fff]';
+    border-color: $ms-color-neutralTertiaryAlt;
 
-  &__buttons {
-    border: 1px;
-    border-style: dashed;
-    border-color: inherit;
-  }
+    &__buttons {
+        border: 1px;
+        border-style: dashed;
+        border-color: inherit;
+    }
 
-  &__file-input {
-    border: 1px;
-    border-style: dashed;
-    border-color: inherit;
-  }
+    &__file-input {
+        border: 1px;
+        border-style: dashed;
+        border-color: inherit;
+    }
 }
