@@ -6,6 +6,7 @@ import Pill from '../components/pill/Pill';
 import { ITaskOverview } from '../tasks/ITaskOverview';
 import { GlobalContext } from '../utils/GlobalContext';
 import styles from './ActionLog.module.scss';
+import { formatHours } from '../utils/hours-duration';
 
 export interface IActionLogItemProps {
     action: IAction;
@@ -69,9 +70,9 @@ const ActionItemContent: React.FC<IActionLogItemProps> = (props) => {
                     >
                         <Text variant="medium">
                             {'Estimated required time: '}
-                            {props.action.Comment.split('|')[0] + ' hours'}
+                            {formatHours(+props.action.Comment.split('|')[0]) + ' hour(s)'}
                             {' to '}
-                            {props.action.Comment.split('|')[1] + ' hours'}
+                            {formatHours(+props.action.Comment.split('|')[1])+ ' hour(s)'}
                         </Text>
                     </span>
                 );

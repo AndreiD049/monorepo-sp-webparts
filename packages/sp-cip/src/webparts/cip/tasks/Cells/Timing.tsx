@@ -6,12 +6,17 @@ import {
     Text,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
+import {
+    loadingStart,
+    loadingStop,
+} from '../../components/utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
 import MainService from '../../services/main-service';
+import { formatHours } from '../../utils/hours-duration';
+import { HoursInput } from '../../components/HoursInput';
 
 const TimingCallout: React.FC<ITimingProps> = (props) => {
     const task = props.node.getTask();
@@ -26,7 +31,11 @@ const TimingCallout: React.FC<ITimingProps> = (props) => {
             EstimatedTime: value,
         });
         const newTask = await taskService.getTask(task.Id);
-        await actionService.addAction(task.Id, 'Estimated time', `${task.EstimatedTime}|${newTask.EstimatedTime}`);
+        await actionService.addAction(
+            task.Id,
+            'Estimated time',
+            `${task.EstimatedTime}|${newTask.EstimatedTime}`
+        );
         taskUpdated(newTask);
         loadingStop();
     }, [props.node, value]);
@@ -41,30 +50,61 @@ const TimingCallout: React.FC<ITimingProps> = (props) => {
                     Update estimated hours:
                 </Text>
             </StackItem>
-            <SpinButton
-                inputProps={{
-                    autoFocus: true,
-                }}
-                tabIndex={1}
-                value={value.toString()}
-                min={0}
-                onValidate={(val) => !Number.isNaN(+val) ? val : null}
-                onChange={(ev: any) => {
-                    const val = ev.target.value;
-                    if (!Number.isNaN(+val)) {
-                        setValue(+val);
-                    }
-                }}
-                onIncrement={(val) => {
-                    if (!Number.isNaN(+val)) {
-                        setValue(+val + 1);
-                    }
-                }}
-                onDecrement={(val) => {
-                    if (!Number.isNaN(+val) && +val > 0) {
-                        setValue(+val - 1);
-                    }
-                }}
+            <HoursInput
+                value={value}
+                onChange={(val) => setValue(val)}
+                buttons={[
+                    {
+                        key: '+.25',
+                        value: 0.25,
+                        label: '+15m',
+                    },
+                    {
+                        key: '+.5',
+                        value: 0.5,
+                        label: '+30m',
+                    },
+                    {
+                        key: '+1',
+                        value: 1,
+                        label: '+1h',
+                    },
+                    {
+                        key: '+5',
+                        value: 5,
+                        label: '+5h',
+                    },
+                    {
+                        key: '+10',
+                        value: 10,
+                        label: '+10h',
+                    },
+                    {
+                        key: '-.25',
+                        value: -0.25,
+                        label: '-15m',
+                    },
+                    {
+                        key: '-.5',
+                        value: -0.5,
+                        label: '-30m',
+                    },
+                    {
+                        key: '-1',
+                        value: -1,
+                        label: '-1h',
+                    },
+                    {
+                        key: '-5',
+                        value: -5,
+                        label: '-5h',
+                    },
+                    {
+                        key: '-10',
+                        value: -10,
+                        label: '-10h',
+                    },
+                ]}
             />
             <ActionButton iconProps={{ iconName: 'Save' }} onClick={handleSave}>
                 Save
@@ -101,8 +141,10 @@ const Timing: React.FC<ITimingProps> = (props) => {
             ref={elemRef}
             onClick={handleClick}
         >
-            <div>Estimated: {task.EstimatedTime} hour(s)</div>
-            <div style={{fontWeight: 'bold'}} >Effective: {task.EffectiveTime} hour(s)</div>
+            <div>Estimated: {formatHours(task.EstimatedTime)} hour(s)</div>
+            <div style={{ fontWeight: 'bold' }}>
+                Effective: {formatHours(task.EffectiveTime)} hour(s)
+            </div>
         </button>
     );
 };

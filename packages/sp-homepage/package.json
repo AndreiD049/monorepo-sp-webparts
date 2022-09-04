@@ -24,7 +24,7 @@
     "sp-preset": "^2.0.13",
     "sp-react-notifications": "^1.0.23",
     "tslib": "2.3.1",
-    "use-web-storage-api": "^1.0.3"
+    "use-web-storage-api": "^1.0.5"
   },
   "devDependencies": {
     "@microsoft/eslint-config-spfx": "1.15.2",

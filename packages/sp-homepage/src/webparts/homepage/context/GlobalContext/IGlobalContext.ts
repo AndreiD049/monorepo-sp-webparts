@@ -4,7 +4,7 @@ import IUser from "../../models/IUser";
 
 export default interface IGlobalContext {
     config: IJsonConfig<IConfig>;
-    currentUserInfo: IUser;
+    currentUser: IUser;
     selectedUser: IUser;
     selectedTeam: string;
 }

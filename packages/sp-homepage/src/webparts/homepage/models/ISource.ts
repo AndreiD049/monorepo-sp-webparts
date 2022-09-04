@@ -1,12 +1,13 @@
-import ISourceCondition from "./ISourceCondition";
+import IConfigCondition from "./IConfigCondition";
 
 export default interface ISource {
     type?: string;
     rootUrl: string;
+    pageUrl: string;
     listName: string;
     filter: string;
     select: string[];
     expand: string[];
-    conditions: ISourceCondition;
+    conditions: IConfigCondition[];
     ttlMinutes: number;
 }

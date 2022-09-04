@@ -3,6 +3,8 @@ import {
     SpinButton,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { MINUTE_DURATION } from '../utils/constants';
+import { formatHours, validateHours } from '../utils/hours-duration';
 import styles from './HoursInput.module.scss';
 
 export interface IHoursInputProps {
@@ -35,15 +37,8 @@ export const HoursInput: React.FC<IHoursInputProps> = (props) => {
     }
 
     const handleValidate = (val: string) => {
-        const valNumber = Number.parseFloat(val);
-        if (!valNumber) {
-            props.onChange(0);
-            return '0 hour(s)'
-        };
-        if (valNumber < 0) {
-            props.onChange(0);
-            return '0 hour(s)'
-        };
+        const valNumber = validateHours(val);
+        console.log(valNumber);
         props.onChange(valNumber);
         return val;
     }
@@ -54,7 +49,7 @@ export const HoursInput: React.FC<IHoursInputProps> = (props) => {
                 labelPosition={Position.top}
                 label={props.label}
                 min={0}
-                value={`${props.value.toString()} hour(s)`}
+                value={`${formatHours(props.value)} hour(s)`}
                 onIncrement={(val) => props.onChange(Number.parseFloat(val) + 1)}
                 onDecrement={(val) => props.onChange(Number.parseFloat(val) - 1)}
                 onValidate={handleValidate}

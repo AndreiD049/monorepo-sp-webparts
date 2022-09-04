@@ -1,47 +1,12 @@
 import { IconButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { SECTION_EVENT } from '../../constants';
 import ISection from '../../models/ISection';
+import { dispatchSectionHandler } from './section-events';
 import styles from './Section.module.scss';
 
 export interface ISectionProps extends React.HTMLAttributes<HTMLDivElement> {
     section: ISection;
     editable?: boolean;
-}
-
-type SectionActions = 'REFRESH';
-
-interface ISectionActionHandlers {
-    open: () => void;
-    refresh: () => void | undefined;
-}
-interface ISectionEventDetails {
-    sectionName: string;
-    action: SectionActions;
-}
-
-export const dispatchSectionHandler = (
-    sectionName: string,
-    action: SectionActions,
-): void => {
-    document.dispatchEvent(
-        new CustomEvent<ISectionEventDetails>(SECTION_EVENT, {
-            detail: {
-                sectionName,
-                action,
-            },
-        })
-    );
-};
-
-export const listenSectionEvent = (sectionName: string, action: SectionActions, handler: () => void): () => void => {
-    const resultHandler = (ev: CustomEvent<ISectionEventDetails>): void => {
-        if (ev.detail.sectionName === sectionName && ev.detail.action === action) {
-            handler();
-        }
-    }
-    document.addEventListener(SECTION_EVENT, resultHandler);
-    return () => document.removeEventListener(SECTION_EVENT, resultHandler);
 }
 
 const SectionHeader: React.FC<{
@@ -57,8 +22,17 @@ const SectionHeader: React.FC<{
                 </div>
                 {/* Far items */}
                 <div>
-                    <IconButton onClick={() => dispatchSectionHandler(section.name, 'REFRESH')} iconProps={{ iconName: 'Refresh' }} />
                     <IconButton
+                        onClick={() => dispatchSectionHandler(section.name, 'REFRESH')}
+                        iconProps={{ iconName: 'Refresh' }}
+                    />
+                    <IconButton
+                        onClick={() => {
+                            if (section.sources.length > 0 && section.sources[0].pageUrl) {
+                                return window.open(section.sources[0].pageUrl, '_blank', 'noreferrer');
+                            }
+                            return null;
+                        }}
                         className={styles.openNewTabButton}
                         iconProps={{ iconName: 'OpenInNewTab' }}
                     />

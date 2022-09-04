@@ -2,15 +2,17 @@ import * as React from 'react';
 import { GlobalContext } from '../../context/GlobalContext';
 import IGlobalContext from '../../context/GlobalContext/IGlobalContext';
 import UserService from '../../services/UserService';
-import { Layouts, Responsive, WidthProvider } from 'react-grid-layout';
+import { Responsive, WidthProvider } from 'react-grid-layout';
 import { IHomepageProps } from './IHomepageProps';
 import './grid-styles.scss';
 import { Section } from '../Section';
 import { GridWrapper } from '../GridWrapper';
 import IUser from '../../models/IUser';
-import useWebStorage from 'use-web-storage-api';
 import { filterSections } from '../../services/SectionService';
 import { SectionFactory } from '../SectionFactory';
+import { ConditionChecker } from '../../services/ConditionChecker';
+import { SectionPreProcessor } from '../../services/SectionPreProcessor';
+import { useLayout } from '../../hooks/useLayout';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -20,20 +22,24 @@ export const Homepage: React.FC<IHomepageProps> = (props) => {
     const [selectedUser, setSelectedUser] = React.useState<IUser>(null);
     const [context, setContext] = React.useState<IGlobalContext>({
         config: props.properties.config,
-        currentUserInfo: null,
+        currentUser: null,
         selectedTeam: team,
         selectedUser: selectedUser,
     });
-    const [layouts, setLayouts] = useWebStorage<Layouts>(props.properties.config.defaultLayouts, {
-        key: props.properties.config.layoutsLocalStorageKey,
-    });
+    const { layout, handleLayoutChange } = useLayout(context.currentUser, selectedUser, props.properties.config);
 
     const sections = React.useMemo(() => {
-        if (selectedUser && team) {
-            return filterSections(props.properties.config.sections, selectedUser, team);
+        if (selectedUser && team && context.currentUser) {
+            const conditionChecker = new ConditionChecker(context.currentUser, selectedUser, team);
+            const preProcessor = new SectionPreProcessor({
+                currentUser: context.currentUser,
+                selectedUser: selectedUser,
+                selectedTeam: team,
+            });
+            return filterSections(props.properties.config.sections, conditionChecker, preProcessor);
         }
         return [];
-    }, [selectedUser, team]);
+    }, [selectedUser, team, context.currentUser]);
 
     const body = React.useMemo(() => {
         return sections.map((s) => (
@@ -48,7 +54,7 @@ export const Homepage: React.FC<IHomepageProps> = (props) => {
             const currentUser = await UserService.getCurrentUser();
             setContext((prev) => ({
                 ...prev,
-                currentUserInfo: currentUser,
+                currentUser: currentUser,
             }));
             setSelectedUser(currentUser);
             setTeam(currentUser.teams[0] || null);
@@ -85,15 +91,13 @@ export const Homepage: React.FC<IHomepageProps> = (props) => {
                         className="layout"
                         rowHeight={30}
                         cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-                        layouts={layouts}
+                        layouts={layout}
                         measureBeforeMount={false}
                         // preventCollision
                         useCSSTransforms
                         isResizable={!locked}
                         isDraggable={!locked}
-                        onLayoutChange={(_layouts, allLayouts) => {
-                            setLayouts(allLayouts);
-                        }}
+                        onLayoutChange={handleLayoutChange}
                     >
                         {body}
                     </ResponsiveGridLayout>

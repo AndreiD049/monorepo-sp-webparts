@@ -26,7 +26,6 @@ import { tasksAdded, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import { ICreateTask } from '../ICreateTask';
-import { useGroups } from '../table/useGroups';
 import MainService from '../../services/main-service';
 
 const CreateTaskPanel: React.FC = () => {
@@ -144,7 +143,7 @@ const CreateTaskPanel: React.FC = () => {
         if (data.ResponsibleId <= 0)
             messages.push(`'Responsible' is a required field`);
         if (data.EstimatedTime <= 0)
-            messages.push(`'Estimated duaration' is should be specified`);
+            messages.push(`'Estimated duaration' is mandatory`);
         if (messages.length > 0) {
             setMessages(messages);
             return false;
@@ -158,11 +157,14 @@ const CreateTaskPanel: React.FC = () => {
     /** Task creation */
     const handleCreateTask = React.useCallback(
         async (ev: React.FormEvent) => {
-            handleDismissPanel();
             loadingStart('default');
             ev.preventDefault();
             let createdId: number;
-            if (!validateData()) return;
+            if (!validateData()) {
+                loadingStop('default');
+                return;
+            };
+            handleDismissPanel();
             if (params.parentId) {
                 const parent = await taskService.getTask(+params.parentId);
                 const subtaskId = await taskService.createSubtask(data, parent);

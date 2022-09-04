@@ -1,5 +1,4 @@
 import { IndexedDbCache } from 'indexeddb-manual-cache';
-import { DateTime } from 'luxon';
 import SPBuilder, { IList, SPFI } from 'sp-preset';
 import HomepageWebPart from '../HomepageWebPart';
 import ISource from '../models/ISource';
@@ -10,44 +9,6 @@ export interface ISourceUserContext {
     user: IUser;
     team?: string;
 }
-
-const tagMap: { [key: string]: (ctx: ISourceUserContext) => string } = {
-    '@currentUserId': (context: ISourceUserContext) => context.user.Id.toString(),
-    '@today': (_context: ISourceUserContext) => DateTime.now().toISODate(),
-    '@monday': (_context: ISourceUserContext) => DateTime.now().set({ 'weekday': 1 }).toISODate(),
-    '@tuesday': (_context: ISourceUserContext) => DateTime.now().set({ 'weekday': 2 }).toISODate(),
-    '@wednesday': (_context: ISourceUserContext) => DateTime.now().set({ 'weekday': 3 }).toISODate(),
-    '@thursday': (_context: ISourceUserContext) => DateTime.now().set({ 'weekday': 4 }).toISODate(),
-    '@friday': (_context: ISourceUserContext) => DateTime.now().set({ 'weekday': 5 }).toISODate(),
-    "@startOfMonth": (_context: ISourceUserContext) => DateTime.now().startOf('month').toISODate(),
-    "@endOfMonth": (_context: ISourceUserContext) => DateTime.now().endOf('month').toISODate(),
-};
-
-const getTagFromMap = (tag: string): ((ctx: ISourceUserContext) => string) => {
-    if (tag in tagMap) {
-        return tagMap[tag];
-    }
-    return null;
-};
-
-export const preprocessSourceFilter = (source: ISource, context: ISourceUserContext): ISource => {
-    if (!source.filter) return source;
-
-    const copy = { ...source };
-    const placeholderRe = /@\w+/g;
-
-    let filter = copy.filter;
-    const matches = new Set(filter.match(placeholderRe));
-
-    if (matches.size > 0) {
-        matches.forEach((tag) => {
-            filter = getTagFromMap(tag) && filter.replaceAll(tag, getTagFromMap(tag)(context));
-        });
-        copy.filter = filter;
-    }
-
-    return copy;
-};
 
 export default class SourceService {
     private spBuilder: SPBuilder;
@@ -101,9 +62,28 @@ export default class SourceService {
         return updated;
     }
 
+    public async clearCache(): Promise<void> {
+        await this.cache.all.remove();
+    }
+
     private getUniqueKey(): string {
         return `${this.source.rootUrl}${this.source.listName}-${this.source.filter}-${
             this.select ? this.select.join(',') : ''
         }${this.expand ? this.expand.join(',') : ''}`;
     }
+}
+
+
+/** Utils */
+export const createServices = (sources: ISource[], filter?: (s: ISource) => boolean, select?: string[], expand?: string[]): SourceService[] => {
+    let applicableSources = sources;
+    if (filter) {
+        applicableSources = applicableSources.filter(filter);
+    }
+    return applicableSources.map((source) => new SourceService(source, select, expand));
+};
+
+export const clearCache = async (services: SourceService[]): Promise<void[]> => {
+    const calls = services.map(async (s) => s.clearCache());
+    return Promise.all(calls);
 }

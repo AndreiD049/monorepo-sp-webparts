@@ -2,6 +2,7 @@ import { IconButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { IAction } from '../../services/action-service';
 import { ITaskOverview } from '../../tasks/ITaskOverview';
+import { formatHours } from '../../utils/hours-duration';
 import { DIALOG_IDS, getDialog } from '../AlertDialog';
 import { TimeLogGeneral } from '../TimeLogGeneral';
 import styles from './ActionLogTime.module.scss';
@@ -22,7 +23,6 @@ const iconButtonStyles = {
 };
 
 export const ActionLogTime: React.FC<IActionLogTimeProps> = (props) => {
-    const [editable, setEditable] = React.useState(false);
     const [logged, setLogged] = React.useState(0);
     const [comment, setComment] = React.useState('');
 
@@ -43,7 +43,7 @@ export const ActionLogTime: React.FC<IActionLogTimeProps> = (props) => {
     return (
         <div className={styles.container}>
             <div className={styles.topHeader}>
-                <div>Logged {logged} hour(s)</div>
+                <div>Logged {formatHours(logged)} hour(s)</div>
                 <IconButton styles={iconButtonStyles} onClick={handleEdit} iconProps={{ iconName: 'Edit' }} />
             </div>
             {comment && (

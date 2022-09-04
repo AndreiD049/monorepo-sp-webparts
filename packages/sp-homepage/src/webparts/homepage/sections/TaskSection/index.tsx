@@ -1,17 +1,18 @@
 import { flatten } from '@microsoft/sp-lodash-subset';
-import { MessageBarType, Text } from 'office-ui-fabric-react';
+import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { SPnotify } from 'sp-react-notifications';
 import { ExpandHeader } from '../../components/ExpandHeader';
 import { NoData } from '../../components/NoData';
-import { ISectionProps, listenSectionEvent } from '../../components/Section';
+import { ISectionProps } from '../../components/Section';
 import { TaskStatus } from '../../components/TaskStatus';
 import ITaskItem from '../../models/ITaskItem';
 import ITaskLogItem from '../../models/ITaskLogItem';
-import SourceService from '../../services/SourceService';
+import SourceService, { clearCache, createServices } from '../../services/SourceService';
 import { DateTime } from 'luxon';
 import styles from './TaskSection.module.scss';
-import { getMonthDayLabel, taskSorter } from '../../utils';
+import { checkSourceTypes, getMonthDayLabel, taskSorter } from '../../utils';
+import { listenSectionEvent } from '../../components/Section/section-events';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
 
 const selectLogs = ['Id', 'Status', 'Title', 'Time', 'Date', 'TaskId'];
 const selectTasks = [
@@ -36,8 +37,6 @@ const daysMap: { [key: string]: number } = {
     Saturday: 6,
     Sunday: 0,
 };
-const supportedSourceTypes = new Set(['logs', 'tasks']);
-
 export interface ITaskSectionProps extends ISectionProps {
     // Props go here
 }
@@ -48,7 +47,11 @@ interface ITaskProps {
     weekylDay?: string;
 }
 
-const findTaskLog = (task: ITaskItem, taskLogs?: ITaskLogItem[], weekDay?: string): ITaskLogItem | undefined => {
+const findTaskLog = (
+    task: ITaskItem,
+    taskLogs?: ITaskLogItem[],
+    weekDay?: string
+): ITaskLogItem | undefined => {
     if (!taskLogs) return null;
     if (task.Type === 'Weekly' && weekDay) {
         return taskLogs.find((t) => DateTime.fromISO(t.Date).get('weekday') === daysMap[weekDay]);
@@ -83,23 +86,23 @@ const Task: React.FC<ITaskProps> = (props) => {
 };
 
 export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
+    const sources = props.section.sources;
+    const [loading, setLoading] = React.useState(true);
     const taskLogServices = React.useMemo<SourceService[]>(
-        () =>
-            props.section.sources
-                .filter((s) => s.type === 'logs')
-                .map((source) => new SourceService(source, selectLogs)),
+        () => createServices(sources, (s) => s.type === 'logs', selectLogs),
         [props.section]
     );
     const taskServices = React.useMemo<SourceService[]>(
-        () =>
-            props.section.sources
-                .filter((s) => s.type === 'tasks')
-                .map((source) => new SourceService(source, selectTasks)),
+        () => createServices(sources, (s) => s.type === 'tasks', selectTasks),
         [props.section]
     );
     const [taskLogs, setTaskLogs] = React.useState<ITaskLogItem[]>([]);
     const [tasks, setTasks] = React.useState<ITaskItem[]>([]);
 
+    /**
+     * Associative map from task.id to the tasklogs
+     * corresponding to this task
+     */
     const taskLogsMap = React.useMemo(() => {
         const map = new Map<number, ITaskLogItem[]>();
         taskLogs.forEach((log) => {
@@ -110,35 +113,22 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
         });
         return map;
     }, [taskLogs]);
-    
 
-    const fetchData = async(): Promise<void> => {
-        const logs = taskLogServices.map(async (service) =>
-            service.getSourceData<ITaskLogItem>()
-        );
-        const tasks = taskServices.map(async (service) => service.getSourceData<ITaskItem>());
-        setTaskLogs(flatten(await Promise.all(logs)));
-        setTasks(flatten(await Promise.all(tasks)).sort(taskSorter));
-    }
+    const fetchData = async (): Promise<void> => {
+        try {
+            const logs = taskLogServices.map(async (service) => service.getSourceData<ITaskLogItem>());
+            const tasks = taskServices.map(async (service) => service.getSourceData<ITaskItem>());
+            setTaskLogs(flatten(await Promise.all(logs)));
+            setTasks(flatten(await Promise.all(tasks)).sort(taskSorter));
+        } finally {
+            setLoading(false);
+        }
+    };
+
     /** Fetch Data */
     React.useEffect(() => {
-        // TODO: extract this function to utils
-        const configValid = props.section.sources.map((source) => {
-            if (!supportedSourceTypes.has(source.type)) {
-                SPnotify({
-                    message: `Tasks section: Source type '${
-                        source.type
-                    }' is not supported.\nOnly supported source types are '${Array.from(
-                        supportedSourceTypes
-                    ).join(', ')}'.\nCheck webpart properties.`,
-                    timeout: 10000,
-                    messageType: MessageBarType.blocked,
-                });
-                return false;
-            }
-            return true;
-        });
-        if (configValid.every((c) => c === true)) {
+        const configValid = checkSourceTypes(props.section, ['logs', 'tasks']);
+        if (configValid) {
             fetchData().catch((err) => console.error(err));
         } else {
             setTaskLogs([]);
@@ -149,12 +139,14 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
     /** Listen events */
     React.useEffect(() => {
         const listenHandlerRemove = listenSectionEvent(props.section.name, 'REFRESH', async () => {
-            console.log('fetch');
-            await fetchData()
+            setLoading(true);
+            await clearCache([...taskLogServices, ...taskServices]);
+            await fetchData();
         });
-        () => listenHandlerRemove();
-    }, []);
-
+        return () => {
+            listenHandlerRemove();
+        };
+    }, [props.section]);
 
     const dailyTasks = React.useMemo(() => tasks.filter((t) => t.Type === 'Daily'), [tasks]);
 
@@ -192,11 +184,16 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
                 }, {}),
         [tasks]
     );
-    const monthlyDays = React.useMemo(() => Object.keys(monthlyTasks).sort((a, b) => Number.parseInt(a) - Number.parseInt(b)), [monthlyTasks]);
-
+    const monthlyDays = React.useMemo(
+        () => Object.keys(monthlyTasks).sort((a, b) => Number.parseInt(a) - Number.parseInt(b)),
+        [monthlyTasks]
+    );
 
     if (tasks.length === 0) {
         return <NoData />;
+    }
+    if (loading) {
+        return <LoadingSpinner />
     }
 
     const renderParts = [];
@@ -205,7 +202,11 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
         renderParts.push(
             <ExpandHeader header={<Text variant="mediumPlus">Daily</Text>}>
                 {dailyTasks.map((task) => (
-                    <Task key={task.Id} task={task} taskLog={findTaskLog(task, taskLogsMap.get(task.Id))} />
+                    <Task
+                        key={task.Id}
+                        task={task}
+                        taskLog={findTaskLog(task, taskLogsMap.get(task.Id))}
+                    />
                 ))}
             </ExpandHeader>
         );

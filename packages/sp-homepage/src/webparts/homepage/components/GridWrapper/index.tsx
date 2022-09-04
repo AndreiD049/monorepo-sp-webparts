@@ -17,7 +17,7 @@ export interface IGridWrapperProps extends React.PropsWithChildren<{}> {
 }
 
 export const GridWrapper: React.FC<IGridWrapperProps> = (props) => {
-    const { currentUserInfo } = React.useContext(GlobalContext);
+    const { currentUser: currentUserInfo } = React.useContext(GlobalContext);
     const [users, setUsers] = React.useState([]);
 
     React.useEffect(() => {
