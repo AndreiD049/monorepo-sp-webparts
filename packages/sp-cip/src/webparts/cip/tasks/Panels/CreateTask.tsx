@@ -140,7 +140,7 @@ const CreateTaskPanel: React.FC = () => {
     const validateData = React.useCallback(() => {
         const messages = [];
         if (data.Title === '') messages.push(`'Title' is a required field`);
-        if (data.ResponsibleId <= 0)
+        if (!data.ResponsibleId || data.ResponsibleId <= 0)
             messages.push(`'Responsible' is a required field`);
         if (data.EstimatedTime <= 0)
             messages.push(`'Estimated duaration' is mandatory`);
