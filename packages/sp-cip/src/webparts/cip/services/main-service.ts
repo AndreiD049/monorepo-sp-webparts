@@ -1,10 +1,9 @@
-import { ActionButton } from 'office-ui-fabric-react';
-import { ICipWebPartProps } from '../CipWebPart';
+import CipWebPart, { ICipWebPartProps } from '../CipWebPart';
 import { ActionService } from './action-service';
 import { AttachmentService } from './attachment-service';
 import { CommentService } from './comment-service';
-import { TaskService } from './task-service';
 import { UserService } from './user-service';
+import { TaskService } from '@service/sp-cip/dist';
 
 export default class MainService {
     private static taskServices: Map<string, TaskService>;
@@ -31,12 +30,12 @@ export default class MainService {
         this.taskServices = new Map();
         this.taskServices.set(
             defaultKey,
-            new TaskService(defaultKey, properties.config.listName)
+            new TaskService(CipWebPart.SPBuilder.getSP(defaultKey), properties.config.listName)
         );
         properties.config.remotes.forEach((remote) =>
             this.taskServices.set(
                 remote.Name,
-                new TaskService(remote.Name, remote.ListTitle)
+                new TaskService(CipWebPart.SPBuilder.getSP(remote.Name), remote.ListTitle)
             )
         );
     }
