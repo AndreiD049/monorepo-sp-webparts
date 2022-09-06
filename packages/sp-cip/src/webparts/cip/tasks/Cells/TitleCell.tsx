@@ -10,10 +10,10 @@ import {
 } from '../../components/utils/LoadingAnimation';
 import styles from './Cells.module.scss';
 import { TaskNodeContext } from '../TaskNodeContext';
-import { ITaskOverview } from '../ITaskOverview';
-import { isFinished } from '../task-utils';
 import Pill from '../../components/pill/Pill';
 import MainService from '../../services/main-service';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import { isFinished } from '@service/sp-cip';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {

@@ -1,7 +1,7 @@
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import * as React from 'react';
 import { createTaskTree } from '../../graph/factory';
 import { TaskNode } from '../../graph/TaskNode';
-import { ITaskOverview } from '../../ITaskOverview';
 import { ICipFilters } from './filters-reducer';
 import { getColumnSortingFunc } from './sorting';
 

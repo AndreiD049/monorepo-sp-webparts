@@ -1,10 +1,7 @@
-import CipWebPart, { ICipWebPartProps } from '../CipWebPart';
-import { taskUpdated } from '../utils/dom-events';
-import { ITaskComment } from '../comments/ITaskComment';
-import MainService from './main-service';
-import { IList, SPFI } from 'sp-preset';
-import { TaskService } from '@service/sp-cip';
-import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import SPBuilder, { IList, SPFI } from 'sp-preset';
+import { TaskService } from './task-service';
+import { ITaskOverview } from '../models/ITaskOverview';
+import { ITaskComment } from '../models/ITaskComment';
 
 const COMMENTS_SELECT = [
     'Id',
@@ -21,21 +18,19 @@ const COMMENTS_EXPAND = ['Author'];
 
 export interface IPagedCollection<T> {
     hasNext: boolean;
-    getNext: () => Promise<IPagedCollection<T | null>>;
+    getNext: () => Promise<IPagedCollection<T> | null>;
     results: T;
 }
 
 export class CommentService {
     private taskListId: string;
-    private taskService: TaskService;
     private sp: SPFI;
     private list: IList;
 
-    constructor(key: string, properties: ICipWebPartProps) {
-        this.taskListId = properties.taskListId;
-        this.taskService = MainService.getTaskService();
-        this.sp = CipWebPart.SPBuilder.getSP(key);
-        this.list = this.sp.web.lists.getByTitle(properties.config.commentListName);
+    constructor(spBuilder: SPBuilder, rootUrl: string, commentListName: string, taskListId: string, private taskService: TaskService) {
+        this.taskListId = taskListId;
+        this.sp = spBuilder.getSP(rootUrl);
+        this.list = this.sp.web.lists.getByTitle(commentListName);
     }
 
     getAllRequest = (listId: string) => {

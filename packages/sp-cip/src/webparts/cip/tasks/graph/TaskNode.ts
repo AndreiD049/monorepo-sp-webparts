@@ -1,5 +1,5 @@
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IClonable } from '../../utils/IClonable';
-import { ITaskOverview } from '../ITaskOverview';
 
 type NodeType = 'root' | 'normal' | 'proxy' | 'stub';
 

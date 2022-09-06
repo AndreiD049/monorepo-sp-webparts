@@ -1,6 +1,4 @@
 import { TaskNode } from '../../graph/TaskNode';
-import { ITaskOverview } from '../../ITaskOverview';
-import { ITaskNodeContext } from '../../TaskNodeContext';
 
 export enum SortDirection {
     Ascending,

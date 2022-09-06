@@ -1,5 +1,4 @@
-import { IItems, IList, SPFI } from 'sp-preset';
-import CipWebPart, { ICipWebPartProps } from '../CipWebPart';
+import SPBuilder, { IItems, IList, SPFI } from 'sp-preset';
 
 export type ActionType =
     | 'Time log'
@@ -62,10 +61,10 @@ export class ActionService {
     private taskListId: string;
     private list: IList;
 
-    constructor(defaultKey: string, properties: ICipWebPartProps) {
-        this.sp = CipWebPart.SPBuilder.getSP(defaultKey);
-        this.taskListId = properties.taskListId;
-        this.list = this.sp.web.lists.getByTitle(properties.config.commentListName);
+    constructor(spBuilder: SPBuilder,rootUrl: string, taskListId: string, private listName: string) {
+        this.sp = spBuilder.getSP(rootUrl);
+        this.taskListId = taskListId;
+        this.list = this.sp.web.lists.getByTitle(listName);
     }
 
     async getAction(id: number): Promise<IAction> {

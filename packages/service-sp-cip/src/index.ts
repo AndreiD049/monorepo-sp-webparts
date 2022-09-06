@@ -1,7 +1,12 @@
+import { ActionService } from "./services/action-service";
+import { CommentService } from "./services/comment-service";
 import { TaskService } from "./services/task-service";
-import { ITaskOverview } from '../src/models/ITaskOverview';
+import { isFinished } from "./utils";
+
 
 export {
     TaskService,
-    ITaskOverview,
+    isFinished,
+    ActionService,
+    CommentService,
 };

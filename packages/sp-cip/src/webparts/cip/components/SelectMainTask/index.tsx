@@ -3,12 +3,9 @@ import {
     TagPicker,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { ITaskOverview } from '../../tasks/ITaskOverview';
-import { TaskService } from '../../services/task-service';
-import { GlobalContext } from '../../utils/GlobalContext';
 import { StatusSelected } from '../command-bar/StatusSelector';
-import styles from './SelectMainTask.module.scss';
 import MainService from '../../services/main-service';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 export interface ISelectMainTaskProps extends React.HTMLAttributes<HTMLElement> {
     tasks?: ITaskOverview[];

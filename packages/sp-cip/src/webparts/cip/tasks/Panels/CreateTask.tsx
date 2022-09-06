@@ -1,4 +1,3 @@
-import { uniqBy } from '@microsoft/sp-lodash-subset';
 import {
     ComboBox,
     CompactPeoplePicker,
@@ -25,8 +24,8 @@ import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimati
 import { tasksAdded, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { useChoiceFields } from '../../utils/useChoiceFields';
-import { ICreateTask } from '../ICreateTask';
 import MainService from '../../services/main-service';
+import { ICreateTask } from '@service/sp-cip/dist/models/ICreateTask';
 
 const CreateTaskPanel: React.FC = () => {
     const { teams } = React.useContext(GlobalContext);

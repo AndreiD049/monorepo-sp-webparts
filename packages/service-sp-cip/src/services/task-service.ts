@@ -1,4 +1,4 @@
-import { IList, SPFI } from 'sp-preset';
+import SPBuilder, { IList, SPFI } from 'sp-preset';
 import { ICreateTask } from '../models/ICreateTask';
 import { ITaskOverview, LIST_EXPAND, LIST_SELECT } from '../models/ITaskOverview';
 import { isFinished } from '../utils';
@@ -7,9 +7,11 @@ import { isFinished } from '../utils';
  * Tasks service
  */
 export class TaskService {
+    private sp: SPFI;
     private list: IList;
 
-    constructor(private sp: SPFI, private listTitle: string) {
+    constructor(spBuilder: SPBuilder, rootSite: string, private listTitle: string) {
+        this.sp = spBuilder.getSP(rootSite);
         this.list = this.sp.web.lists.getByTitle(listTitle);
     }
 

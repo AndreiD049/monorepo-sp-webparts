@@ -1,10 +1,10 @@
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import {
     ButtonType,
     ICalloutProps,
     IDialogContentProps,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { ITaskOverview } from '../tasks/ITaskOverview';
 import {
     CALLOUT_MENU_EVT,
     DIALOG_EVT,

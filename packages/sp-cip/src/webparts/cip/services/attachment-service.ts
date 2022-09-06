@@ -1,7 +1,7 @@
 import CipWebPart, { ICipWebPartProps } from "../CipWebPart";
-import { ITaskOverview } from "../tasks/ITaskOverview";
 import { IAttachment } from "../attachments/IAttachment";
 import { IFolder, SPFI } from "sp-preset";
+import { ITaskOverview } from "@service/sp-cip/dist/models/ITaskOverview";
 
 const FILE_SELECT = ['Name', 'UniqueId'];
 

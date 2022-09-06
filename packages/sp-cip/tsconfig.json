@@ -16,7 +16,8 @@
     "noUnusedLocals": false,
     "typeRoots": [
       "./node_modules/@types",
-      "./node_modules/@microsoft"
+      "./node_modules/@microsoft",
+      "./node_modules/@service"
     ],
     "types": [
       "webpack-env",

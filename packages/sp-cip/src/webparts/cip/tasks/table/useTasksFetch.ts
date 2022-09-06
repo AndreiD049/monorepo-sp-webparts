@@ -1,3 +1,4 @@
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { uniqBy } from 'lodash';
 import * as React from 'react';
 import { AssigneeSelected } from '../../components/command-bar/CipAssigneeSelector';
@@ -14,7 +15,6 @@ import {
     taskDeletedHandler,
     taskUpdatedHandler,
 } from '../../utils/dom-events';
-import { ITaskOverview } from '../ITaskOverview';
 import { ICipFilters } from './sort-filter/filters-reducer';
 
 export const useTasksFetch = (filters: ICipFilters) => {

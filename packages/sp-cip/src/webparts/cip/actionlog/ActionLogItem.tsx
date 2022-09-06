@@ -1,12 +1,10 @@
 import { Icon, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { ActionType, IAction } from '../services/action-service';
 import { ActionLogTime } from '../components/ActionLogTime';
-import Pill from '../components/pill/Pill';
-import { ITaskOverview } from '../tasks/ITaskOverview';
-import { GlobalContext } from '../utils/GlobalContext';
 import styles from './ActionLog.module.scss';
 import { formatHours } from '../utils/hours-duration';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import { ActionType, IAction } from '@service/sp-cip/dist/services/action-service';
 
 export interface IActionLogItemProps {
     action: IAction;

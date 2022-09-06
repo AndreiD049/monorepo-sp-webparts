@@ -2,9 +2,9 @@
   "name": "@service/sp-cip",
   "version": "1.0.0",
   "description": "API calls and service for sp-cip",
+  "module": "dist/index.js",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "type": "module",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c --environment BUILD:production",
@@ -30,5 +30,6 @@
   },
   "peerDependencies": {
     "sp-preset": "^2.0.13"
-  }
+  },
+  "dependencies": {}
 }

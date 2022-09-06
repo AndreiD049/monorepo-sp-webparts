@@ -6,11 +6,11 @@ import {
 } from '../../components/utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
-import { ITaskOverview } from '../ITaskOverview';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
 import MainService from '../../services/main-service';
 import { DAY } from '../../utils/constants';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 const defaultCalendarStrings = {
     months: [
