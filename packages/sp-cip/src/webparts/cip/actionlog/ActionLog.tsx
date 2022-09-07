@@ -1,7 +1,7 @@
-import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { IAction } from '@service/sp-cip/dist/services/action-service';
 import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import { IAction } from '@service/sp-cip/dist/services/cip/action-service';
 import MainService from '../services/main-service';
 import { ActionLogItem } from './ActionLogItem';
 

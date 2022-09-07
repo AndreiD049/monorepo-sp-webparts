@@ -1,6 +1,6 @@
-import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import * as React from 'react';
 import { Caching, IFieldInfo, SPFI } from 'sp-preset';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import CipWebPart from '../CipWebPart';
 import { GlobalContext } from './GlobalContext';
 

@@ -1,7 +1,7 @@
 import SPBuilder, { IList, SPFI } from 'sp-preset';
-import { TaskService } from './task-service';
-import { ITaskOverview } from '../models/ITaskOverview';
 import { ITaskComment } from '../models/ITaskComment';
+import { ITaskOverview } from '../models/ITaskOverview';
+import { TaskService } from './task-service';
 
 const COMMENTS_SELECT = [
     'Id',

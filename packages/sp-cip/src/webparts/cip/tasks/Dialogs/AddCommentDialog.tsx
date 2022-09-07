@@ -12,9 +12,8 @@ import * as React from 'react';
 import { dismissDialog } from '../../components/AlertDialog';
 import styles from '../../comments/Comments.module.scss';
 import MainService from '../../services/main-service';
-import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { taskUpdated } from '../../utils/dom-events';
-import { TaskService } from '@service/sp-cip';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 export const AddCommentDialog: React.FC<{ task: ITaskOverview }> = (props) => {
     const commentService = MainService.getCommentService();

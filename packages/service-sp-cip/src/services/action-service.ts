@@ -1,4 +1,5 @@
-import SPBuilder, { IItems, IList, SPFI } from 'sp-preset';
+import { IItems, IList, SPFI } from 'sp-preset';
+import { IServiceProps } from '../models/IServiceProps';
 
 export type ActionType =
     | 'Time log'
@@ -56,15 +57,19 @@ const wrap = (item: IItems) => {
         .orderBy('Created', false)();
 };
 
+export interface IActionServiceProps extends IServiceProps {
+    taskListName: string;
+}
+
 export class ActionService {
     private sp: SPFI;
-    private taskListId: string;
+    private taskListId: Promise<string>;
     private list: IList;
 
-    constructor(spBuilder: SPBuilder,rootUrl: string, taskListId: string, private listName: string) {
-        this.sp = spBuilder.getSP(rootUrl);
-        this.taskListId = taskListId;
-        this.list = this.sp.web.lists.getByTitle(listName);
+    constructor(props: IActionServiceProps) {
+        this.sp = props.sp;
+        this.taskListId = this.sp.web.lists.getByTitle(props.taskListName).select('Id')().then((l) => l.Id.toString());
+        this.list = this.sp.web.lists.getByTitle(props.listName);
     }
 
     async getAction(id: number): Promise<IAction> {
@@ -77,7 +82,7 @@ export class ActionService {
     async getActions(taskId: number): Promise<IAction[]> {
         return wrap(
             this.list.items.filter(
-                `ListId eq '${this.taskListId}' and ItemId eq ${taskId} and ActivityType ne 'Comment'`
+                `ListId eq '${await this.taskListId}' and ItemId eq ${taskId} and ActivityType ne 'Comment'`
             )
         );
     };
@@ -88,7 +93,7 @@ export class ActionService {
         comment?: string
     ) {
         return this.list.items.add({
-            ListId: this.taskListId,
+            ListId: await this.taskListId,
             ItemId: taskId,
             ActivityType: type,
             Comment: comment,

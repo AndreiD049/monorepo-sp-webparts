@@ -14,8 +14,8 @@ import { IPagedCollection } from '../services/comment-service';
 import { ITaskComment } from './ITaskComment';
 import { Comment } from './Comment';
 import MainService from '../services/main-service';
-import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { taskUpdated } from '../utils/dom-events';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 interface ICommentsProps {
     task: ITaskOverview;

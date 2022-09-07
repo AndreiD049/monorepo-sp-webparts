@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { ITaskOverview } from "../ITaskOverview"
 import { TaskNode } from "./TaskNode"
 
 const dummyTask: ITaskOverview = {

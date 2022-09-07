@@ -1,5 +1,5 @@
-import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import * as React from 'react';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { createTaskTree } from '../../graph/factory';
 import { TaskNode } from '../../graph/TaskNode';
 import { ICipFilters } from './filters-reducer';

@@ -1,8 +1,8 @@
+import { ActionService, TaskService } from '@service/sp-cip';
 import CipWebPart, { ICipWebPartProps } from '../CipWebPart';
 import { AttachmentService } from './attachment-service';
 import { CommentService } from './comment-service';
 import { UserService } from './user-service';
-import { ActionService, TaskService } from '@service/sp-cip';
 
 export default class MainService {
     private static taskServices: Map<string, TaskService>;
@@ -80,12 +80,20 @@ export default class MainService {
         this.actionServices = new Map();
         this.actionServices.set(
             defaultKey,
-            new ActionService(CipWebPart.SPBuilder, defaultKey, properties.taskListId, properties.config.commentListName)
+            new ActionService({
+                sp: CipWebPart.SPBuilder.getSP(defaultKey),
+                listName: properties.config.commentListName,
+                taskListName: properties.config.listName
+            })
         );
         properties.config.remotes.forEach((remote) =>
             this.actionServices.set(
                 remote.Name,
-                new ActionService(CipWebPart.SPBuilder, remote.Name, properties.taskListId, properties.config.commentListName)
+                new ActionService({
+                    sp: CipWebPart.SPBuilder.getSP(remote.Name),
+                    listName: properties.config.commentListName,
+                    taskListName: properties.config.listName
+                })
             )
         );
     }
