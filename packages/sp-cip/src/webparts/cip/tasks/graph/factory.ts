@@ -1,4 +1,4 @@
-import { ITaskOverview } from "../ITaskOverview";
+import { ITaskOverview } from "@service/sp-cip/dist/models/ITaskOverview";
 import { TaskNode } from "./TaskNode";
 
 export function createTaskTree(tasks: ITaskOverview[]) {

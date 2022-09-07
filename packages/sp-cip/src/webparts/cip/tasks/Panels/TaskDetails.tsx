@@ -23,12 +23,9 @@ import {
     loadingStop,
 } from '../../components/utils/LoadingAnimation';
 import { taskUpdated, taskUpdatedHandler } from '../../utils/dom-events';
-import { GlobalContext } from '../../utils/GlobalContext';
-import { TaskNode } from '../graph/TaskNode';
-import { ITaskOverview } from '../ITaskOverview';
-import { TaskService } from '../../services/task-service';
 import styles from './Panels.module.scss';
 import MainService from '../../services/main-service';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 export const TaskDetails: React.FC = () => {
     const params = useParams();

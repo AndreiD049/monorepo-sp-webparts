@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Caching, IFieldInfo, SPFI } from 'sp-preset';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import CipWebPart from '../CipWebPart';
-import { ITaskOverview } from '../tasks/ITaskOverview';
 import { GlobalContext } from './GlobalContext';
 
 export const useChoiceFields = (fieldName: keyof ITaskOverview, customSP?: SPFI) => {

@@ -3,7 +3,6 @@ import { MessageBarType } from 'office-ui-fabric-react';
 import { SPnotify } from 'sp-react-notifications';
 import ISection from './models/ISection';
 import ITaskItem from './models/ITaskItem';
-import IUser from './models/IUser';
 
 export function getMonthDayLabel(day: number, suffix: string = 'day'): string {
     switch (day) {

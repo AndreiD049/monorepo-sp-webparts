@@ -5,12 +5,10 @@ import { useNavigate } from 'react-router';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
 import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
-import { TaskService } from '../../services/task-service';
 import { taskDeleted } from '../../utils/dom-events';
 import { AddCommentDialog } from '../dialogs/AddCommentDialog';
 import { TaskNode } from '../graph/TaskNode';
 import { TimeLogGeneral } from '../../components/TimeLogGeneral';
-import { GlobalContext } from '../../utils/GlobalContext';
 import MainService from '../../services/main-service';
 
 const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {

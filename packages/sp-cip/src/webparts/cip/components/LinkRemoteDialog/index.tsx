@@ -1,7 +1,6 @@
 import { Dropdown } from 'office-ui-fabric-react';
 import * as React from 'react';
 import MainService from '../../services/main-service';
-import { TaskService } from '../../services/task-service';
 import { GlobalContext } from '../../utils/GlobalContext';
 import styles from './LinkRemoteDialog.module.scss';
 

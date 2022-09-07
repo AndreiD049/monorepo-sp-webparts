@@ -1,10 +1,10 @@
 import CipWebPart, { ICipWebPartProps } from '../CipWebPart';
-import { ITaskOverview } from '../tasks/ITaskOverview';
-import { TaskService } from './task-service';
 import { taskUpdated } from '../utils/dom-events';
 import { ITaskComment } from '../comments/ITaskComment';
 import MainService from './main-service';
 import { IList, SPFI } from 'sp-preset';
+import { TaskService } from '@service/sp-cip';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 const COMMENTS_SELECT = [
     'Id',
@@ -58,8 +58,7 @@ export class CommentService {
 
         const added = await this.list.items.add(payload);
 
-        const latest = await this.taskService.commentAdded(task.Id);
-        await taskUpdated(latest);
+        await this.taskService.commentAdded(task.Id);
 
         return added;
     };

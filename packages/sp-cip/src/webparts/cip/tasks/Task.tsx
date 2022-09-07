@@ -6,7 +6,7 @@ import { nodeToggleOpenHandler, relinkParent } from '../utils/dom-events';
 import SubtasksProxy from './SubtasksProxy';
 import { RenderCell } from './cells/render-cells';
 import { TaskNodeContext } from './TaskNodeContext';
-import { isFinished } from './task-utils';
+import { isFinished } from '@service/sp-cip';
 
 function initialOpen(node: TaskNode, isFiltered: boolean) {
     if (!isFiltered) return false;

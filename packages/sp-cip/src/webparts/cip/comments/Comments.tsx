@@ -10,13 +10,12 @@ import {
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import styles from './Comments.module.scss';
-import { ITaskOverview } from '../tasks/ITaskOverview';
 import { IPagedCollection } from '../services/comment-service';
 import { ITaskComment } from './ITaskComment';
 import { Comment } from './Comment';
-import { taskUpdated } from '../utils/dom-events';
 import MainService from '../services/main-service';
+import { taskUpdated } from '../utils/dom-events';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 interface ICommentsProps {
     task: ITaskOverview;
@@ -24,6 +23,7 @@ interface ICommentsProps {
 
 export const Comments: React.FC<ICommentsProps> = (props) => {
     const commentService = MainService.getCommentService();
+    const taskService = MainService.getTaskService();
     const [newComment, setNewComment] = React.useState('');
     const [taskComments, setTaskComments] = React.useState<ITaskComment[]>([]);
     const [commentPager, setCommentPager] = React.useState<IPagedCollection<ITaskComment[]>>(null);
@@ -39,6 +39,7 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
     const handleNewComment = React.useCallback(async () => {
         if (!newComment.trim()) return;
         const added = await commentService.addComment(props.task, newComment);
+        taskUpdated(await taskService.getTask(props.task.Id));
         setNewComment('');
         const synced = await commentService.getComment(added.data.Id);
         setTaskComments((prev) => [synced, ...prev]);

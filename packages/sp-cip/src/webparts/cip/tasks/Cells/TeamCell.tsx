@@ -5,11 +5,10 @@ import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimati
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { TaskNode } from '../graph/TaskNode';
-import { ITaskOverview } from '../ITaskOverview';
 import { TaskNodeContext } from '../TaskNodeContext';
-import { TaskService } from '../../services/task-service';
 import styles from './Cells.module.scss';
 import MainService from '../../services/main-service';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 const TeamCellCallout: React.FC<ITeamCellProps> = (props) => {
     const task = props.node.getTask();

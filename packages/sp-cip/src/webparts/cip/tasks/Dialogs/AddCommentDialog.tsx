@@ -10,12 +10,14 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { dismissDialog } from '../../components/AlertDialog';
-import { ITaskOverview } from '../ITaskOverview';
 import styles from '../../comments/Comments.module.scss';
 import MainService from '../../services/main-service';
+import { taskUpdated } from '../../utils/dom-events';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 export const AddCommentDialog: React.FC<{ task: ITaskOverview }> = (props) => {
     const commentService = MainService.getCommentService();
+    const taskService = MainService.getTaskService();
     const [newComment, setNewComment] = React.useState('');
     const [comments, setComments] = React.useState([]);
 
@@ -55,6 +57,7 @@ export const AddCommentDialog: React.FC<{ task: ITaskOverview }> = (props) => {
     const handleNewComment = React.useCallback(async () => {
         if (!newComment.trim()) return;
         await commentService.addComment(props.task, newComment);
+        taskUpdated(await taskService.getTask(props.task.Id));
         dismissDialog('MAIN');
     }, [newComment]);
 

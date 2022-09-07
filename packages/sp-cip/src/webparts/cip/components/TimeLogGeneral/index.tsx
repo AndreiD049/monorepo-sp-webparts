@@ -7,8 +7,6 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { actionUpdated } from '../../actionlog/ActionLog';
-import { IAction } from '../../services/action-service';
-import { ITaskOverview } from '../../tasks/ITaskOverview';
 import { taskUpdated } from '../../utils/dom-events';
 import { DIALOG_IDS, dismissDialog } from '../AlertDialog';
 import { HoursInput } from '../HoursInput';
@@ -16,6 +14,8 @@ import { SelectMainTask } from '../SelectMainTask';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
 import styles from './TimeLogGeneral.module.scss';
 import MainService from '../../services/main-service';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import { IAction } from '@service/sp-cip/dist/services/cip/action-service';
 
 export interface ITimeLogGeneralProps {
     dialogId: DIALOG_IDS;

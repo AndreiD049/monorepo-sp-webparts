@@ -1,8 +1,8 @@
-import React from "react";
-import { Layout, Layouts } from "react-grid-layout";
-import useWebStorage from "use-web-storage-api";
-import IConfig from "../models/IConfig";
-import IUser from "../models/IUser";
+import React from 'react';
+import { Layout, Layouts } from 'react-grid-layout';
+import useWebStorage from 'use-web-storage-api';
+import IConfig from '../models/IConfig';
+import IUser from '../models/IUser';
 
 export function getLayoutKey(currentUser?: IUser, selectedUser?: IUser): string {
     if (currentUser && selectedUser) {
@@ -11,27 +11,34 @@ export function getLayoutKey(currentUser?: IUser, selectedUser?: IUser): string 
     return 'Default';
 }
 
-export const useLayout = (currentUser: IUser, selectedUser: IUser, config: IConfig) => {
+export const useLayout = (
+    currentUser: IUser,
+    selectedUser: IUser,
+    config: IConfig
+): { layout: Layouts; handleLayoutChange: (l: Layout[], all: Layouts) => void } => {
     const [layouts, setLayouts] = useWebStorage<{ [key: string]: Layouts }>(
         {
-            'Default': config.defaultLayouts,
-            'Self': config.defaultLayouts,
-            'Other': config.defaultLayouts,
+            Default: config.defaultLayouts,
+            Self: config.defaultLayouts,
+            Other: config.defaultLayouts,
         },
         {
             key: config.layoutsLocalStorageKey,
         }
     );
 
-    const handleLayoutChange = React.useCallback((_layouts: Layout[], allLayouts: Layouts) => {
-        setLayouts((prev) => ({
-            ...prev,
-            [getLayoutKey(currentUser, selectedUser)]: allLayouts,
-        }));
-    }, [currentUser, selectedUser])
+    const handleLayoutChange = React.useCallback(
+        (_layouts: Layout[], allLayouts: Layouts) => {
+            setLayouts((prev) => ({
+                ...prev,
+                [getLayoutKey(currentUser, selectedUser)]: allLayouts,
+            }));
+        },
+        [currentUser, selectedUser]
+    );
 
     return {
         layout: layouts[getLayoutKey(currentUser, selectedUser)],
-        handleLayoutChange
+        handleLayoutChange,
     };
-}
+};
