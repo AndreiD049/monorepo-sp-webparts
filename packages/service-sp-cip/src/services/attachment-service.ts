@@ -1,7 +1,7 @@
-import CipWebPart, { ICipWebPartProps } from "../CipWebPart";
-import { IAttachment } from "../attachments/IAttachment";
 import { IFolder, SPFI } from "sp-preset";
-import { ITaskOverview } from "@service/sp-cip/dist/models/ITaskOverview";
+import { IAttachment } from "../models/IAttachment";
+import { IServiceProps } from "../models/IServiceProps";
+import { ITaskOverview } from "../models/ITaskOverview";
 
 const FILE_SELECT = ['Name', 'UniqueId'];
 
@@ -11,11 +11,11 @@ export class AttachmentService {
     private taskFolder: (id: number) => IFolder;
     private attachmentsPath: string;
 
-    constructor(defaultKey: string, properties: ICipWebPartProps) {
-        this.sp = CipWebPart.SPBuilder.getSP(defaultKey);
-        this.folder = this.sp.web.getFolderByServerRelativePath(properties.config.attachmentsPath);
-        this.taskFolder = (id: number) => this.sp.web.getFolderByServerRelativePath(`${properties.config.attachmentsPath}/${id}`);
-        this.attachmentsPath = properties.config.attachmentsPath;
+    constructor(props: IServiceProps) {
+        this.sp = props.sp;
+        this.folder = this.sp.web.getFolderByServerRelativePath(props.listName);
+        this.taskFolder = (id: number) => this.sp.web.getFolderByServerRelativePath(`${props.listName}/${id}`);
+        this.attachmentsPath = props.listName;
     }
 
     async addAttachments(task: ITaskOverview, attachments: File[]) {
@@ -42,7 +42,7 @@ export class AttachmentService {
     async ensureFolder(task: ITaskOverview) {
         try {
             await this.taskFolder(task.Id)();
-        } catch (err) {
+        } catch (err: any) {
             if (err.message.indexOf('File Not Found') !== -1) {
                 const added = await this.folder.addSubFolderUsingPath(task.Id.toString());
                 const addedFolderItem = await added.listItemAllFields();    

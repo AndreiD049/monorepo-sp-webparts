@@ -4,7 +4,7 @@ import { ActionLogTime } from '../components/ActionLogTime';
 import styles from './ActionLog.module.scss';
 import { formatHours } from '../utils/hours-duration';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { ActionType, IAction } from '@service/sp-cip/dist/services/cip/action-service';
+import { ActionType, IAction } from '@service/sp-cip/dist/services/action-service';
 
 export interface IActionLogItemProps {
     action: IAction;

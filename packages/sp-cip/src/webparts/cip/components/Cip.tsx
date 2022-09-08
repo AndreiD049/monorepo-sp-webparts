@@ -62,7 +62,7 @@ const Cip: React.FC<ICipProps> = (props) => {
                                     {props.properties.headerText}
                                 </Text>
                                 <TasksTable />
-                                <Timer />
+                                {/* <Timer /> */}
                                 <Outlet />
                             </div>
                         }

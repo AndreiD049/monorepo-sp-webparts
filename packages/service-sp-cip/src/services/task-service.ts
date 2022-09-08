@@ -1,5 +1,6 @@
 import SPBuilder, { IList, SPFI } from 'sp-preset';
 import { ICreateTask } from '../models/ICreateTask';
+import { IServiceProps } from '../models/IServiceProps';
 import { ITaskOverview, LIST_EXPAND, LIST_SELECT } from '../models/ITaskOverview';
 import { isFinished } from '../utils';
 
@@ -10,9 +11,9 @@ export class TaskService {
     private sp: SPFI;
     private list: IList;
 
-    constructor(spBuilder: SPBuilder, rootSite: string, private listTitle: string) {
-        this.sp = spBuilder.getSP(rootSite);
-        this.list = this.sp.web.lists.getByTitle(listTitle);
+    constructor(props: IServiceProps) {
+        this.sp = props.sp;
+        this.list = this.sp.web.lists.getByTitle(props.listName);
     }
 
     async getTaskListId() {

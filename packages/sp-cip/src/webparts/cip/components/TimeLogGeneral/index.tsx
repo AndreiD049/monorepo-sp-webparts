@@ -15,7 +15,7 @@ import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
 import styles from './TimeLogGeneral.module.scss';
 import MainService from '../../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { IAction } from '@service/sp-cip/dist/services/cip/action-service';
+import { IAction } from '@service/sp-cip/dist/services/action-service';
 
 export interface ITimeLogGeneralProps {
     dialogId: DIALOG_IDS;

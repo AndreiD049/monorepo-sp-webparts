@@ -1,4 +1,4 @@
-import { ITaskOverview } from "../tasks/ITaskOverview";
+import { ITaskOverview } from "@service/sp-cip/dist/models/ITaskOverview";
 
 export default interface ITimer {
     id: string;

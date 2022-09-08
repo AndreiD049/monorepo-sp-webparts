@@ -2,12 +2,12 @@ import { ButtonType, Icon, Label, Link, Stack, Text } from 'office-ui-fabric-rea
 import * as React from 'react';
 import { FileInput } from '../components/utils/FileInput';
 import { GlobalContext } from '../utils/GlobalContext';
-import { IAttachment } from './IAttachment';
 import styles from './Attachments.module.scss';
 import { getDialog } from '../components/AlertDialog';
 import { taskUpdated } from '../utils/dom-events';
 import MainService from '../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import { IAttachment } from '@service/sp-cip/dist/models/IAttachment';
 
 interface IAttachmentsProps extends React.HTMLAttributes<HTMLDivElement> {
     task?: ITaskOverview;

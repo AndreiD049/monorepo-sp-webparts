@@ -1,4 +1,5 @@
 import SPBuilder, { IList, SPFI } from 'sp-preset';
+import { IServiceProps } from '../models/IServiceProps';
 import { ITaskComment } from '../models/ITaskComment';
 import { ITaskOverview } from '../models/ITaskOverview';
 import { TaskService } from './task-service';
@@ -22,15 +23,23 @@ export interface IPagedCollection<T> {
     results: T;
 }
 
+export interface ICommentServiceProps extends IServiceProps {
+    taskListName: string;
+}
 export class CommentService {
-    private taskListId: string;
+    private taskListId: Promise<string>;
     private sp: SPFI;
     private list: IList;
+    private taskService: TaskService;
 
-    constructor(spBuilder: SPBuilder, rootUrl: string, commentListName: string, taskListId: string, private taskService: TaskService) {
-        this.taskListId = taskListId;
-        this.sp = spBuilder.getSP(rootUrl);
-        this.list = this.sp.web.lists.getByTitle(commentListName);
+    constructor(props: ICommentServiceProps) {
+        this.sp = props.sp;
+        this.taskListId = this.sp.web.lists.getByTitle(props.taskListName).select('Id')().then((l) => l.Id.toString());
+        this.list = this.sp.web.lists.getByTitle(props.listName);
+        this.taskService = new TaskService({
+            sp: props.sp,
+            listName: props.taskListName,
+        });
     }
 
     getAllRequest = (listId: string) => {
@@ -40,12 +49,12 @@ export class CommentService {
     };
 
     async getAll(): Promise<ITaskComment[]> {
-        return this.getAllRequest(this.taskListId)();
+        return this.getAllRequest(await this.taskListId)();
     };
 
     async addComment(task: ITaskOverview, comment: string) {
         const payload: ITaskComment = {
-            ListId: this.taskListId,
+            ListId: await this.taskListId,
             ItemId: task.Id,
             ActivityType: 'Comment',
             Comment: comment,
@@ -89,7 +98,7 @@ export class CommentService {
         top?: number,
         skip?: number
     ): Promise<ITaskComment[]> {
-        const listId = this.taskListId;
+        const listId = await this.taskListId;
         return this.getByTaskRequest(listId, task.Id, top, skip)();
     };
 
@@ -99,7 +108,7 @@ export class CommentService {
     ): Promise<IPagedCollection<ITaskComment[]>> {
         return this.list.items
             .filter(
-                `ListId eq '${this.taskListId}' and ItemId eq ${task.Id} and ActivityType eq 'Comment'`
+                `ListId eq '${await this.taskListId}' and ItemId eq ${task.Id} and ActivityType eq 'Comment'`
             )
             .select(...COMMENTS_SELECT)
             .expand(...COMMENTS_EXPAND)
