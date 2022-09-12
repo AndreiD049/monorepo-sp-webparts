@@ -1,0 +1,18 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    padding: 0 .5em 0 .5em;
+}
+
+.breadcrumb {
+    text-transform: uppercase;
+    text-decoration: underline;
+    color: $ms-color-neutralSecondaryAlt;
+    font-size: .85em;
+    user-select: none;
+
+    &Clickable {
+        color: $ms-color-blue;
+        cursor: pointer;
+    }
+}

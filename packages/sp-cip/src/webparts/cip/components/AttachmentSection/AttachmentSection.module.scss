@@ -1,0 +1,24 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    min-height: 250px;
+    border: 1px dashed;
+    border-color: "[theme: themeLight, default: #e3afb2]";
+    border-radius: 3px;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+.attachmentsBody {
+    padding-bottom: 1em;
+}
+
+.dropZone {
+    flex-grow: 2;
+}
+
+.dropzoneDraggingOver {
+    background-color: "[theme: themeLight, default: #e3afb2]";
+}
