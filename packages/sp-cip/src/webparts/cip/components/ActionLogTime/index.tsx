@@ -34,7 +34,7 @@ export const ActionLogTime: React.FC<IActionLogTimeProps> = (props) => {
 
     const handleEdit = () => {
         getDialog({
-            alertId: 'DETAILS_PANEL',
+            alertId: DIALOG_IDS.DETAILS_PANEL,
             title: 'Log time',
             Component: <TimeLogGeneral task={props.task} dialogId={DIALOG_IDS.DETAILS_PANEL} action={props.action} />,
         });

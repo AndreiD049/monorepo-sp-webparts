@@ -1,0 +1,8 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    color: "[theme: neutralTertiary, default: #666666]";
+    font-size: 1.2em;
+    text-align: center;
+    margin-top: .5em;
+}

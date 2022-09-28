@@ -28,7 +28,7 @@ const defaultProps = {
 };
 
 interface IGetAlertProps {
-    alertId: string;
+    alertId: DIALOG_IDS;
     title: string;
     subText?: string;
     buttons?: IDialogButtonProp[];

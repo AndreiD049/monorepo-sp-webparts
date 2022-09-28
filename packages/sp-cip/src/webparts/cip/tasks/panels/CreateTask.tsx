@@ -18,7 +18,6 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { Attachments } from '../../attachments/Attachments';
 import { HoursInput } from '../../components/HoursInput';
 import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
 import { tasksAdded, taskUpdated } from '../../utils/dom-events';
@@ -440,16 +439,6 @@ const CreateTaskPanel: React.FC = () => {
                         readOnly
                     />
                 )}
-                <Attachments style={{ height: '100px' }} onAttachments={(files) => {
-                    setAttachments(files);
-                    setData((prev) => ({
-                        ...prev,
-                        AttachmentsCount: files.length,
-                    }));
-                }} label="Attachments" />
-                {
-                    attachments.map((a) => <Text block variant='medium'>{a.name}</Text>)
-                }
             </form>
         </Panel>
     );

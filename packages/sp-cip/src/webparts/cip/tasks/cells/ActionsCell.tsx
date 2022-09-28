@@ -44,7 +44,7 @@ const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
                 disabled={isDisabled}
                 onClick={() =>
                     getDialog({
-                        alertId: 'MAIN',
+                        alertId: DIALOG_IDS.MAIN,
                         title: 'Add comment',
                         Component: (<AddCommentDialog task={node.getTask()} />)
                     })
@@ -66,7 +66,7 @@ const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
                 disabled={isDisabled}
                 onClick={() =>
                     getDialog({
-                        alertId: 'MAIN',
+                        alertId: DIALOG_IDS.MAIN,
                         title: 'Log time',
                         Component: (<TimeLogGeneral task={node.getTask()} dialogId={DIALOG_IDS.MAIN} />),
                     })
@@ -87,7 +87,7 @@ const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
                             },
                             onClick: async () => {
                                 const confirm = await getDialog({
-                                    alertId: 'MAIN',
+                                    alertId: DIALOG_IDS.MAIN,
                                     title: 'Delete tasks',
                                     subText: 'All subtasks will be deleted as well. Are you sure',
                                     buttons: [{ key: 'yes', text: 'Yes' }, { key: 'no', text: 'No', type: ButtonType.default }],
@@ -108,7 +108,7 @@ const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
                             },
                             onClick: () => {
                                 getDialog({
-                                    alertId: 'MAIN',
+                                    alertId: DIALOG_IDS.MAIN,
                                     title: 'Work in progress',
                                     subText: 'Work in progress',
                                     buttons: [{ key: 'ok', text: 'Ok' }],

@@ -1,5 +1,5 @@
 import { IAttachmentFile } from '@service/sp-cip/dist/models/IAttachmentFile';
-import { Icon, IconButton, Text } from 'office-ui-fabric-react';
+import { ButtonType, Icon, IconButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Draggable } from '@rast999/drag-and-drop';
 import { GlobalContext } from '../../../utils/GlobalContext';
@@ -8,12 +8,15 @@ import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { loadingStart, loadingStop } from '../../utils/LoadingAnimation';
 import styles from './AttachmentFile.module.scss';
 import { taskUpdated } from '../../../utils/dom-events';
+import { getBasePath } from '../../../utils/path';
+import { DIALOG_IDS, getDialog } from '../../AlertDialog';
 
 export interface IAttachmentFileProps {
     file: IAttachmentFile;
     task: ITaskOverview;
     setAttachments: React.Dispatch<React.SetStateAction<IAttachmentFile[]>>;
     folder?: string;
+    onDelete: (file: IAttachmentFile) => void;
 }
 
 const getFileIconName = (name: string) => {
@@ -99,7 +102,7 @@ export const AttachmentFile: React.FC<IAttachmentFileProps> = (props) => {
                 '/Forms/AllItems.aspx?id=' +
                 props.file.ServerRelativeUrl +
                 '&parent=' +
-                rootSite,
+                getBasePath(props.file.ServerRelativeUrl),
             '_blank',
             'noreferrer'
         );
@@ -113,25 +116,41 @@ export const AttachmentFile: React.FC<IAttachmentFileProps> = (props) => {
     }, [props.file]);
 
     const handleDelete = React.useCallback(async () => {
+        console.log(props.file);
+        const answer = await getDialog({
+            alertId: DIALOG_IDS.DETAILS_PANEL,
+            title: 'Delete file?',
+            subText: `Do you really want to delete file '${props.file.Name}'?`,
+            buttons: [
+                {
+                    key: 'yes',
+                    text: 'Yes',
+                    type: ButtonType.primary,
+                },
+                {
+                    key: 'no',
+                    text: 'No',
+                    type: ButtonType.default,
+                },
+            ],
+        });
+        if (answer === 'no' || !answer) return;
         const service = MainService.getAttachmentService();
         const taskService = MainService.getTaskService();
         loadingStart('details');
-        await service.removeAttachment(
-            props.task,
-            props.file.Name,
-            props.folder
-        );
+        await service.removeAttachment(props.file.ServerRelativeUrl);
         props.setAttachments((files) =>
             files.filter((f) => f.UniqueId !== props.file.UniqueId)
         );
         const latest = await taskService.attachmentsUpdated(props.task.Id, -1);
+        props.onDelete(props.file);
         taskUpdated(latest);
         loadingStop('details');
     }, []);
 
     return (
         <div className={`${styles.container}`}>
-            <span onDoubleClick={handleViewFile}>
+            <span onDoubleClick={handleViewFile} style={{ overflow: 'hidden' }}>
                 <Draggable
                     className={styles.fileLabel}
                     type="spfile"

@@ -72,7 +72,7 @@ const Cip: React.FC<ICipProps> = (props) => {
                             path="new/:parentId"
                             element={<CreateTaskPanel />}
                         />
-                        <Route path="task/:taskId" element={<TaskDetails />} />
+                        <Route path="task/:taskId/*" element={<TaskDetails />} />
                     </Route>
                 </Routes>
                 <AlertDialog alertId="MAIN" />

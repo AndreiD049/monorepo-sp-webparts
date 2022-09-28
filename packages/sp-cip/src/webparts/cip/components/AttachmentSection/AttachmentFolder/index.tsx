@@ -1,14 +1,14 @@
 import { IAttachmentFolder } from '@service/sp-cip/dist/models/IAttachmentFolder';
-import { Icon, IconButton, Text } from 'office-ui-fabric-react';
+import { Icon, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import styles from './AttachmentFolder.module.scss';
 import dropzoneStyles from '../AttachmentSection.module.scss';
 import { Droppable, IDragData } from '@rast999/drag-and-drop';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import MainService from '../../../services/main-service';
 import { IAttachmentFile } from '@service/sp-cip/dist/models/IAttachmentFile';
 import { loadingStart, loadingStop } from '../../utils/LoadingAnimation';
 import { UserHandler } from '@rast999/drag-and-drop/dist/utils';
+import { PATH_BACK } from '../../../utils/path';
 
 export interface IAttachmentFolderProps {
     folder: Partial<IAttachmentFolder>;
@@ -39,7 +39,6 @@ export const AttachmentFolder: React.FC<IAttachmentFolderProps> = (props) => {
     const handleDrop = React.useCallback(async (data: IDragData<IAttachmentFile>) => {
         try {
             loadingStart('details');
-            console.log(data);
             if (data.files.length) {
                 await props.handleFileDrop(data);
             } else {
@@ -49,6 +48,11 @@ export const AttachmentFolder: React.FC<IAttachmentFolderProps> = (props) => {
             loadingStop('details');
         }
     }, []);
+
+    let childItemLabel = null;
+    if (props.folder.Name !== PATH_BACK) {
+        childItemLabel = (<span> ({props.folder.ItemCount})</span>);
+    }
 
     return (
         <Droppable
@@ -67,7 +71,7 @@ export const AttachmentFolder: React.FC<IAttachmentFolderProps> = (props) => {
                 onDoubleClick={handleDoubleClick}
             >
                 <Icon iconName="Folder" />
-                <Text variant="medium">{props.folder.Name}</Text>
+                <Text variant="medium">{props.folder.Name}{childItemLabel}</Text>
             </div>
         </Droppable>
     );

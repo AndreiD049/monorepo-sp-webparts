@@ -165,7 +165,7 @@ export const TaskDetails: React.FC = () => {
             },
             onClick: () =>
                 getDialog({
-                    alertId: 'DETAILS_PANEL',
+                    alertId: DIALOG_IDS.DETAILS_PANEL,
                     title: 'Log time',
                     Component: <TimeLogGeneral task={task} dialogId={DIALOG_IDS.DETAILS_PANEL}/>,
                 }),
@@ -200,20 +200,9 @@ export const TaskDetails: React.FC = () => {
                 {task && (
                     <Stack>
                         {editableInformation}
-                        {/* <Attachments
-                            task={task}
-                            onAttachments={async (files: File[]) => {
-                                loadingStart('details');
-                                await attachmentService.addAttachments(task, files);
-                                const latest = await taskService.attachmentsUpdated(
-                                    task.Id,
-                                    files.length
-                                );
-                                taskUpdated(latest);
-                                loadingStop('details');
-                            }}
-                        /> */}
-                        <AttachmentSection task={task} />
+                        <StackItem>
+                            <AttachmentSection task={task} />
+                        </StackItem>
                         <StackItem style={{ marginTop: '1em' }}>
                             <Pivot
                                 selectedKey={
