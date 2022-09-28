@@ -24,7 +24,7 @@
 }
 
 .fileLabel {
-    display: flex;
+    display: flex !important;
     flex-flow: row nowrap;
     gap: 4px;
     flex-grow: 2;

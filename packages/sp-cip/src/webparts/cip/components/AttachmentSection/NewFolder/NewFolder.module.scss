@@ -1,0 +1,11 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.textField {
+    flex-grow: 2;
+    padding: 2px 4px;
+}

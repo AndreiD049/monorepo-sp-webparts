@@ -3,5 +3,6 @@ export interface IAttachmentFolder {
     TimeCreated: string;
     TimeLastModified: string;
     UniqueId: string;
+    ItemCount: number;
     ServerRelativeUrl: string;
 }

@@ -1,9 +1,11 @@
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { ActionButton, SearchBox } from 'office-ui-fabric-react';
 import * as React from 'react';
 import styles from './AttachmentsHeader.module.scss';
 
 export interface IAttachmentsHeaderProps {
-    // Props go here
+    task: ITaskOverview;
+    setNewFolder: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const AttachmentsHeader: React.FC<IAttachmentsHeaderProps> = (props) => {
@@ -14,6 +16,7 @@ export const AttachmentsHeader: React.FC<IAttachmentsHeaderProps> = (props) => {
                     styles={{ label: { fontSize: '.65em' } }}
                     className={styles.headerActionButton}
                     iconProps={{ iconName: 'Add' }}
+                    onClick={() => { props.setNewFolder(true) }}
                 >
                     Folder
                 </ActionButton>

@@ -61,7 +61,6 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                 .withAdditionalTimelines([
                     InjectHeaders({
                         UserAgent: `NONISV|Katoen Natie|Cip/${this.dataVersion.toString()}`,
-                        Accept: 'application/json;odata=nometadata',
                     }),
                 ]);
 

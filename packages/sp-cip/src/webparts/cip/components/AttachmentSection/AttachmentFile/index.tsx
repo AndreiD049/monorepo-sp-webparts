@@ -1,11 +1,19 @@
 import { IAttachmentFile } from '@service/sp-cip/dist/models/IAttachmentFile';
 import { Icon, IconButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { onDragStart } from '../drag-n-drop';
+import { Draggable } from '@rast999/drag-and-drop';
+import { GlobalContext } from '../../../utils/GlobalContext';
+import MainService from '../../../services/main-service';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import { loadingStart, loadingStop } from '../../utils/LoadingAnimation';
 import styles from './AttachmentFile.module.scss';
+import { taskUpdated } from '../../../utils/dom-events';
 
 export interface IAttachmentFileProps {
     file: IAttachmentFile;
+    task: ITaskOverview;
+    setAttachments: React.Dispatch<React.SetStateAction<IAttachmentFile[]>>;
+    folder?: string;
 }
 
 const getFileIconName = (name: string) => {
@@ -68,41 +76,98 @@ const getFileIconName = (name: string) => {
     }
 };
 
+const getRootSite = (serverRelativeUrl: string, libraryName: string) => {
+    const rootSiteParts = serverRelativeUrl.split('/');
+    const libraryIndex = rootSiteParts.indexOf(libraryName);
+    return rootSiteParts.slice(0, libraryIndex + 1).join('/');
+};
+
 export const AttachmentFile: React.FC<IAttachmentFileProps> = (props) => {
+    const { properties } = React.useContext(GlobalContext);
+    const rootSite = React.useMemo(
+        () =>
+            getRootSite(
+                props.file.ServerRelativeUrl,
+                properties.config.attachmentsPath
+            ),
+        [props.file]
+    );
+
+    const handleViewFile = React.useCallback(() => {
+        window.open(
+            rootSite +
+                '/Forms/AllItems.aspx?id=' +
+                props.file.ServerRelativeUrl +
+                '&parent=' +
+                rootSite,
+            '_blank',
+            'noreferrer'
+        );
+    }, [props.file]);
+
+    const hadnleDownload = React.useCallback(() => {
+        window.open(
+            `${properties.config.rootSite}/_layouts/download.aspx?SourceUrl=${props.file.ServerRelativeUrl}`,
+            '_self'
+        );
+    }, [props.file]);
+
+    const handleDelete = React.useCallback(async () => {
+        const service = MainService.getAttachmentService();
+        const taskService = MainService.getTaskService();
+        loadingStart('details');
+        await service.removeAttachment(
+            props.task,
+            props.file.Name,
+            props.folder
+        );
+        props.setAttachments((files) =>
+            files.filter((f) => f.UniqueId !== props.file.UniqueId)
+        );
+        const latest = await taskService.attachmentsUpdated(props.task.Id, -1);
+        taskUpdated(latest);
+        loadingStop('details');
+    }, []);
+
     return (
         <div className={`${styles.container}`}>
-            <div
-                className={styles.fileLabel}
-                draggable
-                onDragStart={onDragStart(props.file)}
-            >
-                <Icon iconName={getFileIconName(props.file.Name)} />
-                <Text
-                    styles={{
-                        root: {
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                        },
-                    }}
-                    title={props.file.Name}
-                    variant="medium"
+            <span onDoubleClick={handleViewFile}>
+                <Draggable
+                    className={styles.fileLabel}
+                    type="spfile"
+                    data={props.file}
                 >
-                    {props.file.Name}
-                </Text>
-            </div>
+                    <Icon iconName={getFileIconName(props.file.Name)} />
+                    <Text
+                        styles={{
+                            root: {
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                            },
+                        }}
+                        title={props.file.Name}
+                        variant="medium"
+                    >
+                        {props.file.Name}
+                    </Text>
+                </Draggable>
+            </span>
             <div className={styles.fileControlBar}>
                 <IconButton
                     className={styles.fileControlBarButton}
                     iconProps={{ iconName: 'View' }}
+                    onClick={handleViewFile}
                 />
                 <IconButton
                     className={styles.fileControlBarButton}
-                    iconProps={{ iconName: 'Edit' }}
+                    iconProps={{ iconName: 'Download' }}
+                    onClick={hadnleDownload}
                 />
                 <IconButton
                     className={styles.fileControlBarButton}
                     iconProps={{ iconName: 'Delete' }}
+                    onClick={handleDelete}
                 />
             </div>
         </div>
