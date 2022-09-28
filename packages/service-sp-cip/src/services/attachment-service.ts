@@ -79,7 +79,7 @@ export class AttachmentService {
   async searchInFolder(text: string, task: ITaskOverview, parentPath: string) {
     console.log(getQueryTemplate(await this.siteId, await this.webId, await this.listId, parentPath));
     return this.sp.search({
-      Querytext: `${text}`,
+      Querytext: `(${text}*)`,
       QueryTemplate: getQueryTemplate(await this.siteId, await this.webId, await this.listId, parentPath),
       SummaryLength: 100,
       RowLimit: 6,
