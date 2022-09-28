@@ -1,7 +1,7 @@
 import { IconButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { IAction } from '@service/sp-cip/dist/services/cip/action-service';
+import { IAction } from '@service/sp-cip/dist/services/action-service';
 import { formatHours } from '../../utils/hours-duration';
 import { DIALOG_IDS, getDialog } from '../AlertDialog';
 import { TimeLogGeneral } from '../TimeLogGeneral';

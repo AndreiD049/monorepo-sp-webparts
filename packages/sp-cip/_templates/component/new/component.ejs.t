@@ -1,5 +1,5 @@
 ---
-to: src/webparts/<%= h.webPart %>/components/<%= Name %>/index.tsx
+to: <%= locals.to || `src/webparts/${h.webPart}/components` %>/<%= Name %>/index.tsx
 ---
 import * as React from 'react';
 import styles from './<%= Name %>.module.scss';
@@ -10,6 +10,6 @@ export interface I<%= Name %>Props {
 
 export const <%= Name %>: React.FC<I<%= Name %>Props> = (props) => {
     return (
-        <div><%= Name %></div>
+        <div className={styles.container}><%= Name %></div>
     );
 };

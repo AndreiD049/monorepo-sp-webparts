@@ -13,7 +13,6 @@ import * as React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import { ActionLog } from '../../actionlog/ActionLog';
-import { Attachments } from '../../attachments/Attachments';
 import { Comments } from '../../comments/Comments';
 import { AlertDialog, DIALOG_IDS, getDialog } from '../../components/AlertDialog';
 import { TimeLogGeneral } from '../../components/TimeLogGeneral';
@@ -26,6 +25,7 @@ import { taskUpdated, taskUpdatedHandler } from '../../utils/dom-events';
 import styles from './Panels.module.scss';
 import MainService from '../../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import { AttachmentSection } from '../../components/AttachmentSection';
 
 export const TaskDetails: React.FC = () => {
     const params = useParams();
@@ -200,7 +200,7 @@ export const TaskDetails: React.FC = () => {
                 {task && (
                     <Stack>
                         {editableInformation}
-                        <Attachments
+                        {/* <Attachments
                             task={task}
                             onAttachments={async (files: File[]) => {
                                 loadingStart('details');
@@ -212,7 +212,8 @@ export const TaskDetails: React.FC = () => {
                                 taskUpdated(latest);
                                 loadingStop('details');
                             }}
-                        />
+                        /> */}
+                        <AttachmentSection task={task} />
                         <StackItem style={{ marginTop: '1em' }}>
                             <Pivot
                                 selectedKey={

@@ -2,12 +2,12 @@ import { ButtonType, Icon, Label, Link, Stack, Text } from 'office-ui-fabric-rea
 import * as React from 'react';
 import { FileInput } from '../components/utils/FileInput';
 import { GlobalContext } from '../utils/GlobalContext';
-import { IAttachment } from './IAttachment';
 import styles from './Attachments.module.scss';
 import { getDialog } from '../components/AlertDialog';
 import { taskUpdated } from '../utils/dom-events';
 import MainService from '../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import { IAttachments } from '@service/sp-cip/dist/models/IAttachments';
 
 interface IAttachmentsProps extends React.HTMLAttributes<HTMLDivElement> {
     task?: ITaskOverview;
@@ -47,9 +47,9 @@ const getFileIconName = (name: string) => {
 }
 
 export interface IAttachmentProps {
-    attachment: IAttachment;
+    attachment: IAttachments;
     task: ITaskOverview;
-    setAttachments: React.Dispatch<React.SetStateAction<IAttachment[]>>;
+    setAttachments: React.Dispatch<React.SetStateAction<IAttachments[]>>;
 }
 
 const Attachment: React.FC<IAttachmentProps> = (props) => {
@@ -58,35 +58,37 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
     const attachmentService = MainService.getAttachmentService();
 
     const linkHref = React.useCallback((file: string) => {
-        const url = attachmentService.getAttachmentsRequest(props.task).toRequestUrl();
-        const re = /sharepoint.com(\/(sites|teams).*)\/_api/;
-        const match = url.match(re);
-        const site = match ? match[1] : '';
-        return `${site}/${properties.config.attachmentsPath}/Forms/AllItems.aspx?id=${site}/${properties.config.attachmentsPath}/${props.task.Id}/${file}&parent=${site}/${props.task.Id}`;
+        // const url = attachmentService.getAttachmentsRequest(props.task).toRequestUrl();
+        // const re = /sharepoint.com(\/(sites|teams).*)\/_api/;
+        // const match = url.match(re);
+        // const site = match ? match[1] : '';
+        // return `${site}/${properties.config.attachmentsPath}/Forms/AllItems.aspx?id=${site}/${properties.config.attachmentsPath}/${props.task.Id}/${file}&parent=${site}/${props.task.Id}`;
+        return '#';
     }, []);
 
     const downloadLinkHref = React.useCallback((file: string) => {
-        const url = attachmentService.getAttachmentsRequest(props.task).toRequestUrl();
-        const re = /sharepoint.com(\/(sites|teams).*)\/_api/;
-        const match = url.match(re);
-        const site = match ? match[1] : '';
-        return `${site}/_layouts/download.aspx?SourceUrl=${site}/${properties.config.attachmentsPath}/${props.task.Id}/${file}`;
+        // const url = attachmentService.getAttachmentsRequest(props.task).toRequestUrl();
+        // const re = /sharepoint.com(\/(sites|teams).*)\/_api/;
+        // const match = url.match(re);
+        // const site = match ? match[1] : '';
+        // return `${site}/_layouts/download.aspx?SourceUrl=${site}/${properties.config.attachmentsPath}/${props.task.Id}/${file}`;
+        return '#';
     }, []);
 
-    const fileIcon = React.useMemo(() => getFileIconName(props.attachment.Name), []);
+    const fileIcon = React.useMemo(() => getFileIconName(props.attachment.Files[0].Name), []);
 
     return (
         <div className={styles.attachment}>
             <Stack horizontal tokens={{ childrenGap: 10 }}>
                 <Icon iconName={fileIcon} className={styles['attachment__fileicon']} />
-                <Text title={props.attachment.Name} variant='smallPlus' className={styles['attachment__filename']}>{props.attachment.Name}</Text>
+                <Text title={props.attachment.Files[1].Name} variant='smallPlus' className={styles['attachment__filename']}></Text>
             </Stack>
             <div className={styles.attachment__links}>
                 <Link
                     data-interception="off"
                     underline={false}
                     target="_blank"
-                    href={linkHref(props.attachment.Name)}
+                    href={linkHref(props.attachment.Files[1].Name)}
                     title="Open"
                 >
                     <Icon iconName="RedEye" />
@@ -94,12 +96,12 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
                 <Link
                     data-interception="off"
                     underline={false}
-                    href={downloadLinkHref(props.attachment.Name)}
+                    href={downloadLinkHref(props.attachment.Files[1].Name)}
                     title="Download"
                 >
                     <Icon iconName="Download" />
                 </Link>
-                <Link
+                {/* <Link
                     onClick={async (evt) => {
                         const alert = await getDialog({
                             alertId: "DETAILS_PANEL",
@@ -121,9 +123,9 @@ const Attachment: React.FC<IAttachmentProps> = (props) => {
                         return false;
                     }}
                     title="Delete"
-                >
-                    <Icon iconName="Delete" />
-                </Link>
+                > */}
+                    {/* <Icon iconName="Delete" />
+                </Link> */}
             </div>
         </div>
     )
@@ -136,7 +138,7 @@ export const Attachments: React.FC<IAttachmentsProps> = (props) => {
 
     React.useEffect(() => {
         if (props.task) {
-            attachmentService.getAttachments(props.task).then((r) => setAttachments(r));
+            // attachmentService.getAttachments(props.task).then((r) => setAttachments(r));
         }
     }, [props.task]);
 
@@ -155,7 +157,7 @@ export const Attachments: React.FC<IAttachmentsProps> = (props) => {
                     onFilesAdded={async (files) => {
                         await props.onAttachments(files);
                         if (props.task) {
-                            setAttachments(await attachmentService.getAttachments(props.task));
+                            // setAttachments(await attachmentService.getAttachments(props.task));
                         }
                     }}
                 >

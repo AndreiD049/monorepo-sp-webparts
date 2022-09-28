@@ -1,0 +1,14 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.timer {
+    position: fixed;
+    right: 0;
+    top: 300px;
+    min-width: 300px;
+    min-height: 300px;
+    background-color: lightgoldenrodyellow;
+}
+
+.timerBox {
+    box-shadow: $ms-depth-shadow-16;
+}
