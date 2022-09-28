@@ -1,6 +1,6 @@
 {
   "name": "sp-preset",
-  "version": "2.0.16",
+  "version": "2.0.17",
   "description": "Convenient preset that make @pnp/sp version 3 usage easier",
   "main": "./dist/index.js",
   "scripts": {

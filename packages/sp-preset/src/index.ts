@@ -192,4 +192,19 @@ export {
 export { getHashCode, getGUID } from '@pnp/core';
 
 /** Search */
-export { SearchQueryBuilder, SearchResults, ISearchQuery, ISuggestResult, ISuggestQuery, Search, Suggest } from '@pnp/sp/search';
+export {
+    SearchQueryBuilder,
+    SearchResults,
+    ISearchQuery,
+    ISuggestResult,
+    ISuggestQuery,
+    ISearch,
+    ISearchBuilder,
+    ISearchResponse,
+    ISearchResult,
+    ISuggest,
+    IPersonalResultSuggestion,
+    ISearchPropertyValue,
+    Search,
+    Suggest,
+} from '@pnp/sp/search';
