@@ -141,6 +141,8 @@ const CreateTaskPanel: React.FC = () => {
         if (data.Title === '') messages.push(`'Title' is a required field`);
         if (!data.ResponsibleId || data.ResponsibleId <= 0)
             messages.push(`'Responsible' is a required field`);
+        if (!data.Team)
+            messages.push(`'Team' is a required field`);
         if (data.EstimatedTime <= 0)
             messages.push(`'Estimated duaration' is mandatory`);
         if (messages.length > 0) {
@@ -214,7 +216,7 @@ const CreateTaskPanel: React.FC = () => {
             {messages.length > 0 && (
                 <MessageBar messageBarType={MessageBarType.blocked}>
                     {messages.map((message) => (
-                        <div> - {message}</div>
+                        <div>{message}</div>
                     ))}
                 </MessageBar>
             )}
