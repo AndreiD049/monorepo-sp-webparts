@@ -15,6 +15,7 @@ import '@pnp/sp/security';
 import '@pnp/sp/views';
 import '@pnp/sp/comments';
 import '@pnp/sp/sputilities';
+import '@pnp/sp/search';
 import RPMController from './controller';
 import {
     ThrottlingDetector,
@@ -189,3 +190,6 @@ export {
 } from '@pnp/sp/site-groups';
 
 export { getHashCode, getGUID } from '@pnp/core';
+
+/** Search */
+export { SearchQueryBuilder, SearchResults, ISearchQuery, ISuggestResult, ISuggestQuery, Search, Suggest } from '@pnp/sp/search';
