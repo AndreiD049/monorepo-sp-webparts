@@ -7,6 +7,7 @@ import {
     PivotItem,
     Stack,
     StackItem,
+    Text,
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
@@ -14,7 +15,11 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import { ActionLog } from '../../actionlog/ActionLog';
 import { Comments } from '../../comments/Comments';
-import { AlertDialog, DIALOG_IDS, getDialog } from '../../components/AlertDialog';
+import {
+    AlertDialog,
+    DIALOG_IDS,
+    getDialog,
+} from '../../components/AlertDialog';
 import { TimeLogGeneral } from '../../components/TimeLogGeneral';
 import {
     LoadingAnimation,
@@ -26,9 +31,11 @@ import styles from './Panels.module.scss';
 import MainService from '../../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { AttachmentSection } from '../../components/AttachmentSection';
+import { RelativeTasks } from '../../components/RelativeTasks';
 
 export const TaskDetails: React.FC = () => {
     const params = useParams();
+    const [open, setOpen] = React.useState(true);
     const navigate = useNavigate();
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -36,7 +43,6 @@ export const TaskDetails: React.FC = () => {
     const [task, setTask] = React.useState<ITaskOverview>(null);
     const taskService = MainService.getTaskService();
     const [editable, setEditable] = React.useState(Boolean(state?.editable));
-    const attachmentService = MainService.getAttachmentService();
     const [editData, setEditData] = React.useState({
         title: task?.Title,
         description: task?.Description,
@@ -52,7 +58,7 @@ export const TaskDetails: React.FC = () => {
             }
             loadingStop('details');
         }
-        run();
+        run().catch((e) => console.error(e));
     }, [params]);
 
     React.useEffect(() => {
@@ -167,14 +173,26 @@ export const TaskDetails: React.FC = () => {
                 getDialog({
                     alertId: DIALOG_IDS.DETAILS_PANEL,
                     title: 'Log time',
-                    Component: <TimeLogGeneral task={task} dialogId={DIALOG_IDS.DETAILS_PANEL}/>,
+                    Component: (
+                        <TimeLogGeneral
+                            task={task}
+                            dialogId={DIALOG_IDS.DETAILS_PANEL}
+                        />
+                    ),
                 }),
         });
         return items;
     }, [editable, editData]);
 
     const handleDismiss = React.useCallback(() => {
-        navigate('/');
+        try {
+            setOpen(false);
+        } finally {
+            setTimeout(() => {
+                navigate('/');
+                setOpen(true);
+            }, 200);
+        }
     }, []);
 
     return (
@@ -183,7 +201,7 @@ export const TaskDetails: React.FC = () => {
             isFooterAtBottom
             headerText="Task details"
             type={PanelType.medium}
-            isOpen={true}
+            isOpen={open}
             onDismiss={handleDismiss}
         >
             <div className={styles['details-panel']}>
@@ -200,6 +218,9 @@ export const TaskDetails: React.FC = () => {
                 {task && (
                     <Stack>
                         {editableInformation}
+                        <StackItem>
+                            <RelativeTasks task={task} onDismiss={handleDismiss} />
+                        </StackItem>
                         <StackItem>
                             <AttachmentSection task={task} />
                         </StackItem>

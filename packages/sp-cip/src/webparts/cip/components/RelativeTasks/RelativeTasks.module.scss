@@ -1,0 +1,19 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    margin-bottom: .5em;
+}
+
+.parent {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 4px;
+}
+
+.subtask {
+    display: block;
+    margin-left: .4em;
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 4px;
+}

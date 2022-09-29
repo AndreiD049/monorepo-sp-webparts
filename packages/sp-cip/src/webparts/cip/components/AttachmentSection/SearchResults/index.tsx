@@ -14,7 +14,7 @@ export interface ISearchResultsProps {
 }
 
 const convertResultToFile = (result: ISearchResult): IAttachmentFile => {
-    const fileName = getFileName(result.Path || result.OriginalPath);
+    const fileName = getFileName(result.Path || result.OriginalPath, result.FileType);
     return {
         Length: result.Size.toString(),
         Name: `${fileName}`,

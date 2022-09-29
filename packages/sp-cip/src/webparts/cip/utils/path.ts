@@ -34,9 +34,14 @@ export function getBasePath(path: string | string[]): string {
 /**
  * @description Assumes the file path provided already contains the name
  * @param path string or array of strings representing a path
+ * @param filetype alternative file type. For some files (like gitignore, sharepoint displays wrong filename)
  * @returns the filename
  */
-export function getFileName(path: string | string[]): string {
+export function getFileName(path: string | string[], filetype?: string): string {
     let tokens = Array.isArray(path) ? path : path.split(PATH_SEP);
-    return tokens[tokens.length - 1];
+    let filename = tokens[tokens.length - 1];
+    if (filename.startsWith('DispForm.aspx') && filetype) {
+        filename = `.${filetype}`;
+    }
+    return filename;
 }

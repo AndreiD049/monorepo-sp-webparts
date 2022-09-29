@@ -7,7 +7,11 @@ import { IAttachmentFolder } from '@service/sp-cip/dist/models/IAttachmentFolder
 import { PathBreadcrumbs } from './PathBreadcrumbs';
 import { AttachmentFile } from './AttachmentFile';
 import { AttachmentFolder } from './AttachmentFolder';
-import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
+import {
+    loadingStart,
+    loadingStop,
+    withLoading,
+} from '../utils/LoadingAnimation';
 import { taskUpdated } from '../../utils/dom-events';
 import { Droppable, IDragData } from '@rast999/drag-and-drop';
 import { NewFolder } from './NewFolder';
@@ -15,9 +19,9 @@ import { getBasePath, getMovedPath, PATH_SEP } from '../../utils/path';
 import { ISearchResult } from 'sp-preset';
 import { SearchResults } from './SearchResults';
 import { NoData } from './NoData';
-import styles from './AttachmentSection.module.scss';
 import { IndexedDbCache } from 'indexeddb-manual-cache';
 import { DB_NAME, MINUTE, STORE_NAME } from '../../utils/constants';
+import styles from './AttachmentSection.module.scss';
 
 export interface IAttachmentSectionProps {
     task: ITaskOverview;
@@ -25,7 +29,7 @@ export interface IAttachmentSectionProps {
 
 /** Client Database cache */
 export const db = new IndexedDbCache(DB_NAME, STORE_NAME, {
-    expiresIn: MINUTE * 60,
+    expiresIn: MINUTE * 10,
 });
 export const cache = {
     searchAll: (taskId: number) => db.key(`searchAll${taskId}`),
@@ -69,9 +73,35 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
         run();
     }, [path]);
 
+    /**
+     * Check if number of attachments changed
+     * Maybe, user added some attachments directly from the library.
+     */
+    const handleSync = React.useCallback(async () => {
+        if (serverRelativeUrl === '') return;
+        const results = (
+            await attachmentService.searchInFolder(
+                '',
+                props.task,
+                location.origin + getBasePath(serverRelativeUrl)
+            )
+        ).TotalRowsIncludingDuplicates;
+
+        const delta = results - props.task.AttachmentsCount;
+        if (delta !== 0) {
+            // update number of attachments
+            const latest = await taskService.attachmentsUpdated(
+                props.task.Id,
+                delta
+            );
+            taskUpdated(latest);
+        }
+    }, [serverRelativeUrl]);
+
     const handleAttach = async (files: File[]) => {
         try {
             loadingStart('details');
+            await handleSync();
             await attachmentService.addAttachments(
                 props.task,
                 files,
@@ -98,6 +128,7 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
             if (!data.files.length) return;
             try {
                 loadingStart('details');
+                await handleSync();
                 await attachmentService.addAttachments(
                     props.task,
                     data.files,
@@ -181,41 +212,6 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
         },
         [props.task, attachments, folders, serverRelativeUrl]
     );
-
-    /**
-     * Check if number of attachments changed
-     * Maybe, user added some attachments directly from the library.
-     */
-    React.useEffect(() => {
-        async function run() {
-            console.log(serverRelativeUrl);
-            // Get cached results
-            let results = props.task.AttachmentsCount;
-            if (serverRelativeUrl !== '') {
-                results = await cache.searchAll(props.task.Id).get(async () => {
-                    return (
-                        await attachmentService.searchInFolder(
-                            '',
-                            props.task,
-                            location.origin + getBasePath(serverRelativeUrl)
-                        )
-                    ).TotalRowsIncludingDuplicates;
-                });
-            }
-
-            const delta = results - props.task.AttachmentsCount;
-            if (delta !== 0) {
-                // update number of attachments
-                const latest = await taskService.attachmentsUpdated(
-                    props.task.Id,
-                    delta
-                );
-                taskUpdated(latest);
-            }
-        }
-
-        run();
-    }, [serverRelativeUrl]);
 
     const hasResults =
         attachments.length > 0 || folders.length > 0 || path.length > 0;
@@ -301,6 +297,7 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
                 setNewFolder={setNewFolder}
                 onSearch={handleSearch}
                 onAttach={handleAttach}
+                onSync={() => withLoading('details', handleSync)}
             />
             {body}
         </Droppable>

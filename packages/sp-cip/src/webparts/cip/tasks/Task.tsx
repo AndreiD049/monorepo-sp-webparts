@@ -66,9 +66,9 @@ const Task: React.FC<ITaskProps> = (props) => {
     }, [props.node]);
 
     React.useEffect(() => {
-        const removeOpenHandler = nodeToggleOpenHandler(props.node.Id, () =>
+        const removeOpenHandler = nodeToggleOpenHandler(props.node.Id, (val) =>
             setOpen((prev) => {
-                return !prev;
+                return val ? val : !prev;
             })
         );
         return () => {

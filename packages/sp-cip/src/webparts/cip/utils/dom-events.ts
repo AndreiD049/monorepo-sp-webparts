@@ -20,20 +20,21 @@ import {
 /**
  *  Open/Close toggle
  */
-export const nodeToggleOpen = (id: number) => {
+export const nodeSetOpen = (id: number, value?: boolean) => {
     document.dispatchEvent(
         new CustomEvent(NODE_OPEN_EVT, {
             detail: {
                 id,
+                value,
             },
         })
     );
 };
 
-export const nodeToggleOpenHandler = (id: number, func: () => void) => {
+export const nodeToggleOpenHandler = (id: number, func: (val?: boolean) => void) => {
     const handler = (evt: CustomEvent) => {
         if (evt.detail && evt.detail.id === id) {
-            func();
+            func(evt.detail.value);
         }
     };
     document.addEventListener(NODE_OPEN_EVT, handler);

@@ -2,7 +2,7 @@ import { Icon, IconButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import useParentStroke from '../../components/ParentStroke';
 import { TaskNode } from '../graph/TaskNode';
-import { nodeToggleOpen, taskUpdated } from '../../utils/dom-events';
+import { nodeSetOpen, taskUpdated } from '../../utils/dom-events';
 import { useNavigate } from 'react-router';
 import {
     loadingStart,
@@ -75,7 +75,7 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
         if (item.Subtasks > 0) {
             return (
                 <IconButton
-                    onClick={() => nodeToggleOpen(item.Id)}
+                    onClick={() => nodeSetOpen(item.Id)}
                     iconProps={{
                         iconName: `${open ? 'ChevronDown' : 'ChevronRight'}`,
                     }}
@@ -175,7 +175,7 @@ export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
                         }
                         loadingStop();
                     } else {
-                        nodeToggleOpen(node.Id);
+                        nodeSetOpen(node.Id);
                     }
                 }}
             />

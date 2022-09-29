@@ -27,10 +27,13 @@ export const loadingStop = (id: string = "default") => {
     dispatch(id, false);
 };
 
-export const withLoading = (id: string, func: () => any) => {
-    loadingStart();
-    func();
-    loadingStop();
+export const withLoading = async (id: string, func: () => any) => {
+    try {
+        loadingStart(id);
+        await func();
+    } finally {
+        loadingStop(id);
+    }
 }
 
 export interface ILoadingAnimationProps {
