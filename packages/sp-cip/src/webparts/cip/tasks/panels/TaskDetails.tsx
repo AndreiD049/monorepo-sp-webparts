@@ -50,6 +50,8 @@ export const TaskDetails: React.FC = () => {
 
     React.useEffect(() => {
         async function run() {
+            // if we have a task already, just skip it
+            if (task) return null;
             loadingStart('details');
             const id = +params.taskId;
             if (Number.isInteger(id)) {
@@ -186,6 +188,7 @@ export const TaskDetails: React.FC = () => {
 
     const handleDismiss = React.useCallback(() => {
         try {
+            setTask(null);
             setOpen(false);
         } finally {
             setTimeout(() => {
