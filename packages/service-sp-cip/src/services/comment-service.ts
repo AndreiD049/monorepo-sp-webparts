@@ -14,8 +14,12 @@ const COMMENTS_SELECT = [
     'Author/Title',
     'Author/EMail',
     'Author/Id',
+    'Date',
+    'User/Title',
+    'User/EMail',
+    'User/Id',
 ];
-const COMMENTS_EXPAND = ['Author'];
+const COMMENTS_EXPAND = ['Author', 'User'];
 
 export interface IPagedCollection<T> {
     hasNext: boolean;
@@ -52,13 +56,15 @@ export class CommentService {
         return this.getAllRequest(await this.taskListId)();
     };
 
-    async addComment(task: ITaskOverview, comment: string) {
+    async addComment(task: ITaskOverview, comment: string, userId?: number, date?: string) {
         const payload: ITaskComment = {
             ListId: await this.taskListId,
             ItemId: task.Id,
             ActivityType: 'Comment',
             Comment: comment,
         };
+        if (userId) payload.UserId = userId;
+        if (date) payload.Date = date;
 
         const added = await this.list.items.add(payload);
 

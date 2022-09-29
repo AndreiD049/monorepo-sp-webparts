@@ -30,3 +30,13 @@ export function getBasePath(path: string | string[]): string {
     let tokens = Array.isArray(path) ? path : path.split(PATH_SEP);
     return tokens.slice(0, -1).join(PATH_SEP);
 }
+
+/**
+ * @description Assumes the file path provided already contains the name
+ * @param path string or array of strings representing a path
+ * @returns the filename
+ */
+export function getFileName(path: string | string[]): string {
+    let tokens = Array.isArray(path) ? path : path.split(PATH_SEP);
+    return tokens[tokens.length - 1];
+}

@@ -14,6 +14,7 @@ import Pill from '../../components/pill/Pill';
 import MainService from '../../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { isFinished } from '@service/sp-cip';
+import { GlobalContext } from '../../utils/GlobalContext';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {
@@ -109,7 +110,11 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
     );
 };
 
-export const TitleCell: React.FC<{node: TaskNode, nestLevel: number}> = ({node, nestLevel}) => {
+export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
+    node,
+    nestLevel,
+}) => {
+    const { currentUser } = React.useContext(GlobalContext);
     const { isTaskFinished } = React.useContext(TaskNodeContext);
     const navigate = useNavigate();
     const item = node.getTask();
@@ -119,7 +124,13 @@ export const TitleCell: React.FC<{node: TaskNode, nestLevel: number}> = ({node, 
     const handleFinishTask = async (node: TaskNode) => {
         await taskService.finishTask(node.Id);
         const newItem = await taskService.getTask(node.Id);
-        await actionService.addAction(node.Id, 'Finished');
+        await actionService.addAction(
+            node.Id,
+            'Finished',
+            null,
+            currentUser.Id,
+            new Date().toISOString(),
+        );
         taskUpdated(newItem);
         if (newItem.ParentId) {
             taskUpdated(await taskService.getTask(newItem.ParentId));
@@ -181,8 +192,12 @@ export const TitleCell: React.FC<{node: TaskNode, nestLevel: number}> = ({node, 
                     {item.Title}
                 </Text>
                 <div className={styles['title-cell__count-icons']}>
-                    <div><Icon iconName='Comment' /> {item.CommentsCount}</div>
-                    <div><Icon iconName='Attach' /> {item.AttachmentsCount}</div>
+                    <div>
+                        <Icon iconName="Comment" /> {item.CommentsCount}
+                    </div>
+                    <div>
+                        <Icon iconName="Attach" /> {item.AttachmentsCount}
+                    </div>
                 </div>
             </div>
         </div>

@@ -35,6 +35,7 @@ export class AttachmentService {
   private listId: Promise<string>;
   private webId: Promise<string>;
   private siteId: Promise<string>;
+  private foldersCreated: {[id: number]: boolean} = {};
 
   constructor(props: IServiceProps) {
     this.sp = props.sp;
@@ -85,6 +86,7 @@ export class AttachmentService {
     task: ITaskOverview,
     path?: string
   ): Promise<IAttachments> {
+    await this.ensureFolder(task);
     return this.taskFolder(task.Id, path)
       .select(...FILE_SELECT)
       .expand("Folders", "Files")();
@@ -105,10 +107,12 @@ export class AttachmentService {
     folderName: string,
     path?: string
   ): Promise<void> {
+    await this.ensureFolder(task);
     await this.taskFolder(task.Id, path).folders.getByUrl(folderName).recycle();
   }
 
   async searchInFolder(text: string, task: ITaskOverview, parentPath: string) {
+    await this.ensureFolder(task);
     return this.sp.search({
       Querytext: `(${text}*)`,
       QueryTemplate: getQueryTemplate(
@@ -129,12 +133,14 @@ export class AttachmentService {
 
   async ensureFolder(task: ITaskOverview) {
     try {
+      if (this.foldersCreated[task.Id]) return;
       await this.taskFolder(task.Id)();
     } catch (err: any) {
       if (err.message.indexOf("File Not Found") !== -1) {
         const added = await this.folder.addSubFolderUsingPath(
           task.Id.toString()
         );
+        this.foldersCreated[task.Id] = true;
         const addedFolderItem = await added.listItemAllFields();
         const list = this.sp.web.lists.getByTitle(this.attachmentsPath);
         await list.items.getById(addedFolderItem.Id).update({

@@ -17,8 +17,10 @@ import styles from './Cells.module.scss';
 import MainService from '../../services/main-service';
 import { formatHours } from '../../utils/hours-duration';
 import { HoursInput } from '../../components/HoursInput';
+import { GlobalContext } from '../../utils/GlobalContext';
 
 const TimingCallout: React.FC<ITimingProps> = (props) => {
+    const { currentUser } = React.useContext(GlobalContext);
     const task = props.node.getTask();
     const taskService = MainService.getTaskService();
     const actionService = MainService.getActionService();
@@ -34,7 +36,9 @@ const TimingCallout: React.FC<ITimingProps> = (props) => {
         await actionService.addAction(
             task.Id,
             'Estimated time',
-            `${task.EstimatedTime}|${newTask.EstimatedTime}`
+            `${task.EstimatedTime}|${newTask.EstimatedTime}`,
+            currentUser.Id,
+            new Date().toISOString()
         );
         taskUpdated(newTask);
         loadingStop();

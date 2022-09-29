@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { ITaskComment } from './ITaskComment';
 import styles from './Comments.module.scss';
 import {
     ActivityItem,
@@ -11,6 +10,7 @@ import {
 } from 'office-ui-fabric-react';
 import { GlobalContext } from '../utils/GlobalContext';
 import MainService from '../services/main-service';
+import { ITaskComment } from '@service/sp-cip/dist/models/ITaskComment';
 
 export interface ICommentProps {
     comment: ITaskComment;
@@ -26,7 +26,8 @@ interface ICommentHeaderProps {
 
 const CommentHeader: React.FC<ICommentHeaderProps> = (props) => {
     const { currentUser } = React.useContext(GlobalContext);
-    const isCurrentUserComment = props.comment.Author.Id === currentUser?.Id;
+    const user = props.comment.User || props.comment.Author;
+    const isCurrentUserComment = user.Id === currentUser?.Id;
     const handleClick = async () => {
         if (props.edit && isCurrentUserComment) {
             await props.onEdit();
@@ -39,7 +40,7 @@ const CommentHeader: React.FC<ICommentHeaderProps> = (props) => {
     return (
         <div className={styles['comments__activity-description']}>
             <div>
-                <Link>{props.comment.Author.Title}</Link>
+                <Link>{user.Title}</Link>
                 <span key={2}> commented</span>
             </div>
             <div>
@@ -68,9 +69,10 @@ interface ICommentBodyProps {
 
 const CommentBody: React.FC<ICommentBodyProps> = (props) => {
     const { currentUser } = React.useContext(GlobalContext);
+    const user = props.comment.User || props.comment.Author;
     let content = <Text variant="medium">{props.newValue}</Text>;
 
-    if (props.edit && props.comment.Author.Id === currentUser?.Id) {
+    if (props.edit && user.Id === currentUser?.Id) {
         content = (
             <TextField
                 multiline
@@ -89,6 +91,7 @@ const CommentBody: React.FC<ICommentBodyProps> = (props) => {
 
 export const Comment: React.FC<ICommentProps> = (props) => {
     const commentService = MainService.getCommentService();
+    const user = props.comment.User || props.comment.Author;
     const [edit, setEdit] = React.useState(false);
     const [newValue, setNewValue] = React.useState(props.comment.Comment);
 
@@ -118,7 +121,7 @@ export const Comment: React.FC<ICommentProps> = (props) => {
             ),
             activityPersonas: [
                 {
-                    imageUrl: `/_layouts/15/userphoto.aspx?accountname=${props.comment.Author.EMail}&Size=M`,
+                    imageUrl: `/_layouts/15/userphoto.aspx?accountname=${user.EMail}&Size=M`,
                 },
             ],
             comments: (

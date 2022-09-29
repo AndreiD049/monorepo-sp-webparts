@@ -11,6 +11,7 @@ import styles from './Cells.module.scss';
 import MainService from '../../services/main-service';
 import { DAY } from '../../utils/constants';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import { GlobalContext } from '../../utils/GlobalContext';
 
 const defaultCalendarStrings = {
     months: [
@@ -68,6 +69,7 @@ const defaultCalendarStrings = {
 };
 
 const DueDateCellCallout = (props) => {
+    const { currentUser } = React.useContext(GlobalContext);
     const task: ITaskOverview = props.node.getTask();
     const taskService = MainService.getTaskService();
     const actionService = MainService.getActionService();
@@ -97,7 +99,9 @@ const DueDateCellCallout = (props) => {
                     await actionService.addAction(
                         task.Id,
                         'Due date',
-                        `${task.DueDate}|${newTask.DueDate}`
+                        `${task.DueDate}|${newTask.DueDate}`,
+                        currentUser.Id,
+                        new Date().toISOString(),
                     );
                     taskUpdated(newTask);
                     loadingStop();

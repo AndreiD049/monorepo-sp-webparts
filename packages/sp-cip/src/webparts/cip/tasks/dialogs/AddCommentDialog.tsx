@@ -14,8 +14,10 @@ import styles from '../../comments/Comments.module.scss';
 import MainService from '../../services/main-service';
 import { taskUpdated } from '../../utils/dom-events';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import { GlobalContext } from '../../utils/GlobalContext';
 
 export const AddCommentDialog: React.FC<{ task: ITaskOverview }> = (props) => {
+    const { currentUser } = React.useContext(GlobalContext);
     const commentService = MainService.getCommentService();
     const taskService = MainService.getTaskService();
     const [newComment, setNewComment] = React.useState('');
@@ -56,7 +58,7 @@ export const AddCommentDialog: React.FC<{ task: ITaskOverview }> = (props) => {
 
     const handleNewComment = React.useCallback(async () => {
         if (!newComment.trim()) return;
-        await commentService.addComment(props.task, newComment);
+        await commentService.addComment(props.task, newComment, currentUser.Id, new Date().toISOString());
         taskUpdated(await taskService.getTask(props.task.Id));
         dismissDialog('MAIN');
     }, [newComment]);

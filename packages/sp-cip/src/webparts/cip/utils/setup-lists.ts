@@ -43,6 +43,16 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         );
         notifyOnFieldCreation(activityType);
 
+        const user = await commentList.list.fields.createFieldAsXml(
+            `<Field Indexed='TRUE' Description='User for which the action is registered' DisplayName='User' Format='Dropdown' IsModern='TRUE' List='UserInfo' Name='User' Title='User' Type='User' UserSelectionMode='0' UserSelectionScope='0'></Field>`
+        )
+        notifyOnFieldCreation(user);
+
+        const date = await commentList.list.fields.createFieldAsXml(
+            `<Field Indexed='TRUE' DisplayName='Date' FriendlyDisplayFormat='Disabled' Format='DateTime' IsModern='TRUE' Name='Date' Title='Date' Type='DateTime'></Field>`
+        )
+        notifyOnFieldCreation(date);
+
         /**
          * Adjust default view
          */
@@ -71,6 +81,8 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
                         <FieldRef Name=\"${itemId.data.InternalName}\"/>
                         <FieldRef Name=\"${comment.data.InternalName}\"/>
                         <FieldRef Name=\"${activityType.data.InternalName}\"/>
+                        <FieldRef Name=\"${user.data.InternalName}\"/>
+                        <FieldRef Name=\"${date.data.InternalName}\"/>
                         <FieldRef Name=\"Author\"/>
                         <FieldRef Name=\"Created\"/>
                     </ViewFields>

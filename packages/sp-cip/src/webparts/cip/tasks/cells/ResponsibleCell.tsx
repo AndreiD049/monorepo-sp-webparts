@@ -7,9 +7,13 @@ import {
     Text,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
+import {
+    loadingStart,
+    loadingStop,
+} from '../../components/utils/LoadingAnimation';
 import MainService from '../../services/main-service';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
+import { GlobalContext } from '../../utils/GlobalContext';
 import { TaskNode } from '../graph/TaskNode';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
@@ -26,6 +30,7 @@ function filterUser(value: string) {
 }
 
 const ResponsibleCellCallout: React.FC<IResponsibleCellProps> = (props) => {
+    const { currentUser } = React.useContext(GlobalContext);
     const userService = MainService.getUserService();
     const taskService = MainService.getTaskService();
     const actionService = MainService.getActionService();
@@ -45,7 +50,15 @@ const ResponsibleCellCallout: React.FC<IResponsibleCellProps> = (props) => {
                 ResponsibleId: newId,
             });
             const newTask = await taskService.getTask(props.node.Id);
-            await actionService.addAction(props.node.Id, 'Responisble', `${props.node.getTask().Responsible.Title}|${newTask.Responsible.Title}`);
+            await actionService.addAction(
+                props.node.Id,
+                'Responisble',
+                `${props.node.getTask().Responsible.Title}|${
+                    newTask.Responsible.Title
+                }`,
+                currentUser.Id,
+                new Date().toISOString()
+            );
             taskUpdated(newTask);
             loadingStop('default');
         },

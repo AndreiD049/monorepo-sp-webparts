@@ -1,6 +1,9 @@
 import { ActionButton, Slider, StackItem, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
+import {
+    loadingStart,
+    loadingStop,
+} from '../../components/utils/LoadingAnimation';
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { TaskNode } from '../graph/TaskNode';
@@ -13,6 +16,7 @@ export interface IProgressCellProps {
 }
 
 const ProgressCellCallout: React.FC<IProgressCellProps> = (props) => {
+    const { currentUser } = React.useContext(GlobalContext);
     const taskService = MainService.getTaskService();
     const actionService = MainService.getActionService();
     const [value, setValue] = React.useState(props.node.getTask().Progress);
@@ -25,7 +29,13 @@ const ProgressCellCallout: React.FC<IProgressCellProps> = (props) => {
         await taskService.updateTask(props.node.Id, {
             Progress: value,
         });
-        await actionService.addAction(props.node.Id, 'Progress', `${Math.round(value * 100)}%`)
+        await actionService.addAction(
+            props.node.Id,
+            'Progress',
+            `${Math.round(value * 100)}%`,
+            currentUser.Id,
+            new Date().toISOString()
+        );
         taskUpdated(await taskService.getTask(props.node.Id));
         loadingStop();
     }, [props.node, value]);

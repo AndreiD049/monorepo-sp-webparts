@@ -29,7 +29,7 @@ export const ActionLog: React.FC<IActionLogProps> = (props) => {
         const result = {};
         const dates = [];
         actions.forEach((action) => {
-            const date = new Date(action.Created);
+            const date = new Date(action.Date || action.Created);
             const dateString = date.toLocaleDateString();
             if (!result[dateString]) {
                 result[dateString] = [];

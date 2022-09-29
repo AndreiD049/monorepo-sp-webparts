@@ -3,6 +3,7 @@ import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { Separator, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { ISearchResult } from 'sp-preset';
+import { getFileName } from '../../../utils/path';
 import { AttachmentFile } from '../AttachmentFile';
 import styles from './SearchResults.module.scss';
 
@@ -13,11 +14,11 @@ export interface ISearchResultsProps {
 }
 
 const convertResultToFile = (result: ISearchResult): IAttachmentFile => {
-    const extension = result.FileType ? `.${result.FileType}` : '';
+    const fileName = getFileName(result.Path || result.OriginalPath);
     return {
         Length: result.Size.toString(),
-        Name: `${result.Title}${extension}`,
-        ServerRelativeUrl: result.ParentLink.replace(location.origin, '') + `/${result.Title}${extension}`,
+        Name: `${fileName}`,
+        ServerRelativeUrl: result.ParentLink.replace(location.origin, '') + `/${fileName}`,
         TimeCreated: result.LastModifiedTime.toString(),
         TimeLastModified: result.LastModifiedTime.toString(),
         UniqueId: result.UniqueId,

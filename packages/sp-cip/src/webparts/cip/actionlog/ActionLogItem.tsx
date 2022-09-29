@@ -158,8 +158,8 @@ export const ActionLogItem: React.FC<IActionLogItemProps> = (props) => {
                     <ActionItemContent {...props} />
                 </div>
                 <div className={styles['actionLogItem__signature']}>
-                    {props.action.Author.Title} -{' '}
-                    {new Date(props.action.Created).toLocaleTimeString()}
+                    {props.action.User?.Title || props.action.Author.Title} -{' '}
+                    {props.action.Date ? new Date(props.action.Date).toLocaleTimeString() : new Date(props.action.Created).toLocaleTimeString()}
                 </div>
             </div>
         </div>

@@ -17,3 +17,6 @@ export const GET_SUBTASKS_EVT = 'sp-cip-get-subtasks-event';
 export const CALLOUT_MENU_EVT = 'sp-cip-contextual-menu-event';
 export const DIALOG_EVT = 'sp-cip-alert-dialog-event';
 export const FILTERS_ASSIGNED = 'sp-cip-filter-assigned-to';
+
+export const DB_NAME = 'SPFx_CIP';
+export const STORE_NAME = location.origin + location.pathname;

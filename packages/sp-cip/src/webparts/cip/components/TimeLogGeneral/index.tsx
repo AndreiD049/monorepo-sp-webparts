@@ -16,6 +16,7 @@ import styles from './TimeLogGeneral.module.scss';
 import MainService from '../../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IAction } from '@service/sp-cip/dist/services/action-service';
+import { GlobalContext } from '../../utils/GlobalContext';
 
 export interface ITimeLogGeneralProps {
     dialogId: DIALOG_IDS;
@@ -24,6 +25,7 @@ export interface ITimeLogGeneralProps {
 }
 
 export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
+    const { currentUser } = React.useContext(GlobalContext);
     const taskService = MainService.getTaskService();
     const actionService = MainService.getActionService();
     const [selected, setSelected] = React.useState<ITaskOverview>(props.task);
@@ -48,7 +50,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     // New action - has selected task
     const handleLogNew = async () => {
         const selId = selected?.Id || null;
-        await actionService.addAction(selId, 'Time log', `${time}|${comment}`);
+        await actionService.addAction(selId, 'Time log', `${time}|${comment}`, currentUser.Id, new Date().toISOString());
         if (selId) {
             const task = props.task || (await taskService.getTask(selId));
             await taskService.updateTask(selId, {

@@ -16,20 +16,25 @@ import { ISearchResult } from 'sp-preset';
 import { SearchResults } from './SearchResults';
 import { NoData } from './NoData';
 import styles from './AttachmentSection.module.scss';
+import { IndexedDbCache } from 'indexeddb-manual-cache';
+import { DB_NAME, MINUTE, STORE_NAME } from '../../utils/constants';
 
 export interface IAttachmentSectionProps {
     task: ITaskOverview;
 }
 
-export async function addFilesToFolder(
-    data: IDragData<any>,
-    task: ITaskOverview,
-    path: string = ''
-) {}
+/** Client Database cache */
+export const db = new IndexedDbCache(DB_NAME, STORE_NAME, {
+    expiresIn: MINUTE * 60,
+});
+export const cache = {
+    searchAll: (taskId: number) => db.key(`searchAll${taskId}`),
+};
 
 export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
     const [path, setPath] = React.useState<string[]>([]);
 
+    const [serverRelativeUrl, setServerRelativeUrl] = React.useState('');
     const [attachments, setAttachments] = React.useState<IAttachmentFile[]>([]);
     const [folders, setFolders] = React.useState<IAttachmentFolder[]>([]);
 
@@ -40,13 +45,28 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
 
     // Fetch Data
     React.useEffect(() => {
-        setAttachments([]);
-        setFolders([]);
-        const fullPath = path.join('/');
-        attachmentService.getAttachments(props.task, fullPath).then((r) => {
-            setAttachments(r.Files);
-            setFolders(r.Folders);
-        });
+        async function run() {
+            loadingStart('details');
+            const fullPath = path.join('/');
+            const result = await attachmentService.getAttachments(
+                props.task,
+                fullPath
+            );
+            setAttachments(result.Files);
+            setFolders(result.Folders);
+            if (
+                serverRelativeUrl === '' &&
+                (result.Files.length > 0 || result.Folders.length > 0)
+            ) {
+                setServerRelativeUrl(
+                    result.Files.length > 0
+                        ? result.Files[0].ServerRelativeUrl
+                        : result.Folders[0].ServerRelativeUrl
+                );
+            }
+            loadingStop('details');
+        }
+        run();
     }, [path]);
 
     const handleAttach = async (files: File[]) => {
@@ -61,6 +81,9 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
                 props.task.Id,
                 files.length
             );
+            await cache
+                .searchAll(props.task.Id)
+                .update<number>(() => latest.AttachmentsCount);
             taskUpdated(latest);
         } finally {
             loadingStop('details');
@@ -84,6 +107,9 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
                     props.task.Id,
                     data.files.length
                 );
+                await cache
+                    .searchAll(props.task.Id)
+                    .update<number>(() => latest.AttachmentsCount);
                 taskUpdated(latest);
             } finally {
                 loadingStop('details');
@@ -112,6 +138,15 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
             }
         };
 
+    const handleDelete = React.useCallback(
+        async (file: IAttachmentFile) => {
+            await cache
+                .searchAll(props.task.Id)
+                .update<number>((prev) => prev - 1);
+        },
+        [props.task]
+    );
+
     // Create new folder
     const handleSaveNewFolder = React.useCallback(
         async (name: string) => {
@@ -137,22 +172,53 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
                 const results = await attachmentService.searchInFolder(
                     value,
                     props.task,
-                    location.origin +
-                        getBasePath(
-                            attachments.length > 0
-                                ? attachments[0].ServerRelativeUrl
-                                : folders[0].ServerRelativeUrl
-                        )
+                    location.origin + getBasePath(serverRelativeUrl)
                 );
                 setSearchResults(results.PrimarySearchResults);
             } finally {
                 loadingStop('details');
             }
         },
-        [props.task, attachments, folders]
+        [props.task, attachments, folders, serverRelativeUrl]
     );
 
-    const hasResults = attachments.length > 0 || folders.length > 0 || path.length > 0;
+    /**
+     * Check if number of attachments changed
+     * Maybe, user added some attachments directly from the library.
+     */
+    React.useEffect(() => {
+        async function run() {
+            console.log(serverRelativeUrl);
+            // Get cached results
+            let results = props.task.AttachmentsCount;
+            if (serverRelativeUrl !== '') {
+                results = await cache.searchAll(props.task.Id).get(async () => {
+                    return (
+                        await attachmentService.searchInFolder(
+                            '',
+                            props.task,
+                            location.origin + getBasePath(serverRelativeUrl)
+                        )
+                    ).TotalRowsIncludingDuplicates;
+                });
+            }
+
+            const delta = results - props.task.AttachmentsCount;
+            if (delta !== 0) {
+                // update number of attachments
+                const latest = await taskService.attachmentsUpdated(
+                    props.task.Id,
+                    delta
+                );
+                taskUpdated(latest);
+            }
+        }
+
+        run();
+    }, [serverRelativeUrl]);
+
+    const hasResults =
+        attachments.length > 0 || folders.length > 0 || path.length > 0;
 
     let body = null;
     if (searchResults?.length >= 0) {
@@ -160,8 +226,8 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
             <SearchResults
                 results={searchResults}
                 task={props.task}
-                onDelete={(file) => {
-                    console.log(file);
+                onDelete={async (file) => {
+                    await handleDelete(file);
                     setSearchResults((prev) =>
                         prev.filter((p) => p.UniqueId !== file.UniqueId)
                     );
@@ -208,7 +274,7 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
                         task={props.task}
                         setAttachments={setAttachments}
                         folder={path.join('/')}
-                        onDelete={() => null}
+                        onDelete={async (file) => handleDelete(file)}
                     />
                 ))}
             </>

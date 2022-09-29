@@ -27,7 +27,7 @@ import MainService from '../../services/main-service';
 import { ICreateTask } from '@service/sp-cip/dist/models/ICreateTask';
 
 const CreateTaskPanel: React.FC = () => {
-    const { teams } = React.useContext(GlobalContext);
+    const { teams, currentUser } = React.useContext(GlobalContext);
     const taskService = MainService.getTaskService();
     const actionService = MainService.getActionService();
     const navigate = useNavigate();
@@ -169,7 +169,7 @@ const CreateTaskPanel: React.FC = () => {
                 const parent = await taskService.getTask(+params.parentId);
                 const subtaskId = await taskService.createSubtask(data, parent);
                 createdId = subtaskId;
-                await actionService.addAction(subtaskId, 'Created', data.Title);
+                await actionService.addAction(subtaskId, 'Created', data.Title, currentUser.Id, new Date().toISOString());
                 parent.Subtasks += 1;
                 // Refresh the parent task
                 const subtasks = await taskService.getSubtasks(parent);
@@ -177,7 +177,7 @@ const CreateTaskPanel: React.FC = () => {
                 tasksAdded(subtasks);
             } else {
                 createdId = await taskService.createTask(data);
-                await actionService.addAction(createdId, 'Created', data.Title);
+                await actionService.addAction(createdId, 'Created', data.Title, currentUser.Id, new Date().toISOString());
                 tasksAdded([await taskService.getTask(createdId)]);
             }
             if (attachments.length > 0 && createdId) {

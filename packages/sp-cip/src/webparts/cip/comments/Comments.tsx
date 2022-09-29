@@ -1,27 +1,26 @@
 import {
     ActionButton,
-    ActivityItem,
-    Icon,
     IconButton,
-    Link,
     Separator,
     Stack,
     StackItem,
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { ITaskComment } from './ITaskComment';
 import { Comment } from './Comment';
 import MainService from '../services/main-service';
 import { taskUpdated } from '../utils/dom-events';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IPagedCollection } from '@service/sp-cip/dist/services/comment-service';
+import { GlobalContext } from '../utils/GlobalContext';
+import { ITaskComment } from '@service/sp-cip/dist/models/ITaskComment';
 
 interface ICommentsProps {
     task: ITaskOverview;
 }
 
 export const Comments: React.FC<ICommentsProps> = (props) => {
+    const { currentUser } = React.useContext(GlobalContext);
     const commentService = MainService.getCommentService();
     const taskService = MainService.getTaskService();
     const [newComment, setNewComment] = React.useState('');
@@ -38,7 +37,7 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
 
     const handleNewComment = React.useCallback(async () => {
         if (!newComment.trim()) return;
-        const added = await commentService.addComment(props.task, newComment);
+        const added = await commentService.addComment(props.task, newComment, currentUser.Id, new Date().toISOString());
         taskUpdated(await taskService.getTask(props.task.Id));
         setNewComment('');
         const synced = await commentService.getComment(added.data.Id);

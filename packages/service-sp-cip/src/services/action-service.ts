@@ -15,9 +15,9 @@ export type ActionType =
 export interface IAction {
     Id: number;
     ListId: string;
-    ItemId: number;
+    ItemId: number | null;
     ActivityType: ActionType;
-    Comment: string;
+    Comment?: string;
     Author?: {
         Id: number;
         Title: string;
@@ -30,6 +30,13 @@ export interface IAction {
     };
     Created?: string;
     Modified?: string;
+    User?: {
+        Id: number;
+        Title: string;
+        EMail: string;
+    };
+    UserId?: number;
+    Date?: string;
 }
 
 export const LIST_SELECT = [
@@ -46,9 +53,13 @@ export const LIST_SELECT = [
     'Editor/Title',
     'Editor/EMail',
     'Modified',
+    'User/Id',
+    'User/Title',
+    'User/EMail',
+    'Date',
 ];
 
-export const LIST_EXPAND = ['Author', 'Editor'];
+export const LIST_EXPAND = ['Author', 'Editor', 'User'];
 
 const wrap = (item: IItems) => {
     return item
@@ -90,14 +101,19 @@ export class ActionService {
     async addAction(
         taskId: number | null,
         type: ActionType,
-        comment?: string
+        comment?: string,
+        userId?: number,
+        date?: string,
     ) {
-        return this.list.items.add({
+        const data: Partial<IAction> ={
             ListId: await this.taskListId,
             ItemId: taskId,
             ActivityType: type,
             Comment: comment,
-        });
+        } 
+        if (userId) data.UserId = userId;
+        if (date) data.Date = date;
+        return this.list.items.add(data);
     };
 
     async updateAction(

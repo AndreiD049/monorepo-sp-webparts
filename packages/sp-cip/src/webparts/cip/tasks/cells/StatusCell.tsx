@@ -7,12 +7,14 @@ import { TaskNode } from '../graph/TaskNode';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
 import MainService from '../../services/main-service';
+import { GlobalContext } from '../../utils/GlobalContext';
 
 export interface IStatusCellProps {
     node: TaskNode;
 }
 
 export const StatusCellCallout: React.FC<IStatusCellProps> = ({ node }) => {
+    const { currentUser } = React.useContext(GlobalContext);
     const { fieldInfo } = useChoiceFields('Status');
     const taskService = MainService.getTaskService();
     const actionService = MainService.getActionService();
@@ -28,7 +30,7 @@ export const StatusCellCallout: React.FC<IStatusCellProps> = ({ node }) => {
             Status: status
         });
         const newTask = await taskService.getTask(node.Id);
-        await actionService.addAction(node.Id, 'Status', `${node.getTask().Status}|${newTask.Status}`);
+        await actionService.addAction(node.Id, 'Status', `${node.getTask().Status}|${newTask.Status}`, currentUser.Id, new Date().toISOString());
         taskUpdated(newTask);
         loadingStop();
     }, [node]);
