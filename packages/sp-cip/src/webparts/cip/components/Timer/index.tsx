@@ -8,9 +8,9 @@ import {
     ITranslate,
     IPositionStyles,
 } from '@rast999/react-movable';
-import styles from './Timer.module.scss';
 import { NoData } from './NoData';
 import { IconButton, Text } from 'office-ui-fabric-react';
+import styles from './Timer.module.scss';
 
 export interface ITimerProps<T> {
     tasks?: T[];
@@ -37,6 +37,11 @@ export interface ITimerProps<T> {
     onTimerUpdated?: (timer: ITimer<T>) => void;
     onTimerRemoved?: (timer: ITimer<T>) => void;
     onTimerLogged?: (timer: ITimer<T>) => void;
+
+    /** get task text */
+    getTaskText?: (task: T) => string;
+    /** get task id */
+    getTaskId?: (task: T) => number | string;
 }
 
 export const Timer = <T,>(props: React.PropsWithChildren<ITimerProps<T>>) => {
@@ -47,6 +52,7 @@ export const Timer = <T,>(props: React.PropsWithChildren<ITimerProps<T>>) => {
         const timer = {
             id: Guid.newGuid().toString(),
             duration: 0,
+            spot: false,
             active: true,
             lastStartTimestamp: Date.now(),
         };
@@ -122,6 +128,22 @@ export const Timer = <T,>(props: React.PropsWithChildren<ITimerProps<T>>) => {
         }
     }, []); 
 
+    const handleTaskSelect = React.useCallback((timer: ITimer<T>, task: T) => {
+        if (!props.timers) {
+            setTimers((prev) => prev.map((t) => t.id === timer.id ? {...t, task} : t));
+        } else {
+            props.onTimerUpdated({ ...timer, task });
+        }
+    }, []);
+
+    const handleTaskUpdated = React.useCallback((timer: ITimer<T>) => {
+        if (!props.timers) {
+            setTimers((prev) => prev.map((t) => t.id === timer.id ? timer : t));
+        } else {
+            props.onTimerUpdated(timer);
+        }
+    }, []);
+
     return (
         <Movable
             position="fixed"
@@ -164,9 +186,14 @@ export const Timer = <T,>(props: React.PropsWithChildren<ITimerProps<T>>) => {
                         <TimerItem
                             key={timer.id}
                             item={timer}
+                            tasks={props.tasks}
                             onToggle={handleToggleTimer}
                             onRemove={handleTimerRemoved}
                             onLogged={handleTimerLogged}
+                            onUpdated={handleTaskUpdated}
+                            onTaskSelect={handleTaskSelect}
+                            getTaskText={props.getTaskText}
+                            getTaskId={props.getTaskId}
                         />
                     ))
                 ) : (

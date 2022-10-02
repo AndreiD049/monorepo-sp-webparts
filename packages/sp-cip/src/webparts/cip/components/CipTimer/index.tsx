@@ -122,6 +122,8 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
                     loadingStop();
                 }
             }}
+            getTaskText={(task: ITaskOverview) => task.Title}
+            getTaskId={(task: ITaskOverview) => task.Id}
         />
     );
 };

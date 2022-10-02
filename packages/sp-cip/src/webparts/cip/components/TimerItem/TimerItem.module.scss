@@ -5,4 +5,22 @@
     flex-flow: row nowrap;
     align-items: center;
     justify-content: flex-start;
+    gap: .3em;
+    padding: .3em 0;
+    border-bottom: 1px solid;
+    border-color: "[theme: themePrimary, default: #a4262c]"
+}
+
+.activeTimer {
+    background-color:  "[theme: neutralQuaternary, default: #c8c8c8]";
+}
+
+.timerDuration {
+    background-color: "[theme: themePrimary, default: #a4262c]";
+    color: "[theme: white, default: #ffffff]";
+    font-weight: 500;
+    padding: .2em .4em;
+    border-radius: 10px;
+    width: 60px;
+    text-align: center;
 }
