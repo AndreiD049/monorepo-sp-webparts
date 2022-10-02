@@ -52,13 +52,13 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
         return removeHandler;
     }, []);
 
-    if (!visible) return null;
-
     const handleTimerUpdated = React.useCallback((timer: ITimer<ITaskOverview>) => {
         setTimers((prev) =>
             prev.map((t) => (t.id === timer.id ? timer : t))
         )
     }, [])
+
+    if (!visible) return null;
 
     return (
         <Timer
