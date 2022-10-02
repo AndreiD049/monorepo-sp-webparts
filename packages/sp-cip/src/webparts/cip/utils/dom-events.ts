@@ -14,7 +14,8 @@ import {
     TASKS_ADDED_EVT,
     TASK_UPDATED_EVT,
     GET_SUBTASKS_EVT,
-    TASKS_DELETED_EVT
+    TASKS_DELETED_EVT,
+    TIMER_EVT
 } from './constants';
 
 /**
@@ -252,4 +253,29 @@ export const dialogVisibilityHandler = (
     };
     document.addEventListener(DIALOG_EVT, handler);
     return () => document.removeEventListener(DIALOG_EVT, handler);
+};
+
+/**
+ *  Timer events
+ */
+export interface ITimerEventOptions {
+    visible: boolean;
+}
+
+export const setTimerOptions = (options: ITimerEventOptions) => {
+    document.dispatchEvent(
+        new CustomEvent<ITimerEventOptions>(TIMER_EVT, {
+            detail: options,
+        })
+    );
+};
+
+export const timerOptionsHandler = (func: (options: ITimerEventOptions) => void) => {
+    const handler = (evt: CustomEvent) => {
+        if (evt.detail) {
+            func(evt.detail);
+        }
+    };
+    document.addEventListener(TIMER_EVT, handler);
+    return () => document.removeEventListener(TIMER_EVT, handler);
 };

@@ -17,6 +17,7 @@
     "@microsoft/sp-property-pane": "1.14.0",
     "@microsoft/sp-webpart-base": "1.14.0",
     "@rast999/drag-and-drop": "^1.0.4",
+    "@rast999/react-movable": "^1.0.6",
     "@service/sp-cip": "^1.0.0",
     "indexeddb-manual-cache": "^1.0.0",
     "json-configuration": "^0.0.1",

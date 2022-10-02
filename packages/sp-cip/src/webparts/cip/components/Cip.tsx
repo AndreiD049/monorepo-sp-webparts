@@ -11,7 +11,7 @@ import { LoadingAnimation } from './utils/LoadingAnimation';
 import { AlertDialog } from './AlertDialog';
 import MainService from '../services/main-service';
 import styles from './Cip.module.scss';
-import { Timer } from './Timer';
+import { CipTimer } from './CipTimer';
 
 interface ICipProps {
     properties: ICipWebPartProps;
@@ -62,7 +62,6 @@ const Cip: React.FC<ICipProps> = (props) => {
                                     {props.properties.headerText}
                                 </Text>
                                 <TasksTable />
-                                {/* <Timer /> */}
                                 <Outlet />
                             </div>
                         }
@@ -76,6 +75,7 @@ const Cip: React.FC<ICipProps> = (props) => {
                     </Route>
                 </Routes>
                 <AlertDialog alertId="MAIN" />
+                <CipTimer />
             </HashRouter>
         </GlobalContext.Provider>
     );

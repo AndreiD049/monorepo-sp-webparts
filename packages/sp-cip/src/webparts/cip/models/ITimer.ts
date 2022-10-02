@@ -1,8 +1,8 @@
 import { ITaskOverview } from "@service/sp-cip/dist/models/ITaskOverview";
 
-export default interface ITimer {
+export default interface ITimer<T> {
     id: string;
-    task?: ITaskOverview;
+    task?: T;
     active: boolean;
     duration: number;
     lastStartTimestamp: number;

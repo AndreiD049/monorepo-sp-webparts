@@ -16,6 +16,10 @@ export const TASK_UPDATED_EVT = 'sp-cip-task-updated-event';
 export const GET_SUBTASKS_EVT = 'sp-cip-get-subtasks-event';
 export const CALLOUT_MENU_EVT = 'sp-cip-contextual-menu-event';
 export const DIALOG_EVT = 'sp-cip-alert-dialog-event';
+export const TIMER_EVT = 'sp-cip-timer-event';
+export const TIMER_VISIBLE_KEY = 'sp-cip-timer-visible';
+export const TIMER_RIGHT_POSITION = 'sp-cip-timer-right-position';
+export const TIMERS_KEY = 'sp-cip-timers';
 export const FILTERS_ASSIGNED = 'sp-cip-filter-assigned-to';
 
 export const DB_NAME = 'SPFx_CIP';

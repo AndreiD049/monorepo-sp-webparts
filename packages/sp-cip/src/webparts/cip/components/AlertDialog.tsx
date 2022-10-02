@@ -52,11 +52,12 @@ export const getDialog = async (props: IGetAlertProps) => {
     });
 };
 
-export const dismissDialog = (id: string) => {
+export const dismissDialog = (id: string, answer?: any) => {
     document.dispatchEvent(
         new CustomEvent(DISMISS_DIALOG_EVT, {
             detail: {
                 id,
+                answer: answer,
             },
         })
     );
@@ -76,11 +77,10 @@ export const AlertDialog: React.FC<IAlertDialogProps> = ({ alertId }) => {
 
     const handleDismiss = React.useCallback(
         (answer) => () => {
-            console.log('dismiss');
             beforeDismiss && beforeDismiss(answer);
             setHidden(true);
         },
-        [hidden]
+        [beforeDismiss]
     );
 
     React.useEffect(() => {
@@ -93,8 +93,9 @@ export const AlertDialog: React.FC<IAlertDialogProps> = ({ alertId }) => {
                 setComponent(props.Component || <></>);
             }
         });
-        const dismissHanler = (evt: CustomEvent<{ id: string }>) => {
+        const dismissHanler = (evt: CustomEvent<{ id: string, answer?: any }>) => {
             if (evt.detail.id === alertId) {
+                beforeDismiss && beforeDismiss(evt.detail.answer);
                 setHidden(true);
             }
         };
@@ -103,7 +104,7 @@ export const AlertDialog: React.FC<IAlertDialogProps> = ({ alertId }) => {
             removeShow();
             document.removeEventListener(DISMISS_DIALOG_EVT, dismissHanler);
         };
-    }, []);
+    }, [beforeDismiss]);
 
     const buttonElements = React.useMemo(() => {
         if (hidden) return null;

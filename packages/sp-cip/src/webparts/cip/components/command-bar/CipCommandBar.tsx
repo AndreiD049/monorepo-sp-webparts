@@ -2,7 +2,7 @@ import { debounce } from '@microsoft/sp-lodash-subset';
 import { CommandBar, ICommandBarItemProps, SearchBox } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate } from 'react-router';
-import { relinkParent } from '../../utils/dom-events';
+import { relinkParent, setTimerOptions } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { DIALOG_IDS, getDialog } from '../AlertDialog';
 import { LinkRemoteDialog } from '../LinkRemoteDialog';
@@ -10,6 +10,8 @@ import { TimeLogGeneral } from '../TimeLogGeneral';
 import { AssigneeSelected, CipAssigneeSelector } from './CipAssigneeSelector';
 import { CipCategoriesToggle } from './CipCategoriesToggle';
 import { CipStatusSelector, StatusSelected } from './StatusSelector';
+import { TIMER_VISIBLE_KEY } from '../../utils/constants';
+import useWebStorage from 'use-web-storage-api';
 
 interface ICipCommandBarProps {
     onSearch: (val: string) => void;
@@ -28,6 +30,15 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
         [props.onSearch]
     );
     const navigate = useNavigate();
+
+    /** Timer */
+    const [timerVisible, setTimerVisible] = useWebStorage<boolean>(true, {
+        key: TIMER_VISIBLE_KEY,
+    });
+
+    React.useEffect(() => {
+        setTimerOptions({ visible: timerVisible });
+    }, [timerVisible]);
 
     const items: ICommandBarItemProps[] = React.useMemo(() => {
         const result = [
@@ -54,6 +65,14 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                         ),
                     }),
             },
+            {
+                key: 'timers',
+                text: timerVisible ? 'Hide timers' : 'Show timers',
+                iconProps: {
+                    iconName: 'Timer',
+                },
+                onClick: () => { setTimerVisible((prev) => !prev) },
+            },
         ];
         if (properties.config.remotes.length > 0) {
             result.push({
@@ -73,7 +92,7 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
             });
         }
         return result;
-    }, []);
+    }, [timerVisible]);
 
     return (
         <>
