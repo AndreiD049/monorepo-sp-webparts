@@ -1,5 +1,6 @@
 import { Icon, IconButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { finishTask } from '../../utils/task';
 import useParentStroke from '../../components/ParentStroke';
 import { TaskNode } from '../graph/TaskNode';
 import { nodeSetOpen, taskUpdated } from '../../utils/dom-events';
@@ -122,18 +123,12 @@ export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
     const actionService = MainService.getActionService();
 
     const handleFinishTask = async (node: TaskNode) => {
-        await taskService.finishTask(node.Id);
-        const newItem = await taskService.getTask(node.Id);
-        await actionService.addAction(
-            node.Id,
-            'Finished',
-            null,
-            currentUser.Id,
-            new Date().toISOString(),
-        );
-        taskUpdated(newItem);
-        if (newItem.ParentId) {
-            taskUpdated(await taskService.getTask(newItem.ParentId));
+        const newItem = await finishTask(node.getTask(), currentUser.Id);
+        if (newItem) {
+            taskUpdated(newItem);
+            if (newItem.ParentId) {
+                taskUpdated(await taskService.getTask(newItem.ParentId));
+            }
         }
     };
 

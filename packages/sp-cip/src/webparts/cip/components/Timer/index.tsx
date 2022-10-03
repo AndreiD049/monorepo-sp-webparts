@@ -52,7 +52,7 @@ export const Timer = <T,>(props: React.PropsWithChildren<ITimerProps<T>>) => {
         const timer = {
             id: Guid.newGuid().toString(),
             duration: 0,
-            spot: false,
+            spot: true,
             active: true,
             lastStartTimestamp: Date.now(),
         };

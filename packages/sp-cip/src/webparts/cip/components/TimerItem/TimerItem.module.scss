@@ -11,9 +11,6 @@
     border-color: "[theme: themePrimary, default: #a4262c]"
 }
 
-.activeTimer {
-    background-color:  "[theme: neutralQuaternary, default: #c8c8c8]";
-}
 
 .timerDuration {
     background-color: "[theme: themePrimary, default: #a4262c]";
@@ -23,4 +20,8 @@
     border-radius: 10px;
     width: 60px;
     text-align: center;
+}
+
+.timerInput {
+    min-width: 250px;
 }

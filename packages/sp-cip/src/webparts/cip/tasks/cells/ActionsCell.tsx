@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
 import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
-import { taskDeleted } from '../../utils/dom-events';
+import { taskDeleted, addTimer } from '../../utils/dom-events';
 import { AddCommentDialog } from '../dialogs/AddCommentDialog';
 import { TaskNode } from '../graph/TaskNode';
 import { TimeLogGeneral } from '../../components/TimeLogGeneral';
@@ -58,6 +58,13 @@ const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
                 onClick={() => {
                     navigate(`task/${node.Id}`, { state: { editable: true } });
                 }}
+            />
+            <IconButton
+                className={styles['action-buttons-container__action-button']}
+                iconProps={{ iconName: 'Play' }}
+                title="Start timer"
+                disabled={isDisabled}
+                onClick={() => addTimer({ task: node.getTask() })}
             />
             <IconButton
                 className={styles['action-buttons-container__action-button']}

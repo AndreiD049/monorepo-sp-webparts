@@ -136,9 +136,6 @@ export class TaskService {
         };
         const added = await this.list.items.add(payload);
         const subtasks = await this.getSubtasks(parent);
-        await this.updateTask(parent.Id, {
-            Subtasks: subtasks.length,
-        });
         return added.data.Id;
     };
 
@@ -185,13 +182,13 @@ export class TaskService {
         return latest;
     };
 
-    async finishTask(id: number) {
+    async finishTask(id: number, status: string = 'Finished') {
         const item = await this.getTask(id);
         // Already finished
         if (isFinished(item)) return;
         await this.updateTask(id, {
             FinishDate: new Date().toISOString(),
-            Status: 'Finished',
+            Status: status,
             Progress: 1,
         });
         // Check if we need to remove subtask from parent

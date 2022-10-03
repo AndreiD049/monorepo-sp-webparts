@@ -11,6 +11,7 @@ import {
     ComboBox,
     Checkbox,
 } from 'office-ui-fabric-react';
+import { useVisibility } from 'react-visibility-hook';
 import styles from './TimerItem.module.scss';
 
 export interface ITimerItemProps<T> {
@@ -50,7 +51,7 @@ export function unPauseTimerItem<T>(item: ITimer<T>): ITimer<T> {
     return item;
 }
 
-const calculatePassedTime = (passedMills: number) => {
+const calculatePassedTime = (passedMills: number): ITimerDuration => {
     // First, calculate how many full hours passed, and keep the remainder
     const hours = Math.floor(passedMills / HOUR);
     let remainder = passedMills - HOUR * hours;
@@ -73,18 +74,25 @@ const formatPassedDuration = (duration: ITimerDuration) => {
     return `${hours}:${minutes}:${seconds}`;
 };
 
-const advanceDuration = (duration: ITimerDuration) => {
-    const clone = { ...duration };
-    clone.seconds += 1;
-    if (clone.seconds >= 60) {
-        clone.seconds -= 60;
-        clone.minutes += 1;
-    }
-    if (clone.minutes >= 60) {
-        clone.minutes -= 60;
-        clone.hours += 1;
-    }
-    return clone;
+export function getDuration<T = unknown>(item: ITimer<T>) {
+    const remaining = item.active ? Date.now() - item.lastStartTimestamp : 0;
+    return item.duration + remaining;
+}
+
+const advanceDuration = (timer: ITimer<unknown>) => {
+    let rest = getDuration(timer);
+    const result = {
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+    };
+
+    result.hours = Math.floor(rest / HOUR);
+    rest -= result.hours * HOUR;
+    result.minutes = Math.floor(rest / MINUTE);
+    rest -= result.minutes * MINUTE;
+    result.seconds = Math.floor(rest / SECOND);
+    return result;
 };
 
 export function TimerItem<T>(props: ITimerItemProps<T>) {
@@ -93,9 +101,11 @@ export function TimerItem<T>(props: ITimerItemProps<T>) {
         minutes: 0,
         seconds: 0,
     });
+    const [pickerValue, setPickerValue] = React.useState<string>('');
     const timerRef = React.useRef<number>(0);
     const getTaskText = props.getTaskText || ((task: T) => task.toString());
     const getTaskId = props.getTaskId || ((task: T) => task['Id']);
+    const visibility = useVisibility();
 
     const createTagFromTask = (item: T) => {
         return {
@@ -108,22 +118,22 @@ export function TimerItem<T>(props: ITimerItemProps<T>) {
      * If timer is active, we will count seconds from start timestamp
      */
     React.useEffect(() => {
-        if (props.item.active) {
-            const now = Date.now();
-            const passed =
-                props.item.duration + now - props.item.lastStartTimestamp;
-            setTimerDuration(calculatePassedTime(passed));
+        if (props.item.active && visibility.visible) {
+            const passed = calculatePassedTime(getDuration(props.item));
+            setTimerDuration(passed);
             timerRef.current = setInterval(() => {
-                setTimerDuration((prev) => advanceDuration(prev));
+                setTimerDuration(advanceDuration(props.item));
             }, 1000);
         } else {
             setTimerDuration(calculatePassedTime(props.item.duration));
         }
         return () => clearInterval(timerRef.current);
-    }, [props.item.active]);
+    }, [props.item.active, visibility]);
 
     return (
-        <div className={`${styles.container} ${props.item.active ? styles.activeTimer : ''}`}>
+        <div
+            className={styles.container}
+        >
             <IconButton
                 iconProps={{
                     iconName: props.item.active ? 'pause' : 'play',
@@ -133,14 +143,21 @@ export function TimerItem<T>(props: ITimerItemProps<T>) {
             <Text className={styles.timerDuration} variant="smallPlus">
                 {formatPassedDuration(timerDuration)}
             </Text>
-            { props.item.spot ? (
-                <TextField 
+            {props.item.description ? (
+                <TextField
+                    multiline={props.item.description.length > 35}
+                    resizable={false}
+                    autoAdjustHeight
+                    className={styles.timerInput}
                     placeholder="Spot task description..."
                     value={props.item.description}
-                    onChange={(_ev, value) => props.onUpdated({ ...props.item, description: value })}
+                    onChange={(_ev, value) =>
+                        props.onUpdated({ ...props.item, spot: value.length > 0, description: value })
+                    }
                 />
             ) : (
                 <TagPicker
+                    className={styles.timerInput}
                     inputProps={{
                         placeholder: 'No task: SPOT',
                     }}
@@ -161,23 +178,35 @@ export function TimerItem<T>(props: ITimerItemProps<T>) {
                             )
                             .map((t) => createTagFromTask(t))
                     }
+                    onBlur={() => {
+                        if (pickerValue) {
+                            props.onUpdated({ ...props.item, spot: true, description: pickerValue });
+                        }
+                    }}
+                    onInputChange={(val: string) => {
+                        setPickerValue(val);
+                        return val;
+                    }}
                     onChange={(items) => {
+                        console.log(items);
                         let task = null;
                         if (items.length > 0) {
                             task = props.tasks.find(
                                 (t) => props.getTaskId(t) === items[0].key
                             );
                         }
-                        props.onTaskSelect(props.item, task);
+                        setPickerValue('');
+                        props.onTaskSelect({ ...props.item, spot: !Boolean(task), description: '' }, task);
                     }}
                     itemLimit={1}
                 />
             )}
             <Checkbox
-                disabled={Boolean(props.item.task)}
+                inputProps={{
+                    tabIndex: -1,
+                }}
                 label="Spot"
                 checked={props.item.spot}
-                onChange={(_ev: {}, checked: boolean) => props.onUpdated({ ...props.item, spot: checked, description: null })}
                 styles={{
                     checkbox: {
                         height: '1.1em',

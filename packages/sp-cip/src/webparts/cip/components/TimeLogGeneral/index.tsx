@@ -22,8 +22,10 @@ export interface ITimeLogGeneralProps {
     dialogId: DIALOG_IDS;
     task?: ITaskOverview;
     action?: IAction;
-    /* Number of hours */
+    /* initial hours value */
     time?: number;
+    /* initial comment value */
+    description?: string;
 }
 
 export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
@@ -32,7 +34,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     const actionService = MainService.getActionService();
     const [selected, setSelected] = React.useState<ITaskOverview>(props.task);
     const [time, setTime] = React.useState(props.time || 0);
-    const [comment, setComment] = React.useState('');
+    const [comment, setComment] = React.useState(props.description || '');
     const [errorMessage, setErrorMessage] = React.useState('');
 
     React.useEffect(() => {

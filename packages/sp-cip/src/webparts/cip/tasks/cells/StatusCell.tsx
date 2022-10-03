@@ -8,6 +8,7 @@ import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
 import MainService from '../../services/main-service';
 import { GlobalContext } from '../../utils/GlobalContext';
+import { finishTask } from '../../utils/task';
 
 export interface IStatusCellProps {
     node: TaskNode;
@@ -24,15 +25,27 @@ export const StatusCellCallout: React.FC<IStatusCellProps> = ({ node }) => {
     }, [fieldInfo]);
 
     const handleClick = React.useCallback((status: string) => async () => {
-        calloutVisibility({ visible: false });
-        loadingStart();
-        await taskService.updateTask(node.Id, {
-            Status: status
-        });
-        const newTask = await taskService.getTask(node.Id);
-        await actionService.addAction(node.Id, 'Status', `${node.getTask().Status}|${newTask.Status}`, currentUser.Id, new Date().toISOString());
-        taskUpdated(newTask);
-        loadingStop();
+        try {
+            calloutVisibility({ visible: false });
+
+            loadingStart();
+            if (status === 'Finished' || status === 'Cancelled') {
+                const newTask = await finishTask(node.getTask(), currentUser.Id, status);
+                taskUpdated(newTask);
+                if (newTask.ParentId) {
+                    taskUpdated(await taskService.getTask(newTask.ParentId));
+                }
+            } else {
+                await taskService.updateTask(node.Id, {
+                    Status: status
+                });
+                const newTask = await taskService.getTask(node.Id);
+                await actionService.addAction(node.Id, 'Status', `${node.getTask().Status}|${newTask.Status}`, currentUser.Id, new Date().toISOString());
+                taskUpdated(newTask);
+            }
+        } finally {
+            loadingStop();
+        }
     }, [node]);
 
     return (<div className={`${styles.callout} ${styles['center-content']}`}>

@@ -1,4 +1,4 @@
-import { MINUTE_DURATION } from './constants';
+import { MINUTE_DURATION, HOUR } from './constants';
 
 const hoursRg = /(\d{1,2}):?(\d{1,2})/;
 
@@ -21,3 +21,10 @@ export const validateHours = (value: string): number => {
     const minutes = match[2] || 0;
     return +hours + Math.round(+minutes * MINUTE_DURATION * 100) / 100;
 };
+
+/** 
+ * Get a value in milliseconds, return a decimal representing hours
+ */
+export const hoursFromMilliseconds = (value: number): number => {
+    return value / HOUR;
+}

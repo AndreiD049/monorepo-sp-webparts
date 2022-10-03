@@ -8,6 +8,7 @@ import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { TaskNode } from '../graph/TaskNode';
 import { TaskNodeContext } from '../TaskNodeContext';
+import { finishTask } from '../../utils/task';
 import styles from './Cells.module.scss';
 import MainService from '../../services/main-service';
 
@@ -22,22 +23,33 @@ const ProgressCellCallout: React.FC<IProgressCellProps> = (props) => {
     const [value, setValue] = React.useState(props.node.getTask().Progress);
 
     const handleClick = React.useCallback(async () => {
-        calloutVisibility({
-            visible: false,
-        });
-        loadingStart();
-        await taskService.updateTask(props.node.Id, {
-            Progress: value,
-        });
-        await actionService.addAction(
-            props.node.Id,
-            'Progress',
-            `${Math.round(value * 100)}%`,
-            currentUser.Id,
-            new Date().toISOString()
-        );
-        taskUpdated(await taskService.getTask(props.node.Id));
-        loadingStop();
+        try {
+            calloutVisibility({
+                visible: false,
+            });
+            loadingStart();
+            if (value === 1) {
+                const newItem = await finishTask(props.node.getTask(), currentUser.Id);
+                taskUpdated(newItem);
+                if (newItem.ParentId) {
+                    taskUpdated(await taskService.getTask(newItem.ParentId));
+                }
+            } else {
+                await taskService.updateTask(props.node.Id, {
+                    Progress: value,
+                });
+                await actionService.addAction(
+                    props.node.Id,
+                    'Progress',
+                    `${Math.round(value * 100)}%`,
+                    currentUser.Id,
+                    new Date().toISOString()
+                );
+                taskUpdated(await taskService.getTask(props.node.Id));
+            }
+        } finally {
+            loadingStop();
+        }
     }, [props.node, value]);
 
     return (

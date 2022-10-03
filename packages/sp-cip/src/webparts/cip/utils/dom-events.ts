@@ -15,7 +15,8 @@ import {
     TASK_UPDATED_EVT,
     GET_SUBTASKS_EVT,
     TASKS_DELETED_EVT,
-    TIMER_EVT
+    TIMER_EVT,
+    TIMER_ADD_EVT,
 } from './constants';
 
 /**
@@ -278,4 +279,26 @@ export const timerOptionsHandler = (func: (options: ITimerEventOptions) => void)
     };
     document.addEventListener(TIMER_EVT, handler);
     return () => document.removeEventListener(TIMER_EVT, handler);
+};
+
+export interface ITimerAddEventOptions {
+    task?: ITaskOverview;
+}
+
+export const addTimer = (options: ITimerAddEventOptions) => {
+    document.dispatchEvent(
+        new CustomEvent<ITimerAddEventOptions>(TIMER_ADD_EVT, {
+            detail: options,
+        })
+    );
+}
+
+export const timerAddHandler = (func: (options: ITimerAddEventOptions) => void) => {
+    const handler = (evt: CustomEvent) => {
+        if (evt.detail) {
+            func(evt.detail);
+        }
+    };
+    document.addEventListener(TIMER_ADD_EVT, handler);
+    return () => document.removeEventListener(TIMER_ADD_EVT, handler);
 };
