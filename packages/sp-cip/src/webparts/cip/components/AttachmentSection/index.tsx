@@ -98,6 +98,7 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
         }
     }, [serverRelativeUrl]);
 
+    /** Attach via button */
     const handleAttach = async (files: File[]) => {
         try {
             loadingStart('details');
@@ -121,7 +122,7 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
         }
     };
 
-    // Drop file
+    /** Attach by dropping */ 
     const handleDrop =
         (currentPath: string[] = path) =>
         async (data: IDragData<any>) => {

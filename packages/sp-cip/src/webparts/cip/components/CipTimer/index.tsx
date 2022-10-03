@@ -2,15 +2,14 @@ import * as React from 'react';
 import { timerOptionsHandler } from '../../utils/dom-events';
 import ITimer from '../../models/ITimer';
 import { Timer } from '../Timer';
-import { TIMER_VISIBLE_KEY, TIMER_RIGHT_POSITION } from '../../utils/constants';
+import { TIMER_VISIBLE_KEY, TIMER_RIGHT_POSITION,  HOUR, DB_NAME, STORE_NAME, TIMERS_KEY  } from '../../utils/constants';
 import useWebStorage from 'use-web-storage-api';
 import MainService from '../../services/main-service';
-import { HOUR, DB_NAME, STORE_NAME, TIMERS_KEY } from '../../utils/constants';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IndexedDbCache } from 'indexeddb-manual-cache';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
 import { DIALOG_IDS, getDialog } from '../AlertDialog';
-import { ButtonType } from 'office-ui-fabric-react';
+import { ButtonType, portalContainsElement } from 'office-ui-fabric-react';
 import { TimeLogGeneral } from '../TimeLogGeneral';
 import styles from './CipTimer.module.scss';
 
@@ -30,7 +29,7 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
     const [visible, setVisible] = useWebStorage<boolean>(true, {
         key: TIMER_VISIBLE_KEY,
     });
-    const [left, setLeft] = useWebStorage<number>(50, {
+    const [right, setRight] = useWebStorage<number>(50, {
         key: TIMER_RIGHT_POSITION,
     });
     const [tasks, setTasks] = React.useState<ITaskOverview[]>([]);
@@ -64,7 +63,7 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
         <Timer
             tasks={tasks}
             bottom={5}
-            left={left}
+            right={right}
             timers={timers}
             onTimerAdded={(timer) => setTimers((prev) => [...prev, timer])}
             onTimerUpdated={handleTimerUpdated}
@@ -107,7 +106,8 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
                 }
             }}
             onPositionChange={(_el, translate, positionStyles) => {
-                setLeft(translate.x + (positionStyles?.left || 50));
+                console.log(translate, positionStyles);
+                setRight(-translate.x + (positionStyles?.right || 50));
             }}
             onSyncTasks={async () => {
                 try {

@@ -18,7 +18,7 @@ export const CALLOUT_MENU_EVT = 'sp-cip-contextual-menu-event';
 export const DIALOG_EVT = 'sp-cip-alert-dialog-event';
 export const TIMER_EVT = 'sp-cip-timer-event';
 export const TIMER_VISIBLE_KEY = 'sp-cip-timer-visible';
-export const TIMER_RIGHT_POSITION = 'sp-cip-timer-right-position';
+export const TIMER_RIGHT_POSITION = 'sp-cip-timer-right-pos';
 export const TIMERS_KEY = 'sp-cip-timers';
 export const FILTERS_ASSIGNED = 'sp-cip-filter-assigned-to';
 

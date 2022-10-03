@@ -152,7 +152,7 @@ export const Timer = <T,>(props: React.PropsWithChildren<ITimerProps<T>>) => {
             left={props.left}
             right={props.right}
             restrictions={{ y: true }}
-            style={{ zIndex: 3 }}
+            style={{ zIndex: 20 }}
             handlePositionChange={props.onPositionChange || (() => null)}
         >
             <div className={`${styles.timer} ${styles.timerBox}`}>
