@@ -26,7 +26,6 @@
     "react-dom": "16.13.1",
     "react-router-dom": "6",
     "react-visibility-hook": "^1.0.0",
-    "sp-indexeddb-caching": "^1.0.0",
     "sp-preset": "^2.0.5",
     "sp-react-notifications": "^1.0.22",
     "use-web-storage-api": "^1.0.6"

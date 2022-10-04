@@ -1,8 +1,8 @@
 {
   "index.js": {
-    "bundled": 19426,
-    "minified": 10814,
-    "gzipped": 2633,
+    "bundled": 20252,
+    "minified": 11113,
+    "gzipped": 2718,
     "treeshaked": {
       "rollup": {
         "code": 0,

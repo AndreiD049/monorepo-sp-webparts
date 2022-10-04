@@ -16,7 +16,11 @@ import { useFilteredTree } from './sort-filter/useFilteredTree';
 import { useShowCategories } from './useShowCategories';
 import styles from './TasksTable.module.scss';
 
-const TasksTable = () => {
+export interface ITasksTableProps {
+    onTeamSelect: (team: string) => void;
+}
+
+const TasksTable: React.FC<ITasksTableProps> = (props) => {
     const tableRef = React.useRef(null);
     const { CalloutComponent } = useCallout();
     const [filters, dispatch] = React.useReducer(filtersReducer, {
@@ -56,6 +60,7 @@ const TasksTable = () => {
         <>
             <CipCommandBar
                 onSearch={(val) => dispatch({ type: 'SEARCH', value: val })}
+                onTeamSelect={props.onTeamSelect}
                 onStatusSelectedChange={(val) =>
                     dispatch({ type: 'STATUS', value: val })
                 }

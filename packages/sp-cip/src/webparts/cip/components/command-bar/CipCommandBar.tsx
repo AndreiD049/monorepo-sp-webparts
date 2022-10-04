@@ -1,5 +1,9 @@
 import { debounce } from '@microsoft/sp-lodash-subset';
-import { CommandBar, ICommandBarItemProps, SearchBox } from 'office-ui-fabric-react';
+import {
+    CommandBar,
+    ICommandBarItemProps,
+    SearchBox,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate } from 'react-router';
 import { relinkParent, setTimerOptions } from '../../utils/dom-events';
@@ -12,16 +16,18 @@ import { CipCategoriesToggle } from './CipCategoriesToggle';
 import { CipStatusSelector, StatusSelected } from './StatusSelector';
 import { TIMER_VISIBLE_KEY } from '../../utils/constants';
 import useWebStorage from 'use-web-storage-api';
+import { TeamSelector } from '../TeamSelector';
 
 interface ICipCommandBarProps {
     onSearch: (val: string) => void;
+    onTeamSelect: (team: string) => void;
     onStatusSelectedChange: (newStatus: StatusSelected) => void;
     onAssignedToChange: (newAssigned: AssigneeSelected) => void;
     onShowCategoriesToggle: (val: boolean) => void;
 }
 
 const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
-    const { properties } = React.useContext(GlobalContext);
+    const { properties, teams, selectedTeam } = React.useContext(GlobalContext);
     const handleSearch = React.useCallback(
         debounce((_ev: any, value: string) => {
             props.onSearch(value);
@@ -71,7 +77,9 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                 iconProps: {
                     iconName: 'Timer',
                 },
-                onClick: () => { setTimerVisible((prev) => !prev) },
+                onClick: () => {
+                    setTimerVisible((prev) => !prev);
+                },
             },
         ];
         if (properties.config.remotes.length > 0) {
@@ -85,9 +93,7 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                     getDialog({
                         alertId: DIALOG_IDS.MAIN,
                         title: 'Link task',
-                        Component: (
-                            <LinkRemoteDialog />
-                        ),
+                        Component: <LinkRemoteDialog />,
                     }),
             });
         }
@@ -106,6 +112,19 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                                 onShowCategoriesToggle={
                                     props.onShowCategoriesToggle
                                 }
+                            />
+                        ),
+                    },
+                    {
+                        key: 'team',
+                        onRender: () => (
+                            <TeamSelector
+                                style={{ alignSelf: 'center', marginRight: '.5em', minWidth: 70 }}
+                                items={['All', ...teams]}
+                                selectedTeam={selectedTeam}
+                                getTeamText={(team) => team}
+                                getTeamId={(team) => team}
+                                onTeamChange={props.onTeamSelect}
                             />
                         ),
                     },

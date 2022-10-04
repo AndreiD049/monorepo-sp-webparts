@@ -1,12 +1,13 @@
-import { IndexedDBCacher } from "sp-indexeddb-caching";
-import CipWebPart from "../CipWebPart";
+import { IndexedDbCache } from 'indexeddb-manual-cache';
+import { DB_NAME, STORE_NAME, HOUR } from './constants';
+import CipWebPart from '../CipWebPart';
 
+const db = new IndexedDbCache(DB_NAME, STORE_NAME, {
+    expiresIn: HOUR * 24,
+});
 
 export const getListId = async (name: string): Promise<string> => {
-    const caching = IndexedDBCacher({
-        expireFunction: () => new Date(Date.now() + 1000 * 60 * 60 * 24),
-    });
-    const sp = CipWebPart.SPBuilder.getSP('Data').using(caching.CachingTimeline);
+    const sp = CipWebPart.SPBuilder.getSP('Data');
 
-    return (await sp.web.lists.getByTitle(name).select('Id')()).Id;
-}
+    return db.getCached('getListId', async () => (await sp.web.lists.getByTitle(name).select('Id')()).Id);
+};

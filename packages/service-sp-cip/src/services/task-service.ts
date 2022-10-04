@@ -20,11 +20,19 @@ export class TaskService {
         return (await this.list.select('Id')()).Id;
     };
 
-    getAllRequest() {
-        return this.list.items.select(...LIST_SELECT).expand(...LIST_EXPAND);
+    private teamFilter(team: string) {
+        return `Team eq '${team}'`;
+    }
+
+    getAllRequest(team?: string) {
+        let request = this.list.items;
+        if (team) {
+            request = request.filter(this.teamFilter(team));
+        }
+        return request.select(...LIST_SELECT).expand(...LIST_EXPAND);
     };
 
-    async getAll(): Promise<ITaskOverview[]> {
+    async getAll(team?: string): Promise<ITaskOverview[]> {
         return this.getAllRequest()();
     };
 
@@ -35,7 +43,8 @@ export class TaskService {
 
     async getUserTasks(
         userId: number,
-        status: 'Open' | 'Finished' | 'All'
+        status: 'Open' | 'Finished' | 'All',
+        team?: string,
     ): Promise<ITaskOverview[]> {
         let filter = `ResponsibleId eq ${userId}`;
         // Handle status
@@ -46,6 +55,9 @@ export class TaskService {
             case 'Open':
                 filter += ` and FinishDate eq null`;
                 break;
+        }
+        if (team) {
+            filter += ` and ${this.teamFilter(team)}`;
         }
         return this.list.items
             .filter(filter)
@@ -71,32 +83,44 @@ export class TaskService {
             .expand(...LIST_EXPAND);
     };
 
-    async getNonFinishedMains(): Promise<ITaskOverview[]> {
-        return this.getMainsRequest(`FinishDate eq null and Parent eq null`)();
+    async getNonFinishedMains(team?: string): Promise<ITaskOverview[]> {
+        let filter = `FinishDate eq null and Parent eq null`;
+        if (team) {
+            filter += ` and ${this.teamFilter(team)}`;
+        }
+        return this.getMainsRequest(filter)();
     };
 
-    async getFinishedMains(): Promise<ITaskOverview[]> {
-        return this.getMainsRequest(`FinishDate ne null and Parent eq null`)();
+    async getFinishedMains(team?: string): Promise<ITaskOverview[]> {
+        let filter = `FinishDate ne null and Parent eq null`;
+        if (team) {
+            filter += ` and ${this.teamFilter(team)}`;
+        }
+        return this.getMainsRequest(filter)();
     };
 
-    async getAllMains(): Promise<ITaskOverview[]> {
-        return this.getMainsRequest(`Parent eq null`)();
+    async getAllMains(team?: string): Promise<ITaskOverview[]> {
+        let filter = `Parent eq null`;
+        if (team) {
+            filter += ` and ${this.teamFilter(team)}`;
+        }
+        return this.getMainsRequest(filter)();
     };
 
-    getSubtasksRequest(id: number) {
+    getSubtasksRequest(id: number, team?: string) {
+        let filter = `ParentId eq ${id}`;
+        if (team) {
+            filter += ` and ${this.teamFilter(team)}`;
+        }
         return this.list.items
-            .filter(`ParentId eq ${id}`)
+            .filter(filter)
             .select(...LIST_SELECT)
             .expand(...LIST_EXPAND);
     };
 
-    async deleteTaskAndSubtasks(task: ITaskOverview) {
-        // All subtasks should be deleted because of this.list field setup (DeleteBehavior Cascade)
-        await this.list.items.getById(task.Id).delete();
-    };
-
     async getSubtasks(
-        parent: ITaskOverview
+        parent: ITaskOverview,
+        team?: string,
     ): Promise<ITaskOverview[]> {
         let subtasks = await this.getSubtasksRequest(parent.Id)();
         // Guard if we have wrong number of subtasks
@@ -106,6 +130,11 @@ export class TaskService {
             });
         }
         return subtasks;
+    };
+
+    async deleteTaskAndSubtasks(task: ITaskOverview) {
+        // All subtasks should be deleted because of this.list field setup (DeleteBehavior Cascade)
+        await this.list.items.getById(task.Id).delete();
     };
 
     async createTask(details: ICreateTask) {

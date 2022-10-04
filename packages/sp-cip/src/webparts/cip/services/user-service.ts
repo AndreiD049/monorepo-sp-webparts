@@ -1,11 +1,21 @@
 import { IPersonaProps, PersonaSize } from "office-ui-fabric-react";
 import { useContext } from "react";
-import { IndexedDBCacher } from "sp-indexeddb-caching";
+import { IndexedDbCache } from 'indexeddb-manual-cache';
+import { DB_NAME, STORE_NAME, HOUR } from '../utils/constants';
 import { IList, ISiteUserInfo, SPFI } from "sp-preset";
 import CipWebPart, { ICipWebPartProps } from "../CipWebPart";
 import { GlobalContext } from "../utils/GlobalContext";
 
-const HOUR = 1000 * 60 * 60;
+const db = new IndexedDbCache(DB_NAME, STORE_NAME, {
+    expiresIn: HOUR,
+});
+
+const cache = {
+    all: db.key('allUsers'),
+    user: (id: number) => db.key(`user(${id})`),
+    currentUser: db.key(`currentUser`),
+    teams: db.key('teams'),
+}
 
 export class UserService {
     private sp: SPFI;
@@ -13,28 +23,25 @@ export class UserService {
     private teamsField: string;
 
     constructor(key: string, properties: ICipWebPartProps) {
-        const { CachingTimeline } = IndexedDBCacher({
-            expireFunction: () => new Date(Date.now() + HOUR),
-        });
-        this.sp = CipWebPart.SPBuilder.getSP().using(CachingTimeline);
+        this.sp = CipWebPart.SPBuilder.getSP();
         this.usersList = this.sp.web.lists.getByTitle(properties.config?.teamsList.name);
         this.teamsField = properties.config?.teamsList.fieldName;
     }
 
     async getAll() {
-        return this.sp.web.siteUsers();
+        return cache.all.get(() => this.sp.web.siteUsers());
     }
 
     async getUser(id: number) {
-        return this.sp.web.siteUsers.getById(id)();
+        return cache.user(id).get(() => this.sp.web.siteUsers.getById(id)());
     }
 
-    getCurrentUser(): Promise<ISiteUserInfo> {
-        return this.sp.web.currentUser();
+    async getCurrentUser(): Promise<ISiteUserInfo> {
+        return cache.currentUser.get(() => this.sp.web.currentUser());
     }
 
     async getTeams() {
-        const teamsField = await this.usersList.fields.getByTitle(this.teamsField)();
+        const teamsField = await cache.teams.get(() => this.usersList.fields.getByTitle(this.teamsField)());
         return teamsField.Choices;
     };
 

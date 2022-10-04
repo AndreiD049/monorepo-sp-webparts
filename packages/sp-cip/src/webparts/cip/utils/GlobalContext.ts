@@ -7,6 +7,7 @@ export interface IGlobalContext {
     properties: ICipWebPartProps;
     theme: IReadonlyTheme;
     teams: string[];
+    selectedTeam: string;
     currentUser: ISiteUserInfo
 }
 
@@ -14,5 +15,6 @@ export const GlobalContext = React.createContext<IGlobalContext>({
     properties: null,
     theme: null,
     teams: [],
+    selectedTeam: 'All',
     currentUser: null,
 });

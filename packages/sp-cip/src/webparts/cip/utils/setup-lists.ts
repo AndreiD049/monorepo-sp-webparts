@@ -137,7 +137,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         notifyOnFieldCreation(responsible);
 
         const team = await list.fields.createFieldAsXml(
-            `<Field DisplayName='Team' Format='Dropdown' IsModern='TRUE' MaxLength='50' Name='Team' Required='TRUE' Title='Team' Type='Text'></Field>`
+            `<Field Indexed='TRUE' DisplayName='Team' Format='Dropdown' IsModern='TRUE' MaxLength='50' Name='Team' Required='TRUE' Title='Team' Type='Text'></Field>`
         );
         notifyOnFieldCreation(team);
 

@@ -67,8 +67,9 @@ const calculatePassedTime = (passedMills: number): ITimerDuration => {
     };
 };
 
+/* format passed duration like 'hh:mm:ss' */
 const formatPassedDuration = (duration: ITimerDuration) => {
-    const hours = `${duration.hours < 10 ? '0' : '0'}${duration.hours}`;
+    const hours = `${duration.hours < 10 ? '0' : ''}${duration.hours}`;
     const minutes = `${duration.minutes < 10 ? '0' : ''}${duration.minutes}`;
     const seconds = `${duration.seconds < 10 ? '0' : ''}${duration.seconds}`;
     return `${hours}:${minutes}:${seconds}`;

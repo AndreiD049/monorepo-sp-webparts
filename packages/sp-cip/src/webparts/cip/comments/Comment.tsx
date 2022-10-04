@@ -133,7 +133,7 @@ export const Comment: React.FC<ICommentProps> = (props) => {
                     setEdit={setEdit}
                 />
             ),
-            timeStamp: new Date(props.comment.Created).toLocaleString(),
+            timeStamp: new Date(props.comment.Date || props.comment.Created).toLocaleString(),
         }),
         [props.comment, edit, newValue]
     );

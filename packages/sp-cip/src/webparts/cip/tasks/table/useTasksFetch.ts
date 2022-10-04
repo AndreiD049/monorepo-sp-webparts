@@ -15,58 +15,75 @@ import {
     taskDeletedHandler,
     taskUpdatedHandler,
 } from '../../utils/dom-events';
+import { GlobalContext } from '../../utils/GlobalContext';
 import { ICipFilters } from './sort-filter/filters-reducer';
 
 export const useTasksFetch = (filters: ICipFilters) => {
+    const { selectedTeam, currentUser } = React.useContext(GlobalContext);
+    const team = React.useMemo(
+        () => (selectedTeam !== 'All' ? selectedTeam : null),
+        [selectedTeam]
+    );
     const userService = MainService.getUserService();
     const [tasks, setTasks] = React.useState<ITaskOverview[]>([]);
     const taskService = MainService.getTaskService();
 
-    const getAll = React.useCallback(async () => {
-        if (filters.assignedTo === AssigneeSelected.Single) {
-            const currentUser = await userService.getCurrentUser();
-            return taskService.getUserTasks(currentUser.Id, 'All');
-        }
-        return taskService.getAllMains();
-    }, [filters])
+    const getAll = React.useCallback(
+        async (team: string) => {
+            if (filters.assignedTo === AssigneeSelected.Single) {
+                return taskService.getUserTasks(currentUser?.Id, 'All', team);
+            }
+            return taskService.getAllMains(team);
+        },
+        [filters, currentUser]
+    );
 
-    const getOpen = React.useCallback(async () => {
-        if (filters.assignedTo === AssigneeSelected.Single) {
-            const currentUser = await userService.getCurrentUser();
-            return taskService.getUserTasks(currentUser.Id, 'Open');
-        }
-        return taskService.getNonFinishedMains();
-    }, [filters])
+    const getOpen = React.useCallback(
+        async (team: string) => {
+            if (filters.assignedTo === AssigneeSelected.Single) {
+                return taskService.getUserTasks(currentUser?.Id, 'Open', team);
+            }
+            return taskService.getNonFinishedMains(team);
+        },
+        [filters, currentUser]
+    );
 
-    const getFinished = React.useCallback(async () => {
-        if (filters.assignedTo === AssigneeSelected.Single) {
-            const currentUser = await userService.getCurrentUser();
-            return taskService.getUserTasks(currentUser.Id, 'Finished');
-        }
-        return taskService.getFinishedMains();
-    }, [filters])
+    const getFinished = React.useCallback(
+        async (team: string) => {
+            if (filters.assignedTo === AssigneeSelected.Single) {
+                return taskService.getUserTasks(
+                    currentUser?.Id,
+                    'Finished',
+                    team
+                );
+            }
+            return taskService.getFinishedMains(team);
+        },
+        [filters, currentUser]
+    );
 
     React.useEffect(() => {
         async function run() {
+            if (!currentUser) return;
             loadingStart('default');
             switch (filters.status) {
                 case StatusSelected.All:
-                    setTasks(await getAll());
+                    setTasks(await getAll(team));
                     break;
                 case StatusSelected.Open:
-                    setTasks(await getOpen());
+                    setTasks(await getOpen(team));
                     break;
                 case StatusSelected.Finished:
-                    setTasks(await getFinished());
+                    setTasks(await getFinished(team));
                     break;
                 default:
                     setTasks([]);
                     break;
             }
-            loadingStop('default')
+            loadingStop('default');
         }
         run();
-    }, [filters.status, filters.assignedTo]);
+    }, [filters.status, filters.assignedTo, team, currentUser]);
 
     // Dom events
     React.useEffect(() => {
@@ -86,11 +103,15 @@ export const useTasksFetch = (filters: ICipFilters) => {
         });
 
         // When subtasks are loaded
-        const removeGetSubtasks = getSubtasksHandler((parent: ITaskOverview) => {
-            taskService.getSubtasks(parent).then(async (subtasks) => {
-                setTasks((prev) => uniqBy([...prev, ...subtasks], (t) => t.Id));
-            });
-        });
+        const removeGetSubtasks = getSubtasksHandler(
+            (parent: ITaskOverview) => {
+                taskService.getSubtasks(parent).then(async (subtasks) => {
+                    setTasks((prev) =>
+                        uniqBy([...prev, ...subtasks], (t) => t.Id)
+                    );
+                });
+            }
+        );
 
         const removeTaskDeleted = taskDeletedHandler((taskId: number) => {
             setTasks((prev) => prev.filter((t) => t.Id !== taskId));

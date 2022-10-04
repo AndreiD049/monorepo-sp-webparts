@@ -11,6 +11,9 @@ import { LoadingAnimation } from './utils/LoadingAnimation';
 import { AlertDialog } from './AlertDialog';
 import MainService from '../services/main-service';
 import styles from './Cip.module.scss';
+import { TEAM_ALL, SELECTED_TEAM_KEY } from '../utils/constants';
+import { IndexedDbCache } from 'indexeddb-manual-cache';
+import useWebStorage from 'use-web-storage-api';
 import { CipTimer } from './CipTimer';
 
 interface ICipProps {
@@ -23,6 +26,10 @@ const Cip: React.FC<ICipProps> = (props) => {
         teams: [],
         currentUser: null,
     });
+    const [selectedTeam, setSelectedTeam] = useWebStorage('All', {
+        key: location.origin + SELECTED_TEAM_KEY,
+    });
+
     const userService = MainService.getUserService();
 
     React.useEffect(() => {
@@ -44,6 +51,7 @@ const Cip: React.FC<ICipProps> = (props) => {
                 properties: props.properties,
                 theme: props.theme,
                 teams: info.teams,
+                selectedTeam: selectedTeam,
                 currentUser: info.currentUser,
             }}
         >
@@ -61,7 +69,11 @@ const Cip: React.FC<ICipProps> = (props) => {
                                 >
                                     {props.properties.headerText}
                                 </Text>
-                                <TasksTable />
+                                <TasksTable
+                                    onTeamSelect={(team) =>
+                                        setSelectedTeam(team)
+                                    }
+                                />
                                 <Outlet />
                             </div>
                         }
@@ -71,7 +83,10 @@ const Cip: React.FC<ICipProps> = (props) => {
                             path="new/:parentId"
                             element={<CreateTaskPanel />}
                         />
-                        <Route path="task/:taskId/*" element={<TaskDetails />} />
+                        <Route
+                            path="task/:taskId/*"
+                            element={<TaskDetails />}
+                        />
                     </Route>
                 </Routes>
                 <AlertDialog alertId="MAIN" />
