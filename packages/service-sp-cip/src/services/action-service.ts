@@ -101,7 +101,7 @@ export class ActionService {
 
     async getActionsFromTo(dateFrom: Date, dateTo: Date): Promise<IAction[]> {
         return wrap(
-            this.list.items.filter(`ListId eq '${await this.taskListId}' and Date ge '${dateODataFormat(dateFrom)}' and Date le '${dateODataFormat(dateTo)}'`)
+            this.list.items.filter(`ListId eq '${await this.taskListId}' and Date ge '${dateODataFormat(dateFrom)}' and Date lt '${dateODataFormat(dateTo)}'`)
         );
     }
 

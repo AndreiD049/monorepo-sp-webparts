@@ -21,7 +21,6 @@ import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IAction } from '@service/sp-cip/dist/services/action-service';
 import { GlobalContext } from '../../utils/GlobalContext';
 import styles from './TimeLogGeneral.module.scss';
-import { UserService } from '../../services/user-service';
 
 export interface ITimeLogGeneralProps {
     dialogId: DIALOG_IDS;
@@ -32,6 +31,14 @@ export interface ITimeLogGeneralProps {
     /* initial comment value */
     description?: string;
 }
+
+const setDateCurrentTime = (dt: Date) => {
+    const now = new Date();
+    dt.setHours(now.getHours());
+    dt.setMinutes(now.getMinutes());
+    dt.setSeconds(now.getSeconds());
+    return dt;
+};
 
 export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     const { currentUser } = React.useContext(GlobalContext);
@@ -79,7 +86,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
             'Time log',
             `${time}|${comment}`,
             selectedUser?.length > 0 ? +selectedUser[0].id : currentUser.Id,
-            date ? date.toISOString() : new Date().toISOString()
+            date ? setDateCurrentTime(date).toISOString() : new Date().toISOString()
         );
         if (selId) {
             const task = props.task || (await taskService.getTask(selId));
@@ -99,7 +106,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
             time;
         let dt = props.action.Date ? props.action.Date : props.action.Created;
         if (date) {
-            dt = date.toISOString();
+            dt = setDateCurrentTime(date).toISOString();
         }
         const action = await actionService.updateAction(props.action.Id, {
             Comment: `${time}|${comment}`,

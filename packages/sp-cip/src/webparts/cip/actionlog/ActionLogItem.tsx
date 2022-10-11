@@ -1,41 +1,46 @@
 import { Icon, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { ActionLogTime } from '../components/ActionLogTime';
-import styles from './ActionLog.module.scss';
 import { formatHours } from '../utils/hours-duration';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { ActionType, IAction } from '@service/sp-cip/dist/services/action-service';
+import {
+    ActionType,
+    IAction,
+} from '@service/sp-cip/dist/services/action-service';
+import styles from './ActionLog.module.scss';
 
 export interface IActionLogItemProps {
     action: IAction;
     task: ITaskOverview;
 }
 
+export const getActionIconName = (type: ActionType) => {
+    switch (type) {
+        case 'Created':
+            return 'BuildDefinition';
+        case 'Finished':
+            return 'IconSetsFlag';
+        case 'Estimated time':
+            return 'DateTime';
+        case 'Due date':
+            return 'Calendar';
+        case 'Status':
+            return 'SyncStatus';
+        case 'Responisble':
+            return 'FollowUser';
+        case 'Priority':
+            return 'FavoriteStarFill';
+        case 'Time log':
+            return 'Stopwatch';
+        case 'Progress':
+            return 'CalculatorPercentage';
+        default:
+            return 'ProgressLoopOuter';
+    }
+};
+
 const ActionIcon: React.FC<{ type: ActionType }> = (props) => {
-    const name = React.useMemo(() => {
-        switch (props.type) {
-            case 'Created':
-                return 'BuildDefinition';
-            case 'Finished':
-                return 'IconSetsFlag';
-            case 'Estimated time':
-                return 'DateTime';
-            case 'Due date':
-                return 'Calendar';
-            case 'Status':
-                return 'SyncStatus';
-            case 'Responisble':
-                return 'FollowUser';
-            case 'Priority':
-                return 'FavoriteStarFill';
-            case 'Time log':
-                return 'Stopwatch';
-            case 'Progress':
-                return 'CalculatorPercentage';
-            default:
-                return 'ProgressLoopOuter';
-        }
-    }, [props.type]);
+    const name = React.useMemo(() => getActionIconName(props.type), [props.type]);
 
     return (
         <div className={styles['actionLogItem__icon']}>
@@ -49,7 +54,9 @@ const ActionItemContent: React.FC<IActionLogItemProps> = (props) => {
         switch (props.action.ActivityType) {
             case 'Created':
                 return (
-                    <span className={styles['actionLogItem__value_highlighted']}>
+                    <span
+                        className={styles['actionLogItem__value_highlighted']}
+                    >
                         <Text variant="medium">{'Task created'}</Text>
                     </span>
                 );
@@ -68,9 +75,11 @@ const ActionItemContent: React.FC<IActionLogItemProps> = (props) => {
                     >
                         <Text variant="medium">
                             {'Estimated required time: '}
-                            {formatHours(+props.action.Comment.split('|')[0]) + ' hour(s)'}
+                            {formatHours(+props.action.Comment.split('|')[0]) +
+                                ' hour(s)'}
                             {' to '}
-                            {formatHours(+props.action.Comment.split('|')[1])+ ' hour(s)'}
+                            {formatHours(+props.action.Comment.split('|')[1]) +
+                                ' hour(s)'}
                         </Text>
                     </span>
                 );
@@ -130,7 +139,10 @@ const ActionItemContent: React.FC<IActionLogItemProps> = (props) => {
                         </Text>
                     </span>
                 );
-            case 'Time log': return <ActionLogTime action={props.action} task={props.task} />
+            case 'Time log':
+                return (
+                    <ActionLogTime action={props.action} task={props.task} />
+                );
             case 'Progress':
                 return (
                     <span
@@ -159,7 +171,9 @@ export const ActionLogItem: React.FC<IActionLogItemProps> = (props) => {
                 </div>
                 <div className={styles['actionLogItem__signature']}>
                     {props.action.User?.Title || props.action.Author.Title} -{' '}
-                    {props.action.Date ? new Date(props.action.Date).toLocaleTimeString() : new Date(props.action.Created).toLocaleTimeString()}
+                    {props.action.Date
+                        ? new Date(props.action.Date).toLocaleTimeString()
+                        : new Date(props.action.Created).toLocaleTimeString()}
                 </div>
             </div>
         </div>
