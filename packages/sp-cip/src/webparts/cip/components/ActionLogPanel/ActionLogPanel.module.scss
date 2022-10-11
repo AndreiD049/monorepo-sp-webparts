@@ -1,0 +1,17 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.header {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1em;
+}
+
+.headerDropdown {
+    min-width: 150px;
+}
+
+.body {
+    display: block;
+}

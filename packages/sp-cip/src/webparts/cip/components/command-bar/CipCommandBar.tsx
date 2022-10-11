@@ -81,6 +81,14 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                     setTimerVisible((prev) => !prev);
                 },
             },
+            {
+                key: 'actionLog',
+                text: 'Action log',
+                iconProps: {
+                    iconName: 'BacklogList',
+                },
+                onClick: () => navigate('actionlog'),
+            }
         ];
         if (properties.config.remotes.length > 0) {
             result.push({

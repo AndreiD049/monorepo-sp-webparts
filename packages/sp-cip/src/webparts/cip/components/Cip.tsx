@@ -11,10 +11,10 @@ import { LoadingAnimation } from './utils/LoadingAnimation';
 import { AlertDialog } from './AlertDialog';
 import MainService from '../services/main-service';
 import styles from './Cip.module.scss';
-import { TEAM_ALL, SELECTED_TEAM_KEY } from '../utils/constants';
-import { IndexedDbCache } from 'indexeddb-manual-cache';
+import { SELECTED_TEAM_KEY } from '../utils/constants';
 import useWebStorage from 'use-web-storage-api';
 import { CipTimer } from './CipTimer';
+import { ActionLogPanel } from './ActionLogPanel';
 
 interface ICipProps {
     properties: ICipWebPartProps;
@@ -87,6 +87,7 @@ const Cip: React.FC<ICipProps> = (props) => {
                             path="task/:taskId/*"
                             element={<TaskDetails />}
                         />
+                        <Route path="actionlog" element={<ActionLogPanel />} />
                     </Route>
                 </Routes>
                 <AlertDialog alertId="MAIN" />

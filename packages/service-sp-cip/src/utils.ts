@@ -5,3 +5,7 @@ export const isFinished = (task: ITaskOverview): boolean => {
     const date = new Date(task.FinishDate);
     return date instanceof Date && date.getTime && !isNaN(date.getTime());
 }
+
+export const dateODataFormat = (date: Date): string => {
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+}

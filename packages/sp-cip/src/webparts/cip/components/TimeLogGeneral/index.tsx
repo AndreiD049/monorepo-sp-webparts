@@ -1,4 +1,8 @@
 import {
+    Checkbox,
+    CompactPeoplePicker,
+    DatePicker,
+    IPersonaProps,
     Label,
     MessageBar,
     MessageBarType,
@@ -12,11 +16,12 @@ import { DIALOG_IDS, dismissDialog } from '../AlertDialog';
 import { HoursInput } from '../HoursInput';
 import { SelectMainTask } from '../SelectMainTask';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
-import styles from './TimeLogGeneral.module.scss';
 import MainService from '../../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IAction } from '@service/sp-cip/dist/services/action-service';
 import { GlobalContext } from '../../utils/GlobalContext';
+import styles from './TimeLogGeneral.module.scss';
+import { UserService } from '../../services/user-service';
 
 export interface ITimeLogGeneralProps {
     dialogId: DIALOG_IDS;
@@ -32,10 +37,25 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     const { currentUser } = React.useContext(GlobalContext);
     const taskService = MainService.getTaskService();
     const actionService = MainService.getActionService();
+    const userService = MainService.getUserService();
     const [selected, setSelected] = React.useState<ITaskOverview>(props.task);
     const [time, setTime] = React.useState(props.time || 0);
     const [comment, setComment] = React.useState(props.description || '');
     const [errorMessage, setErrorMessage] = React.useState('');
+    const [diffDate, setDiffDate] = React.useState(false);
+    const [date, setDate] = React.useState<Date>(null);
+    const [diffPerson, setDiffPerson] = React.useState(false);
+    const [selectedUser, setSelectedUser] = React.useState<IPersonaProps[]>([]);
+    const [users, setUsers] = React.useState<IPersonaProps[]>([]);
+
+    React.useEffect(() => {
+        async function run() {
+            setUsers(await userService.getPersonaProps());
+        }
+        if (diffPerson) {
+            run();
+        }
+    }, [diffPerson]);
 
     React.useEffect(() => {
         async function checkAction() {
@@ -54,7 +74,13 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     // New action - has selected task
     const handleLogNew = async () => {
         const selId = selected?.Id || null;
-        await actionService.addAction(selId, 'Time log', `${time}|${comment}`, currentUser.Id, new Date().toISOString());
+        await actionService.addAction(
+            selId,
+            'Time log',
+            `${time}|${comment}`,
+            selectedUser?.length > 0 ? +selectedUser[0].id : currentUser.Id,
+            date ? date.toISOString() : new Date().toISOString()
+        );
         if (selId) {
             const task = props.task || (await taskService.getTask(selId));
             await taskService.updateTask(selId, {
@@ -62,15 +88,23 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
             });
             taskUpdated(await taskService.getTask(selId));
         }
-    }
-    
+    };
+
     // Already existing action log, update it
-    // And also update the task with the delta 
+    // And also update the task with the delta
     const handleLogUpdate = async () => {
         const indexOfPipe = props.action.Comment.indexOf('|');
-        const delta = Number.parseFloat(props.action.Comment.substring(0, indexOfPipe)) - time;
+        const delta =
+            Number.parseFloat(props.action.Comment.substring(0, indexOfPipe)) -
+            time;
+        let dt = props.action.Date ? props.action.Date : props.action.Created;
+        if (date) {
+            dt = date.toISOString();
+        }
         const action = await actionService.updateAction(props.action.Id, {
             Comment: `${time}|${comment}`,
+            UserId: selectedUser.length > 0 ? +selectedUser[0].id : props.action.User.Id,
+            Date: dt,
         });
         const updateTaskAction = await taskService.updateTask(props.task.Id, {
             EffectiveTime: props.task.EffectiveTime - delta,
@@ -171,6 +205,28 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
                 resizable={false}
                 autoAdjustHeight
             />
+            <div className={styles.diffBlock}>
+                <Checkbox label="Different date" checked={diffDate} onChange={(_ev, checked) => setDiffDate(checked)} />
+                {
+                    diffDate && (<DatePicker value={date} onSelectDate={(dt) => setDate(dt)} className={styles.diffBlockInput} />)
+                }
+            </div>
+            <div className={styles.diffBlock}>
+                <Checkbox label="Different person" checked={diffPerson} onChange={(_ev, checked) => setDiffPerson(checked)} />
+                {
+                    diffPerson && (
+                        <CompactPeoplePicker
+                            className={styles.diffBlockInput} 
+                            itemLimit={1}
+                            inputProps={{ id: 'ResponsiblePicker' }}
+                            onResolveSuggestions={(filter: string) => users.filter((u) => u.text.toLowerCase().includes(filter.toLowerCase()))}
+                            onEmptyResolveSuggestions={() => users}
+                            selectedItems={selectedUser}
+                            onChange={(items) => setSelectedUser(items)}
+                        />
+                    )
+                }
+            </div>
             <PrimaryButton className={styles.logButton} onClick={handleLogTime}>
                 Log
             </PrimaryButton>

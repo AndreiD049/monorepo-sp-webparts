@@ -4,7 +4,7 @@ import { timerOptionsHandler, timerAddHandler } from '../../utils/dom-events';
 import ITimer from '../../models/ITimer';
 import { getDuration, pauseTimerItem } from '../TimerItem';
 import { Timer } from '../Timer';
-import { TIMER_VISIBLE_KEY, TIMER_RIGHT_POSITION,  HOUR, DB_NAME, STORE_NAME, TIMERS_KEY  } from '../../utils/constants';
+import { TIMER_VISIBLE_KEY, TIMER_RIGHT_POSITION,  HOUR, DB_NAME, STORE_NAME, TIMERS_KEY, ALL_TASKS_KEY  } from '../../utils/constants';
 import { hoursFromMilliseconds } from '../../utils/hours-duration';
 import useWebStorage from 'use-web-storage-api';
 import MainService from '../../services/main-service';
@@ -12,7 +12,7 @@ import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IndexedDbCache } from 'indexeddb-manual-cache';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
 import { DIALOG_IDS, getDialog } from '../AlertDialog';
-import { ButtonType, portalContainsElement } from 'office-ui-fabric-react';
+import { ButtonType } from 'office-ui-fabric-react';
 import { TimeLogGeneral } from '../TimeLogGeneral';
 import { GlobalContext } from '../../utils/GlobalContext';
 import styles from './CipTimer.module.scss';
@@ -26,7 +26,7 @@ const db = new IndexedDbCache(DB_NAME, STORE_NAME, {
     expiresIn: HOUR * 24,
 });
 const cache = {
-    allTasks: db.key('allTasks'),
+    allTasks: db.key(ALL_TASKS_KEY),
 };
 
 const newTimer = (task?: ITaskOverview): ITimer<ITaskOverview> => ({

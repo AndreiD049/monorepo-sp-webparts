@@ -1,5 +1,6 @@
 import { IItems, IList, SPFI } from 'sp-preset';
 import { IServiceProps } from '../models/IServiceProps';
+import { dateODataFormat } from '../utils';
 
 export type ActionType =
     | 'Time log'
@@ -97,6 +98,12 @@ export class ActionService {
             )
         );
     };
+
+    async getActionsFromTo(dateFrom: Date, dateTo: Date): Promise<IAction[]> {
+        return wrap(
+            this.list.items.filter(`ListId eq '${await this.taskListId}' and Date ge '${dateODataFormat(dateFrom)}' and Date le '${dateODataFormat(dateTo)}'`)
+        );
+    }
 
     async addAction(
         taskId: number | null,
