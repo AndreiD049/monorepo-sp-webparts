@@ -7,10 +7,11 @@ export type ActionType =
     | 'Due date'
     | 'Progress'
     | 'Priority'
-    | 'Responisble'
+    | 'Responsible'
     | 'Status'
     | 'Estimated time'
     | 'Created'
+    | 'Comment'
     | 'Finished';
 
 export interface IAction {

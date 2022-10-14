@@ -52,7 +52,7 @@ const ResponsibleCellCallout: React.FC<IResponsibleCellProps> = (props) => {
             const newTask = await taskService.getTask(props.node.Id);
             await actionService.addAction(
                 props.node.Id,
-                'Responisble',
+                'Responsible',
                 `${props.node.getTask().Responsible.Title}|${
                     newTask.Responsible.Title
                 }`,

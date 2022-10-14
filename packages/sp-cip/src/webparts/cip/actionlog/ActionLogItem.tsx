@@ -8,6 +8,7 @@ import {
     IAction,
 } from '@service/sp-cip/dist/services/action-service';
 import styles from './ActionLog.module.scss';
+import { Action } from 'history';
 
 export interface IActionLogItemProps {
     action: IAction;
@@ -26,7 +27,7 @@ export const getActionIconName = (type: ActionType) => {
             return 'Calendar';
         case 'Status':
             return 'SyncStatus';
-        case 'Responisble':
+        case 'Responsible':
             return 'FollowUser';
         case 'Priority':
             return 'FavoriteStarFill';
@@ -34,13 +35,81 @@ export const getActionIconName = (type: ActionType) => {
             return 'Stopwatch';
         case 'Progress':
             return 'CalculatorPercentage';
+        case 'Comment':
+            return 'Comment';
         default:
             return 'ProgressLoopOuter';
     }
 };
 
+const formatToken = (token: string, itemType: ActionType) => {
+    switch (itemType) {
+        case 'Due date':
+            return new Date(token).toLocaleDateString();
+        case 'Estimated time':
+        case 'Time log':
+            return `${formatHours(Number.parseFloat(token))} hour(s)`;
+        default:
+            return token;
+    }
+};
+
+export const getActionComment = (action: IAction) => {
+    let content: JSX.Element = null;
+    const tokens = action.Comment.split('|');
+    const arrow = (
+        <Icon style={{ margin: '0 .5em' }} iconName="DoubleChevronRight8" />
+    );
+    const style = {
+        display: 'flex',
+        flexFlow: 'row nowrap',
+        alignItems: 'center',
+    };
+
+    switch (action.ActivityType) {
+        case 'Due date':
+        case 'Estimated time':
+        case 'Priority':
+        case 'Responsible':
+        case 'Status':
+            if (tokens.length > 1) {
+                content = (
+                    <div style={style}>
+                        <span>
+                            {formatToken(tokens[0], action.ActivityType)}
+                        </span>
+                        {arrow}
+                        <span>
+                            {formatToken(tokens[1], action.ActivityType)}
+                        </span>
+                    </div>
+                );
+            }
+            break;
+        case 'Time log':
+            console.log(tokens);
+            if (tokens.length > 1) {
+                content = (
+                    <div>
+                        <div>{formatToken(tokens[0], action.ActivityType)}</div>
+                        <p>{tokens.slice(1).join('|')}</p>
+                    </div>
+                );
+            }
+            break;
+        default:
+            content = <span>{action.Comment}</span>;
+            break;
+    }
+
+    return content;
+};
+
 const ActionIcon: React.FC<{ type: ActionType }> = (props) => {
-    const name = React.useMemo(() => getActionIconName(props.type), [props.type]);
+    const name = React.useMemo(
+        () => getActionIconName(props.type),
+        [props.type]
+    );
 
     return (
         <div className={styles['actionLogItem__icon']}>
@@ -52,109 +121,23 @@ const ActionIcon: React.FC<{ type: ActionType }> = (props) => {
 const ActionItemContent: React.FC<IActionLogItemProps> = (props) => {
     const content = React.useMemo(() => {
         switch (props.action.ActivityType) {
-            case 'Created':
-                return (
-                    <span
-                        className={styles['actionLogItem__value_highlighted']}
-                    >
-                        <Text variant="medium">{'Task created'}</Text>
-                    </span>
-                );
-            case 'Finished':
-                return (
-                    <span
-                        className={styles['actionLogItem__value_highlighted']}
-                    >
-                        <Text variant="medium">{'Task finished'}</Text>
-                    </span>
-                );
-            case 'Estimated time':
-                return (
-                    <span
-                        className={styles['actionLogItem__value_highlighted']}
-                    >
-                        <Text variant="medium">
-                            {'Estimated required time: '}
-                            {formatHours(+props.action.Comment.split('|')[0]) +
-                                ' hour(s)'}
-                            {' to '}
-                            {formatHours(+props.action.Comment.split('|')[1]) +
-                                ' hour(s)'}
-                        </Text>
-                    </span>
-                );
-            case 'Due date':
-                return (
-                    <span
-                        className={styles['actionLogItem__value_highlighted']}
-                    >
-                        <Text variant="medium">
-                            {'Due date: '}
-                            {new Date(
-                                props.action.Comment.split('|')[0]
-                            ).toLocaleDateString()}
-                            {' to '}
-                            {new Date(
-                                props.action.Comment.split('|')[1]
-                            ).toLocaleDateString()}
-                        </Text>
-                    </span>
-                );
-            case 'Status':
-                return (
-                    <span
-                        className={styles['actionLogItem__value_highlighted']}
-                    >
-                        <Text variant="medium">
-                            {'Status: '}
-                            {props.action.Comment.split('|')[0]}
-                            {' to '}
-                            {props.action.Comment.split('|')[1]}
-                        </Text>
-                    </span>
-                );
-            case 'Responisble':
-                return (
-                    <span
-                        className={styles['actionLogItem__value_highlighted']}
-                    >
-                        <Text variant="medium">
-                            {'Responsible: '}
-                            {props.action.Comment.split('|')[0]}
-                            {' to '}
-                            {props.action.Comment.split('|')[1]}
-                        </Text>
-                    </span>
-                );
-            case 'Priority':
-                return (
-                    <span
-                        className={styles['actionLogItem__value_highlighted']}
-                    >
-                        <Text variant="medium">
-                            {'Priority: '}
-                            {props.action.Comment.split('|')[0]}
-                            {' to '}
-                            {props.action.Comment.split('|')[1]}
-                        </Text>
-                    </span>
-                );
             case 'Time log':
                 return (
                     <ActionLogTime action={props.action} task={props.task} />
                 );
-            case 'Progress':
-                return (
-                    <span
-                        className={styles['actionLogItem__value_highlighted']}
-                    >
-                        <Text variant="medium">
-                            Progress: {props.action.Comment}
-                        </Text>
-                    </span>
-                );
             default:
-                return <>props.action.ActivityType</>;
+                return (
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexFlow: 'row',
+                            gap: '.5em',
+                        }}
+                    >
+                        <span>{props.action.ActivityType} update: </span>
+                        <span>{getActionComment(props.action)}</span>
+                    </div>
+                );
         }
     }, []);
 

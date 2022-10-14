@@ -43,7 +43,7 @@ export const ActionLogTime: React.FC<IActionLogTimeProps> = (props) => {
     return (
         <div className={styles.container}>
             <div className={styles.topHeader}>
-                <div>Logged {formatHours(logged)} hour(s)</div>
+                <div>Time log: {formatHours(logged)} hour(s)</div>
                 <IconButton styles={iconButtonStyles} onClick={handleEdit} iconProps={{ iconName: 'Edit' }} />
             </div>
             {comment && (

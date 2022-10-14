@@ -1,3 +1,5 @@
+const VERSION = "1.0.0.31";
+
 export const SECOND = 1000;
 export const MINUTE = SECOND * 60;
 export const HOUR = MINUTE * 60;
@@ -5,7 +7,7 @@ export const DAY = HOUR * 24;
 
 export const MINUTE_DURATION = 1 / 60;
 
-export const GROUP_LABELS_KEY = 'sp-cip-group-labels-key';
+export const GROUP_LABELS_KEY = `sp-cip-group-labels-key/${VERSION}`;
 export const REFRESH_PARENT_EVT ='cip-refresh-parent-tasks-event';
 export const PANEL_OPEN_EVT ='cip-panel-open-event';
 export const RELINK_PARENT_EVT ='cip-relink-parent-event';
@@ -18,14 +20,14 @@ export const CALLOUT_MENU_EVT = 'sp-cip-contextual-menu-event';
 export const DIALOG_EVT = 'sp-cip-alert-dialog-event';
 export const TIMER_EVT = 'sp-cip-timer-event';
 export const TIMER_ADD_EVT = 'sp-cip-timer-add-event';
-export const TIMER_VISIBLE_KEY = 'sp-cip-timer-visible';
+export const TIMER_VISIBLE_KEY = `sp-cip-timer-visible/${VERSION}`;
 export const TIMER_RIGHT_POSITION = 'sp-cip-timer-right-pos';
-export const TIMERS_KEY = (root: string) => `${root}/cip-timers`;
+export const TIMERS_KEY = (root: string) => `${root}/cip-timers/${VERSION}`;
 export const FILTERS_ASSIGNED = 'sp-cip-filter-assigned-to';
 
 export const DB_NAME = 'SPFx_CIP';
-export const STORE_NAME = location.origin + location.pathname;
-export const ALL_TASKS_KEY = 'allTasks';
+export const STORE_NAME = location.origin + location.pathname + `/${VERSION}`;
+export const ALL_TASKS_KEY = `allTasks/${VERSION}`;
 
-export const SELECTED_TEAM_KEY = '/sp-cip-selected-team';
+export const SELECTED_TEAM_KEY = `/sp-cip-selected-team/${VERSION}`;
 export const TEAM_ALL = 'All';

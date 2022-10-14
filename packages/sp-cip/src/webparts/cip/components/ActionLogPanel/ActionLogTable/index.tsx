@@ -4,7 +4,6 @@ import {
     DetailsListLayoutMode,
     IColumn,
     Icon,
-    IconBase,
     IconButton,
     IGroup,
     Persona,
@@ -17,6 +16,7 @@ import MainService from '../../../services/main-service';
 import { HOUR } from '../../../utils/constants';
 import { GlobalContext } from '../../../utils/GlobalContext';
 import styles from './ActionLogTable.module.scss';
+import { useColumns } from './useColumns';
 
 export interface IActionLogTableProps {
     dateFrom: Date;
@@ -24,73 +24,13 @@ export interface IActionLogTableProps {
 }
 
 export const ActionLogTable: React.FC<IActionLogTableProps> = (props) => {
-    const { currentUser } = React.useContext(GlobalContext);
     const actionService = React.useMemo(
         () => MainService.getActionService(),
         []
     );
     const [items, setItems] = React.useState<IAction[]>([]);
 
-    const columns: IColumn[] = React.useMemo(() => {
-        return [
-            {
-                key: 'Icon',
-                name: '',
-                minWidth: 50,
-                onRender: (item: IAction) => <Icon className={styles.icon} iconName={getActionIconName(item.ActivityType)} />,
-                isResizable: false,
-            },
-            {
-                key: 'Action',
-                name: 'Action',
-                fieldName: 'ActivityType',
-                minWidth: 100,
-                isResizable: true,
-            },
-            {
-                key: 'Comment',
-                name: 'Comment',
-                fieldName: 'Comment',
-                minWidth: 250,
-                isResizable: true,
-            },
-            {
-                key: 'Created on',
-                name: 'Created on',
-                fieldName: 'Date',
-                onRender: (item: IAction) =>
-                    new Date(item.Date).toLocaleString(),
-                minWidth: 150,
-                isResizable: true,
-            },
-            {
-                key: 'Created by',
-                name: 'Created by',
-                onRender: (item: IAction) => (
-                    <Persona
-                        text={item.User.Title}
-                        imageUrl={`/_layouts/15/userphoto.aspx?AccountName=${item.User.EMail}&Size=M`}
-                        size={PersonaSize.size24}
-                    />
-                ),
-                minWidth: 150,
-                isResizable: true,
-            },
-            {
-                key: 'Actions',
-                name: '',
-                minWidth: 70,
-                onRender: (item: IAction) => {
-                    // Edit is possible only for time logs
-                    if (item.ActivityType !== 'Time log') return null;
-                    if (currentUser?.Id === item.Author.Id) return (
-                        <IconButton iconProps={{ iconName: 'Edit' }} />
-                    );
-                },
-                isResizable: true,
-            },
-        ];
-    }, [currentUser]);
+    const columns: IColumn[] = useColumns();
 
     React.useEffect(() => {
         async function run() {
