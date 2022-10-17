@@ -77,6 +77,15 @@ export class TaskLogsService {
         return res;
     }
 
+    async getTaskLogsByUserId(date: Date, userId: number): Promise<ITaskLog[]> {
+        let res: ITaskLog[] = [];
+        const dt = DateTime.fromJSDate(date);
+        // Additional query for incomplete tasks
+        return this._wrap(
+            this.list.items.filter(this.getTaskLogFilter(userId, dt))
+        )().then((r) => (res = res.concat(r)));
+    }
+
     /**
      * Get single task log by id
      */

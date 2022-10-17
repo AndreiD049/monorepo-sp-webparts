@@ -1,3 +1,3 @@
-export function testService() {
-    console.log("test 2");
-}
+export { TaskService } from './service/tasks';
+export { TaskLogsService } from './service/tasklogs';
+export * from './utils';

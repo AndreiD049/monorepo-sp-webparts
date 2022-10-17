@@ -12,6 +12,7 @@ import { IHomepageProps } from './components/Homepage/IHomepageProps';
 import { IJsonConfig, PropertyPaneJsonConfiguration } from 'json-configuration';
 import IConfig from './models/IConfig';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
+import { getTheme } from 'office-ui-fabric-react';
 
 export interface IHomepageWebPartProps {
     config: IJsonConfig<IConfig>;
@@ -19,6 +20,7 @@ export interface IHomepageWebPartProps {
 
 export default class HomepageWebPart extends BaseClientSideWebPart<IHomepageWebPartProps> {
     public static spBuilder: SPBuilder;
+    public static theme: IReadonlyTheme = getTheme();
     private _isDarkTheme: boolean = false;
     private _environmentMessage: string = '';
 
@@ -68,6 +70,7 @@ export default class HomepageWebPart extends BaseClientSideWebPart<IHomepageWebP
         }
 
         this._isDarkTheme = !!currentTheme.isInverted;
+        HomepageWebPart.theme = currentTheme;
         const { semanticColors } = currentTheme;
 
         if (semanticColors) {

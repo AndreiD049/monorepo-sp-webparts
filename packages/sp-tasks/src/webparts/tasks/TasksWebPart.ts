@@ -24,6 +24,8 @@ import PropertyPaneAccessControl, {
     IUserGroupPermissions,
     setupAccessControl,
 } from 'property-pane-access-control';
+import { IReadonlyTheme } from '@microsoft/sp-component-base';
+import { getTheme } from 'office-ui-fabric-react';
 
 export interface ITasksWebPartProps {
     dataSourceRoot: string;
@@ -39,6 +41,7 @@ export interface ITasksWebPartProps {
 
 export default class TasksWebPart extends BaseClientSideWebPart<ITasksWebPartProps> {
     static SPBuilder: SPBuilder;
+    static theme: IReadonlyTheme = getTheme();
 
     public async render(): Promise<void> {
         let userServeice = new UserService();
@@ -101,6 +104,10 @@ export default class TasksWebPart extends BaseClientSideWebPart<ITasksWebPartPro
 
     protected get dataVersion(): Version {
         return Version.parse('1.0');
+    }
+
+    protected onThemeChanged(theme: IReadonlyTheme): void {
+        TasksWebPart.theme = theme;
     }
 
     protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {

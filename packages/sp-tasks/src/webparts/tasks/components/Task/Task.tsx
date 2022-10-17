@@ -14,10 +14,10 @@ import { MINUTE } from '../../utils/constants';
 import GlobalContext from '../../utils/GlobalContext';
 import { getTaskUniqueId, isTask } from '../../utils/utils';
 import { TaskPersona } from './persona/TaskPersona';
-import colors from './Colors.module.scss';
 import { SPnotify } from 'sp-react-notifications';
 import styles from './Task.module.scss';
 import { Task as InnerTask } from 'sp-components';
+import TasksWebPart from '../../TasksWebPart';
 
 export interface ITaskProps {
     task: ITaskLog | ITask;
@@ -134,17 +134,17 @@ const Task: FC<ITaskProps> = (props) => {
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    className={`${styles.task} ${colors[info.status.toLowerCase()]}`}
                     onMouseOver={handleHover(true)}
                     onMouseOut={handleHover(false)}
                 >
                     <InnerTask
                         info={info}
                         canEditOthers={canEditOthers}
-                        currentUser={currentUser}
+                        currentUserId={currentUser.User.ID}
                         expired={expired}
                         isHovering={isHovering}
                         onChange={handleChange}
+                        theme={TasksWebPart.theme}
                         TaskPersona={
                             <TaskPersona
                                 title={info.user.Title}

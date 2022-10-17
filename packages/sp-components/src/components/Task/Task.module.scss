@@ -1,5 +1,15 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
 
+.task {
+    box-shadow: $ms-depth-shadow-4;
+    width: 300px;
+    min-height: 60px;
+    padding: 0.5em 1em;
+    background-color: $ms-color-neutralLight;
+    border-left-width: 5px;
+    border-left-style: solid;
+}
+
 .expired {
     font-weight: bold;
     color: $ms-color-red;

@@ -1,76 +1,7 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
 
 .task {
-    box-shadow: $ms-depth-shadow-4;
-    width: 300px;
-    min-height: 60px;
-    padding: 0.5em 1em;
-    background-color: $ms-color-neutralLight;
-    border-left-color: inherit;
-    border-left-width: 5px;
-    border-left-style: solid;
-
-    .expired {
-        font-weight: bold;
-        color: $ms-color-red;
-    }
-
-    .header {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .subheader {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: flex-start;
-        margin-top: 0.3em;
-
-        .hours {
-            margin-left: 1em;
-        }
-
-    }
-
-    .status {
-        display: flex;
-        flex-flow: row nowrap;
-        align-items: flex-end;
-        justify-content: flex-start;
-        gap: 1em;
-        margin-top: 0.3em;
-    }
-
-    .body {
-        display: flex;
-        flex-flow: column nowrap;
-        align-items: center;
-        justify-content: flex-start;
-
-        i {
-            font-size: 1em;
-        }
-
-        .separator {
-            align-self: stretch;
-            &::before {
-                background-color: '[theme: neutralLight, default: #eaeaea]';
-            }
-        }
-    }
-}
-
-.Task__remark-icon {
-    font-size: 1.3em;
-    color: '[theme: themePrimary, default: #a4262c]';
-    cursor: default;
-    padding-right: .5em;
-}
-
-.Task__title {
-    flex-grow: 1;
+    border-left-color: "[theme: themePrimary, default: #a4262c]";
 }
 
 .Task_person {

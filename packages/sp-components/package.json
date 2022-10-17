@@ -12,6 +12,7 @@
   "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.0",
+    "@microsoft/sp-component-base": "1.14.0",
     "@types/react": "16.9.51",
     "node-sass": "^7.0.3",
     "office-ui-fabric-react": "7.174.1",

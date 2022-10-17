@@ -1,9 +1,11 @@
 import { Icon, Text, Dropdown, IconButton, IDropdownOption } from 'office-ui-fabric-react';
 import styles from './Task.module.scss';
-import { IUser, IUserDetails } from '../models';
+import colors from './Colors.module.scss';
+import { IUser } from '../../models';
 import * as React from 'react';
 import { TaskBody } from './TaskBody';
 import { TaskPersona } from './DefaultPersona/TaskPersona';
+import { IReadonlyTheme } from '@microsoft/sp-component-base';
 
 const CLOSED_ICON = 'ChevronDown';
 const OPEN_ICON = 'ChevronUp';
@@ -65,13 +67,24 @@ export interface ITaskProps {
     info: ITaskInfo;
     expired: boolean;
     isHovering: boolean;
-    currentUser: IUserDetails;
+    currentUserId: number;
     canEditOthers: boolean;
     onChange: (ev: {}, option: IDropdownOption | undefined) => void;
     TaskPersona?: JSX.Element;
+    className?: string;
+    style?: React.CSSProperties;
+    theme?: IReadonlyTheme;
 }
 
-export const Task: React.FC<ITaskProps> = ({ info, expired, isHovering, currentUser, ...props }) => {
+export const Task: React.FC<ITaskProps> = ({
+    info,
+    expired,
+    isHovering,
+    currentUserId,
+    className = '',
+    style = {},
+    ...props
+}) => {
     const [open, setOpen] = React.useState<boolean>(false);
 
     const toggleOpen = React.useCallback(() => {
@@ -84,7 +97,13 @@ export const Task: React.FC<ITaskProps> = ({ info, expired, isHovering, currentU
     }, [open]);
 
     return (
-        <>
+        <div
+            className={`${styles.task} ${colors[info.status.toLowerCase()]} ${className}`}
+            style={{
+                borderLeftColor: props.theme ? props.theme.palette.themePrimary : 'inherit',
+                ...style,
+            }}
+        >
             <div className={styles.header}>
                 {info.remark && (
                     <Icon
@@ -123,11 +142,11 @@ export const Task: React.FC<ITaskProps> = ({ info, expired, isHovering, currentU
                     styles={DROPDOWN_STYLES}
                     selectedKey={info.status}
                     onChange={
-                        info.user.ID === currentUser.User.ID || props.canEditOthers
+                        info.user.ID === currentUserId || props.canEditOthers
                             ? props.onChange
                             : () => null
                     }
-                    disabled={info.user.ID === currentUser.User.ID ? false : !props.canEditOthers}
+                    disabled={info.user.ID === currentUserId ? false : !props.canEditOthers}
                 />
             </div>
             {info.description || info.remark ? (
@@ -141,6 +160,6 @@ export const Task: React.FC<ITaskProps> = ({ info, expired, isHovering, currentU
                     {body}
                 </div>
             ) : null}
-        </>
+        </div>
     );
 };
