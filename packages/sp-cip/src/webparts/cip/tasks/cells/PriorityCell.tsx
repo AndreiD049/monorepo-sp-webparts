@@ -1,4 +1,3 @@
-import { useConst } from '@uifabric/react-hooks';
 import * as React from 'react';
 import Pill from '../../components/pill/Pill';
 import {
@@ -15,7 +14,7 @@ import { GlobalContext } from '../../utils/GlobalContext';
 
 const PriorityCellCallout: React.FC<IPriorityCellProps> = (props) => {
     const { currentUser } = React.useContext(GlobalContext);
-    const task = useConst(props.node.getTask());
+    const task = React.useMemo(() => props.node.getTask(), []);
     const taskService = MainService.getTaskService();
     const actionService = MainService.getActionService();
     const priority = useChoiceFields('Priority');

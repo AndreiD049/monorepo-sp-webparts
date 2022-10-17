@@ -15,7 +15,7 @@
     "@microsoft/sp-core-library": "^1.13.1",
     "@microsoft/sp-property-pane": "^1.13.1",
     "@microsoft/sp-webpart-base": "^1.13.1",
-    "office-ui-fabric-react": "^7.174.1",
+    "office-ui-fabric-react": "7.185.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "sp-preset": "^2.0.1"
@@ -33,7 +33,7 @@
     "@types/react-dom": "16.9.8",
     "@types/webpack-env": "1.13.1",
     "eslint": "^8.8.0",
-    "office-ui-fabric-react": "^7.174.1",
+    "office-ui-fabric-react": "7.185.7",
     "prettier": "^2.5.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
