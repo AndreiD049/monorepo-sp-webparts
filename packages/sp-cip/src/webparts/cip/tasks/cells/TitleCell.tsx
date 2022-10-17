@@ -9,13 +9,13 @@ import {
     loadingStart,
     loadingStop,
 } from '../../components/utils/LoadingAnimation';
-import styles from './Cells.module.scss';
 import { TaskNodeContext } from '../TaskNodeContext';
 import Pill from '../../components/pill/Pill';
 import MainService from '../../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { isFinished } from '@service/sp-cip';
 import { GlobalContext } from '../../utils/GlobalContext';
+import styles from './Cells.module.scss';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {
@@ -47,7 +47,7 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
         return false;
     }, [node]);
 
-    let classNames = React.useMemo(() => {
+    const classNames: string = React.useMemo(() => {
         let result = styles['round-button'];
         if (!isButtonDisabled && item.Subtasks === item.FinishedSubtasks) {
             result += ` ${
@@ -66,7 +66,6 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
             return (
                 <Icon
                     iconName={`${isTaskFinished ? 'Cancel' : 'CheckMark'}`}
-                    className={styles['round-button__icon']}
                 />
             );
         }
@@ -120,9 +119,8 @@ export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
     const navigate = useNavigate();
     const item = node.getTask();
     const taskService = MainService.getTaskService();
-    const actionService = MainService.getActionService();
 
-    const handleFinishTask = async (node: TaskNode) => {
+    const handleFinishTask = async (node: TaskNode): Promise<void> => {
         const newItem = await finishTask(node.getTask(), currentUser.Id);
         if (newItem) {
             taskUpdated(newItem);
@@ -132,7 +130,7 @@ export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
         }
     };
 
-    const handleReopenTask = async (node: TaskNode) => {
+    const handleReopenTask = async (node: TaskNode): Promise<void> => {
         await taskService.reopenTask(node.Id);
         const newItem = await taskService.getTask(node.Id);
         taskUpdated(newItem);
@@ -179,8 +177,8 @@ export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
                 <Text
                     variant="medium"
                     block
-                    className={`${styles['title__text']} ${
-                        isTaskFinished ? styles['title__text_finished'] : ''
+                    className={`${styles.title__text} ${
+                        isTaskFinished ? styles.title__text_finished : ''
                     }`}
                     title={item.Title}
                 >

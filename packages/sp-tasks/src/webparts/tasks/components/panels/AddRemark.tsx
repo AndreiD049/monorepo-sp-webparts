@@ -47,7 +47,7 @@ export const AddRemark: React.FC<IAddRemarkProps> = ({ taskId, taskLogId, date }
     React.useEffect(() => {
         setPanelProperties('SP_TASKS', {
             isFooterAtBottom: true,
-            onRenderFooterContent: (_props) => (
+            onRenderFooterContent: () => (
                 <>
                     <PrimaryButton onClick={handleSave}>Save</PrimaryButton>
                     <DefaultButton

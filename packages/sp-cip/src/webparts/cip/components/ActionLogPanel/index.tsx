@@ -50,13 +50,17 @@ export const ActionLogPanel: React.FC<IActionLogPanelProps> = (props) => {
             headerText="Action log"
         >
             <div className={styles.header}>
-                <PeoplePicker selectedUsers={selectedUsers} onUsersSelected={(users) => setSelectedUsers(users)} />
+                <PeoplePicker
+                    selectedUsers={selectedUsers}
+                    onUsersSelected={(users) => setSelectedUsers(users)}
+                />
                 <ActionDropdown
                     selectedAction={action}
                     onActionChange={(action) => setAction(action)}
                 />
                 <DatePicker
                     label="Week"
+                    allowTextInput
                     textField={{
                         value:
                             dateFrom &&

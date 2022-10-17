@@ -18,10 +18,10 @@ export interface ITaskPersona extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const TaskPersona: React.FC<ITaskPersona> = (props): JSX.Element => {
-    const { canEditOthers, TaskLogsService, TaskService } = React.useContext(GlobalContext);
+    const { canEditOthers } = React.useContext(GlobalContext);
 
     const outerClass = React.useMemo(() => {
-        var result = `${styles['Task__persona']} ${styles['Task__persona_size_sm']}`;
+        let result = `${styles['Task__persona']} ${styles['Task__persona_size_sm']}`;
         if (props.isHovering && canEditOthers)
             result += ` ${styles['Task__persona_theme_primary']}`;
         return result;
@@ -72,7 +72,7 @@ export const TaskPersona: React.FC<ITaskPersona> = (props): JSX.Element => {
                     tabIndex={-1}
                     iconProps={{ iconName: 'MoreVertical' }}
                     className={`${styles['Task__edit-icon_size_sm']} ${
-                        colors[`button_status_${props.status.toLowerCase()}`]
+                        colors[`button_status_${props.status.toLowerCase()}` as keyof typeof colors]
                     }`}
                     styles={{
                         menuIcon: {

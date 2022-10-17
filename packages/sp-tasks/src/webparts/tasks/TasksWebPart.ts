@@ -44,7 +44,7 @@ export default class TasksWebPart extends BaseClientSideWebPart<ITasksWebPartPro
     static theme: IReadonlyTheme = getTheme();
 
     public async render(): Promise<void> {
-        let userServeice = new UserService();
+        const userServeice = new UserService();
         const teamService = new TeamService(
             this.properties.staffListUrl,
             this.properties.userColumn,

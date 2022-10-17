@@ -3,7 +3,6 @@ import { SPFI, IList, IItems } from 'sp-preset';
 import ITask from '../models/ITask';
 import TasksWebPart, { ITasksWebPartProps } from '../TasksWebPart';
 import { processChangeResult } from '../utils/utils';
-import UserService from './users';
 
 const TASK_SELECT = [
     'ID',
@@ -30,7 +29,7 @@ class TaskService {
     list: IList;
     listTitle: string;
     lastToken: string;
-    private id: string = 'TASKS';
+    private id = 'TASKS';
 
 
     constructor(public props: ITasksWebPartProps) {
@@ -53,7 +52,7 @@ class TaskService {
             .filter(`AssignedToId eq ${userId}`))();
     }
 
-    async getTasksByOriginalId(originalId): Promise<ITask[]> {
+    async getTasksByOriginalId(originalId: number): Promise<ITask[]> {
         return this._wrap(this.list.items
             .filter(`ID eq ${originalId} or OriginalTaskId eq ${originalId}`))();
     }
@@ -87,11 +86,11 @@ class TaskService {
      * Return just the result of update, if user will need the updated task
      */
     async updateTask(taskId: number, update: Partial<ITask>) {
-        var result = this.list.items.getById(taskId).update(update);
+        const result = this.list.items.getById(taskId).update(update);
         return result;
     }
 
-    async deleteTask(taskId) {
+    async deleteTask(taskId: number) {
         return this.list.items.getById(taskId).delete();
     }
 

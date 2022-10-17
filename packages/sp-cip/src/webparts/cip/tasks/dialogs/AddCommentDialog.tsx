@@ -26,14 +26,14 @@ export const AddCommentDialog: React.FC<{ task: ITaskOverview }> = (props) => {
     React.useEffect(() => {
         commentService.getByTask(props.task, 3, 0).then((c) => {
             setComments(c);
-        });
+        }).catch((err) => console.error(err));
     }, [props.task]);
 
     const data = React.useMemo(() => {
         return comments.map((comment) => ({
             key: comment.Id,
             activityDescription: [
-                <Link>{comment.Author.Title}</Link>,
+                <Link key={comment.Id}>{comment.Author.Title}</Link>,
                 <span key={2}> commented</span>,
             ],
             activityIcon: (
@@ -48,7 +48,7 @@ export const AddCommentDialog: React.FC<{ task: ITaskOverview }> = (props) => {
                 },
             ],
             comments: (
-                <div className={styles['comments__content']}>
+                <div className={styles.comments__content}>
                     {comment.Comment}
                 </div>
             ),
@@ -97,7 +97,7 @@ export const AddCommentDialog: React.FC<{ task: ITaskOverview }> = (props) => {
                     </Text>
                     {data.map((comment) => {
                         return (
-                            <div className={styles.comments}>
+                            <div key={comment.key} className={styles.comments}>
                                 <ActivityItem
                                     key={comment.key}
                                     activityPersonas={comment.activityPersonas}

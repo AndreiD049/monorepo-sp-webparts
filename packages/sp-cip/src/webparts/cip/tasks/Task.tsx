@@ -8,7 +8,7 @@ import { RenderCell } from './cells/render-cells';
 import { TaskNodeContext } from './TaskNodeContext';
 import { isFinished } from '@service/sp-cip';
 
-function initialOpen(node: TaskNode, isFiltered: boolean) {
+function initialOpen(node: TaskNode, isFiltered: boolean): boolean {
     if (!isFiltered) return false;
     if (!node.hasChildren()) return false;
     if (node.getChildren().some((c) => c.isFilterApplicable)) return true;
@@ -44,6 +44,7 @@ const Task: React.FC<ITaskProps> = (props) => {
                 <div>
                     {props.node.getChildren().map((child) => (
                         <Task
+                            key={child.Id}
                             isFiltered={props.isFiltered}
                             node={child}
                             rowProps={props.rowProps}
@@ -56,7 +57,7 @@ const Task: React.FC<ITaskProps> = (props) => {
     }, [open, props.node, props.rowProps.columns]);
 
     const cells = React.useMemo(() => {
-        const result = {};
+        const result: { [key: string]: JSX.Element } = {};
         props.rowProps.columns.forEach((column) => {
             result[column.key] = (
                 <RenderCell fieldName={column.fieldName} node={props.node} />

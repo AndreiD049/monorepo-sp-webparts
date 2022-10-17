@@ -1,6 +1,7 @@
 import {
     ChoiceFieldFormatType,
     DateTimeFieldFormatType,
+    IListInfo,
 } from 'sp-preset';
 import { MessageBarType } from 'office-ui-fabric-react';
 import { SPnotify } from 'sp-react-notifications';
@@ -86,7 +87,7 @@ export const setupLists = async (properties: ITasksWebPartProps) => {
         )
     }
 
-    let taskList = await sp.web.lists.getByTitle(properties.tasksListTitle)();
+    const taskList: IListInfo = await sp.web.lists.getByTitle(properties.tasksListTitle)();
 
     // make sure 'Task logs' list exists
     const taskLogsExists = await sp.web.lists.ensure(

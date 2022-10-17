@@ -50,6 +50,7 @@ const TeamCheckbox: React.FC<ITeamCheckboxProps> = ({
     }, [selectedSet, props.data]);
 
     const handleChange = React.useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (_ev: any, checked: boolean) => {
             setSelectedUsers((users: IUser[]) => {
                 let selected: IUser[] = clone(users);
@@ -116,7 +117,7 @@ const UserTeamSelctor: React.FC<IUserSelectorProps> = (props) => {
     }, [teamMembers, props.users]);
 
     const selectedKeys = React.useMemo(() => {
-        const result = [];
+        const result: string[] = [];
         props.users.forEach((u) => {
             u.Teams.forEach((team) => {
                 result.push(team + u.User.ID);
@@ -125,6 +126,7 @@ const UserTeamSelctor: React.FC<IUserSelectorProps> = (props) => {
         return result;
     }, [props.users]);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleChange = (_ev: any, option: IComboBoxOption) => {
         if (option.selected) {
             props.setUsers([...props.users, option.data]);

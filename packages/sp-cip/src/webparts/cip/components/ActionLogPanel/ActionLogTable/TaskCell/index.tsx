@@ -3,7 +3,6 @@ import { IAction } from '@service/sp-cip/dist/services/action-service';
 import { Link } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './TaskCell.module.scss';
 
 export interface ITaskCellProps {
     // Props go here

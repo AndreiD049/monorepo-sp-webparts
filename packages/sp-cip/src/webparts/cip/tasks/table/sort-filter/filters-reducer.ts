@@ -12,27 +12,28 @@ export interface ICipFilters {
 }
 
 export interface IFilterAction {
-    value?: any;
+    value?: ((n: TaskNode) => boolean) | string | StatusSelected | AssigneeSelected | { [key: string]: (n: TaskNode) => boolean };
     type: 'SEARCH' | 'STATUS' | 'ASSIGNED' | 'FACET' | 'FACET_UNSET' | 'SORT';
     column?: string;
 }
 
-export const filtersReducer = (state: ICipFilters, action: IFilterAction) => {
+export const filtersReducer = (state: ICipFilters, action: IFilterAction): ICipFilters => {
+    const filters = { ...state.facetFilters };
     switch (action.type) {
         case 'SEARCH':
             return {
                 ...state,
-                search: action.value,
+                search: action.value as string,
             };
         case 'STATUS':
             return {
                 ...state,
-                status: action.value,
+                status: action.value as StatusSelected,
             };
         case 'ASSIGNED':
             return {
                 ...state,
-                assignedTo: action.value,
+                assignedTo: action.value as AssigneeSelected,
             };
         case 'FACET':
             return {
@@ -40,10 +41,9 @@ export const filtersReducer = (state: ICipFilters, action: IFilterAction) => {
                 facetFilters: {
                     ...state.facetFilters,
                     [action.column]: action.value,
-                },
+                } as { [key: string]: (n: TaskNode) => boolean },
             };
         case 'FACET_UNSET':
-            const filters = { ...state.facetFilters };
             delete filters[action.column];
             return {
                 ...state,

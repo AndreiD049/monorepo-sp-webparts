@@ -1,7 +1,7 @@
 import { ITaskOverview } from "@service/sp-cip/dist/models/ITaskOverview";
 import { TaskNode } from "./TaskNode";
 
-export function createTaskTree(tasks: ITaskOverview[]) {
+export function createTaskTree(tasks: ITaskOverview[]): TaskNode {
     const roots: ITaskOverview[] = [];
     const taskMap: Map<number, TaskNode> = new Map();
     const rootNode = new TaskNode();

@@ -32,7 +32,7 @@ export class TaskNode implements IClonable<TaskNode> {
         }
     }
 
-    public withChildren(tasks: ITaskOverview[] | TaskNode[]) {
+    public withChildren(tasks: ITaskOverview[] | TaskNode[]): TaskNode {
         if (tasks.length > 0) {
             if (this.type !== 'root') {
                 this.type = 'normal';
@@ -50,18 +50,18 @@ export class TaskNode implements IClonable<TaskNode> {
         return this;
     }
 
-    public withLevel(level: number) {
+    public withLevel(level: number): TaskNode {
         this.level = level;
         this.children.forEach((child) => child.withLevel(this.level + 1));
         return this;
     }
 
-    public withIndex(idx: number) {
+    public withIndex(idx: number): TaskNode {
         this.index = idx;
         return this;
     }
 
-    public setChild(child: TaskNode) {
+    public setChild(child: TaskNode): void {
         child.parent = this;
         child.withIndex(this.children.size);
         this.children.set(child.task.Id, child.withLevel(this.level + 1));
@@ -71,7 +71,7 @@ export class TaskNode implements IClonable<TaskNode> {
         }
     }
 
-    public withParent(parent: TaskNode) {
+    public withParent(parent: TaskNode): TaskNode {
         this.parent = parent;
         if (parent) {
             parent.setChild(this);
@@ -79,7 +79,7 @@ export class TaskNode implements IClonable<TaskNode> {
         return this;
     }
 
-    public withTask(task: ITaskOverview) {
+    public withTask(task: ITaskOverview): TaskNode {
         this.task = task;
         return this;
     }
@@ -112,7 +112,7 @@ export class TaskNode implements IClonable<TaskNode> {
         return this.parent || null;
     }
 
-    public getPreviousSibling(): TaskNode | null {
+    public getPreviousSibling(): TaskNode | undefined {
         if (this.index === 0) return null;
         const parent = this.getParent();
         if (!parent) return null;
@@ -120,7 +120,7 @@ export class TaskNode implements IClonable<TaskNode> {
         return parent.getChildren()[this.index - 1];
     }
 
-    public getNextSibling(): TaskNode | null {
+    public getNextSibling(): TaskNode | undefined {
         const parent = this.getParent();
         if (!parent) return null;
         if (parent.children.size <= this.index + 1) return null;
@@ -128,7 +128,7 @@ export class TaskNode implements IClonable<TaskNode> {
     }
 
     public getAllDescendants(): TaskNode[] {
-        const result = [];
+        const result: TaskNode[] = [];
         this.getChildren().forEach((child) => { 
             result.push(child);
             result.push(...child.getAllDescendants());
@@ -136,13 +136,13 @@ export class TaskNode implements IClonable<TaskNode> {
         return result;
     }
 
-    public filter(filter: ((node: TaskNode) => boolean)) {
+    public filter(filter: ((node: TaskNode) => boolean)): TaskNode {
         const filtered = this.getChildren().filter((c: TaskNode) => filter(c));
         this.withChildren(filtered);
         return this;
     }
 
-    public hide(filters: ((node: TaskNode) => boolean)[]) {
+    public hide(filters: ((node: TaskNode) => boolean)[]): TaskNode {
         this.getChildren().forEach((n) => {
             if (filters.every((filter) => filter(n))) {
                 n.Display = 'shown';

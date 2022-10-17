@@ -47,7 +47,7 @@ export const PathBreadcrumbs: React.FC<IPathBreadcrumbsProps> = (props) => {
         <div className={styles.container}>
             <Breadcrumb name="Root" isLast={props.path.length === 0} onChange={handleChange(0)} />
             {props.path.map((name, idx) => (
-                <Breadcrumb name={name} isLast={idx === props.path.length - 1} onChange={handleChange(idx + 1)} />
+                <Breadcrumb key={name} name={name} isLast={idx === props.path.length - 1} onChange={handleChange(idx + 1)} />
             ))}
         </div>
     );

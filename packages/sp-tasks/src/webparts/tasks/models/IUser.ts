@@ -8,6 +8,7 @@ export interface IUser {
     Role: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function convertToUser(item: any, userCol: string, teamsCol: string, roleCol: string): IUser {
     return ({
         User: {

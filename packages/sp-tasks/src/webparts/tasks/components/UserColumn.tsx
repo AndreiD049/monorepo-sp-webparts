@@ -18,7 +18,7 @@ export interface IUserColumnsProps {
 const UserColumn: FC<IUserColumnsProps> = ({ tasksPerUser, id, date }) => {
     const { canEditOthers } = React.useContext(GlobalContext);
 
-    let body;
+    let body: JSX.Element[] | JSX.Element;
 
     if (tasksPerUser[id]?.result && tasksPerUser[id]?.result.length > 0) {
         body = tasksPerUser[id]?.result.map((task, index) => (

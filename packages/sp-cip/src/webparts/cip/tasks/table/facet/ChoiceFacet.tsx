@@ -1,6 +1,5 @@
 import {
     Checkbox,
-    FocusTrapZone,
     IColumn,
     PrimaryButton,
     SearchBox,
@@ -27,14 +26,15 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
     const searchRef = React.useRef(null);
     React.useEffect(() => {
         if (searchRef.current) {
-            searchRef.current.focus()
+            searchRef.current.focus();
         }
     }, [searchRef]);
 
     const [search, setSearch] = React.useState('');
 
     const options: IFacetOption[] = React.useMemo(() => {
-        const result = {};
+        const result: { [key: string]: { label: string; items: TaskNode[] } } =
+            {};
         props.options.forEach((node) => {
             const label = props.getValue(node);
             if (!label) return;
@@ -65,7 +65,7 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
         new Set(shownOptions.map((o) => o.label))
     );
 
-    const handleSelectToggle = (label: string) => () => {
+    const handleSelectToggle = (label: string): () => void => () => {
         if (selected.has(label)) {
             selected.delete(label);
         } else {
@@ -74,8 +74,8 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
         setSelected(new Set(Array.from(selected)));
     };
 
-    const handleSave = () => {
-        let resultSet = selected;
+    const handleSave = (): void => {
+        const resultSet = selected;
         // If something is filtered, treat is as selected
         if (search !== '') {
             const filtered = new Set(filteredOptions.map((o) => o.label));
@@ -93,7 +93,7 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
         calloutVisibility({ visible: false });
     };
 
-    const handleSelectAllToggle = () => {
+    const handleSelectAllToggle = (): void => {
         if (selected.size === options.length) {
             setSelected(new Set([]));
         } else {
@@ -102,7 +102,7 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
         return;
     };
 
-    const handleSearch = (_ev: any, newValue: string) => {
+    const handleSearch = (_ev: {}, newValue: string): void => {
         setSearch(newValue);
     };
 
@@ -111,9 +111,9 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
             style={{
                 width: props.column.currentWidth,
             }}
-            className={styles['facet__main']}
+            className={styles.facet__main}
         >
-            <div className={styles['facet__search']}>
+            <div className={styles.facet__search}>
                 <SearchBox
                     componentRef={searchRef}
                     tabIndex={0}
@@ -122,7 +122,7 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
                     clearButtonProps={{ tabIndex: -1 }}
                 />
             </div>
-            <div className={styles['facet__options']}>
+            <div className={styles.facet__options}>
                 <Checkbox
                     label="Select all"
                     checked={selected.size === options.length}
@@ -130,6 +130,7 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
                 />
                 {Object.values(filteredOptions).map((opt) => (
                     <Checkbox
+                        key={opt.label}
                         inputProps={{ tabIndex: -1 }}
                         checked={selected.has(opt.label)}
                         label={opt.label}

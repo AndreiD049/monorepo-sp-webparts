@@ -12,7 +12,7 @@ import {
     Selection,
     getTheme,
     SelectionMode,
-    ICommandBarItemProps,
+    IObjectWithKey,
 } from 'office-ui-fabric-react';
 import IPeriod from '../../dal/IPeriod';
 import constants from '../../utils/constants';
@@ -60,7 +60,7 @@ const AppraisalPeriods: FC = () => {
 
     /* Selection */
     const [selectedItem, setSelectedItem] = React.useState<IPeriod>(null);
-    const selection = React.useMemo(
+    const selection: any = React.useMemo(
         () =>
             new Selection({
                 getKey: (item: IPeriod) => item.ID,

@@ -2,8 +2,8 @@ const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
 const USER_WEB_RE = /^(.*sharepoint.com\/(sites|teams)\/.*)\/Lists/;
 const CHANGE_TOKEN_RE = /LastChangeToken=['"](.*?)['"]/;
-const CHANGE_ROW_RE = /\<.?\:row/;
-const CHANGE_DELETE_RE = /\<Id ChangeType=['"]Delete['"]/;
+const CHANGE_ROW_RE = /<.?:row/;
+const CHANGE_DELETE_RE = /<Id ChangeType=['"]Delete['"]/;
 const ACCESS_EDIT_OTHERS = 'edit-others';
 const ACCESS_SEE_ALL = 'see-all-users';
 

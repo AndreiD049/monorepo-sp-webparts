@@ -22,7 +22,7 @@ import {
 /**
  *  Open/Close toggle
  */
-export const nodeSetOpen = (id: number, value?: boolean) => {
+export const nodeSetOpen = (id: number, value?: boolean): void => {
     document.dispatchEvent(
         new CustomEvent(NODE_OPEN_EVT, {
             detail: {
@@ -33,8 +33,8 @@ export const nodeSetOpen = (id: number, value?: boolean) => {
     );
 };
 
-export const nodeToggleOpenHandler = (id: number, func: (val?: boolean) => void) => {
-    const handler = (evt: CustomEvent) => {
+export const nodeToggleOpenHandler = (id: number, func: (val?: boolean) => void): () => void => {
+    const handler = (evt: CustomEvent): void => {
         if (evt.detail && evt.detail.id === id) {
             func(evt.detail.value);
         }
@@ -46,7 +46,7 @@ export const nodeToggleOpenHandler = (id: number, func: (val?: boolean) => void)
 /**
  * Relink parent
  */
-export const relinkParent = (id: number | 'all') => {
+export const relinkParent = (id: number | 'all'): void => {
     document.dispatchEvent(
         new CustomEvent(RELINK_PARENT_EVT, {
             detail: {
@@ -56,8 +56,8 @@ export const relinkParent = (id: number | 'all') => {
     );
 };
 
-export const relinkParentHandler = (id: number, func: () => void) => {
-    const handler = (evt: CustomEvent) => {
+export const relinkParentHandler = (id: number, func: () => void): () => void => {
+    const handler = (evt: CustomEvent): void => {
         if (evt.detail?.id === id || evt.detail?.id === 'all') {
             func();
         }
@@ -69,7 +69,7 @@ export const relinkParentHandler = (id: number, func: () => void) => {
 /**
  * Handle new tasks added
  */
-export const tasksAdded = (tasks: ITaskOverview[]) => {
+export const tasksAdded = (tasks: ITaskOverview[]): void => {
     document.dispatchEvent(
         new CustomEvent(TASKS_ADDED_EVT, {
             detail: {
@@ -79,8 +79,8 @@ export const tasksAdded = (tasks: ITaskOverview[]) => {
     );
 };
 
-export const taskAddedHandler = (func: (tasks: ITaskOverview[]) => void) => {
-    const handler = (evt: CustomEvent) => {
+export const taskAddedHandler = (func: (tasks: ITaskOverview[]) => void): () => void => {
+    const handler = (evt: CustomEvent): void => {
         if (evt.detail && evt.detail.tasks.length > 0) {
             func(evt.detail.tasks);
         }
@@ -92,7 +92,7 @@ export const taskAddedHandler = (func: (tasks: ITaskOverview[]) => void) => {
 /**
  * Handle new tasks added
  */
-export const taskDeleted = (taskId: number) => {
+export const taskDeleted = (taskId: number): void => {
     document.dispatchEvent(
         new CustomEvent(TASKS_DELETED_EVT, {
             detail: {
@@ -102,8 +102,8 @@ export const taskDeleted = (taskId: number) => {
     );
 };
 
-export const taskDeletedHandler = (func: (taskId: number) => void) => {
-    const handler = (evt: CustomEvent) => {
+export const taskDeletedHandler = (func: (taskId: number) => void): () => void => {
+    const handler = (evt: CustomEvent): void => {
         if (evt.detail && evt.detail.taskId) {
             func(evt.detail.taskId);
         }
@@ -115,7 +115,7 @@ export const taskDeletedHandler = (func: (taskId: number) => void) => {
 /**
  * Handle task details updated
  */
-export const taskUpdated = (task: ITaskOverview) => {
+export const taskUpdated = (task: ITaskOverview): void => {
     document.dispatchEvent(
         new CustomEvent(TASK_UPDATED_EVT, {
             detail: {
@@ -125,8 +125,8 @@ export const taskUpdated = (task: ITaskOverview) => {
     );
 };
 
-export const taskUpdatedHandler = (func: (task: ITaskOverview) => void) => {
-    const handler = (evt: CustomEvent) => {
+export const taskUpdatedHandler = (func: (task: ITaskOverview) => void): () => void => {
+    const handler = (evt: CustomEvent): void => {
         if (evt.detail && evt.detail.task) {
             func(evt.detail.task);
         }
@@ -139,7 +139,7 @@ export interface IGetSubtasksProps {
     parent: ITaskOverview;
 }
 
-export const getSubtasks = (parent: ITaskOverview) => {
+export const getSubtasks = (parent: ITaskOverview): void => {
     document.dispatchEvent(
         new CustomEvent<IGetSubtasksProps>(GET_SUBTASKS_EVT, {
             detail: {
@@ -149,8 +149,8 @@ export const getSubtasks = (parent: ITaskOverview) => {
     );
 };
 
-export const getSubtasksHandler = (func: (parent: ITaskOverview) => void) => {
-    const handler = (evt: CustomEvent<IGetSubtasksProps>) => {
+export const getSubtasksHandler = (func: (parent: ITaskOverview) => void): () => void => {
+    const handler = (evt: CustomEvent<IGetSubtasksProps>): void => {
         if (evt.detail && evt.detail.parent) {
             func(evt.detail.parent);
         }
@@ -162,7 +162,7 @@ export const getSubtasksHandler = (func: (parent: ITaskOverview) => void) => {
 /**
  * Handle panel opened
  */
-export const openPanel = (panelId: string, open: boolean, props?: any) => {
+export const openPanel = (panelId: string, open: boolean, props?: {}): void => {
     document.dispatchEvent(
         new CustomEvent(PANEL_OPEN_EVT, {
             detail: {
@@ -176,9 +176,9 @@ export const openPanel = (panelId: string, open: boolean, props?: any) => {
 
 export const openPanelHandler = (
     id: string,
-    func: (open: boolean, props?: any) => void
-) => {
-    const handler = (evt: CustomEvent) => {
+    func: (open: boolean, props?: {}) => void
+): () => void => {
+    const handler = (evt: CustomEvent): void => {
         if (evt.detail && evt.detail.id === id) {
             func(evt.detail.open, evt.detail.props);
         }
@@ -194,9 +194,9 @@ export const openPanelHandler = (
 export interface ICalloutEventProps<T> extends ICalloutProps {
     visible: boolean;
     componentProps?: T;
-    RenderComponent?: React.FunctionComponent;
+    RenderComponent?: React.FunctionComponent<T>;
 }
-export const calloutVisibility = <T>(props: ICalloutEventProps<T>) => {
+export const calloutVisibility = <T>(props: ICalloutEventProps<T>): void => {
     document.dispatchEvent(
         new CustomEvent(CALLOUT_MENU_EVT, {
             detail: {
@@ -208,8 +208,8 @@ export const calloutVisibility = <T>(props: ICalloutEventProps<T>) => {
 
 export const calloutVisibilityHandler = (
     func: <T>(props: ICalloutEventProps<T>) => void
-) => {
-    const handler = (evt: CustomEvent) => {
+): () => void => {
+    const handler = (evt: CustomEvent): void => {
         if (evt.detail?.props) {
             func(evt.detail.props);
         }
@@ -234,7 +234,7 @@ export interface IDialogVisibilityProps {
     Component?: JSX.Element;
 }
 
-export const dialogVisibility = (props: IDialogVisibilityProps) => {
+export const dialogVisibility = (props: IDialogVisibilityProps): void => {
     document.dispatchEvent(
         new CustomEvent(DIALOG_EVT, {
             detail: {
@@ -246,8 +246,8 @@ export const dialogVisibility = (props: IDialogVisibilityProps) => {
 
 export const dialogVisibilityHandler = (
     func: (props: IDialogVisibilityProps) => void
-) => {
-    const handler = (evt: CustomEvent) => {
+): () => void => {
+    const handler = (evt: CustomEvent): void => {
         if (evt.detail?.props) {
             func(evt.detail.props);
         }
@@ -263,7 +263,7 @@ export interface ITimerEventOptions {
     visible: boolean;
 }
 
-export const setTimerOptions = (options: ITimerEventOptions) => {
+export const setTimerOptions = (options: ITimerEventOptions): void => {
     document.dispatchEvent(
         new CustomEvent<ITimerEventOptions>(TIMER_EVT, {
             detail: options,
@@ -271,8 +271,8 @@ export const setTimerOptions = (options: ITimerEventOptions) => {
     );
 };
 
-export const timerOptionsHandler = (func: (options: ITimerEventOptions) => void) => {
-    const handler = (evt: CustomEvent) => {
+export const timerOptionsHandler = (func: (options: ITimerEventOptions) => void): () => void => {
+    const handler = (evt: CustomEvent): void => {
         if (evt.detail) {
             func(evt.detail);
         }
@@ -285,7 +285,7 @@ export interface ITimerAddEventOptions {
     task?: ITaskOverview;
 }
 
-export const addTimer = (options: ITimerAddEventOptions) => {
+export const addTimer = (options: ITimerAddEventOptions): void => {
     document.dispatchEvent(
         new CustomEvent<ITimerAddEventOptions>(TIMER_ADD_EVT, {
             detail: options,
@@ -293,8 +293,8 @@ export const addTimer = (options: ITimerAddEventOptions) => {
     );
 }
 
-export const timerAddHandler = (func: (options: ITimerAddEventOptions) => void) => {
-    const handler = (evt: CustomEvent) => {
+export const timerAddHandler = (func: (options: ITimerAddEventOptions) => void): () => void => {
+    const handler = (evt: CustomEvent): void => {
         if (evt.detail) {
             func(evt.detail);
         }

@@ -20,7 +20,7 @@ const PriorityCellCallout: React.FC<IPriorityCellProps> = (props) => {
     const priority = useChoiceFields('Priority');
 
     const handleClick = React.useCallback(
-        (prio: any) => async () => {
+        (prio: 'None' | 'Low' | 'Medium' | 'High') => async () => {
             loadingStart();
             calloutVisibility({ visible: false });
             await taskService.updateTask(task.Id, {
@@ -47,7 +47,8 @@ const PriorityCellCallout: React.FC<IPriorityCellProps> = (props) => {
                 task.Priority.toLowerCase() === field.toLowerCase();
             return (
                 <Pill
-                    onClick={!taskDisabled && handleClick(field)}
+                    key={field}
+                    onClick={!taskDisabled && handleClick(field as 'None' | 'Low' | 'Medium' | 'High')}
                     style={{
                         height: '100%',
                         width: '100%',

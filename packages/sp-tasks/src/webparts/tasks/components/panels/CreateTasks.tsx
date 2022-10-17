@@ -168,7 +168,8 @@ const TaskTypeStep: React.FC<ICreationStepProps> = ({ wrapper, onUpdate }) => {
         []
     );
 
-    const handleChange = (ev, opt) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleChange = (_ev: any, opt: any) => {
         onUpdate(
             wrapperSetValue(wrapper, (w) => {
                 switch (opt.key) {
@@ -426,13 +427,13 @@ const TaskWizard: React.FC<ITaskWizard> = ({ wrapper, onUpdate, onCopy, onDelete
                         result.push(
                             {
                                 key: 'WeeklyDays',
-                                onRender: (w) => (
+                                onRender: (w: ICreateTaskWrapper) => (
                                     <WeeklyDaysSteps wrapper={w} onUpdate={onUpdate} />
                                 ),
                             },
                             {
                                 key: 'Transferable',
-                                onRender: (w) => (
+                                onRender: (w: ICreateTaskWrapper) => (
                                     <TransferableStep wrapper={w} onUpdate={onUpdate} />
                                 ),
                             }
@@ -442,11 +443,11 @@ const TaskWizard: React.FC<ITaskWizard> = ({ wrapper, onUpdate, onCopy, onDelete
                         result.push(
                             {
                                 key: 'MonthlyDay',
-                                onRender: (w) => <MonthlyDayStep wrapper={w} onUpdate={onUpdate} />,
+                                onRender: (w: ICreateTaskWrapper) => <MonthlyDayStep wrapper={w} onUpdate={onUpdate} />,
                             },
                             {
                                 key: 'Transferable',
-                                onRender: (w) => (
+                                onRender: (w: ICreateTaskWrapper) => (
                                     <TransferableStep wrapper={w} onUpdate={onUpdate} />
                                 ),
                             }
@@ -463,7 +464,8 @@ const TaskWizard: React.FC<ITaskWizard> = ({ wrapper, onUpdate, onCopy, onDelete
         [wrapper, onUpdate]
     );
 
-    const renderFlow = React.useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const renderFlow: any = React.useCallback(
         (
             step: ICreationStep | ((step: ICreateTaskWrapper) => ICreationStep[]),
             w: ICreateTaskWrapper
@@ -545,7 +547,7 @@ export const CreateTasks: React.FC = () => {
         });
     };
 
-    const handleSave = async () => {
+    const handleSave = async (): Promise<void> => {
         const incomplete = createdTasks.filter((w) => !w.complete);
         if (incomplete.length > 0) {
             setErrorMessage('Not all required info filled in');
@@ -578,7 +580,7 @@ export const CreateTasks: React.FC = () => {
     React.useEffect(() => {
         setPanelProperties('SP_TASKS', {
             isFooterAtBottom: true,
-            onRenderFooterContent: (_props) => (
+            onRenderFooterContent: () => (
                 <>
                     <PrimaryButton onClick={handleSave}>Save</PrimaryButton>
                     <DefaultButton

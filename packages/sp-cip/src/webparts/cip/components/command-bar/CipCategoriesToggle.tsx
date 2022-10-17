@@ -27,7 +27,7 @@ export const CipCategoriesToggle: React.FC<ICipCategoriesToggleProps> = (props) 
             offText="Categories"
             inlineLabel
             checked={value}
-            onChange={(ev: any, checked: boolean) => setValue(checked)}
+            onChange={(_ev: {}, checked: boolean) => setValue(checked)}
         />
     );
 };

@@ -46,7 +46,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
     protected async onInit(): Promise<void> {
         initNotifications();
 
-        const tennats = {};
+        const tennats: { [key: string]: string } = {};
         this.properties.config?.remotes?.forEach(
             (s) => (tennats[s.Name] = s.ListRoot)
         );

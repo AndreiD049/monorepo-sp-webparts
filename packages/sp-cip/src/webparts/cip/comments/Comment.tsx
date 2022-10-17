@@ -28,7 +28,7 @@ const CommentHeader: React.FC<ICommentHeaderProps> = (props) => {
     const { currentUser } = React.useContext(GlobalContext);
     const user = props.comment.User || props.comment.Author;
     const isCurrentUserComment = user.Id === currentUser?.Id;
-    const handleClick = async () => {
+    const handleClick = async (): Promise<void> => {
         if (props.edit && isCurrentUserComment) {
             await props.onEdit();
             props.setEdit(false);
@@ -77,7 +77,7 @@ const CommentBody: React.FC<ICommentBodyProps> = (props) => {
             <TextField
                 multiline
                 value={props.newValue}
-                onChange={(_e: any, newValue: string) =>
+                onChange={(_e: {}, newValue: string) =>
                     props.setNewValue(newValue)
                 }
                 autoAdjustHeight
@@ -86,7 +86,7 @@ const CommentBody: React.FC<ICommentBodyProps> = (props) => {
         );
     }
 
-    return <div className={styles['comments__content']}>{content}</div>;
+    return <div className={styles.comments__content}>{content}</div>;
 };
 
 export const Comment: React.FC<ICommentProps> = (props) => {
@@ -107,6 +107,7 @@ export const Comment: React.FC<ICommentProps> = (props) => {
             key: props.comment.Id,
             activityDescription: [
                 <CommentHeader
+                    key={props.comment.Id}
                     comment={props.comment}
                     edit={edit}
                     setEdit={setEdit}

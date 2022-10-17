@@ -14,7 +14,7 @@ import { CommentCell } from './CommentCell';
 import { TaskCell } from './TaskCell';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
-export function useColumns(tasks: ITaskOverview[], handleEdit: (action: IAction, task?: ITaskOverview) => void) {
+export function useColumns(tasks: ITaskOverview[], handleEdit: (action: IAction, task?: ITaskOverview) => void): IColumn[] {
     const { currentUser } = React.useContext(GlobalContext);
 
     const columns: IColumn[] = React.useMemo(() => {

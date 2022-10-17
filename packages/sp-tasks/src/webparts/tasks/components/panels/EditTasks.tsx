@@ -9,7 +9,6 @@ import {
     DetailsRow,
     enableBodyScroll,
     IColumn,
-    IComboBoxOption,
     IconButton,
     IDetailsRowProps,
     IStyle,
@@ -77,16 +76,17 @@ const TextCell: React.FC<ITaskCellProps & { textProps?: ITextFieldProps }> = ({
         return (
             <TextField
                 {...textProps}
-                value={wrapper.item[fieldName]}
+                value={wrapper.item[fieldName as keyof ITask] as string}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onChange={(_ev: any, newVal: string) => {
                     return onUpdate(
-                        cloneWrapperSetItem(wrapper, (w) => (w.item[fieldName] = newVal), fieldName)
+                        cloneWrapperSetItem(wrapper, (w) => ((w.item[fieldName as keyof ITask] as string) = newVal), fieldName)
                     );
                 }}
             />
         );
     }
-    return <Text variant="medium">{wrapper.item[fieldName]}</Text>;
+    return <Text variant="medium">{wrapper.item[fieldName as keyof ITask]}</Text>;
 };
 
 const TimeCell: React.FC<ITaskCellProps> = ({ wrapper, onUpdate }) => {
@@ -159,7 +159,7 @@ const TimeCell: React.FC<ITaskCellProps> = ({ wrapper, onUpdate }) => {
 };
 
 const ActiveDateCell: React.FC<ITaskCellProps> = ({ wrapper, onUpdate, fieldName }) => {
-    const dt = DateTime.fromISO(wrapper.item[fieldName]);
+    const dt = DateTime.fromISO(wrapper.item[fieldName as keyof ITask] as string);
     if (wrapper.editable) {
         return (
             <DatePicker
@@ -171,7 +171,7 @@ const ActiveDateCell: React.FC<ITaskCellProps> = ({ wrapper, onUpdate, fieldName
                     return onUpdate(
                         cloneWrapperSetItem(
                             wrapper,
-                            (w) => (w.item[fieldName] = date.toISOString()),
+                            (w) => ((w.item[fieldName as keyof ITask] as string) = date.toISOString()),
                             fieldName
                         )
                     );
@@ -188,13 +188,6 @@ const SelectUserCell: React.FC<ITaskCellProps> = ({ wrapper, onUpdate }) => {
     const userList = React.useMemo(() => {
         return [...teamMembers.All, currentUser];
     }, [teamMembers, currentUser]);
-
-    const userOptions: IComboBoxOption[] = React.useMemo(() => {
-        return userList.map((u) => ({
-            key: u.User.ID,
-            text: u.User.Title,
-        }));
-    }, [userList, wrapper]);
 
     if (wrapper.editable) {
         return (
@@ -380,7 +373,7 @@ export const EditTasks: React.FC<IEditTasksProps> = (props) => {
         setPanelProperties('SP_TASKS', {
             headerText: 'Edit tasks',
             isFooterAtBottom: true,
-            onRenderFooterContent: (_props) => (
+            onRenderFooterContent: () => (
                 <>
                     <PrimaryButton disabled={overlappingIndexes.length > 0} onClick={handleSave}>Save</PrimaryButton>
                     <DefaultButton
@@ -463,7 +456,7 @@ export const EditTasks: React.FC<IEditTasksProps> = (props) => {
                 minWidth: 200,
                 name: 'Assigned to',
                 onRender: (item, idx) => (
-                    <SelectUserCell wrapper={item} onUpdate={handleUpdate(idx)}></SelectUserCell>
+                    <SelectUserCell key={item.id} wrapper={item} onUpdate={handleUpdate(idx)} />
                 ),
             },
             {

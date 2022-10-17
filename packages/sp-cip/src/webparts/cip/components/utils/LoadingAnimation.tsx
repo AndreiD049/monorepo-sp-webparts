@@ -8,7 +8,7 @@ export interface ILoadingEventDetail {
     id: string;
 }
 
-const dispatch = (id: string, val: boolean) => {
+const dispatch = (id: string, val: boolean): void => {
     document.dispatchEvent(
         new CustomEvent<ILoadingEventDetail>(LOADING_ANIMATION_EVENT, {
             detail: {
@@ -19,15 +19,16 @@ const dispatch = (id: string, val: boolean) => {
     );
 };
 
-export const loadingStart = (id: string = "default") => {
+export const loadingStart = (id: string = "default"): void => {
     dispatch(id, true);
 };
 
-export const loadingStop = (id: string = "default") => {
+export const loadingStop = (id: string = "default"): void => {
     dispatch(id, false);
 };
 
-export const withLoading = async (id: string, func: () => any) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const withLoading = async (id: string, func: () => any): Promise<void> => {
     try {
         loadingStart(id);
         await func();
@@ -45,7 +46,7 @@ export const LoadingAnimation: React.FC<ILoadingAnimationProps> = (props) => {
     const [visible, setVisible] = React.useState(props.initialOpen || false);
 
     React.useEffect(() => {
-        function handler(e: CustomEvent<ILoadingEventDetail>) {
+        function handler(e: CustomEvent<ILoadingEventDetail>): void {
             if (props.elementId === e.detail.id) {
                 setVisible(e.detail.isVisible);
             }

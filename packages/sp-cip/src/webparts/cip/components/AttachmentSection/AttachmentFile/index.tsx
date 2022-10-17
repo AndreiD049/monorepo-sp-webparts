@@ -19,7 +19,7 @@ export interface IAttachmentFileProps {
     onDelete: (file: IAttachmentFile) => void;
 }
 
-const getFileIconName = (name: string) => {
+const getFileIconName = (name: string): string => {
     const tokens = name.split('.');
     const extension = tokens[tokens.length - 1].toLowerCase();
     switch (extension) {
@@ -79,7 +79,7 @@ const getFileIconName = (name: string) => {
     }
 };
 
-const getRootSite = (serverRelativeUrl: string, libraryName: string) => {
+const getRootSite = (serverRelativeUrl: string, libraryName: string): string => {
     const rootSiteParts = serverRelativeUrl.split('/');
     const libraryIndex = rootSiteParts.indexOf(libraryName);
     return rootSiteParts.slice(0, libraryIndex + 1).join('/');

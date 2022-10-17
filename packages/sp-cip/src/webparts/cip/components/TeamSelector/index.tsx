@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Dropdown } from 'office-ui-fabric-react';
-import styles from './TeamSelector.module.scss';
 
 export interface ITeamSelectorProps<T>
     extends React.HTMLAttributes<HTMLElement> {
@@ -15,7 +14,7 @@ export function TeamSelector<T>({
     style,
     className,
     ...props
-}: ITeamSelectorProps<T>) {
+}: ITeamSelectorProps<T>): JSX.Element {
     const options = React.useMemo(() => {
         return props.items.map((i) => ({
             key: props.getTeamId(i),

@@ -33,7 +33,7 @@ const Cip: React.FC<ICipProps> = (props) => {
     const userService = MainService.getUserService();
 
     React.useEffect(() => {
-        async function run() {
+        async function run(): Promise<void> {
             const teams = await userService.getTeams();
             const currentUser = await userService.getCurrentUser();
             setInfo((prev) => ({
@@ -42,7 +42,7 @@ const Cip: React.FC<ICipProps> = (props) => {
                 currentUser,
             }));
         }
-        run();
+        run().catch((err) => console.error(err));
     }, []);
 
     return (

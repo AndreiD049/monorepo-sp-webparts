@@ -2,7 +2,7 @@ import { MINUTE_DURATION, HOUR } from './constants';
 
 const hoursRg = /(\d{1,2}):?(\d{1,2})/;
 
-export const formatHours = (value: number) => {
+export const formatHours = (value: number): string => {
     if (value === 0) return '0';
     const hours = Math.floor(value);
     const min = Math.round((value % 1) / MINUTE_DURATION);

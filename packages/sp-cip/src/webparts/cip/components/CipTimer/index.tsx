@@ -15,7 +15,6 @@ import { DIALOG_IDS, getDialog } from '../AlertDialog';
 import { ButtonType } from 'office-ui-fabric-react';
 import { TimeLogGeneral } from '../TimeLogGeneral';
 import { GlobalContext } from '../../utils/GlobalContext';
-import styles from './CipTimer.module.scss';
 
 export interface ICipTimerProps {
     // Props go here
@@ -54,7 +53,7 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
 
     /** Setup dom events for showing and hiding the timer */
     React.useEffect(() => {
-        async function fetchData() {
+        async function fetchData(): Promise<void> {
             const service = MainService.getTaskService();
             const tasks = await cache.allTasks.get(() => service.getAll());
             setTasks(tasks.filter((t) => !t.FinishDate));

@@ -11,7 +11,7 @@ export interface IActionLogProps {
 
 export const UPDATE_ACTION_EVENT = 'SP-CIP-UPDATE-ACTION';
 
-export const actionUpdated = (a: IAction) => {
+export const actionUpdated = (a: IAction): void => {
     document.dispatchEvent(
         new CustomEvent(UPDATE_ACTION_EVENT, {
             detail: {
@@ -26,8 +26,8 @@ export const ActionLog: React.FC<IActionLogProps> = (props) => {
     const [actions, setActions] = React.useState<IAction[]>([]);
 
     const [grouped, dates] = React.useMemo(() => {
-        const result = {};
-        const dates = [];
+        const result: { [key: string]: IAction[] } = {};
+        const dates: Date[] = [];
         actions.forEach((action) => {
             const date = new Date(action.Date || action.Created);
             const dateString = date.toLocaleDateString();
@@ -43,13 +43,13 @@ export const ActionLog: React.FC<IActionLogProps> = (props) => {
 
     React.useEffect(() => {
         if (props.task?.Id) {
-            actionService.getActions(props.task.Id).then((a) => setActions(a));
+            actionService.getActions(props.task.Id).then((a) => setActions(a)).catch((err) => console.error(err));
         }
     }, [props.task]);
 
     /** Dom event to update actions */
     React.useEffect(() => {
-        function handler(ev: CustomEvent) {
+        function handler(ev: CustomEvent): void {
             const { action } = ev.detail;
             setActions((prev) =>
                 prev.map((a) => a.Id === action.Id ? action : a)

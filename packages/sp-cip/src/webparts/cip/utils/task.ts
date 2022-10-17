@@ -3,7 +3,7 @@ import MainService from '../services/main-service';
 import { SPnotify } from 'sp-react-notifications';
 import { MessageBarType } from "office-ui-fabric-react";
 
-export async function finishTask(task: ITaskOverview, currentUserId: number, status: string = 'Finished') {
+export async function finishTask(task: ITaskOverview, currentUserId: number, status: string = 'Finished'): Promise<ITaskOverview> {
     /* user should first register some time */
     if (task.EffectiveTime === 0 && task.Subtasks === 0 && status === 'Finished') {
         SPnotify({

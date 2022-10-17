@@ -60,7 +60,7 @@ export function getSortedTaskList(
     userId: number,
     customSorting: ICustomSorting = {}
 ): (ITask | ITaskLog)[] {
-    let result: (ITask | ITaskLog)[] = [...taskLogs, ...tasks];
+    const result: (ITask | ITaskLog)[] = [...taskLogs, ...tasks];
     result.sort((a, b) => {
         const dtA = DateTime.fromISO(getTime(a)).toISOTime();
         const dtB = DateTime.fromISO(getTime(b)).toISOTime();
@@ -128,15 +128,15 @@ export async function checkTasksAndCreateTaskLogs(
     date: Date,
     logService: TaskLogsService
 ) {
-    let missing: ITask[] = [];
-    let logSet = new Set(logs.map((log) => log.Task.ID));
+    const missing: ITask[] = [];
+    const logSet = new Set(logs.map((log) => log.Task.ID));
     tasks.forEach((task) => {
         if (!logSet.has(task.ID)) {
             missing.push(task);
         }
     });
     const results = await logService.createTaskLogs(missing, date);
-    let newLogs = results.length === 0 ? [] : await logService.getTaskLogsFromAddResult(results);
+    const newLogs = results.length === 0 ? [] : await logService.getTaskLogsFromAddResult(results);
     return newLogs;
 }
 

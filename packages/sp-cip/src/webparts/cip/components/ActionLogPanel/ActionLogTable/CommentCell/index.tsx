@@ -1,5 +1,4 @@
 import { IAction } from '@service/sp-cip/dist/services/action-service';
-import { Icon } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { getActionComment } from '../../../../actionlog/ActionLogItem';
 import styles from './CommentCell.module.scss';

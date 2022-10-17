@@ -49,7 +49,7 @@ export const StatusCellCallout: React.FC<IStatusCellProps> = ({ node }) => {
     }, [node]);
 
     return (<div className={`${styles.callout} ${styles['center-content']}`}>
-            {choices.map((choice) => <Pill onClick={handleClick(choice)} value={choice} />)}
+            {choices.map((choice) => <Pill key={choice} onClick={handleClick(choice)} value={choice} />)}
     </div>);
 };
 

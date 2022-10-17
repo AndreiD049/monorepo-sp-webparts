@@ -29,6 +29,7 @@ interface ICipCommandBarProps {
 const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
     const { properties, teams, selectedTeam } = React.useContext(GlobalContext);
     const handleSearch = React.useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         debounce((_ev: any, value: string) => {
             props.onSearch(value);
             relinkParent('all');

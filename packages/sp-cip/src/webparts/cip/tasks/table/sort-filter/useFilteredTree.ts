@@ -5,7 +5,7 @@ import { TaskNode } from '../../graph/TaskNode';
 import { ICipFilters } from './filters-reducer';
 import { getColumnSortingFunc } from './sorting';
 
-const searchFunc = (node: TaskNode, search: string) => {
+const searchFunc = (node: TaskNode, search: string): boolean => {
     const task = node.getTask();
     const nSearch = search.toLowerCase();
     return (
@@ -18,7 +18,7 @@ export const useFilteredTree = (
     tasks: ITaskOverview[],
     filters: ICipFilters,
     showCategories: boolean
-) => {
+): { tree: TaskNode } => {
     const tree = React.useMemo(() => {
         return createTaskTree(tasks);
     }, [tasks, filters]);

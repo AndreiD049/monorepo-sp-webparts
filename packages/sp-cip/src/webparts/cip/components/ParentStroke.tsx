@@ -3,7 +3,7 @@ import { TaskNode } from '../tasks/graph/TaskNode';
 import { relinkParentHandler } from '../utils/dom-events';
 import styles from './Cip.module.scss';
 
-const getConnectingStroke = (from: HTMLElement, to: HTMLElement, prev :HTMLElement) => {
+const getConnectingStroke = (from: HTMLElement, to: HTMLElement, prev :HTMLElement): JSX.Element => {
     const hasPrev = prev !== from;
     const fromRect = from.getBoundingClientRect();
     const toRect = to.getBoundingClientRect();
@@ -33,12 +33,12 @@ const getConnectingStroke = (from: HTMLElement, to: HTMLElement, prev :HTMLEleme
     );
 };
 
-const useParentStroke = (node: TaskNode) => {
+const useParentStroke = (node: TaskNode): JSX.Element => {
     const task = node.getTask();
     const [elem, setElem] = React.useState(null);
 
     React.useEffect(() => {
-        function linkElements() {
+        function linkElements(): void {
             setElem(null);
             setTimeout(() => {
                 if (task.ParentId) {

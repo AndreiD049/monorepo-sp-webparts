@@ -7,7 +7,7 @@ import { nodeSetOpen } from '../../utils/dom-events';
 import styles from './RelativeTasks.module.scss';
 
 export interface IRelativeTasksProps {
-    task: ITaskOverview | null;
+    task: ITaskOverview | undefined;
     onDismiss: () => void;
 }
 
@@ -25,7 +25,7 @@ export const RelativeTasks: React.FC<IRelativeTasksProps> = (props) => {
     const navigate = useNavigate();
 
     React.useEffect(() => {
-        async function run() {
+        async function run(): Promise<void> {
             let parent = null;
             if (props.task.ParentId) {
                 parent = await taskService.getTask(props.task.ParentId);
@@ -46,7 +46,7 @@ export const RelativeTasks: React.FC<IRelativeTasksProps> = (props) => {
         <Label>Relatives:</Label>
     );
 
-    const handleNavigate = (url: string) => {
+    const handleNavigate = (url: string): void => {
         props.onDismiss();
         setTimeout(() => navigate(url), 200);
     };

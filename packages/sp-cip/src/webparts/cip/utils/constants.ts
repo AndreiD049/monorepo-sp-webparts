@@ -22,7 +22,7 @@ export const TIMER_EVT = 'sp-cip-timer-event';
 export const TIMER_ADD_EVT = 'sp-cip-timer-add-event';
 export const TIMER_VISIBLE_KEY = `sp-cip-timer-visible/${VERSION}`;
 export const TIMER_RIGHT_POSITION = 'sp-cip-timer-right-pos';
-export const TIMERS_KEY = (root: string) => `${root}/cip-timers/${VERSION}`;
+export const TIMERS_KEY = (root: string): string => `${root}/cip-timers/${VERSION}`;
 export const FILTERS_ASSIGNED = 'sp-cip-filter-assigned-to';
 
 export const DB_NAME = 'SPFx_CIP';

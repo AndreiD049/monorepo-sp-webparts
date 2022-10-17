@@ -29,17 +29,18 @@ export class UserService {
         this.teamsField = properties.config?.teamsList.fieldName;
     }
 
-    async getAll() {
+    async getAll(): Promise<ISiteUserInfo[]> {
         return cache.all.get(() => this.sp.web.siteUsers());
     }
 
-    async getCustomListUsers() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async getCustomListUsers(): Promise<any[]> {
         return cache.allCustomList.get(() => this.usersList.items
             .select('Id', 'User/Id', 'User/Title', 'User/EMail')
             .expand('User')());
     }
 
-    async getUser(id: number) {
+    async getUser(id: number): Promise<ISiteUserInfo> {
         return cache.user(id).get(() => this.sp.web.siteUsers.getById(id)());
     }
 
@@ -47,7 +48,7 @@ export class UserService {
         return this.sp.web.currentUser();
     }
 
-    async getTeams() {
+    async getTeams(): Promise<string[]> {
         const teamsField = await cache.teams.get(() =>
             this.usersList.fields.getByTitle(this.teamsField)()
         );

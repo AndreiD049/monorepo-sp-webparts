@@ -44,11 +44,11 @@ export interface ITimerProps<T> {
     getTaskId?: (task: T) => number | string;
 }
 
-export const Timer = <T,>(props: React.PropsWithChildren<ITimerProps<T>>) => {
+export const Timer = <T,>(props: React.PropsWithChildren<ITimerProps<T>>): JSX.Element => {
     const [_timers, setTimers] = React.useState<ITimer<T>[]>([]);
     const timers = props.timers || _timers;
 
-    const handleAddTimer = () => {
+    const handleAddTimer = (): void => {
         const timer = {
             id: Guid.newGuid().toString(),
             duration: 0,
@@ -71,6 +71,7 @@ export const Timer = <T,>(props: React.PropsWithChildren<ITimerProps<T>>) => {
         }
     };
 
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     const handleToggleTimer = (id: string, pause: boolean) => {
         if (!props.timers) {
             setTimers((prev) =>

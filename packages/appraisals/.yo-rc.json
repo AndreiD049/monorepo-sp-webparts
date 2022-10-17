@@ -3,7 +3,7 @@
         "plusBeta": false,
         "isCreatingSolution": true,
         "environment": "spo",
-        "version": "1.14.0",
+        "version": "1.15.2",
         "libraryName": "appraisals",
         "libraryId": "50fd184d-3a90-4f1c-b09a-d776e20bb3db",
         "packageManager": "npm",

@@ -1,4 +1,4 @@
-import { Persona, PersonaSize, Text } from 'office-ui-fabric-react';
+import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import Timing from './Timing';
 import { TaskNode } from '../graph/TaskNode';
@@ -10,6 +10,7 @@ import { TeamCell } from './TeamCell';
 import { TitleCell } from './TitleCell';
 import PriorityCell from './PriorityCell';
 import ResponsibleCell from './ResponsibleCell';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 interface IRenderCellProps {
     fieldName: string;
@@ -41,7 +42,7 @@ export const RenderCell: React.FC<IRenderCellProps> = (props) => {
         default:
             return (
                 <Text variant="medium" block>
-                    {props.node.getTask()[props.fieldName] + ''}
+                    {props.node.getTask()[props.fieldName as keyof ITaskOverview] + ''}
                 </Text>
             );
     }

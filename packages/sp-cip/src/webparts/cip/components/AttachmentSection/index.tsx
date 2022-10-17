@@ -49,7 +49,7 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
 
     // Fetch Data
     React.useEffect(() => {
-        async function run() {
+        async function run(): Promise<void> {
             loadingStart('details');
             const fullPath = path.join('/');
             const result = await attachmentService.getAttachments(
@@ -70,7 +70,7 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
             }
             loadingStop('details');
         }
-        run();
+        run().catch((err) => console.error(err));
     }, [path]);
 
     /**
@@ -99,7 +99,7 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
     }, [serverRelativeUrl]);
 
     /** Attach via button */
-    const handleAttach = async (files: File[]) => {
+    const handleAttach = async (files: File[]): Promise<void> => {
         try {
             loadingStart('details');
             await handleSync();
@@ -124,8 +124,8 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
 
     /** Attach by dropping */ 
     const handleDrop =
-        (currentPath: string[] = path) =>
-        async (data: IDragData<any>) => {
+        (currentPath: string[] = path): (data: IDragData<IAttachmentFile>) => void =>
+        async (data: IDragData<IAttachmentFile>) => {
             if (!data.files.length) return;
             try {
                 loadingStart('details');
@@ -151,7 +151,7 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
 
     // Move file by dragging
     const handleFileMove =
-        (folder: string) => async (data: IDragData<IAttachmentFile>) => {
+        (folder: string): (data: IDragData<IAttachmentFile>) => Promise<void> => async (data: IDragData<IAttachmentFile>) => {
             try {
                 loadingStart('details');
                 if (data.files.length) return;
@@ -160,7 +160,6 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
                 const pathFrom = attachment.ServerRelativeUrl;
                 const movedPath = getMovedPath(pathFrom, folder);
                 await attachmentService.moveAttachment(pathFrom, movedPath);
-                const pathFromTokens = pathFrom.split(PATH_SEP);
                 setPath((prev) => [...prev]);
                 setAttachments((att) =>
                     att.filter((a) => a.UniqueId !== attachment.UniqueId)

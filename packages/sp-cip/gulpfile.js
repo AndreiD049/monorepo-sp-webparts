@@ -1,7 +1,10 @@
 'use strict';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const build = require('@microsoft/sp-build-web');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path');
 
 build.addSuppression(
@@ -26,12 +29,19 @@ build.configureWebpack.mergeConfig({
         generatedConfiguration.resolve.alias = {
             ...generatedConfiguration.resolve.alias,
             'office-ui-fabric-react': path.resolve(
+                // eslint-disable-next-line no-undef
                 __dirname,
                 'node_modules/office-ui-fabric-react/'
             ),
             '@microsoft/load-themed-styles': path.resolve(
+                // eslint-disable-next-line no-undef
                 __dirname,
                 'node_modules/@microsoft/load-themed-styles/'
+            ),
+            'tslib': path.resolve(
+                // eslint-disable-next-line no-undef
+                __dirname,
+                'node_modules/tslib/'
             ),
         };
         return generatedConfiguration;

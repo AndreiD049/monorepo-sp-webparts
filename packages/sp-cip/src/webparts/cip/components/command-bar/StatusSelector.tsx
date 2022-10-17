@@ -19,7 +19,8 @@ export const CipStatusSelector: React.FC<ICipStatusSelectorProps> = (props) => {
         { key: 'sp-cip-status-selected' }
     );
 
-    const handleSelectedChange = (ev, opt: IDropdownOption) => {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    const handleSelectedChange = (_ev: {}, opt: IDropdownOption) => {
         setSelected(+opt.key);
     };
 

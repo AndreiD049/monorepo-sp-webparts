@@ -22,13 +22,13 @@ export const LinkRemoteDialog: React.FC<ILinkRemoteDialogProps> = (props) => {
     }, [properties]);
 
     React.useEffect(() => {
-        async function run() {
+        async function run(): Promise<void> {
             if (selectedRemote) {
                 const taskService = MainService.getTaskService(selectedRemote?.Name);
                 setRemoteItems(await taskService.getAllMains());
             }
-        };
-        run();
+        }
+        run().catch((err) => console.error(err));
     }, [selectedRemote]);
 
     return (
@@ -40,7 +40,7 @@ export const LinkRemoteDialog: React.FC<ILinkRemoteDialogProps> = (props) => {
                 onChange={(ev, opt) => setSelectedRemote(opt.data)}
             />
             {
-                remoteItems.map((i) => (<div>{i.Title}</div>))
+                remoteItems.map((i) => (<div key={i.Title}>{i.Title}</div>))
             }
         </div>
     );

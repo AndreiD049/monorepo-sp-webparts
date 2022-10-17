@@ -30,7 +30,7 @@ const Task: FC<ITaskProps> = (props) => {
     const [expired, setExpired] = React.useState<boolean>(false);
     const [isHovering, setIsHovering] = React.useState<boolean>(false);
 
-    let info: ITaskInfo = React.useMemo(() => {
+    const info: ITaskInfo = React.useMemo(() => {
         if (isTask(props.task)) {
             return {
                 description: props.task.Description,
@@ -82,6 +82,7 @@ const Task: FC<ITaskProps> = (props) => {
         return () => clearInterval(timer);
     }, [info, props.task]);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleChange = async (_: any, option: IDropdownOption) => {
         const log: ITaskLog = !isTask(props.task)
             ? props.task

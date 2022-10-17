@@ -7,7 +7,6 @@ import {
     PivotItem,
     Stack,
     StackItem,
-    Text,
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
@@ -49,7 +48,7 @@ export const TaskDetails: React.FC = () => {
     });
 
     React.useEffect(() => {
-        async function run() {
+        async function run(): Promise<void> {
             // if we have a task already, just skip it
             if (task) return null;
             loadingStart('details');

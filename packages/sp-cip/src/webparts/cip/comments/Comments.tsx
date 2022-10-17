@@ -44,7 +44,7 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
         setTaskComments((prev) => [synced, ...prev]);
     }, [newComment]);
 
-    const handleEditComment = async (id: number) => {
+    const handleEditComment = async (id: number): Promise<void> => {
         const updated = await commentService.getComment(id);
         setTaskComments((prev) => prev.map((p) => p.Id === id ? updated : p));
     }
@@ -53,7 +53,7 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
         commentService.getByTaskPaged(props.task, 5).then((p) => {
             setTaskComments(p.results);
             setCommentPager(p)
-        });
+        }).catch((err) => console.log(err));
     }, []);
 
     return (

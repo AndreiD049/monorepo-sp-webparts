@@ -3,7 +3,6 @@ import {
     SpinButton,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { MINUTE_DURATION } from '../utils/constants';
 import { formatHours, validateHours } from '../utils/hours-duration';
 import styles from './HoursInput.module.scss';
 
@@ -26,7 +25,7 @@ export interface IHoursInputProps {
  * Below the input, a set of buttons will be added to ease insertion of numbers
  */
 export const HoursInput: React.FC<IHoursInputProps> = (props) => {
-    const handleButtonClick = (buttonVal: number) => (ev: React.MouseEvent) => {
+    const handleButtonClick = (buttonVal: number): (ev: React.MouseEvent) => void => (ev: React.MouseEvent) => {
         ev.preventDefault();
         const result = props.value + buttonVal;
         if (result > 0) {
@@ -36,7 +35,7 @@ export const HoursInput: React.FC<IHoursInputProps> = (props) => {
         }
     }
 
-    const handleValidate = (val: string) => {
+    const handleValidate = (val: string): string => {
         const valNumber = validateHours(val);
         console.log(valNumber);
         props.onChange(valNumber);
@@ -44,7 +43,7 @@ export const HoursInput: React.FC<IHoursInputProps> = (props) => {
     }
 
     return (
-        <div className={styles['input']}>
+        <div className={styles.input}>
             <SpinButton
                 labelPosition={Position.top}
                 label={props.label}
@@ -56,12 +55,12 @@ export const HoursInput: React.FC<IHoursInputProps> = (props) => {
             />
             <div className={styles['input__button-wrapper']}>
                 {props.buttons.filter((b) => b.value > 0).map((button) => (
-                    <button tabIndex={-1} className={styles['input__button']} onClick={handleButtonClick(button.value)}>{button.label}</button>
+                    <button key={button.value} tabIndex={-1} className={styles.input__button} onClick={handleButtonClick(button.value)}>{button.label}</button>
                 ))}
             </div>
             <div className={styles['input__button-wrapper']}>
                 {props.buttons.filter((b) => b.value < 0).map((button) => (
-                    <button tabIndex={-1} type="button" key={button.key} className={styles['input__button']} onClick={handleButtonClick(button.value)}>{button.label}</button>
+                    <button tabIndex={-1} type="button" key={button.key} className={styles.input__button} onClick={handleButtonClick(button.value)}>{button.label}</button>
                 ))}
             </div>
         </div>

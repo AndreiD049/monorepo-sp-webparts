@@ -1,4 +1,3 @@
-import { ISiteUserInfo } from 'sp-preset';
 import * as React from 'react';
 import { IUser } from '../models/IUser';
 import TaskLogsService from '../services/tasklogs';

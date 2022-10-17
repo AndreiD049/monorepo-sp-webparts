@@ -68,7 +68,7 @@ const defaultCalendarStrings = {
     dayMarkedAriaLabel: 'marked',
 };
 
-const DueDateCellCallout = (props) => {
+const DueDateCellCallout = (props: { node: TaskNode }): JSX.Element => {
     const { currentUser } = React.useContext(GlobalContext);
     const task: ITaskOverview = props.node.getTask();
     const taskService = MainService.getTaskService();
@@ -113,7 +113,7 @@ const DueDateCellCallout = (props) => {
     );
 };
 
-export const DueDateCell = ({ node }: { node: TaskNode }) => {
+export const DueDateCell = ({ node }: { node: TaskNode }): JSX.Element => {
     const { isTaskFinished } = React.useContext(TaskNodeContext);
     const task = node.getTask();
     const textRef = React.useRef(null);

@@ -6,7 +6,7 @@ import {
 import { SPnotify } from 'sp-react-notifications';
 import { ICipWebPartProps } from '../CipWebPart';
 
-export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
+export default async function setupLists(sp: SPFI, props: ICipWebPartProps): Promise<void> {
     /**
      * Comment list
      */
@@ -59,37 +59,37 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         const view = await commentList.list.defaultView();
         await commentList.list.defaultView.setViewXml(
             `<View 
-                Name=\"${view.Id}\" 
-                DefaultView=\"TRUE\" 
-                MobileView=\"TRUE\" 
-                MobileDefaultView=\"TRUE\" 
-                Type=\"HTML\" 
-                DisplayName=\"All Items\" 
-                Url=\"${view.ServerRelativeUrl}\" 
-                Level=\"1\" 
-                BaseViewID=\"1\" 
-                ContentTypeID=\"0x\" 
-                ImageUrl=\"${view.ImageUrl}\">
+                Name="${view.Id}" 
+                DefaultView="TRUE" 
+                MobileView="TRUE" 
+                MobileDefaultView="TRUE" 
+                Type="HTML" 
+                DisplayName="All Items" 
+                Url="${view.ServerRelativeUrl}" 
+                Level="1" 
+                BaseViewID="1" 
+                ContentTypeID="0x" 
+                ImageUrl="${view.ImageUrl}">
                     <Query>
                         <OrderBy>
-                            <FieldRef Name=\"ID\"/>
+                            <FieldRef Name="ID"/>
                         </OrderBy>
                     </Query>
                     <ViewFields>
-                        <FieldRef Name=\"LinkTitle\"/>
-                        <FieldRef Name=\"${listId.data.InternalName}\"/>
-                        <FieldRef Name=\"${itemId.data.InternalName}\"/>
-                        <FieldRef Name=\"${comment.data.InternalName}\"/>
-                        <FieldRef Name=\"${activityType.data.InternalName}\"/>
-                        <FieldRef Name=\"${user.data.InternalName}\"/>
-                        <FieldRef Name=\"${date.data.InternalName}\"/>
-                        <FieldRef Name=\"Author\"/>
-                        <FieldRef Name=\"Created\"/>
+                        <FieldRef Name="LinkTitle"/>
+                        <FieldRef Name="${listId.data.InternalName}"/>
+                        <FieldRef Name="${itemId.data.InternalName}"/>
+                        <FieldRef Name="${comment.data.InternalName}"/>
+                        <FieldRef Name="${activityType.data.InternalName}"/>
+                        <FieldRef Name="${user.data.InternalName}"/>
+                        <FieldRef Name="${date.data.InternalName}"/>
+                        <FieldRef Name="Author"/>
+                        <FieldRef Name="Created"/>
                     </ViewFields>
-                    <RowLimit Paged=\"TRUE\">30</RowLimit>
+                    <RowLimit Paged="TRUE">30</RowLimit>
                     <JSLink>clienttemplates.js</JSLink>
-                    <XslLink Default=\"TRUE\">main.xsl</XslLink>
-                    <Toolbar Type=\"Standard\"/>
+                    <XslLink Default="TRUE">main.xsl</XslLink>
+                    <Toolbar Type="Standard"/>
                     <ViewType2>COMPACTLIST</ViewType2>
             </View>`
         );
@@ -217,44 +217,44 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         const view = await list.defaultView();
         await list.defaultView.setViewXml(
             `<View 
-                Name=\"${view.Id}\" 
-                DefaultView=\"TRUE\" 
-                MobileView=\"TRUE\" 
-                MobileDefaultView=\"TRUE\" 
-                Type=\"HTML\" 
-                DisplayName=\"All Items\" 
-                Url=\"${view.ServerRelativeUrl}\" 
-                Level=\"1\" 
-                BaseViewID=\"1\" 
-                ContentTypeID=\"0x\" 
-                ImageUrl=\"${view.ImageUrl}\">
+                Name="${view.Id}" 
+                DefaultView="TRUE" 
+                MobileView="TRUE" 
+                MobileDefaultView="TRUE" 
+                Type="HTML" 
+                DisplayName="All Items" 
+                Url="${view.ServerRelativeUrl}" 
+                Level="1" 
+                BaseViewID="1" 
+                ContentTypeID="0x" 
+                ImageUrl="${view.ImageUrl}">
                     <Query>
                         <OrderBy>
-                            <FieldRef Name=\"ID\"/>
+                            <FieldRef Name="ID"/>
                         </OrderBy>
                     </Query>
                     <ViewFields>
-                        <FieldRef Name=\"LinkTitle\"/>
-                        <FieldRef Name=\"${description.data.InternalName}\"/>
-                        <FieldRef Name=\"${responsible.data.InternalName}\"/>
-                        <FieldRef Name=\"${team.data.InternalName}\"/>
-                        <FieldRef Name=\"${status.data.InternalName}\"/>
-                        <FieldRef Name=\"${priority.data.InternalName}\"/>
-                        <FieldRef Name=\"${startDate.data.InternalName}\"/>
-                        <FieldRef Name=\"${finishDate.data.InternalName}\"/>
-                        <FieldRef Name=\"${dueDate.data.InternalName}\"/>
-                        <FieldRef Name=\"${progress.data.InternalName}\"/>
-                        <FieldRef Name=\"${estimated.data.InternalName}\"/>
-                        <FieldRef Name=\"${effective.data.InternalName}\"/>
-                        <FieldRef Name=\"${category.data.InternalName}\"/>
-                        <FieldRef Name=\"${parent.data.InternalName}\"/>
-                        <FieldRef Name=\"${main.data.InternalName}\"/>
-                        <FieldRef Name=\"${remoteInfo.data.InternalName}\"/>
+                        <FieldRef Name="LinkTitle"/>
+                        <FieldRef Name="${description.data.InternalName}"/>
+                        <FieldRef Name="${responsible.data.InternalName}"/>
+                        <FieldRef Name="${team.data.InternalName}"/>
+                        <FieldRef Name="${status.data.InternalName}"/>
+                        <FieldRef Name="${priority.data.InternalName}"/>
+                        <FieldRef Name="${startDate.data.InternalName}"/>
+                        <FieldRef Name="${finishDate.data.InternalName}"/>
+                        <FieldRef Name="${dueDate.data.InternalName}"/>
+                        <FieldRef Name="${progress.data.InternalName}"/>
+                        <FieldRef Name="${estimated.data.InternalName}"/>
+                        <FieldRef Name="${effective.data.InternalName}"/>
+                        <FieldRef Name="${category.data.InternalName}"/>
+                        <FieldRef Name="${parent.data.InternalName}"/>
+                        <FieldRef Name="${main.data.InternalName}"/>
+                        <FieldRef Name="${remoteInfo.data.InternalName}"/>
                     </ViewFields>
-                    <RowLimit Paged=\"TRUE\">30</RowLimit>
+                    <RowLimit Paged="TRUE">30</RowLimit>
                     <JSLink>clienttemplates.js</JSLink>
-                    <XslLink Default=\"TRUE\">main.xsl</XslLink>
-                    <Toolbar Type=\"Standard\"/>
+                    <XslLink Default="TRUE">main.xsl</XslLink>
+                    <Toolbar Type="Standard"/>
                     <ViewType2>COMPACTLIST</ViewType2>
             </View>`
         );
@@ -285,34 +285,34 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
         const view = await attachmentsLibrary.list.defaultView();
         await attachmentsLibrary.list.defaultView.setViewXml(
             `<View 
-                Name=\"${view.Id}\" 
-                DefaultView=\"TRUE\" 
-                MobileView=\"TRUE\" 
-                MobileDefaultView=\"TRUE\" 
-                Type=\"HTML\" 
-                DisplayName=\"All Documents\" 
-                Url=\"${view.ServerRelativeUrl}\" 
-                Level=\"1\" 
-                BaseViewID=\"1\" 
-                ContentTypeID=\"0x\" 
-                ImageUrl=\"${view.ImageUrl}\">
+                Name="${view.Id}" 
+                DefaultView="TRUE" 
+                MobileView="TRUE" 
+                MobileDefaultView="TRUE" 
+                Type="HTML" 
+                DisplayName="All Documents" 
+                Url="${view.ServerRelativeUrl}" 
+                Level="1" 
+                BaseViewID="1" 
+                ContentTypeID="0x" 
+                ImageUrl="${view.ImageUrl}">
                     <Query>
                         <OrderBy>
-                            <FieldRef Name=\"ID\"/>
+                            <FieldRef Name="ID"/>
                         </OrderBy>
                     </Query>
                     <ViewFields>
-                        <FieldRef Name=\"DocIcon\"/>
-                        <FieldRef Name=\"LinkFilename\"/>
-                        <FieldRef Name=\"${taskName.data.InternalName}\"/>
-                        <FieldRef Name=\"Modified\"/>
-                        <FieldRef Name=\"Editor\"/>
-                        <FieldRef Name=\"${commentId.data.InternalName}\"/>
+                        <FieldRef Name="DocIcon"/>
+                        <FieldRef Name="LinkFilename"/>
+                        <FieldRef Name="${taskName.data.InternalName}"/>
+                        <FieldRef Name="Modified"/>
+                        <FieldRef Name="Editor"/>
+                        <FieldRef Name="${commentId.data.InternalName}"/>
                     </ViewFields>
-                    <RowLimit Paged=\"TRUE\">30</RowLimit>
+                    <RowLimit Paged="TRUE">30</RowLimit>
                     <JSLink>clienttemplates.js</JSLink>
-                    <XslLink Default=\"TRUE\">main.xsl</XslLink>
-                    <Toolbar Type=\"Standard\"/>
+                    <XslLink Default="TRUE">main.xsl</XslLink>
+                    <Toolbar Type="Standard"/>
                     <ViewType2>COMPACTLIST</ViewType2>
             </View>`
         );
@@ -330,7 +330,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps) {
     }
 }
 
-function notifyOnFieldCreation(field: IFieldAddResult) {
+function notifyOnFieldCreation(field: IFieldAddResult): void {
     SPnotify({
         message: `Field '${field.data.Title}' added successfully`,
         messageType: MessageBarType.success,

@@ -28,7 +28,7 @@ const TeamCellCallout: React.FC<ITeamCellProps> = (props) => {
     return (
         <div className={`${styles.callout} ${styles['center-content']}`}>
             {teams.map((team) => (
-                <ActionButton disabled={task.Team === team} onClick={handleClick(team)} styles={{ root: { height: '1.8em' } }}>{team}</ActionButton>
+                <ActionButton key={team} disabled={task.Team === team} onClick={handleClick(team)} styles={{ root: { height: '1.8em' } }}>{team}</ActionButton>
             ))}
         </div>
     );

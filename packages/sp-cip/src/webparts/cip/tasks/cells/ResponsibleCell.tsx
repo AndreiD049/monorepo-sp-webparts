@@ -18,7 +18,7 @@ import { TaskNode } from '../graph/TaskNode';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
 
-function filterUser(value: string) {
+function filterUser(value: string): (p: IPersonaProps) => boolean {
     return (props: IPersonaProps) => {
         const name = props.text.toLowerCase();
         const email = props.secondaryText.toLowerCase();
@@ -38,7 +38,10 @@ const ResponsibleCellCallout: React.FC<IResponsibleCellProps> = (props) => {
     const [searchValue, setSearchValue] = React.useState('');
 
     React.useEffect(() => {
-        userService.getPersonaProps().then((personas) => setUsers(personas));
+        userService
+            .getPersonaProps()
+            .then((personas) => setUsers(personas))
+            .catch((err) => console.error(err));
     }, []);
 
     const handleClick = React.useCallback(
@@ -68,6 +71,7 @@ const ResponsibleCellCallout: React.FC<IResponsibleCellProps> = (props) => {
     const userElements = React.useMemo(() => {
         return users.filter(filterUser(searchValue)).map((userProps) => (
             <button
+                key={userProps.id}
                 className={styles.responsible_user}
                 onClick={handleClick(+userProps.id)}
             >
@@ -111,7 +115,7 @@ type IResponsibleCellProps = {
     node: TaskNode;
 };
 
-const ResponsibleCell = (props: IResponsibleCellProps) => {
+const ResponsibleCell = (props: IResponsibleCellProps): JSX.Element => {
     const { isTaskFinished } = React.useContext(TaskNodeContext);
     const task = props.node.getTask();
     const elemRef = React.useRef(null);

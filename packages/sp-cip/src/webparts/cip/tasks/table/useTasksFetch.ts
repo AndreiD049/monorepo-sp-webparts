@@ -18,13 +18,12 @@ import {
 import { GlobalContext } from '../../utils/GlobalContext';
 import { ICipFilters } from './sort-filter/filters-reducer';
 
-export const useTasksFetch = (filters: ICipFilters) => {
+export const useTasksFetch = (filters: ICipFilters): { tasks: ITaskOverview[] } => {
     const { selectedTeam, currentUser } = React.useContext(GlobalContext);
     const team = React.useMemo(
         () => (selectedTeam !== 'All' ? selectedTeam : null),
         [selectedTeam]
     );
-    const userService = MainService.getUserService();
     const [tasks, setTasks] = React.useState<ITaskOverview[]>([]);
     const taskService = MainService.getTaskService();
 
@@ -63,7 +62,7 @@ export const useTasksFetch = (filters: ICipFilters) => {
     );
 
     React.useEffect(() => {
-        async function run() {
+        async function run(): Promise<void> {
             if (!currentUser) return;
             loadingStart('default');
             switch (filters.status) {
@@ -82,7 +81,7 @@ export const useTasksFetch = (filters: ICipFilters) => {
             }
             loadingStop('default');
         }
-        run();
+        run().catch((err) => console.error(err));
     }, [filters.status, filters.assignedTo, team, currentUser]);
 
     // Dom events
@@ -109,7 +108,7 @@ export const useTasksFetch = (filters: ICipFilters) => {
                     setTasks((prev) =>
                         uniqBy([...prev, ...subtasks], (t) => t.Id)
                     );
-                });
+                }).catch((err) => console.error(err));
             }
         );
 

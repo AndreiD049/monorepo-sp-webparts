@@ -11,7 +11,7 @@ import Header from './Header';
 import styles from './Tasks.module.scss';
 import UserColumn from './UserColumn';
 import { SPnotify } from 'sp-react-notifications';
-import { MessageBarType, PanelType, Spinner, SpinnerSize } from 'office-ui-fabric-react';
+import { MessageBarType, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import useWebStorage from 'use-web-storage-api';
 import { HOUR } from '../utils/constants';
 import { usePanel } from '../hooks/usePanel';
@@ -42,6 +42,7 @@ const Tasks: React.FC = () => {
      * Custom sorting of tasks.
      * Applied when user changes task order manually (drag & drop)
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [customSorting, setCustomSorting]: [ICustomSorting, any] = useWebStorage<ICustomSorting>(
         {},
         {
@@ -62,7 +63,7 @@ const Tasks: React.FC = () => {
      */
     const taskItems = useTasks(date, userIds, setLoading, sync);
     const [taskLogs, setTaskLogs] = taskItems.taskLogs;
-    const [tasks, setTasks] = taskItems.tasks;
+    const [tasks,] = taskItems.tasks;
 
     /**
      * Data structures showing tasks and logs per user
@@ -110,7 +111,8 @@ const Tasks: React.FC = () => {
                     OriginalUserId: originalLog.OriginalUser?.ID ?? +source.droppableId,
                 });
                 updateTaskLog(updated);
-                setCustomSorting((prev) => ({
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                setCustomSorting((prev: any) => ({
                     ...prev,
                     [source.droppableId]: moveResults.from.result.map((i) => getTaskUniqueId(i)),
                     [destination.droppableId]: moveResults.to.result.map((i) => getTaskUniqueId(i)),
@@ -125,8 +127,8 @@ const Tasks: React.FC = () => {
                 setTaskLogs((prev) => [...prev]);
             }
         } else {
-            let list = tasksPerUser.reorder(+source.droppableId, source.index, destination.index);
-            setCustomSorting((prev) => ({
+            const list = tasksPerUser.reorder(+source.droppableId, source.index, destination.index);
+            setCustomSorting((prev: { [key: string]: string[]}) => ({
                 ...prev,
                 [source.droppableId]: list.result.map((i) => getTaskUniqueId(i)),
             }));
@@ -149,6 +151,7 @@ const Tasks: React.FC = () => {
                     if (!item) return null;
                     return (
                         <UserColumn
+                            key={id}
                             tasksPerUser={tasksPerUser.tasks}
                             id={id}
                             date={date}

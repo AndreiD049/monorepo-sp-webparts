@@ -1,14 +1,11 @@
-import { NumericDictionary } from 'lodash';
 import * as React from 'react';
 import ITimer from '../../models/ITimer';
 import { HOUR, MINUTE, SECOND } from '../../utils/constants';
 import {
-    ITag,
     TagPicker,
     IconButton,
     Text,
     TextField,
-    ComboBox,
     Checkbox,
 } from 'office-ui-fabric-react';
 import { useVisibility } from 'react-visibility-hook';
@@ -68,19 +65,21 @@ const calculatePassedTime = (passedMills: number): ITimerDuration => {
 };
 
 /* format passed duration like 'hh:mm:ss' */
-const formatPassedDuration = (duration: ITimerDuration) => {
+const formatPassedDuration = (duration: ITimerDuration): string => {
     const hours = `${duration.hours < 10 ? '0' : ''}${duration.hours}`;
     const minutes = `${duration.minutes < 10 ? '0' : ''}${duration.minutes}`;
     const seconds = `${duration.seconds < 10 ? '0' : ''}${duration.seconds}`;
     return `${hours}:${minutes}:${seconds}`;
 };
 
-export function getDuration<T = unknown>(item: ITimer<T>) {
+export function getDuration<T = unknown>(item: ITimer<T>): number {
     const remaining = item.active ? Date.now() - item.lastStartTimestamp : 0;
     return item.duration + remaining;
 }
 
-const advanceDuration = (timer: ITimer<unknown>) => {
+const advanceDuration = (
+    timer: ITimer<unknown>
+): { hours: number; minutes: number; seconds: number } => {
     let rest = getDuration(timer);
     const result = {
         hours: 0,
@@ -96,7 +95,7 @@ const advanceDuration = (timer: ITimer<unknown>) => {
     return result;
 };
 
-export function TimerItem<T>(props: ITimerItemProps<T>) {
+export function TimerItem<T>(props: ITimerItemProps<T>): JSX.Element {
     const [timerDuration, setTimerDuration] = React.useState<ITimerDuration>({
         hours: 0,
         minutes: 0,
@@ -107,7 +106,9 @@ export function TimerItem<T>(props: ITimerItemProps<T>) {
     const getTaskText = props.getTaskText || ((task: T) => task.toString());
     const visibility = useVisibility();
 
-    const createTagFromTask = (item: T) => {
+    const createTagFromTask = (
+        item: T
+    ): { key: string | number; name: string } => {
         return {
             key: props.getTaskId(item),
             name: props.getTaskText(item),
@@ -131,9 +132,7 @@ export function TimerItem<T>(props: ITimerItemProps<T>) {
     }, [props.item.active, visibility]);
 
     return (
-        <div
-            className={styles.container}
-        >
+        <div className={styles.container}>
             <IconButton
                 iconProps={{
                     iconName: props.item.active ? 'pause' : 'play',
@@ -152,7 +151,11 @@ export function TimerItem<T>(props: ITimerItemProps<T>) {
                     placeholder="Spot task description..."
                     value={props.item.description}
                     onChange={(_ev, value) =>
-                        props.onUpdated({ ...props.item, spot: value.length > 0, description: value })
+                        props.onUpdated({
+                            ...props.item,
+                            spot: value.length > 0,
+                            description: value,
+                        })
                     }
                 />
             ) : (
@@ -180,7 +183,11 @@ export function TimerItem<T>(props: ITimerItemProps<T>) {
                     }
                     onBlur={() => {
                         if (pickerValue) {
-                            props.onUpdated({ ...props.item, spot: true, description: pickerValue });
+                            props.onUpdated({
+                                ...props.item,
+                                spot: true,
+                                description: pickerValue,
+                            });
                         }
                     }}
                     onInputChange={(val: string) => {
@@ -196,7 +203,14 @@ export function TimerItem<T>(props: ITimerItemProps<T>) {
                             );
                         }
                         setPickerValue('');
-                        props.onTaskSelect({ ...props.item, spot: !Boolean(task), description: '' }, task);
+                        props.onTaskSelect(
+                            {
+                                ...props.item,
+                                spot: !Boolean(task),
+                                description: '',
+                            },
+                            task
+                        );
                     }}
                     itemLimit={1}
                 />

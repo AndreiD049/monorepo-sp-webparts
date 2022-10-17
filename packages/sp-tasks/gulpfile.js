@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-var-requires */
 'use strict';
 
 const gulp = require('gulp');
@@ -44,6 +46,10 @@ build.configureWebpack.mergeConfig({
             '@microsoft/load-themed-styles': path.resolve(
                 __dirname,
                 'node_modules/@microsoft/load-themed-styles/'
+            ),
+            'tslib': path.resolve(
+                __dirname,
+                'node_modules/tslib'
             ),
         };
 

@@ -36,8 +36,8 @@ interface IGetAlertProps {
     Component?: JSX.Element;
 }
 
-export const getDialog = async (props: IGetAlertProps) => {
-    return new Promise<any>((resolve) => {
+export const getDialog = async (props: IGetAlertProps): Promise<string> => {
+    return new Promise<string>((resolve) => {
         dialogVisibility({
             alertId: props.alertId,
             contentProps: {
@@ -53,7 +53,7 @@ export const getDialog = async (props: IGetAlertProps) => {
     });
 };
 
-export const dismissDialog = (id: string, answer?: any) => {
+export const dismissDialog = (id: string, answer?: string | boolean): void => {
     document.dispatchEvent(
         new CustomEvent(DISMISS_DIALOG_EVT, {
             detail: {
@@ -78,6 +78,7 @@ export const AlertDialog: React.FC<IAlertDialogProps> = ({ alertId }) => {
 
     const handleDismiss = React.useCallback(
         (answer) => () => {
+            // eslint-disable-next-line no-unused-expressions
             beforeDismiss && beforeDismiss(answer);
             setHidden(true);
         },
@@ -90,12 +91,13 @@ export const AlertDialog: React.FC<IAlertDialogProps> = ({ alertId }) => {
                 setHidden(props.hidden);
                 setContentProps(props.contentProps);
                 setButtons(props.buttons);
-                setBeforeDismiss((prev) => props.onBeforeDismiss);
+                setBeforeDismiss(() => props.onBeforeDismiss);
                 setComponent(props.Component || <></>);
             }
         });
-        const dismissHanler = (evt: CustomEvent<{ id: string, answer?: any }>) => {
+        const dismissHanler = (evt: CustomEvent<{ id: string, answer?: string | boolean }>): void => {
             if (evt.detail.id === alertId) {
+                // eslint-disable-next-line no-unused-expressions
                 beforeDismiss && beforeDismiss(evt.detail.answer);
                 setHidden(true);
             }

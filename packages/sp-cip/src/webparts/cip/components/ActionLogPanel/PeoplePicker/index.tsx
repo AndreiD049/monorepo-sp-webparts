@@ -19,11 +19,11 @@ export const PeoplePicker: React.FC<IPeoplePickerProps> = (props) => {
     }, [selectedSet, users]);
 
     React.useEffect(() => {
-        async function run() {
+        async function run(): Promise<void> {
             const userProps = await userService.getPersonaProps(false);
             setUsers(userProps);
         }
-        run();
+        run().catch((err) => console.error(err));
     }, []);
 
     return (

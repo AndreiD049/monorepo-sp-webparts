@@ -9,7 +9,7 @@ import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 export interface ISelectMainTaskProps extends React.HTMLAttributes<HTMLElement> {
     tasks?: ITaskOverview[];
-    selectedTask: ITaskOverview | null;
+    selectedTask: ITaskOverview | undefined;
     onTaskSelected: (task: ITaskOverview) => void;
 }
 
@@ -19,7 +19,7 @@ export const SelectMainTask: React.FC<ISelectMainTaskProps> = (props) => {
 
     /** Fetch tasks if not provided */
     React.useEffect(() => {
-        async function getTasks(status: StatusSelected) {
+        async function getTasks(status: StatusSelected): Promise<void> {
             let result: ITaskOverview[] = [];
             switch (status) {
                 case StatusSelected.All:
@@ -40,7 +40,7 @@ export const SelectMainTask: React.FC<ISelectMainTaskProps> = (props) => {
             const taskStatus =
                 (+selectedStatus?.dataset.taskStatus as StatusSelected) ||
                 StatusSelected.All;
-            getTasks(taskStatus);
+            getTasks(taskStatus).catch((err) => console.error(err));
         } else {
             setTasks(props.tasks);
         }

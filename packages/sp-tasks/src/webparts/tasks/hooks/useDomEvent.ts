@@ -2,7 +2,7 @@ import { RefObject, useEffect } from "react";
 
 type IEventHandler = (e: Event) => void;
 
-export const useDomEvent = (ref: RefObject<HTMLElement>, event: string, handler: IEventHandler, bubbles: boolean = false) => {
+export const useDomEvent = (ref: RefObject<HTMLElement>, event: string, handler: IEventHandler, bubbles = false) => {
     useEffect(() => {
         if (ref.current) {
             ref.current.addEventListener(event, handler, bubbles);

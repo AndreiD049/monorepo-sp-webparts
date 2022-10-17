@@ -19,7 +19,7 @@ interface ICipAssigneeSelectorProps {
 function isSelectedClassName(
     target: AssigneeSelected,
     value: AssigneeSelected
-) {
+): string {
     if (target === value) {
         return styles['asignee-selector__item_selected'];
     }
@@ -36,6 +36,7 @@ export const CipAssigneeSelector: React.FC<ICipAssigneeSelectorProps> = (props) 
         props.onAssignedToChange(selected);
     }, [selected]);
 
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     const handleClick = (value: AssigneeSelected) => () => {
         setSelected(value);
     };

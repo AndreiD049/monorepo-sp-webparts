@@ -119,7 +119,7 @@ const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
                                     title: 'Work in progress',
                                     subText: 'Work in progress',
                                     buttons: [{ key: 'ok', text: 'Ok' }],
-                                });
+                                }).catch((err) => console.error(err));
                             },
                         },
                     ],

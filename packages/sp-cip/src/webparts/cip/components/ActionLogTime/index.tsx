@@ -32,12 +32,12 @@ export const ActionLogTime: React.FC<IActionLogTimeProps> = (props) => {
         setComment(props.action.Comment.substring(indexOfPipe + 1))
     }, []);
 
-    const handleEdit = () => {
+    const handleEdit = (): void => {
         getDialog({
             alertId: DIALOG_IDS.DETAILS_PANEL,
             title: 'Log time',
             Component: <TimeLogGeneral task={props.task} dialogId={DIALOG_IDS.DETAILS_PANEL} action={props.action} />,
-        });
+        }).catch((err) => console.error(err));
     };
 
     return (

@@ -1,14 +1,17 @@
-import * as React from 'react'
+import * as React from 'react';
 
-export const useShowCategories = () => {
-  const [showCategories, setShowCategories] = React.useState(true);
+export const useShowCategories = (): {
+    showCategories: boolean;
+    handleToggleShowCategories: (val: boolean) => void;
+} => {
+    const [showCategories, setShowCategories] = React.useState(true);
 
-  const handleToggleShowCategories = React.useCallback((value: boolean) => {
-    setShowCategories(value);
-  }, []);
+    const handleToggleShowCategories = React.useCallback((value: boolean) => {
+        setShowCategories(value);
+    }, []);
 
-  return ({
-    showCategories,
-    handleToggleShowCategories
-  });
+    return {
+        showCategories,
+        handleToggleShowCategories,
+    };
 };

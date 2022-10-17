@@ -13,13 +13,15 @@ import {
     Separator,
     Stack,
     StackItem,
-    Text,
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { HoursInput } from '../../components/HoursInput';
-import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
+import {
+    loadingStart,
+    loadingStop,
+} from '../../components/utils/LoadingAnimation';
 import { tasksAdded, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { useChoiceFields } from '../../utils/useChoiceFields';
@@ -34,14 +36,17 @@ const CreateTaskPanel: React.FC = () => {
     const params = useParams();
 
     /** Attachments */
-    const [attachments, setAttachments] = React.useState<File[]>([]);
+    const [attachments, ] = React.useState<File[]>([]);
     const attachmentService = MainService.getAttachmentService();
 
     /** Group labels */
     // const { groupLabels, setGroupLabels } = useGroups();
     const [groupLabels, setGroupLabels] = React.useState([]);
     React.useEffect(() => {
-        taskService.getAllCategories().then((categories) => setGroupLabels(categories));
+        taskService
+            .getAllCategories()
+            .then((categories) => setGroupLabels(categories))
+            .catch((err) => console.error(err));
     }, []);
 
     const groupOptions = React.useMemo(() => {
@@ -87,19 +92,23 @@ const CreateTaskPanel: React.FC = () => {
         }));
     }, [teams]);
 
-    const handleSetTextField = (field: keyof ICreateTask) => (_ev: any, val: any) => {
-        setData((prev) => ({
-            ...prev,
-            [field]: val,
-        }));
-    };
+    const handleSetTextField =
+        (field: keyof ICreateTask): ((_ev: {}, val: string) => void) =>
+        (_ev: {}, val: string) => {
+            setData((prev) => ({
+                ...prev,
+                [field]: val,
+            }));
+        };
 
-    const handleSelectDateField = (field: keyof ICreateTask) => (val: Date) => {
-        setData((prev) => ({
-            ...prev,
-            [field]: val.toISOString(),
-        }));
-    };
+    const handleSelectDateField =
+        (field: keyof ICreateTask): ((val: Date) => void) =>
+        (val: Date) => {
+            setData((prev) => ({
+                ...prev,
+                [field]: val.toISOString(),
+            }));
+        };
 
     /** Responsible */
     const userService = MainService.getUserService();
@@ -129,8 +138,7 @@ const CreateTaskPanel: React.FC = () => {
                 }));
                 setParent(null);
             }
-        })();
-        () => setParent(null);
+        })().catch((err) => console.error(err));
     }, []);
 
     /** Data validation */
@@ -140,8 +148,7 @@ const CreateTaskPanel: React.FC = () => {
         if (data.Title === '') messages.push(`'Title' is a required field`);
         if (!data.ResponsibleId || data.ResponsibleId <= 0)
             messages.push(`'Responsible' is a required field`);
-        if (!data.Team)
-            messages.push(`'Team' is a required field`);
+        if (!data.Team) messages.push(`'Team' is a required field`);
         if (data.EstimatedTime <= 0)
             messages.push(`'Estimated duaration' is mandatory`);
         if (messages.length > 0) {
@@ -163,13 +170,19 @@ const CreateTaskPanel: React.FC = () => {
             if (!validateData()) {
                 loadingStop('default');
                 return;
-            };
+            }
             handleDismissPanel();
             if (params.parentId) {
                 const parent = await taskService.getTask(+params.parentId);
                 const subtaskId = await taskService.createSubtask(data, parent);
                 createdId = subtaskId;
-                await actionService.addAction(subtaskId, 'Created', data.Title, currentUser.Id, new Date().toISOString());
+                await actionService.addAction(
+                    subtaskId,
+                    'Created',
+                    data.Title,
+                    currentUser.Id,
+                    new Date().toISOString()
+                );
                 parent.Subtasks += 1;
                 // Refresh the parent task
                 const subtasks = await taskService.getSubtasks(parent);
@@ -177,12 +190,21 @@ const CreateTaskPanel: React.FC = () => {
                 tasksAdded(subtasks);
             } else {
                 createdId = await taskService.createTask(data);
-                await actionService.addAction(createdId, 'Created', data.Title, currentUser.Id, new Date().toISOString());
+                await actionService.addAction(
+                    createdId,
+                    'Created',
+                    data.Title,
+                    currentUser.Id,
+                    new Date().toISOString()
+                );
                 tasksAdded([await taskService.getTask(createdId)]);
             }
             if (attachments.length > 0 && createdId) {
                 const createdTask = await taskService.getTask(createdId);
-                await attachmentService.addAttachments(createdTask, attachments);
+                await attachmentService.addAttachments(
+                    createdTask,
+                    attachments
+                );
             }
             loadingStop('default');
         },
@@ -215,7 +237,7 @@ const CreateTaskPanel: React.FC = () => {
             {messages.length > 0 && (
                 <MessageBar messageBarType={MessageBarType.blocked}>
                     {messages.map((message) => (
-                        <div>{message}</div>
+                        <div key={message}>{message}</div>
                     ))}
                 </MessageBar>
             )}
@@ -275,7 +297,7 @@ const CreateTaskPanel: React.FC = () => {
                         <Dropdown
                             label="Team"
                             options={teamsOptions}
-                            selectedKey={data['Team']}
+                            selectedKey={data.Team}
                             onChange={(evt, option) =>
                                 setData((prev) => ({
                                     ...prev,
@@ -347,7 +369,8 @@ const CreateTaskPanel: React.FC = () => {
                                             option?.key as string;
                                         /** New category added */
                                         if (!category) {
-                                            const target: any = evt.target;
+                                            const target: HTMLInputElement =
+                                                evt.target as HTMLInputElement;
                                             category = target.value as string;
                                             setGroupLabels((prev) => [
                                                 ...prev,

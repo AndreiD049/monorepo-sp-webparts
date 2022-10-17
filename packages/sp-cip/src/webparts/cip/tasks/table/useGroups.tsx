@@ -1,16 +1,23 @@
-import {
-    IDetailsGroupRenderProps,
-    IGroup,
-} from 'office-ui-fabric-react';
+import { IDetailsGroupRenderProps, IGroup } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useState } from 'react';
 import useWebStorage from 'use-web-storage-api';
 import { GROUP_LABELS_KEY } from '../../utils/constants';
 import { TaskNode } from '../graph/TaskNode';
 
-export const useGroups = (tasks?: { key: number; data: TaskNode }[], showCategories: boolean = true) => {
+export const useGroups = (
+    tasks?: { key: number; data: TaskNode }[],
+    showCategories: boolean = true
+): {
+    groups: IGroup[];
+    groupProps: IDetailsGroupRenderProps;
+    groupLabels: string[];
+    setGroupLabels: React.Dispatch<React.SetStateAction<string[]>>;
+} => {
     const [allCollapsed, setAllCollapsed] = useState(false);
-    const [groupStatus, setGroupStatus] = useState({});
+    const [groupStatus, setGroupStatus] = useState<{ [key: string]: boolean }>(
+        {}
+    );
     const [groupLabels, setGroupLabels] = useWebStorage([], {
         key: GROUP_LABELS_KEY,
     });
@@ -18,7 +25,15 @@ export const useGroups = (tasks?: { key: number; data: TaskNode }[], showCategor
     const groups: IGroup[] = React.useMemo(() => {
         if (!tasks) return null;
         if (!showCategories) return null;
-        const groups = {};
+        const groups: {
+            [key: string]: {
+                count: number;
+                key: string;
+                name: string;
+                startIndex: number;
+                isCollapsed: boolean;
+            };
+        } = {};
         tasks.forEach((node, idx) => {
             const category = node.data.Category || 'Other';
             if (category in groups) {
@@ -44,13 +59,13 @@ export const useGroups = (tasks?: { key: number; data: TaskNode }[], showCategor
             isAllGroupsCollapsed: allCollapsed,
             onToggleCollapseAll: () => {
                 setGroupStatus((prev) => {
-                    const copy = {...prev};
+                    const copy = { ...prev };
                     groupLabels.forEach((key) => {
                         copy[key] = !allCollapsed;
                     });
                     return copy;
                 });
-                setAllCollapsed(prev => !prev);
+                setAllCollapsed((prev) => !prev);
             },
             headerProps: {
                 onToggleCollapse: (group) =>

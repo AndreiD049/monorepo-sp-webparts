@@ -4,7 +4,7 @@ import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import CipWebPart from '../CipWebPart';
 import { GlobalContext } from './GlobalContext';
 
-export const useChoiceFields = (fieldName: keyof ITaskOverview, customSP?: SPFI) => {
+export const useChoiceFields = (fieldName: keyof ITaskOverview, customSP?: SPFI): { fieldInfo: IFieldInfo } => {
     const ctx = React.useContext(GlobalContext);
     const sp = customSP || React.useMemo(
         () => CipWebPart.SPBuilder.getSP('Data').using(Caching()),
@@ -17,11 +17,11 @@ export const useChoiceFields = (fieldName: keyof ITaskOverview, customSP?: SPFI)
     const [fieldInfo, setFieldInfo] = React.useState<IFieldInfo>(null);
 
     React.useEffect(() => {
-        async function run() {
-            const field: any = await list.fields.getByTitle(fieldName)();
+        async function run(): Promise<void> {
+            const field: IFieldInfo = await list.fields.getByTitle(fieldName)();
             setFieldInfo(field);
         }
-        run();
+        run().catch((err) => console.error(err));
     }, []);
 
     return {

@@ -15,6 +15,7 @@ export interface IAttachmentFolderProps {
     task: ITaskOverview;
     setPath: React.Dispatch<React.SetStateAction<string[]>>;
     path: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleFileDrop: UserHandler<any>;
     handleFileMove: UserHandler<IAttachmentFile>;
 }

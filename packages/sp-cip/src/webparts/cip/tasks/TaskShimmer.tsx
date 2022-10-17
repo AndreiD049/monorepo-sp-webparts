@@ -37,6 +37,7 @@ const TaskShimmer: React.FC<ITaskShimmerProps> = (props) => {
                 }
                 return (
                     <div
+                        key={column.fieldName}
                         className={styles.task__cell}
                         style={{
                             width: column.calculatedWidth,

@@ -6,16 +6,16 @@ import { ChoiceFacet, IChoiceFacetProps } from './facet/ChoiceFacet';
 import { ICipFilters, IFilterAction } from './sort-filter/filters-reducer';
 import { ISortedColumn, SortDirection } from './sort-filter/sorting';
 
-const isSorted = (column: string, sorting: ISortedColumn) =>
+const isSorted = (column: string, sorting: ISortedColumn): boolean =>
     sorting?.column === column;
-const isSortedDescending = (column: string, sorting: ISortedColumn) =>
+const isSortedDescending = (column: string, sorting: ISortedColumn): boolean =>
     isSorted(column, sorting) && sorting?.direction === SortDirection.Descending;
 
 export const useColumns = (
     tree: TaskNode,
     filters: ICipFilters,
     dispatch: React.Dispatch<IFilterAction>
-) => {
+): { columns: IColumn[] } => {
     const nodes = React.useMemo(() => tree.getChildren(), [tree]);
 
     const columns: IColumn[] = React.useMemo(
@@ -26,7 +26,7 @@ export const useColumns = (
                 fieldName: 'Title',
                 minWidth: 500,
                 isResizable: true,
-                isFiltered: Boolean(filters.facetFilters['Title']),
+                isFiltered: Boolean(filters.facetFilters.Title),
                 isSorted: isSorted('Title', filters.sorting),
                 isSortedDescending: isSortedDescending('Title', filters.sorting),
                 onColumnClick: () => dispatch({ type: 'SORT', column: 'Title' }),
@@ -35,7 +35,7 @@ export const useColumns = (
                     calloutVisibility<IChoiceFacetProps>({
                         visible: true,
                         isBeakVisible: false,
-                        target: ev.currentTarget as any,
+                        target: ev.currentTarget as HTMLDivElement,
                         gapSpace: 3,
                         RenderComponent: ChoiceFacet,
                         componentProps: {
@@ -64,14 +64,14 @@ export const useColumns = (
                 name: 'Actions',
                 fieldName: 'Actions',
                 minWidth: 150,
-                onColumnContextMenu: () => null,
+                onColumnContextMenu: (): void => null,
             },
             {
                 key: 'Priority',
                 name: 'Priority',
                 fieldName: 'Priority',
                 minWidth: 100,
-                isFiltered: Boolean(filters.facetFilters['Priority']),
+                isFiltered: Boolean(filters.facetFilters.Priority),
                 isSorted: isSorted('Priority', filters.sorting),
                 isSortedDescending: isSortedDescending('Priority', filters.sorting),
                 onColumnClick: () => dispatch({ type: 'SORT', column: 'Priority' }),
@@ -80,7 +80,7 @@ export const useColumns = (
                     calloutVisibility<IChoiceFacetProps>({
                         visible: true,
                         isBeakVisible: false,
-                        target: ev.currentTarget as any,
+                        target: ev.currentTarget as HTMLDivElement,
                         gapSpace: 3,
                         RenderComponent: ChoiceFacet,
                         componentProps: {
@@ -109,7 +109,7 @@ export const useColumns = (
                 name: 'Responsible',
                 fieldName: 'Responsible',
                 minWidth: 150,
-                isFiltered: Boolean(filters.facetFilters['Responsible']),
+                isFiltered: Boolean(filters.facetFilters.Responsible),
                 isSorted: isSorted('Responsible', filters.sorting),
                 isSortedDescending: isSortedDescending('Responsible', filters.sorting),
                 onColumnClick: () => dispatch({ type: 'SORT', column: 'Responsible' }),
@@ -118,7 +118,7 @@ export const useColumns = (
                     calloutVisibility<IChoiceFacetProps>({
                         visible: true,
                         isBeakVisible: false,
-                        target: ev.currentTarget as any,
+                        target: ev.currentTarget as HTMLDivElement,
                         gapSpace: 3,
                         RenderComponent: ChoiceFacet,
                         componentProps: {
@@ -148,7 +148,7 @@ export const useColumns = (
                 key: 'Status',
                 name: 'Status',
                 fieldName: 'Status',
-                isFiltered: Boolean(filters.facetFilters['Status']),
+                isFiltered: Boolean(filters.facetFilters.Status),
                 isSorted: isSorted('Status', filters.sorting),
                 isSortedDescending: isSortedDescending('Status', filters.sorting),
                 onColumnClick: () => dispatch({ type: 'SORT', column: 'Status' }),
@@ -157,7 +157,7 @@ export const useColumns = (
                     calloutVisibility<IChoiceFacetProps>({
                         visible: true,
                         isBeakVisible: false,
-                        target: ev.currentTarget as any,
+                        target: ev.currentTarget as HTMLDivElement,
                         gapSpace: 3,
                         RenderComponent: ChoiceFacet,
                         componentProps: {
@@ -190,7 +190,7 @@ export const useColumns = (
                 isSorted: isSorted('Progress', filters.sorting),
                 isSortedDescending: isSortedDescending('Progress', filters.sorting),
                 onColumnClick: () => dispatch({ type: 'SORT', column: 'Progress' }),
-                onColumnContextMenu: () => null,
+                onColumnContextMenu: (): void => null,
             },
             {
                 key: 'DueDate',
@@ -200,13 +200,13 @@ export const useColumns = (
                 isSorted: isSorted('DueDate', filters.sorting),
                 isSortedDescending: isSortedDescending('DueDate', filters.sorting),
                 onColumnClick: () => dispatch({ type: 'SORT', column: 'DueDate' }),
-                onColumnContextMenu: () => null,
+                onColumnContextMenu: (): void => null,
             },
             {
                 key: 'Team',
                 name: 'Team',
                 fieldName: 'Team',
-                isFiltered: Boolean(filters.facetFilters['Team']),
+                isFiltered: Boolean(filters.facetFilters.Team),
                 isSorted: isSorted('Team', filters.sorting),
                 isSortedDescending: isSortedDescending('Team', filters.sorting),
                 onColumnClick: () => dispatch({ type: 'SORT', column: 'Team' }),
@@ -215,7 +215,7 @@ export const useColumns = (
                     calloutVisibility<IChoiceFacetProps>({
                         visible: true,
                         isBeakVisible: false,
-                        target: ev.currentTarget as any,
+                        target: ev.currentTarget as HTMLDivElement,
                         gapSpace: 3,
                         RenderComponent: ChoiceFacet,
                         componentProps: {
@@ -248,7 +248,7 @@ export const useColumns = (
                 isSorted: isSorted('Timing', filters.sorting),
                 isSortedDescending: isSortedDescending('Timing', filters.sorting),
                 onColumnClick: () => dispatch({ type: 'SORT', column: 'Timing' }),
-                onColumnContextMenu: () => null,
+                onColumnContextMenu: (): void => null,
             },
         ],
         [tree, filters.sorting]

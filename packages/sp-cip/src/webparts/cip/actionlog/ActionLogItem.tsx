@@ -8,14 +8,13 @@ import {
     IAction,
 } from '@service/sp-cip/dist/services/action-service';
 import styles from './ActionLog.module.scss';
-import { Action } from 'history';
 
 export interface IActionLogItemProps {
     action: IAction;
     task: ITaskOverview;
 }
 
-export const getActionIconName = (type: ActionType) => {
+export const getActionIconName = (type: ActionType): string => {
     switch (type) {
         case 'Created':
             return 'BuildDefinition';
@@ -42,7 +41,7 @@ export const getActionIconName = (type: ActionType) => {
     }
 };
 
-const formatToken = (token: string, itemType: ActionType) => {
+const formatToken = (token: string, itemType: ActionType): string => {
     switch (itemType) {
         case 'Due date':
             return new Date(token).toLocaleDateString();
@@ -54,7 +53,7 @@ const formatToken = (token: string, itemType: ActionType) => {
     }
 };
 
-export const getActionComment = (action: IAction) => {
+export const getActionComment = (action: IAction): JSX.Element => {
     let content: JSX.Element = null;
     const tokens = action.Comment?.split('|');
     const arrow = (
@@ -111,7 +110,7 @@ const ActionIcon: React.FC<{ type: ActionType }> = (props) => {
     );
 
     return (
-        <div className={styles['actionLogItem__icon']}>
+        <div className={styles.actionLogItem__icon}>
             <Icon iconName={name} />
         </div>
     );
@@ -145,13 +144,13 @@ const ActionItemContent: React.FC<IActionLogItemProps> = (props) => {
 
 export const ActionLogItem: React.FC<IActionLogItemProps> = (props) => {
     return (
-        <div className={styles['actionLogItem']}>
+        <div className={styles.actionLogItem}>
             <ActionIcon type={props.action.ActivityType} />
-            <div className={styles['actionLogItem__content']}>
+            <div className={styles.actionLogItem__content}>
                 <div>
                     <ActionItemContent {...props} />
                 </div>
-                <div className={styles['actionLogItem__signature']}>
+                <div className={styles.actionLogItem__signature}>
                     {props.action.User?.Title || props.action.Author.Title} -{' '}
                     {props.action.Date
                         ? new Date(props.action.Date).toLocaleTimeString()

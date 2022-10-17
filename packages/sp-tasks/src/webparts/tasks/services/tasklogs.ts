@@ -160,7 +160,7 @@ export default class TaskLogsService {
             date = new Date();
         }
 
-        let res: IItemAddResult[] = [];
+        const res: IItemAddResult[] = [];
 
         tasks.forEach((task) => {
             batchSP.web.lists
@@ -218,7 +218,7 @@ export default class TaskLogsService {
             Description: task.Description,
             // If task is not transferable, log is set to default completed
             // meaning it will not appear tomorrow if it's not on the list
-            Completed: !Boolean(task.Transferable),
+            Completed: !task.Transferable,
             Transferable: task.Transferable,
             TaskType: task.Type,
         };

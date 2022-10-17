@@ -23,7 +23,7 @@ export default class TeamService {
         this.userService = new UserService();
         this.usersSP = TasksWebPart.SPBuilder.getSP('Users').using(
             Caching({
-                expireFunc: (_url: string) =>
+                expireFunc: () =>
                     new Date(new Date().getTime() + HOUR),
             })
         );

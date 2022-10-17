@@ -14,7 +14,7 @@ type SortingFunctionsDict<T> = {
     [key: string]: (dir: SortDirection) => (a: T, b: T) => number;
 };
 
-const textSort = (a: string, b: string) => {
+const textSort = (a: string, b: string): number => {
     if (!a) a = '';
     if (!b) b = '';
     const aL = a.toLowerCase();
@@ -24,7 +24,7 @@ const textSort = (a: string, b: string) => {
     return 0;
 };
 
-const numericSort = (a: number | Date, b: number | Date) => {
+const numericSort = (a: number | Date, b: number | Date): number => {
     if (a < b) return -1;
     else if (a > b) return 1;
     return 0;
@@ -141,7 +141,7 @@ export const getColumnSortingFunc = (
             const categorySortValue = columnSortFunctions.Category(
                 SortDirection.Ascending
             )(a, b);
-            if (categorySortValue != 0) return categorySortValue;
+            if (categorySortValue !== 0) return categorySortValue;
             return columnSortFunctions[sorting.column](sorting.direction)(a, b);
         };
     }
@@ -149,7 +149,7 @@ export const getColumnSortingFunc = (
     return (_a: TaskNode, _b: TaskNode) => 0;
 };
 
-const nextSorting = (sorting: ISortedColumn) => {
+const nextSorting = (sorting: ISortedColumn): ISortedColumn => {
     if (sorting.direction === SortDirection.Ascending) {
         return {
             ...sorting,

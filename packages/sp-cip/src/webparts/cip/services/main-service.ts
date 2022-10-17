@@ -19,7 +19,7 @@ export default class MainService {
     public static InitServices(
         defaultKey: string,
         properties: ICipWebPartProps
-    ) {
+    ): void {
         this.builder = CipWebPart.SPBuilder;
         this.InitTaskServices(defaultKey, properties);
         this.InitUserServices(defaultKey, properties);
@@ -31,7 +31,7 @@ export default class MainService {
     private static InitTaskServices(
         defaultKey: string,
         properties: ICipWebPartProps
-    ) {
+    ): void {
         this.taskServices = new Map();
         this.taskServices.set(
             defaultKey,
@@ -54,7 +54,7 @@ export default class MainService {
     private static InitUserServices(
         defaultKey: string,
         properties: ICipWebPartProps
-    ) {
+    ): void {
         this.userServices = new Map();
         this.userServices.set(
             defaultKey,
@@ -71,7 +71,7 @@ export default class MainService {
     private static InitCommentService(
         defaultKey: string,
         properties: ICipWebPartProps
-    ) {
+    ): void {
         this.commentServices = new Map();
         this.commentServices.set(
             defaultKey,
@@ -96,7 +96,7 @@ export default class MainService {
     private static InitActionService(
         defaultKey: string,
         properties: ICipWebPartProps
-    ) {
+    ): void {
         this.actionServices = new Map();
         this.actionServices.set(
             defaultKey,
@@ -121,7 +121,7 @@ export default class MainService {
     private static InitAttachmentService(
         defaultKey: string,
         properties: ICipWebPartProps
-    ) {
+    ): void {
         this.attachmentServices = new Map();
         this.attachmentServices.set(
             defaultKey,
@@ -141,23 +141,23 @@ export default class MainService {
         );
     }
 
-    public static getTaskService(tennantKey: string = 'Data') {
+    public static getTaskService(tennantKey: string = 'Data'): TaskService {
         return this.taskServices.get(tennantKey);
     }
 
-    public static getUserService(tennantKey: string = 'Data') {
+    public static getUserService(tennantKey: string = 'Data'): UserService {
         return this.userServices.get(tennantKey);
     }
 
-    public static getCommentService(tennantKey: string = 'Data') {
+    public static getCommentService(tennantKey: string = 'Data'): CommentService {
         return this.commentServices.get(tennantKey);
     }
 
-    public static getAttachmentService(tennantKey: string = 'Data') {
+    public static getAttachmentService(tennantKey: string = 'Data'): AttachmentService {
         return this.attachmentServices.get(tennantKey);
     }
 
-    public static getActionService(tennantKey: string = 'Data') {
+    public static getActionService(tennantKey: string = 'Data'): ActionService {
         return this.actionServices.get(tennantKey);
     }
 }

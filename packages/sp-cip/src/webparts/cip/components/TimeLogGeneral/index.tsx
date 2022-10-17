@@ -21,6 +21,7 @@ import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IAction } from '@service/sp-cip/dist/services/action-service';
 import { GlobalContext } from '../../utils/GlobalContext';
 import styles from './TimeLogGeneral.module.scss';
+import { IItemUpdateResult } from 'sp-preset';
 
 export interface ITimeLogGeneralProps {
     dialogId: DIALOG_IDS;
@@ -33,7 +34,7 @@ export interface ITimeLogGeneralProps {
     afterLog?: () => void;
 }
 
-const setDateCurrentTime = (dt: Date) => {
+const setDateCurrentTime = (dt: Date): Date => {
     const now = new Date();
     dt.setHours(now.getHours());
     dt.setMinutes(now.getMinutes());
@@ -57,16 +58,16 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     const [users, setUsers] = React.useState<IPersonaProps[]>([]);
 
     React.useEffect(() => {
-        async function run() {
+        async function run(): Promise<void> {
             setUsers(await userService.getPersonaProps());
         }
         if (diffPerson) {
-            run();
+            run().catch((err) => console.error(err));
         }
     }, [diffPerson]);
 
     React.useEffect(() => {
-        async function checkAction() {
+        async function checkAction(): Promise<void> {
             if (props.action) {
                 const action = await actionService.getAction(props.action.Id);
                 const indexPipe = action.Comment.indexOf('|');
@@ -76,11 +77,11 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
                 setComment(action.Comment.substring(indexPipe + 1));
             }
         }
-        checkAction();
+        checkAction().catch((err) => console.error(err));
     }, [props.action]);
 
     // New action - has selected task
-    const handleLogNew = async () => {
+    const handleLogNew = async (): Promise<void> => {
         const selId = selected?.Id || null;
         await actionService.addAction(
             selId,
@@ -100,7 +101,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
 
     // Already existing action log, update it
     // And also update the task with the delta
-    const handleLogUpdate = async () => {
+    const handleLogUpdate = async (): Promise<[IItemUpdateResult, void]> => {
         const indexOfPipe = props.action.Comment.indexOf('|');
         let dt = props.action.Date ? props.action.Date : props.action.Created;
         if (date) {
@@ -126,7 +127,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
         return Promise.all([action, updateTaskAction]);
     };
 
-    const handleLogTime = async () => {
+    const handleLogTime = async (): Promise<void> => {
         try {
             // No time was registered
             if (time <= 0) {
@@ -142,6 +143,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
             dismissDialog(props.dialogId, true);
             loadingStart();
             await action;
+            // eslint-disable-next-line no-unused-expressions
             props.afterLog && props.afterLog()
         } finally {
             loadingStop();

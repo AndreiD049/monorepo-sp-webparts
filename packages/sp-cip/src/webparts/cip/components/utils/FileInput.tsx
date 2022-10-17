@@ -14,10 +14,10 @@ export const FileInput: React.FC<IFileInputProps> = (props) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     React.useEffect(() => {
-        function ondrag() {
+        function ondrag(): void {
             setDragover(true);
         }
-        function ondragend(ev: DragEvent) {
+        function ondragend(ev: DragEvent): void {
             const related = ev.relatedTarget;
             if (
                 ref.current !== related &&
@@ -46,6 +46,7 @@ export const FileInput: React.FC<IFileInputProps> = (props) => {
                 files.push(input.files.item(i));
             }
             setFiles(files);
+            // eslint-disable-next-line no-unused-expressions
             props.onFilesAdded && (await props.onFilesAdded(files));
             setFiles([]);
         },

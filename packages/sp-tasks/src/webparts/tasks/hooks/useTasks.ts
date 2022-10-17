@@ -31,6 +31,7 @@ export function useTasks(
     date: Date,
     userIds: number[],
     setLoading: (val: boolean) => void,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ...deps: any[]
 ): ITasksResult {
     const { TaskService, TaskLogsService } = React.useContext(GlobalContext);
