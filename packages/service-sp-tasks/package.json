@@ -1,0 +1,23 @@
+{
+  "name": "@service/sp-tasks",
+  "version": "1.0.0",
+  "description": "Service for sharepoint tasks webpart",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "author": "Dimitrascu Andrei",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/luxon": "^3.0.1",
+    "luxon": "^3.0.4",
+    "sp-preset": "^2.0.17",
+    "typescript": "^4.8.4"
+  },
+  "peerDependencies": {
+    "luxon": "^3.0.4",
+    "sp-preset": "^2.0.17"
+  }
+}

@@ -11,8 +11,10 @@ import styles from './ActionLogTable.module.scss';
 import { getActionIconName } from '../../../actionlog/ActionLogItem';
 import { GlobalContext } from '../../../utils/GlobalContext';
 import { CommentCell } from './CommentCell';
+import { TaskCell } from './TaskCell';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
-export function useColumns() {
+export function useColumns(tasks: ITaskOverview[], handleEdit: (action: IAction, task?: ITaskOverview) => void) {
     const { currentUser } = React.useContext(GlobalContext);
 
     const columns: IColumn[] = React.useMemo(() => {
@@ -39,7 +41,9 @@ export function useColumns() {
             {
                 key: 'task',
                 name: 'Task',
-                minWidth: 100,
+                onRender: (item: IAction) => (<TaskCell action={item} task={tasks.find((t) => t?.Id === item.ItemId)} />),
+                isResizable: true,
+                minWidth: 150,
             },
             {
                 key: 'Comment',
@@ -79,12 +83,12 @@ export function useColumns() {
                     // Edit is possible only for time logs
                     if (item.ActivityType !== 'Time log') return null;
                     if (currentUser?.Id === item.Author.Id)
-                        return <IconButton iconProps={{ iconName: 'Edit' }} />;
+                        return <IconButton onClick={() => handleEdit(item, tasks.find((t) => t.Id === item.ItemId))} iconProps={{ iconName: 'Edit' }} />;
                 },
                 isResizable: true,
             },
         ];
-    }, [currentUser]);
+    }, [currentUser, tasks]);
 
     return columns;
 }

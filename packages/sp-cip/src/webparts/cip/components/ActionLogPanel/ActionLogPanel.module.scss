@@ -3,7 +3,7 @@
 .header {
     display: flex;
     flex-flow: row nowrap;
-    align-items: center;
+    align-items: flex-start;
     justify-content: flex-start;
     gap: 1em;
 }

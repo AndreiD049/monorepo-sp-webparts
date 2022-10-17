@@ -56,7 +56,7 @@ const formatToken = (token: string, itemType: ActionType) => {
 
 export const getActionComment = (action: IAction) => {
     let content: JSX.Element = null;
-    const tokens = action.Comment.split('|');
+    const tokens = action.Comment?.split('|');
     const arrow = (
         <Icon style={{ margin: '0 .5em' }} iconName="DoubleChevronRight8" />
     );
@@ -87,7 +87,6 @@ export const getActionComment = (action: IAction) => {
             }
             break;
         case 'Time log':
-            console.log(tokens);
             if (tokens.length > 1) {
                 content = (
                     <div>

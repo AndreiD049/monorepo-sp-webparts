@@ -1,9 +1,6 @@
 import { DateTime } from 'luxon';
 import { SPFI, IList, IItems } from 'sp-preset';
 import ITask from '../models/ITask';
-import TasksWebPart, { ITasksWebPartProps } from '../TasksWebPart';
-import { processChangeResult } from '../utils/utils';
-import UserService from './users';
 
 const TASK_SELECT = [
     'ID',
@@ -25,19 +22,21 @@ const TASK_SELECT = [
 
 const TASK_EXPAND = ['AssignedTo'];
 
-class TaskService {
+export interface ITaskServiceProps {
     sp: SPFI;
-    list: IList;
-    listTitle: string;
-    lastToken: string;
-    private id: string = 'TASKS';
+    listName: string;
+}
+
+export class TaskService {
+    private sp: SPFI;
+    private list: IList;
+    private listTitle: string;
 
 
-    constructor(public props: ITasksWebPartProps) {
-        this.sp = TasksWebPart.SPBuilder.getSP('Data');
-        this.list = this.sp.web.lists.getByTitle(props.tasksListTitle);
-        this.listTitle = props.tasksListTitle;
-        this.lastToken = null;
+    constructor(public props: ITaskServiceProps) {
+        this.sp = props.sp;
+        this.list = this.sp.web.lists.getByTitle(props.listName);
+        this.listTitle = props.listName;
     }
 
     async getTasks() {
@@ -53,7 +52,7 @@ class TaskService {
             .filter(`AssignedToId eq ${userId}`))();
     }
 
-    async getTasksByOriginalId(originalId): Promise<ITask[]> {
+    async getTasksByOriginalId(originalId: number): Promise<ITask[]> {
         return this._wrap(this.list.items
             .filter(`ID eq ${originalId} or OriginalTaskId eq ${originalId}`))();
     }
@@ -62,7 +61,7 @@ class TaskService {
         return this.list.items.add({
             Title: createdTask.Title,
             Description: createdTask.Description,
-            AssignedToId: createdTask.AssignedTo.ID,
+            AssignedToId: createdTask.AssignedTo?.ID,
             Type: createdTask.Type,
             MonthlyDay: createdTask.MonthlyDay,
             WeeklyDays: createdTask.WeeklyDays || [],
@@ -91,31 +90,8 @@ class TaskService {
         return result;
     }
 
-    async deleteTask(taskId) {
+    async deleteTask(taskId: number) {
         return this.list.items.getById(taskId).delete();
-    }
-
-    /**
-     * This is a rather strange method, but as long as it works
-     * CAML queries should be used here
-     * See: https://docs.microsoft.com/en-us/sharepoint/dev/schema/introduction-to-collaborative-application-markup-language-caml
-     */
-    async didTasksChanged(userIds: number[]): Promise<boolean> {
-        const values = userIds.map(id => `<Value Type='User'>${id}</Value>`).join();
-        const result = await this.list.getListItemChangesSinceToken({
-            RowLimit: '1',
-            Query: 
-            `<Where>
-                <In>
-                    <FieldRef Name='AssignedTo' LookupId='TRUE'/>
-                    <Values>
-                        ${values}
-                    </Values>
-                </In>
-            </Where>`,
-            ChangeToken: this.lastToken,
-        });
-        return processChangeResult(result, this);
     }
 
     async getTasksByMultipleUserIds(userIds: number[], date: Date) {
@@ -137,5 +113,3 @@ class TaskService {
             .expand(...TASK_EXPAND);
     }
 }
-
-export default TaskService;

@@ -19,6 +19,7 @@ const DISMISS_DIALOG_EVT = 'sp-cip-dismiss-dialog';
 export enum DIALOG_IDS {
     MAIN = "MAIN",
     DETAILS_PANEL = "DETAILS_PANEL",
+    ACTIONLOG_PANEL = "ACTIONLOG_PANEL",
 }
 
 const defaultProps = {

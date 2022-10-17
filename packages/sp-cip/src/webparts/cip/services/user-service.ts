@@ -1,10 +1,8 @@
 import { IPersonaProps, PersonaSize } from 'office-ui-fabric-react';
-import { useContext } from 'react';
 import { IndexedDbCache } from 'indexeddb-manual-cache';
 import { DB_NAME, STORE_NAME, HOUR } from '../utils/constants';
 import { IList, ISiteUserInfo, SPFI } from 'sp-preset';
 import CipWebPart, { ICipWebPartProps } from '../CipWebPart';
-import { GlobalContext } from '../utils/GlobalContext';
 
 const db = new IndexedDbCache(DB_NAME, STORE_NAME, {
     expiresIn: HOUR,
@@ -12,6 +10,7 @@ const db = new IndexedDbCache(DB_NAME, STORE_NAME, {
 
 const cache = {
     all: db.key('allUsers'),
+    allCustomList: db.key('allCustomListUsers'),
     user: (id: number) => db.key(`user(${id})`),
     currentUser: db.key(`currentUser`),
     teams: db.key('teams'),
@@ -34,6 +33,12 @@ export class UserService {
         return cache.all.get(() => this.sp.web.siteUsers());
     }
 
+    async getCustomListUsers() {
+        return cache.allCustomList.get(() => this.usersList.items
+            .select('Id', 'User/Id', 'User/Title', 'User/EMail')
+            .expand('User')());
+    }
+
     async getUser(id: number) {
         return cache.user(id).get(() => this.sp.web.siteUsers.getById(id)());
     }
@@ -49,29 +54,31 @@ export class UserService {
         return teamsField.Choices;
     }
 
-    async getPersonaProps(): Promise<IPersonaProps[]> {
-        const everyone = await this.sp.web.siteUsers.filter(
+    async getPersonaProps(
+        withEveryone: boolean = true
+    ): Promise<IPersonaProps[]> {
+        const everyone = withEveryone && await this.sp.web.siteUsers.filter(
             `Title eq 'Everyone'`
         )();
-        const users = await this.usersList.items
-            .select('Id', 'User/Id', 'User/Title', 'User/EMail')
-            .expand('User')();
-        return users
-            .map((user) => {
-                return {
-                    id: user.User.Id.toString(),
-                    text: user.User.Title,
-                    secondaryText: user.User.EMail,
-                    size: PersonaSize.size24,
-                    imageUrl: `/_layouts/15/userphoto.aspx?AccountName=${user.User.EMail}&Size=M`,
-                };
-            })
-            .concat({
+        const users = await this.getCustomListUsers();
+        let result = users.map((user) => {
+            return {
+                id: user.User.Id.toString(),
+                text: user.User.Title,
+                secondaryText: user.User.EMail,
+                size: PersonaSize.size24,
+                imageUrl: `/_layouts/15/userphoto.aspx?AccountName=${user.User.EMail}&Size=M`,
+            };
+        });
+        if (withEveryone) {
+            result = result.concat({
                 id: everyone[0].Id.toString(),
                 text: everyone[0].Title,
                 secondaryText: everyone[0].Email,
                 size: PersonaSize.size24,
                 imageUrl: `/_layouts/15/userphoto.aspx?AccountName=${everyone[0].Email}&Size=M`,
             });
+        }
+        return result;
     }
 }

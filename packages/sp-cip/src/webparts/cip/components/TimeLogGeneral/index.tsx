@@ -30,6 +30,7 @@ export interface ITimeLogGeneralProps {
     time?: number;
     /* initial comment value */
     description?: string;
+    afterLog?: () => void;
 }
 
 const setDateCurrentTime = (dt: Date) => {
@@ -101,9 +102,6 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     // And also update the task with the delta
     const handleLogUpdate = async () => {
         const indexOfPipe = props.action.Comment.indexOf('|');
-        const delta =
-            Number.parseFloat(props.action.Comment.substring(0, indexOfPipe)) -
-            time;
         let dt = props.action.Date ? props.action.Date : props.action.Created;
         if (date) {
             dt = setDateCurrentTime(date).toISOString();
@@ -113,31 +111,41 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
             UserId: selectedUser.length > 0 ? +selectedUser[0].id : props.action.User.Id,
             Date: dt,
         });
-        const updateTaskAction = await taskService.updateTask(props.task.Id, {
-            EffectiveTime: props.task.EffectiveTime - delta,
-        });
+        let updateTaskAction;
+        if (props.task) {
+            const delta =
+                Number.parseFloat(props.action.Comment.substring(0, indexOfPipe)) -
+                time;
+            updateTaskAction = await taskService.updateTask(props.task.Id, {
+                EffectiveTime: props.task.EffectiveTime - delta,
+            });
+            taskUpdated(await taskService.getTask(props.task.Id));
+        }
         actionUpdated(await actionService.getAction(props.action.Id));
-        taskUpdated(await taskService.getTask(props.task.Id));
 
         return Promise.all([action, updateTaskAction]);
     };
 
     const handleLogTime = async () => {
-        // No time was registered
-        if (time <= 0) {
-            setErrorMessage('Time cannot be 0');
-            return;
+        try {
+            // No time was registered
+            if (time <= 0) {
+                setErrorMessage('Time cannot be 0');
+                return;
+            }
+            let action;
+            if (!props.action) {
+                action = handleLogNew();
+            } else {
+                action = handleLogUpdate();
+            }
+            dismissDialog(props.dialogId, true);
+            loadingStart();
+            await action;
+            props.afterLog && props.afterLog()
+        } finally {
+            loadingStop();
         }
-        let action;
-        if (!props.action) {
-            action = handleLogNew();
-        } else {
-            action = handleLogUpdate();
-        }
-        dismissDialog(props.dialogId, true);
-        loadingStart();
-        await action;
-        loadingStop();
     };
 
     return (

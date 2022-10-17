@@ -1,4 +1,4 @@
-const VERSION = "1.0.0.31";
+const VERSION = "1.0.0.32";
 
 export const SECOND = 1000;
 export const MINUTE = SECOND * 60;
@@ -30,4 +30,5 @@ export const STORE_NAME = location.origin + location.pathname + `/${VERSION}`;
 export const ALL_TASKS_KEY = `allTasks/${VERSION}`;
 
 export const SELECTED_TEAM_KEY = `/sp-cip-selected-team/${VERSION}`;
+export const SELECTED_USERS_KEY = `/sp-cip-selected-users/${VERSION}`;
 export const TEAM_ALL = 'All';

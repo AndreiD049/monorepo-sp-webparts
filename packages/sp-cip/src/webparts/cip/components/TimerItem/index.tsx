@@ -59,7 +59,7 @@ const calculatePassedTime = (passedMills: number): ITimerDuration => {
     const minutes = Math.floor(remainder / MINUTE);
     remainder = remainder - MINUTE * minutes;
     // then, calculate seconds and round to the nearest integer
-    const seconds = Math.round(remainder / SECOND);
+    const seconds = Math.floor(remainder / SECOND);
     return {
         hours,
         minutes,
@@ -105,7 +105,6 @@ export function TimerItem<T>(props: ITimerItemProps<T>) {
     const [pickerValue, setPickerValue] = React.useState<string>('');
     const timerRef = React.useRef<number>(0);
     const getTaskText = props.getTaskText || ((task: T) => task.toString());
-    const getTaskId = props.getTaskId || ((task: T) => task['Id']);
     const visibility = useVisibility();
 
     const createTagFromTask = (item: T) => {

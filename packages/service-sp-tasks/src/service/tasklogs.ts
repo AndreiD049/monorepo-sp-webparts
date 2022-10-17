@@ -1,9 +1,6 @@
 import ITaskLog from '../models/ITaskLog';
-import TasksWebPart, { ITasksWebPartProps } from '../TasksWebPart';
-import UserService from './users';
 import { DateTime } from 'luxon';
 import ITask from '../models/ITask';
-import { processChangeResult } from '../utils/utils';
 import { SPFI, IList, IItemAddResult, IItems } from 'sp-preset';
 
 const LOG_SELECT = [
@@ -29,51 +26,20 @@ const LOG_SELECT = [
 
 const LOG_EXPAND = ['Task', 'User', 'OriginalUser'];
 
-export default class TaskLogsService {
-    userService: UserService;
-    rootSP: SPFI;
+export interface ITaskLogsProps {
+    sp: SPFI;
+    listName: string;
+}
+
+export class TaskLogsService {
     sp: SPFI;
     list: IList;
     listName: string;
-    lastToken: string;
 
-    constructor(props: ITasksWebPartProps) {
-        this.sp = TasksWebPart.SPBuilder.getSP('Data');
-        this.rootSP = TasksWebPart.SPBuilder.getSP();
-        this.list = this.sp.web.lists.getByTitle(props.taskLogsListTitle);
-        this.listName = props.taskLogsListTitle;
-        this.userService = new UserService();
-        this.lastToken = null;
-    }
-
-    /**
-     * Get task logs.
-     * Possible parameters:
-     *  - date: Date - filters on Date of the task log
-     *  - user: string | number - if number, should be user's id, if string should be user's title
-     * Without any parameters will return all task logs
-     */
-    async getTaskLogs(): Promise<ITaskLog[]>;
-    async getTaskLogs(date: Date): Promise<ITaskLog[]>;
-    async getTaskLogs(date: Date, user: number): Promise<ITaskLog[]>;
-    async getTaskLogs(date: Date, user: string): Promise<ITaskLog[]>;
-    async getTaskLogs(
-        date?: Date,
-        user?: number | string
-    ): Promise<ITaskLog[]> {
-        if (date === undefined) {
-            date = new Date();
-        }
-        if (user === undefined) {
-            user = (await this.userService.getCurrentUser()).Id;
-        }
-        if (typeof user === 'string') {
-            user = (await this.userService.getUser(user)).Id;
-        }
-        const filter = `(Date eq '${DateTime.fromJSDate(
-            date
-        ).toISODate()}') and (UserId eq ${user})`;
-        return this._wrap(this.list.items.filter(filter))();
+    constructor(props: ITaskLogsProps) {
+        this.sp = props.sp;
+        this.list = this.sp.web.lists.getByTitle(props.listName);
+        this.listName = props.listName;
     }
 
     async getTaskLogsByTaskId(taskId: number, fromDate: Date): Promise<ITaskLog[]> {
@@ -116,36 +82,6 @@ export default class TaskLogsService {
      */
     async getTaskLog(id: number): Promise<ITaskLog> {
         return this.list.items.getById(id).select(...LOG_SELECT).expand(...LOG_EXPAND)();
-    }
-
-    /**
-     * Returns whether there are any changes in task logs
-     * This is a rather strange method, but as long as it works
-     * CAML queries should be used here
-     * See: https://docs.microsoft.com/en-us/sharepoint/dev/schema/introduction-to-collaborative-application-markup-language-caml
-     */
-    async didTaskLogsChanged(date: Date, userIds: number[]): Promise<boolean> {
-        const dt = DateTime.fromJSDate(date).toISODate();
-        const values = userIds.map(id => `<Value Type='User'>${id}</Value>)`);
-        const result = await this.list.getListItemChangesSinceToken({
-                RowLimit: '1',
-                Query: `<Where>
-                    <And>
-                        <In>
-                            <FieldRef Name='User' LookupId='TRUE'/>
-                            <Values>
-                                ${values}
-                            </Values>
-                        </In>
-                        <Eq>
-                            <FieldRef Name='Date'/>
-                            <Value Type='Date'>${dt}</Value>
-                        </Eq>
-                    </And>
-                </Where>`,
-                ChangeToken: this.lastToken,
-            });
-        return processChangeResult(result, this);
     }
 
     /**
