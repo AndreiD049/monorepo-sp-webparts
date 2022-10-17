@@ -1,5 +1,8 @@
 import { DateTime } from 'luxon';
-import { Dropdown, Icon, IconButton, IDropdownOption, MessageBarType, Separator, Text } from 'office-ui-fabric-react';
+import {
+    IDropdownOption,
+    MessageBarType,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
 import { FC } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
@@ -14,53 +17,7 @@ import { TaskPersona } from './persona/TaskPersona';
 import colors from './Colors.module.scss';
 import { SPnotify } from 'sp-react-notifications';
 import styles from './Task.module.scss';
-import { TaskBody } from '../TaskBody';
-
-const CLOSED_ICON = 'ChevronDown';
-const OPEN_ICON = 'ChevronUp';
-const DROPDOWN_STYLES = {
-    caretDownWrapper: {
-        display: 'none',
-    },
-    title: {
-        border: 'none',
-        height: '1.5em',
-        lineHeight: '1.5em',
-        minWidth: '100px',
-    },
-    dropdownItemSelected: {
-        minHeight: '1.7em',
-        lineHeight: '1.7em',
-    },
-    dropdownItem: {
-        minHeight: '1.7em',
-        lineHeight: '1.7em',
-    },
-    dropdown: {
-        fontSize: '.8em',
-    },
-    dropdownOptionText: {
-        fontSize: '.8em',
-    },
-};
-const DROPDOWN_KEYS: { key: TaskStatus; text: string }[] = [
-    {
-        key: 'Open',
-        text: 'Open',
-    },
-    {
-        key: 'Pending',
-        text: 'In progress',
-    },
-    {
-        key: 'Finished',
-        text: 'Finished',
-    },
-    {
-        key: 'Cancelled',
-        text: 'Cancelled',
-    },
-];
+import { Task as InnerTask } from 'sp-components';
 
 export interface ITaskProps {
     task: ITaskLog | ITask;
@@ -70,7 +27,6 @@ export interface ITaskProps {
 
 const Task: FC<ITaskProps> = (props) => {
     const { TaskLogsService, canEditOthers, currentUser } = React.useContext(GlobalContext);
-    const [open, setOpen] = React.useState<boolean>(false);
     const [expired, setExpired] = React.useState<boolean>(false);
     const [isHovering, setIsHovering] = React.useState<boolean>(false);
 
@@ -80,7 +36,9 @@ const Task: FC<ITaskProps> = (props) => {
                 description: props.task.Description,
                 title: props.task.Title,
                 user: props.task.AssignedTo,
-                date: DateTime.fromJSDate(props.date).plus({ days: props.task.DaysDuration }).toLocaleString(DateTime.DATE_SHORT),
+                date: DateTime.fromJSDate(props.date)
+                    .plus({ days: props.task.DaysDuration })
+                    .toLocaleString(DateTime.DATE_SHORT),
                 time: DateTime.fromISO(props.task.Time).toLocaleString(DateTime.TIME_24_SIMPLE),
                 status: 'Open',
             };
@@ -90,7 +48,9 @@ const Task: FC<ITaskProps> = (props) => {
             remark: props.task.Remark,
             title: props.task.Title,
             user: props.task.User,
-            date: DateTime.fromISO(props.task.Time || props.task.Date).toLocaleString(DateTime.DATE_SHORT),
+            date: DateTime.fromISO(props.task.Time || props.task.Date).toLocaleString(
+                DateTime.DATE_SHORT
+            ),
             time: DateTime.fromISO(props.task.Time || props.task.Task?.Time).toLocaleString(
                 DateTime.TIME_24_SIMPLE
             ),
@@ -121,15 +81,6 @@ const Task: FC<ITaskProps> = (props) => {
         const timer = setInterval(checkExpired, MINUTE);
         return () => clearInterval(timer);
     }, [info, props.task]);
-
-    const body = React.useMemo(() => {
-        if (!open) return null;
-        return (<TaskBody remark={info.remark} description={info.description} />);
-    }, [open]);
-
-    const toggleOpen = React.useCallback(() => {
-        setOpen((prev) => !prev);
-    }, []);
 
     const handleChange = async (_: any, option: IDropdownOption) => {
         const log: ITaskLog = !isTask(props.task)
@@ -187,54 +138,26 @@ const Task: FC<ITaskProps> = (props) => {
                     onMouseOver={handleHover(true)}
                     onMouseOut={handleHover(false)}
                 >
-                    <div className={styles.header}>
-                        {info.remark && (<Icon className={styles['Task__remark-icon']} iconName='InfoSolid' title='Has remark' />)}
-                        <Text className={`${expired && styles.expired} ${styles['Task__title']}`} variant="mediumPlus">
-                            {info.title}
-                        </Text>
-                        <TaskPersona
-                            title={info.user.Title}
-                            email={info.user.EMail}
-                            className={styles.Task_person}
-                            isHovering={isHovering}
-                            taskId={isTask(props.task) ? props.task.ID : props.task.Task.ID}
-                            taskLogId={isTask(props.task) ? null : props.task.ID}
-                            date={props.date}
-                            status={info.status}
-                        />
-                    </div>
-                    <div className={styles.subheader}>
-                        <Text variant="medium">{info.date}</Text>
-                        <Text variant="medium" className={styles.hours}>
-                            {' '}
-                            {info.time}{' '}
-                        </Text>
-                    </div>
-                    <div className={styles.status}>
-                        <Text variant="medium">Status:</Text>
-                        <Dropdown
-                            options={DROPDOWN_KEYS}
-                            styles={DROPDOWN_STYLES}
-                            selectedKey={info.status}
-                            onChange={
-                                info.user.ID === currentUser.User.ID || canEditOthers
-                                    ? handleChange
-                                    : null
-                            }
-                            disabled={info.user.ID === currentUser.User.ID ? false : !canEditOthers}
-                        />
-                    </div>
-                    {info.description || info.remark ? (
-                        <div className={styles.body}>
-                            <IconButton
-                                onClick={toggleOpen}
-                                iconProps={{
-                                    iconName: open ? OPEN_ICON : CLOSED_ICON,
-                                }}
+                    <InnerTask
+                        info={info}
+                        canEditOthers={canEditOthers}
+                        currentUser={currentUser}
+                        expired={expired}
+                        isHovering={isHovering}
+                        onChange={handleChange}
+                        TaskPersona={
+                            <TaskPersona
+                                title={info.user.Title}
+                                email={info.user.EMail}
+                                className={styles.Task_person}
+                                isHovering={isHovering}
+                                taskId={isTask(props.task) ? props.task.ID : props.task.Task.ID}
+                                taskLogId={isTask(props.task) ? null : props.task.ID}
+                                date={props.date}
+                                status={info.status}
                             />
-                            {body}
-                        </div>
-                    ) : null}
+                        }
+                    />
                 </div>
             )}
         </Draggable>

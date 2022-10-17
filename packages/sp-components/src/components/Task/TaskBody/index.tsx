@@ -1,6 +1,6 @@
 import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { CopyOnClickText } from '../CopyOnClickText';
+import { CopyOnClickText } from '../../CopyOnClickText';
 import styles from './TaskBody.module.scss';
 
 export interface ITaskBodyProps {
@@ -15,14 +15,14 @@ const COPY_RE = /\[\[([^\]]+)\]\]/g;
 const parseText = (text: string): JSX.Element => {
     const tokens = Array.from(text.matchAll(COPY_RE));
     // If no tokens, return text as is
-    const result = [];
+    const result: JSX.Element[] = [];
     let startPivot = 0;
     tokens.forEach((token) => {
         // Everything from startPivot to token is simple text
         result.push(<>{text.slice(startPivot, token.index)}</>)
         // token becomes copy on click
         result.push(<CopyOnClickText text={token[1]} variant='smallPlus' />)
-        startPivot = token.index + token[0].length;
+        startPivot = token.index! + token[0].length;
     })
     // If there is any text left after startPivot, just include it as simple text
     if (startPivot < text.length) {

@@ -1,0 +1,36 @@
+.Task__persona {
+    cursor: pointer;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid transparent;
+}
+
+.Task__persona_size_sm {
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    min-height: 24px;
+}
+
+.Task__persona_theme_primary {
+    border: 1px solid '[theme: themePrimary, default: #a4262c]';
+}
+
+.Task__edit-button {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    transition: opacity .2s;
+    width: 100%;
+}
+
+.Task__edit-button_hidden {
+    opacity: 0;
+}
+
+.Task__edit-icon_size_sm {
+    width: 24px;
+    height: 24px;
+}

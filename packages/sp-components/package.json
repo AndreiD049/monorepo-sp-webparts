@@ -1,0 +1,35 @@
+{
+  "name": "sp-components",
+  "version": "1.0.0",
+  "description": "Shared components for Sharepoint Framework",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rollup -c --environment BUILD:production",
+    "dev": "rollup -c --watch"
+  },
+  "author": "Dimitrascu Andrei",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@types/react": "16.9.51",
+    "node-sass": "^7.0.3",
+    "office-ui-fabric-react": "7.174.1",
+    "postcss": "^8.4.18",
+    "react": "^16.13.1",
+    "rollup": "^3.2.2",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "sp-react-notifications": "^1.0.23",
+    "typescript": "^4.8.4"
+  },
+  "peerDependencies": {
+    "office-ui-fabric-react": "7.174.1",
+    "sp-react-notifications": "^1.0.23",
+    "react": "^16.13.1"
+  },
+  "dependencies": {
+    "@service/sp-tasks": "^1.0.0"
+  }
+}

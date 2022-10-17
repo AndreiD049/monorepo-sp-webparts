@@ -36,6 +36,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "16.13.1",
     "react-visibility-hook": "^1.0.0",
+    "sp-components": "^1.0.0",
     "sp-preset": "^2.0.6",
     "sp-react-notifications": "^1.0.23",
     "use-web-storage-api": "^1.0.3"
