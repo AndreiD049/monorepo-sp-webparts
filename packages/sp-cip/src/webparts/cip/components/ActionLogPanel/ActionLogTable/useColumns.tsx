@@ -83,7 +83,7 @@ export function useColumns(tasks: ITaskOverview[], handleEdit: (action: IAction,
                     // Edit is possible only for time logs
                     if (item.ActivityType !== 'Time log') return null;
                     if (currentUser?.Id === item.Author.Id)
-                        return <IconButton onClick={() => handleEdit(item, tasks.find((t) => t.Id === item.ItemId))} iconProps={{ iconName: 'Edit' }} />;
+                        return <IconButton onClick={() => handleEdit(item, tasks.find((t) => t?.Id === item.ItemId))} iconProps={{ iconName: 'Edit' }} />;
                 },
                 isResizable: true,
             },
