@@ -1,1 +1,2 @@
+export const MINUTE = 1000 * 60;
 export const SECTION_EVENT = 'SP_HOMEPAGE_SECTION_EVENT';

@@ -11,10 +11,12 @@ export interface IActionsCellProps {
     disabled?: boolean;
     taskFinished?: boolean;
     items: IActionDetails[];
-    overflowItems: IActionDetails[];
+    overflowItems?: IActionDetails[];
+
+    style?: React.CSSProperties;
 }
 
-export const ActionsCell: React.FC<IActionsCellProps> = (props) => {
+export const ActionsCell: React.FC<IActionsCellProps> = ({ style = {}, ...props }) => {
     const items = React.useMemo(() => {
         const result: JSX.Element[] = [];
         props.items.forEach((item) => {
@@ -42,40 +44,48 @@ export const ActionsCell: React.FC<IActionsCellProps> = (props) => {
                     );
                     break;
                 case 'edit':
-                    result.push(<IconButton
-                        className={styles.actionButton}
-                        iconProps={{ iconName: 'Edit' }}
-                        title="Edit task"
-                        disabled={props.disabled}
-                        onClick={item.onClick}
-                    />);
+                    result.push(
+                        <IconButton
+                            className={styles.actionButton}
+                            iconProps={{ iconName: 'Edit' }}
+                            title="Edit task"
+                            disabled={props.disabled}
+                            onClick={item.onClick}
+                        />
+                    );
                     break;
                 case 'logTime':
-                    result.push(<IconButton
-                        className={styles.actionButton}
-                        iconProps={{ iconName: 'Clock' }}
-                        title="Log time"
-                        disabled={props.disabled}
-                        onClick={item.onClick}
-                    />);
+                    result.push(
+                        <IconButton
+                            className={styles.actionButton}
+                            iconProps={{ iconName: 'Clock' }}
+                            title="Log time"
+                            disabled={props.disabled}
+                            onClick={item.onClick}
+                        />
+                    );
                     break;
                 case 'startTimer':
-                    result.push(<IconButton
-                        className={styles.actionButton}
-                        iconProps={{ iconName: 'Play' }}
-                        title="Start timer"
-                        disabled={props.disabled}
-                        onClick={item.onClick}
-                    />);
+                    result.push(
+                        <IconButton
+                            className={styles.actionButton}
+                            iconProps={{ iconName: 'Play' }}
+                            title="Start timer"
+                            disabled={props.disabled}
+                            onClick={item.onClick}
+                        />
+                    );
                     break;
                 case 'navigate':
-                    result.push(<IconButton
-                        className={styles.actionButton}
-                        iconProps={{ iconName: 'OpenInNewWindow' }}
-                        title="Navigate"
-                        disabled={props.disabled}
-                        onClick={item.onClick}
-                    />);
+                    result.push(
+                        <IconButton
+                            className={styles.actionButton}
+                            iconProps={{ iconName: 'OpenInNewWindow' }}
+                            title="Navigate"
+                            disabled={props.disabled}
+                            onClick={item.onClick}
+                        />
+                    );
                     break;
             }
         });
@@ -112,17 +122,19 @@ export const ActionsCell: React.FC<IActionsCellProps> = (props) => {
     }, [props.overflowItems]);
 
     return (
-        <div className={styles.container}>
+        <div className={styles.container} style={style}>
             {items}
-            <IconButton
-                title="More options"
-                disabled={props.disabled}
-                menuIconProps={{ iconName: 'MoreVertical' }}
-                className={styles.actionButton}
-                menuProps={{
-                    items: overflowItems,
-                }}
-            />
+            {props.overflowItems && (
+                <IconButton
+                    title="More options"
+                    disabled={props.disabled}
+                    menuIconProps={{ iconName: 'MoreVertical' }}
+                    className={styles.actionButton}
+                    menuProps={{
+                        items: overflowItems,
+                    }}
+                />
+            )}
         </div>
     );
 };

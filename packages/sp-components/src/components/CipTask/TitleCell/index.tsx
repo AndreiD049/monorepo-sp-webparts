@@ -21,14 +21,17 @@ export interface ITitleCellProps {
     onDoubleClick?: () => void;
     onClick?: () => void;
     onToggleOpen?: (taskId: number, open: boolean) => void;
+
+    style?: React.CSSProperties;
 }
 
-export const TitleCell: React.FC<ITitleCellProps> = ({ level = 0, ...props }) => {
+export const TitleCell: React.FC<ITitleCellProps> = ({ level = 0, style = {}, ...props }) => {
     return (
         <div
             className={styles.container}
             style={{
                 marginLeft: 30 * level,
+                ...style,
             }}
             data-type="row"
             itemType="button"
