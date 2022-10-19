@@ -1,8 +1,6 @@
 import {
     getTheme,
     Stack,
-    StackItem,
-    themeRulesStandardCreator,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { FC } from 'react';

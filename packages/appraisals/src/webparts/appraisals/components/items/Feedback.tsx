@@ -1,5 +1,4 @@
-import { Stack } from '@microsoft/office-ui-fabric-react-bundle';
-import { TextField } from 'office-ui-fabric-react';
+import { Stack, TextField } from 'office-ui-fabric-react';
 import * as React from 'react';
 import IItem from '../../dal/IItem';
 import IPeriod from '../../dal/IPeriod';
@@ -82,6 +81,7 @@ const Feedback: React.FC<IFeedbackProps> = (props) => {
                     autoAdjustHeight
                     disabled={disabled}
                     onBlur={!disabled && handleBlur}
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     onChange={(_e: any, newVal: string) =>
                         setItem((prev) => ({
                             ...prev,

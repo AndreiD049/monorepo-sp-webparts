@@ -2,3 +2,14 @@ export { Task } from './components/Task';
 export { CopyOnClickText } from './components/CopyOnClickText';
 export { Pill } from './components/Pill';
 export { PriorityCell } from './components/CipTask/PriorityCell';
+export {
+    Callout,
+    ICalloutEventProps,
+    ISPCalloutProps,
+    hideCallout,
+    showCallout,
+} from './components/Callout';
+export { CheckExpandButton, ICheckExpandButtonProps } from './components/CipTask/CheckExpandButton';
+export { TitleCell, ITitleCellProps } from './components/CipTask/TitleCell';
+export { ActionsCell, IActionDetails, IActionsCellProps } from './components/CipTask/ActionsCell';
+export { DueDateCell, IDueDateCellProps } from './components/CipTask/DueDateCell';

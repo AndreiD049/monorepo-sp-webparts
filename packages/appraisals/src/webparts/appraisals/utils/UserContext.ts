@@ -1,4 +1,4 @@
-import { IUserGroupPermissions } from 'property-pane-access-control';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react';
 import { IContextInfo } from 'sp-preset';
 import { IAppraisalsWebPartProps } from '../AppraisalsWebPart';

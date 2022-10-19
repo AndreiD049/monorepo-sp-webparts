@@ -1,22 +1,17 @@
-import {
-    getTheme,
-    Stack,
-    StackItem,
-} from '@microsoft/office-ui-fabric-react-bundle';
-import { MessageBarType, Separator, Text } from 'office-ui-fabric-react';
+import { getTheme, MessageBarType, Separator, Stack, StackItem, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import IPeriod from '../../dal/IPeriod';
 import { IUser } from '../../dal/IUser';
 import useForceUpdate from '../../utils/forceUpdate';
 import UserContext from '../../utils/UserContext';
-import Feedback from '../items/Feedback';
-import ObjectiveItems from '../items/ObjectiveItems';
 import PeoplePicker from '../items/PeoplePicker';
-import SwotItems from '../items/SwotItems';
-import TrainingItems from '../items/TrainingItems';
 import styles from './PeriodDetails.module.scss';
 import { SPnotify } from 'sp-react-notifications';
 import * as strings from 'AppraisalsWebPartStrings';
+import ObjectiveItems from '../items/ObjectiveItems';
+import TrainingItems from '../items/TrainingItems';
+import SwotItems from '../items/SwotItems';
+import Feedback from '../items/Feedback';
 
 export interface IPeriodDetailsProps {
     ID: string;
@@ -31,7 +26,7 @@ const theme = getTheme();
  * - Trainings
  * - SWOT Matrix
  */
-const PeriodDetails = (props: IPeriodDetailsProps) => {
+const PeriodDetails: React.FC<IPeriodDetailsProps> = (props) => {
     const context = React.useContext(UserContext);
     const forceUpdate = useForceUpdate();
     const [period, setPeriod] = React.useState<IPeriod>(null);
@@ -49,7 +44,7 @@ const PeriodDetails = (props: IPeriodDetailsProps) => {
         async function run() {
             const cu = await context.UserService.getCurrentUser();
             setCurrentUser(cu);
-            if (!Boolean(await context.FolderService.getCurrentUserFolder())) {
+            if (!(await context.FolderService.getCurrentUserFolder())) {
                 SPnotify({
                     message: 'Folder is not created. Contact administration in order to create it.',
                     messageType: MessageBarType.severeWarning,

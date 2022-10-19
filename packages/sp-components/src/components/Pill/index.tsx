@@ -7,7 +7,6 @@ export interface IPillProps extends React.HTMLAttributes<HTMLElement> {
 }
 
 export const Pill: React.FC<IPillProps> = ({ value, id, disabled, ...rest }) => {
-
     const classNames = React.useMemo(() => {
         let result = `${styles.pillContainerInner} ${rest.className}`;
         if (disabled) {

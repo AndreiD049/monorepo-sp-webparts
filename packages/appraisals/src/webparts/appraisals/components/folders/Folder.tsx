@@ -3,12 +3,11 @@ import IUserFolder from './IFolder';
 import styles from './Folders.module.scss';
 import {
     CompactPeoplePicker,
-    Icon,
+    IconButton,
     IPersonaProps,
     PersonaCoin,
     Text,
 } from 'office-ui-fabric-react';
-import { IconButton } from '@microsoft/office-ui-fabric-react-bundle';
 import { ISiteUserInfo } from 'sp-preset';
 import ManageFolderService from './folder-service';
 import UserContext from '../../utils/UserContext';

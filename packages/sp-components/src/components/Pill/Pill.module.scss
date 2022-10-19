@@ -22,7 +22,7 @@
 }
 
 .disabled {
-    background-color: transparentize($color: lightgray, $amount: .7);
-    color: transparentize($color: gray, $amount: .5);
-    border-color: gray;
+    background-color: transparentize($color: lightgray, $amount: .7) !important;
+    color: transparentize($color: gray, $amount: .5) !important;
+    border-color: gray !important;
 }

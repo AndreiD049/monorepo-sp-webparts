@@ -1,17 +1,5 @@
-import { flatten, uniqBy } from '@microsoft/sp-lodash-subset';
-import { IUser } from './IUser';
-import { Caching } from 'sp-preset';
-import GroupService from './Groups';
 import UserService from './Users';
-import AppraisalsWebPart from '../AppraisalsWebPart';
-import { intersectionBy } from 'lodash';
-import ItemService, { LIST_NAME } from './Items';
 import ManageFolderService from '../components/folders/folder-service';
-
-const LIST_TITLE = 'TeamLeaders';
-const GROUP_CONTENTTYPE_PREFIX = '0x010B';
-const USER_CONTENTTYPE_PREFIX = '0x010A';
-
 
 export interface ITeamMember {
     UserId: string;

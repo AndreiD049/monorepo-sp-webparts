@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import IItem, { ItemType } from './IItem';
 import { IList, SPFI } from 'sp-preset';
 import AppraisalsWebPart from '../AppraisalsWebPart';
 import UserService from './Users';
 import { Guid } from '@microsoft/sp-core-library';
-import { ThemeSettingName } from 'office-ui-fabric-react';
 
 export const LIST_NAME = 'Appraisal items';
 const SELECT = [

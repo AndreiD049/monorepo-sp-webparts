@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MessageBarType } from 'office-ui-fabric-react';
 import { SPnotify } from 'sp-react-notifications';
 import IItem, { ItemStatus, ItemType } from '../../dal/IItem';
@@ -47,6 +48,7 @@ const handleCreate = async (
 const handleUpdate = async (
     id: string,
     item: Partial<IItem>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setItems: (old: any) => any
 ) => {
     try {

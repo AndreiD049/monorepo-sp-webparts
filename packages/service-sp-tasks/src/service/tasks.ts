@@ -47,9 +47,14 @@ export class TaskService {
         return this.sp.web.lists.getByTitle(this.listTitle).items.getById(id).select(...TASK_SELECT).expand(...TASK_EXPAND)();
     }
 
-    async getTasksByUserId(userId: number) {
+    async getTasksByUserId(userId: number, date?: Date) {
+        let filter = `AssignedToId eq ${userId}`
+        if (date) {
+            const isoDate = DateTime.fromJSDate(date).toISODate();
+            filter += `and ActiveFrom le '${isoDate}' and ActiveTo ge '${isoDate}'`;
+        }
         return this._wrap(this.list.items
-            .filter(`AssignedToId eq ${userId}`))();
+            .filter(filter))();
     }
 
     async getTasksByOriginalId(originalId: number): Promise<ITask[]> {

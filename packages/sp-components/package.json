@@ -6,19 +6,20 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rollup -c --environment BUILD:production",
-    "dev": "rollup -c --watch"
+    "dev": "rollup -c --watch --environment BUILD:production"
   },
   "author": "Dimitrascu Andrei",
   "license": "MIT",
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^15.0.0",
     "@microsoft/sp-component-base": "1.14.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
     "@types/react": "16.9.51",
     "node-sass": "^7.0.3",
     "office-ui-fabric-react": "7.185.7",
     "postcss": "^8.4.18",
     "react": "^16.13.1",
     "rollup": "^3.2.2",
+    "rollup-plugin-cleaner": "^1.0.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-typescript2": "^0.34.1",
@@ -27,10 +28,11 @@
   },
   "peerDependencies": {
     "office-ui-fabric-react": "7.185.7",
-    "sp-react-notifications": "^1.0.23",
-    "react": "^16.13.1"
+    "react": "^16.13.1",
+    "sp-react-notifications": "^1.0.23"
   },
   "dependencies": {
+    "@service/sp-cip": "^1.0.0",
     "@service/sp-tasks": "^1.0.0"
   }
 }

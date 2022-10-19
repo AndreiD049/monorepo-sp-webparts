@@ -1,4 +1,4 @@
-import { ISiteUser, ISiteUserInfo } from "sp-preset";
+import { ISiteUserInfo } from "sp-preset";
 
 export default interface IUserFolder {
     GUID: string;

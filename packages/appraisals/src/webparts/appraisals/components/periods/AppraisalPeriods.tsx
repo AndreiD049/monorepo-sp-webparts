@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FC } from 'react';
 import * as React from 'react';
 import {
@@ -12,7 +13,6 @@ import {
     Selection,
     getTheme,
     SelectionMode,
-    IObjectWithKey,
 } from 'office-ui-fabric-react';
 import IPeriod from '../../dal/IPeriod';
 import constants from '../../utils/constants';
@@ -152,7 +152,7 @@ const AppraisalPeriods: FC = () => {
                 key: 'open',
                 text: 'Open',
                 onClick: () => handleOpenItem(selectedItem),
-                disabled: !Boolean(selectedItem),
+                disabled: !(selectedItem),
                 iconProps: {
                     iconName: 'OEM',
                 },
@@ -180,7 +180,7 @@ const AppraisalPeriods: FC = () => {
                         context.canFinish &&
                         Boolean(selectedItem) &&
                         handleFinishPeriod(selectedItem.ID),
-                    disabled: context.canFinish ? !Boolean(selectedItem) : true,
+                    disabled: context.canFinish ? !(selectedItem) : true,
                     iconProps: {
                         iconName: 'LockSolid',
                     },

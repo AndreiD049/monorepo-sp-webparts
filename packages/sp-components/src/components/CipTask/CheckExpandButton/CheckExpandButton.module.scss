@@ -1,0 +1,59 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+$buttonSide: 30px;
+
+.roundButton {
+    border-radius: 20px;
+    background-color: $ms-color-neutralTertiaryAlt;
+    border: 1px solid;
+    border-color: $ms-color-neutralQuaternary;
+    outline: none;
+    width: $buttonSide;
+    height: $buttonSide;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    cursor: pointer;
+    transition: background-color .2s ease-out;
+    font-size: 1.2em;
+    position: relative;
+
+    &:hover {
+        background-color: $ms-color-neutralTertiary;
+    }
+
+    &Open {
+        &:hover {
+            background-color: $ms-color-greenLight;
+        }
+    }
+
+    &Finished {
+        &:hover {
+            background-color: $ms-color-red;
+            color: white;
+        }
+    }
+}
+
+.container {
+    display: flex;
+    flex-flow: row nowrap;
+    position: relative;
+}
+
+.containerEmpty {
+    margin-right: .8em;
+}
+
+.subtaskCounter {
+    line-height: $buttonSide;
+    display: flex;
+    flex-flow: row nowrap;
+    font-size: .9em;
+}
+
+.subtaskCounterDelimiter {
+    margin: 0 2px;
+}

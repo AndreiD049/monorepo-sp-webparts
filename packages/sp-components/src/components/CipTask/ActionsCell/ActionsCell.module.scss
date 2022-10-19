@@ -1,0 +1,28 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.actionButton {
+    width: 1.5em;
+    height: 1.5em;
+    margin-right: 0.5em;
+
+    i {
+        font-size: 1em;
+    }
+
+    &:disabled {
+        background-color: transparent;
+    }
+}

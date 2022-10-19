@@ -7,7 +7,7 @@ import {
     PropertyPaneTextField,
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import SPBuilder, { InjectHeaders, RequestDigest } from 'sp-preset';
+import SPBuilder, { InjectHeaders } from 'sp-preset';
 
 import * as strings from 'AppraisalsWebPartStrings';
 import Root, { IRootProps } from './components/Root';

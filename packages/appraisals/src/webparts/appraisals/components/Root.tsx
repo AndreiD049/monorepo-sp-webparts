@@ -7,7 +7,7 @@ import UserContext, { IUserContext } from '../utils/UserContext';
 import { getSiteInfo } from '../dal/Site';
 import UserService from '../dal/Users';
 import { getTeamMembers } from '../dal/TeamMembers';
-import { canCurrentUser, IUserGroupPermissions } from 'property-pane-access-control';
+import { canCurrentUser } from 'property-pane-access-control';
 import PeriodService from '../dal/Periods';
 import GroupService from '../dal/Groups';
 import ItemService from '../dal/Items';

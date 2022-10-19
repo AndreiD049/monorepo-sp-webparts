@@ -5,12 +5,10 @@ import {
     Pivot,
     PivotItem,
     SearchBox,
-    Text,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import UserContext from '../../utils/UserContext';
 import Folder, { siteUserInfoToPersona } from './Folder';
-import ManageFolderService from './folder-service';
 import IUserFolder from './IFolder';
 import styles from './Folders.module.scss';
 import UserService from '../../dal/Users';
@@ -23,7 +21,7 @@ export interface ManageFoldersPanelProps {
 }
 
 const ManageFoldersPanel: React.FC<ManageFoldersPanelProps> = (props) => {
-    const { canManageFolders, properties, FolderService } =
+    const { canManageFolders, FolderService } =
         React.useContext(UserContext);
     const [folders, setFolders] = React.useState<IUserFolder[]>([]);
     const [users, setUsers] = React.useState<ISiteUserInfo[]>([]);
@@ -103,6 +101,7 @@ const ManageFoldersPanel: React.FC<ManageFoldersPanelProps> = (props) => {
                                 className={styles.search}
                                 placeholder="Search..."
                                 value={searchValue}
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 onChange={(_evt: any, val: string) =>
                                     setSearchValue(val)
                                 }

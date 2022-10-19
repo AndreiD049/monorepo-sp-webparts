@@ -70,7 +70,7 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
             if (!selectedUser) return;
             const tasks = await taskCache
                 .getTasks(selectedUser.Id)
-                .get(() => taskService.getTasksByUserId(selectedUser.Id));
+                .get(() => taskService.getTasksByUserId(selectedUser.Id,  new Date()));
             const logs = await logService.getTaskLogsByUserId(new Date(), selectedUser.Id);
             const selected = selectTasks(tasks, new Date());
             const created = await checkTasksAndCreateTaskLogs(

@@ -1,0 +1,21 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    min-width: 1px;
+}
+.button {
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    text-align: start;
+}
+
+.dueDateExpired {
+    color: $ms-color-red;
+    font-weight: bold;
+}
+
+.dueDateAboutToExpire {
+    font-weight: bold;
+}
