@@ -71,7 +71,7 @@ export var DueDateCell = function (props) {
                     hideCallout(calloutId);
                 } })),
         });
-    }, []);
+    }, [calloutId]);
     var dateClassName = React.useMemo(function () {
         var due = props.dueDate;
         var today = new Date();

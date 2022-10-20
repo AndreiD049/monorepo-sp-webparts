@@ -1,0 +1,10 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.parentStroke {
+    fill: none;
+    stroke: $ms-color-neutralTertiaryAlt;
+    stroke-width: 2px;
+    stroke-dasharray: 3, 3;
+    position: absolute;
+    overflow: visible;
+}

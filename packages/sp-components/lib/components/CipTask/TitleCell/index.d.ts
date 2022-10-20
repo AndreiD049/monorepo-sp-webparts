@@ -6,6 +6,8 @@ export interface ITitleCellProps {
     attachments: number;
     orphan?: boolean;
     level?: number;
+    parentId?: number;
+    prevSiblingId?: number;
     totalSubtasks: number;
     finishedSubtasks: number;
     open?: boolean;

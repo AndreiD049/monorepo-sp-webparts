@@ -13,3 +13,5 @@ export { CheckExpandButton, ICheckExpandButtonProps } from './components/CipTask
 export { TitleCell, ITitleCellProps } from './components/CipTask/TitleCell';
 export { ActionsCell, IActionDetails, IActionsCellProps } from './components/CipTask/ActionsCell';
 export { DueDateCell, IDueDateCellProps } from './components/CipTask/DueDateCell';
+export { TaskShimmer } from './components/CipTask/TaskShimmer';
+export { ParentStroke } from './components/CipTask/ParentStroke';

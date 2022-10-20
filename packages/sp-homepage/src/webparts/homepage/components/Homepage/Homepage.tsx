@@ -12,6 +12,8 @@ import { filterSections } from '../../services/SectionService';
 import { SectionFactory } from '../SectionFactory';
 import { ConditionChecker } from '../../services/ConditionChecker';
 import { SectionPreProcessor } from '../../services/SectionPreProcessor';
+import { Callout } from 'sp-components';
+import { CALLOUT_ID } from '../../constants';
 import { useLayout } from '../../hooks/useLayout';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -103,6 +105,7 @@ export const Homepage: React.FC<IHomepageProps> = (props) => {
                     </ResponsiveGridLayout>
                 )}
             </GridWrapper>
+            <Callout id={CALLOUT_ID} />
         </GlobalContext.Provider>
     );
 };

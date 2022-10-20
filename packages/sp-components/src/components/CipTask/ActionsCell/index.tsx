@@ -93,6 +93,7 @@ export const ActionsCell: React.FC<IActionsCellProps> = ({ style = {}, ...props 
     }, [props.items]);
 
     const overflowItems = React.useMemo(() => {
+        if (!props.overflowItems) return [];
         const result: IContextualMenuItem[] = [];
         props.overflowItems.forEach((item) => {
             switch (item.name) {

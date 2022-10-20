@@ -2,6 +2,7 @@ import { Icon, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Pill } from '../../Pill';
 import { CheckExpandButton } from '../CheckExpandButton';
+import { ParentStroke } from '../ParentStroke';
 import styles from './TitleCell.module.scss';
 
 export interface ITitleCellProps {
@@ -11,6 +12,10 @@ export interface ITitleCellProps {
     attachments: number;
     orphan?: boolean;
     level?: number;
+
+    // stroke props
+    parentId?: number;
+    prevSiblingId?: number;
 
     totalSubtasks: number;
     finishedSubtasks: number;
@@ -28,25 +33,34 @@ export interface ITitleCellProps {
 export const TitleCell: React.FC<ITitleCellProps> = ({ level = 0, style = {}, ...props }) => {
     return (
         <div
+            style={style}
             className={styles.container}
-            style={{
-                marginLeft: 30 * level,
-                ...style,
-            }}
             data-type="row"
             itemType="button"
             onDoubleClick={props.onDoubleClick || (() => null)}
         >
-            <CheckExpandButton
-                finishedSubtasks={props.finishedSubtasks}
-                totalSubtasks={props.totalSubtasks}
-                onClick={props.onClick || (() => null)}
-                onToggleOpen={props.onToggleOpen || (() => null)}
-                taskId={props.taskId}
-                open={props.open}
-                taskFinished={props.taskFinished}
-                disabled={props.buttonDisabled}
-            />
+            <div
+                style={{
+                    marginLeft: 30 * level,
+                    position: 'relative',
+                }}
+            >
+                <CheckExpandButton
+                    finishedSubtasks={props.finishedSubtasks}
+                    totalSubtasks={props.totalSubtasks}
+                    onClick={props.onClick || (() => null)}
+                    onToggleOpen={props.onToggleOpen || (() => null)}
+                    taskId={props.taskId}
+                    open={props.open}
+                    taskFinished={props.taskFinished}
+                    disabled={props.buttonDisabled}
+                />
+                <ParentStroke
+                    taskId={props.taskId}
+                    parentId={props.parentId}
+                    prevSiblingId={props.prevSiblingId}
+                />
+            </div>
             {props.orphan && <Pill value="Subtask" />}
             <div className={styles.titleCell}>
                 <Text

@@ -29,6 +29,7 @@ export class TaskNode implements IClonable<TaskNode> {
             this.Id = this.task.Id;
             this.type = 'proxy';
         } else {
+            this.Id = this.task.Id;
             this.type = 'normal';
         }
     }

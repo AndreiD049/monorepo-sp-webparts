@@ -41,6 +41,8 @@ export var ActionsCell = function (_a) {
         return result;
     }, [props.items]);
     var overflowItems = React.useMemo(function () {
+        if (!props.overflowItems)
+            return [];
         var result = [];
         props.overflowItems.forEach(function (item) {
             switch (item.name) {

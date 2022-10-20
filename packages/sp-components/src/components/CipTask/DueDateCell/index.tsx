@@ -109,7 +109,7 @@ export const DueDateCell: React.FC<IDueDateCellProps> = (props) => {
                 />
             ),
         });
-    }, []);
+    }, [calloutId]);
 
     const dateClassName = React.useMemo(() => {
         const due = props.dueDate;

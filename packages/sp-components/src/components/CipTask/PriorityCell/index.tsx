@@ -22,34 +22,44 @@ const PriorityCellCallout: React.FC<IPriorityCellCalloutProps> = (props) => {
                     key={choice}
                     style={{
                         height: '100%',
-                        width: '100%',
+                        width: '100px',
                         borderRadius: '5px',
                     }}
-                    onClick={() => props.handleClick(choice)}
+                    onClick={() => {
+                        props.handleClick(choice);
+                    }}
                     value={choice}
                     disabled={taskDisabled}
                     className={`sp-cip-pill-${choice.toLowerCase()}`}
                 />
             );
         });
-    }, [props.choices, props.currentChoice]);
+    }, [props]);
 
     return <div className={styles.text}>{choices}</div>;
 };
 
 export interface IPriorityCellProps {
     task: ITaskOverview;
+    choices: string[];
     disabled?: boolean;
     calloutId?: string;
     onChangePriority: (priority: string) => void;
+
+    className?: string;
+    style?: React.CSSProperties;
 }
 
-export const PriorityCell: React.FC<IPriorityCellProps> = (props) => {
+export const PriorityCell: React.FC<IPriorityCellProps> = ({
+    style = {},
+    className = '',
+    ...props
+}) => {
     const containerRef = React.useRef(null);
-    const calloutId = React.useMemo(() => (props.calloutId ? props.calloutId : CALLOUT_ID), []);
+    const calloutId = React.useMemo(() => (props.calloutId ? props.calloutId : `${CALLOUT_ID}/${props.task.Id}`), []);
 
     return (
-        <div ref={containerRef}>
+        <div ref={containerRef} className={`${styles.container} ${className}`} style={style}>
             <Pill
                 onClick={() =>
                     showCallout({
@@ -60,7 +70,7 @@ export const PriorityCell: React.FC<IPriorityCellProps> = (props) => {
                         },
                         content: (
                             <PriorityCellCallout
-                                choices={['Low', 'Medium', 'High']}
+                                choices={props.choices}
                                 currentChoice={props.task.Priority}
                                 handleClick={(choice) => {
                                     props.onChangePriority(choice);
@@ -79,7 +89,7 @@ export const PriorityCell: React.FC<IPriorityCellProps> = (props) => {
                 value={props.task.Priority}
                 disabled={props.disabled}
             />
-            {props.calloutId ? null : <Callout id={CALLOUT_ID} />}
+            {props.calloutId ? null : <Callout id={calloutId} />}
         </div>
     );
 };
