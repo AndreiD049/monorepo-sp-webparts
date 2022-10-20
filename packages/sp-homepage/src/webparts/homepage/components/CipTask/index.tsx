@@ -1,11 +1,12 @@
-import * as React from 'react';
-import { IDetailsRowProps, IColumn } from 'office-ui-fabric-react';
-import { ITaskOverviewWithSource } from '../../sections/CipSection';
-import { TitleCell, ActionsCell, PriorityCell, DueDateCell, TaskShimmer } from 'sp-components';
 import { TaskNode } from '@service/sp-cip';
-import { CALLOUT_ID, RELINK_EVT } from '../../constants';
-import { convertTask } from './utils';
+import { IColumn, IDetailsRowProps } from 'office-ui-fabric-react';
+import * as React from 'react';
+import { ActionsCell, DueDateCell, PriorityCell, TaskShimmer, TitleCell } from 'sp-components';
+import { CALLOUT_ID } from '../../constants';
+import { ITaskOverviewWithSource } from '../../sections/CipSection';
 import styles from './CipTask.module.scss';
+import { useRelink } from './useRelink';
+import { convertTask } from './utils';
 
 export interface ITaskCellProps {
     column: IColumn;
@@ -22,6 +23,8 @@ export interface ITaskCellProps {
 
 export const TaskCell: React.FC<ITaskCellProps> = (props) => {
     let result = null;
+    
+    // Depending on column, render different cells
     switch (props.column.key) {
         case 'Title':
             result = (
@@ -32,7 +35,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                     }}
                     level={props.level}
                     open={props.open}
-                    onToggleOpen={(id: number, open: boolean) => props.onOpen(open)}
+                    onToggleOpen={(_id: number, open: boolean) => props.onOpen(open)}
                     onClick={() => console.log('finish?')}
                     taskId={props.task.Id}
                     prevSiblingId={props.prevSiblingId}
@@ -100,10 +103,9 @@ export interface ICipTaskProps {
 export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
     const node: TaskNode = props.rowProps.item;
     const item: ITaskOverviewWithSource = node.getTask() as ITaskOverviewWithSource;
-    const evtName = `${RELINK_EVT}/${item.MainTaskId}`;
     const [subtasks, setSubtasks] = React.useState<ITaskOverviewWithSource[]>([]);
     const [open, setOpen] = React.useState<boolean>(false);
-    const [relink, setRelink] = React.useState<boolean>(false);
+    const [relink, relinkAllUnderMain] = useRelink(item.MainTaskId);
 
     // Fetch data from API
     React.useEffect(() => {
@@ -123,49 +125,10 @@ export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
     const handleOpen = React.useCallback((open: boolean) => {
         setOpen(open);
         // After we set nore open, we also relink parent
-        setTimeout(() => {
-            document.dispatchEvent(new CustomEvent(evtName));
-        }, 0);
+        relinkAllUnderMain()
     }, []);
 
-    // Handle Relinking parent with ParentStroke
-    React.useEffect(() => {
-        function handler(evt: CustomEvent): void {
-            setRelink((prev) => !prev);
-        }
-        document.addEventListener(evtName, handler);
-        return () => document.removeEventListener(evtName, handler);
-    }, [evtName]);
-
-    const renderSubtasks = React.useMemo(() => {
-        if (open && subtasks.length === 0) {
-            return Array(item.Subtasks)
-                .fill(1)
-                .map((_t, idx) => (
-                    <TaskShimmer
-                        key={`${item.service.source.rootUrl}/${item.Id}/${idx}`}
-                        rowProps={props.rowProps}
-                        parentNode={node}
-                    />
-                ));
-        } else if (subtasks.length > 0) {
-            setTimeout(() => {
-                document.dispatchEvent(new CustomEvent(evtName));
-            }, 0);
-            return subtasks.map((task) => (
-                <CipTask
-                    key={`${task.service.source.rootUrl}/${task.Id}`}
-                    rowProps={{
-                        ...props.rowProps,
-                        item: node.getChildren().find((n) => n.Id === task.Id),
-                    }}
-                    level={level + 1}
-                />
-            ));
-        }
-        return null;
-    }, [subtasks, props.rowProps, open]);
-
+    // Render the whole row
     const body = React.useMemo(() => {
         const result: JSX.Element[] = [];
         props.rowProps.columns.forEach((column: IColumn) => {
@@ -182,6 +145,39 @@ export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
         });
         return result;
     }, [props.rowProps, open, relink]);
+
+    // Render the subtasks
+    const renderSubtasks = React.useMemo(() => {
+        if (open && subtasks.length === 0) {
+            // task is expanded but the subtasks are not yet loaded
+            // showing shimmers instead
+            return Array(item.Subtasks)
+                .fill(1)
+                .map((_t, idx) => (
+                    <TaskShimmer
+                        key={`${item.service.source.rootUrl}/${item.Id}/${idx}`}
+                        rowProps={props.rowProps}
+                        parentNode={node}
+                    />
+                ));
+        } else if (open && subtasks.length > 0) {
+            // Now the subtasks are loaded
+            // We can render them as well as redraw the link to
+            // the parent task
+            relinkAllUnderMain();
+            return subtasks.map((task) => (
+                <CipTask
+                    key={`${task.service.source.rootUrl}/${task.Id}`}
+                    rowProps={{
+                        ...props.rowProps,
+                        item: node.getChildren().find((n) => n.Id === task.Id),
+                    }}
+                    level={level + 1}
+                />
+            ));
+        }
+        return null;
+    }, [subtasks, props.rowProps, open]);
 
     return (
         <div className={styles.container}>

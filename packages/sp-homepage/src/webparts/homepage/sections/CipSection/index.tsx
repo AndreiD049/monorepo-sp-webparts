@@ -12,13 +12,10 @@ import { flatten } from '@microsoft/sp-lodash-subset';
 import { MINUTE } from '../../constants';
 import { IColumn, DetailsList, SelectionMode, DetailsListLayoutMode } from 'office-ui-fabric-react';
 import { ISiteUserInfo } from 'sp-preset';
+import { useGroups } from '../../components/CipTask/useGroups';
 
 export interface ICipSectionProps extends ISectionProps {
     // Props go here
-}
-
-export interface ITaskOverviewWithSource extends ITaskOverview {
-    service: ICipService;
 }
 
 export interface ICipService {
@@ -26,6 +23,11 @@ export interface ICipService {
     getOpenTasks: (userId: number) => Promise<ITaskOverview[]>;
     getSubtasks: (task: ITaskOverview) => Promise<ITaskOverview[]>;
     getUser: (loginName: string) => Promise<ISiteUserInfo>;
+}
+
+// Task details with information on it's original source
+export interface ITaskOverviewWithSource extends ITaskOverview {
+    service: ICipService;
 }
 
 const createCipService = (source: ISource): ICipService => {
@@ -37,6 +39,7 @@ const createCipService = (source: ISource): ICipService => {
         sp,
         listName: source.listName,
     });
+
     return {
         source,
         getOpenTasks: async (userId: number) => {
@@ -80,12 +83,11 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
         async function run(): Promise<void> {
             if (!selectedUser) return null;
             const tasks = await Promise.all(
-                
                 // Find the open tasks for each service
                 services.map(async (s) => {
                     // Get current source user
                     const user = await s.getUser(selectedUser.LoginName);
-                    
+
                     // If user was found, return his open tasks
                     if (user) {
                         return (await s.getOpenTasks(user.Id)).map((t) => ({ ...t, service: s }));
@@ -104,15 +106,19 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
     }, [tasks]);
 
     const children = React.useMemo(() => {
-        return flatten(treeRoots.map((root) => root.getChildren()));
+        return flatten(treeRoots.map((root) => root.getChildren())).sort((a, b) =>
+            a.Category < b.Category ? -1 : 1
+        );
     }, [treeRoots]);
+
+    const { groups } = useGroups(children, (c) => c.Category); 
 
     const columns: IColumn[] = React.useMemo(() => {
         return [
             {
                 key: 'Title',
                 name: 'Title',
-                minWidth: 450,
+                minWidth: 300,
                 isResizable: true,
             },
             {
@@ -135,9 +141,11 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
             },
         ];
     }, []);
+
     return (
         <div className={styles.container}>
             <DetailsList
+                groups={groups}
                 items={children}
                 getKey={(item) => `${item.getTask().service.source.rootUrl}/${item.getTask().Id}`}
                 columns={columns}
