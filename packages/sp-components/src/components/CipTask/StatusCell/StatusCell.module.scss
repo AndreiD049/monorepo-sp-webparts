@@ -1,0 +1,53 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.callout {
+  padding: .5em;
+}
+
+:global(.sp-cip-pill-low), :global(.sp-cip-pill-finished) {
+    background-color: #caf0cc;
+    border-color: #437406;
+    color: #437406;
+}
+
+:global(.sp-cip-pill-new) {
+    background-color: #d4e7f6;
+    color: #0068b8;
+    border-color: transparent;
+}
+
+:global(.sp-cip-pill-on-hold) {
+    background-color: #ffebc0;
+    color: #8f6200;
+    border-color: transparent;
+}
+
+:global(.sp-cip-pill-in-progress) {
+    background-color: #80c6ff;
+    color: #004e8c;
+    border-color: #004e8c;
+}
+
+:global(.sp-cip-pill-blocked), :global(.sp-cip-pill-high) {
+    background-color: #f5cccf;
+    color: #aa272b;
+    border-color: #aa272b;
+}
+
+:global(.sp-cip-pill-cancelled) {
+    background-color: #d13438;
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+:global(.sp-cip-pill-none) {
+    background-color: #e5e5e5;
+    color: #666666;
+    border-color: #666666;
+}
+
+:global(.sp-cip-pill-medium) {
+    background-color: #ffebc0;
+    color: #8f6200;
+    border-color: #8f6200;
+}

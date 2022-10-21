@@ -1,12 +1,20 @@
-import { TaskNode } from '@service/sp-cip';
-import { IColumn, IDetailsRowProps } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { ActionsCell, DueDateCell, PriorityCell, TaskShimmer, TitleCell } from 'sp-components';
-import { CALLOUT_ID } from '../../constants';
-import { ITaskOverviewWithSource } from '../../sections/CipSection';
 import styles from './CipTask.module.scss';
-import { useRelink } from './useRelink';
+import {
+    ActionsCell,
+    DueDateCell,
+    PriorityCell,
+    StatusCell,
+    TaskShimmer,
+    TitleCell,
+} from 'sp-components';
+import { CALLOUT_ID } from '../../constants';
+import { CipSectionContext } from '../../sections/CipSection/CipSectionContext';
+import { IColumn, IDetailsRowProps } from 'office-ui-fabric-react';
+import { ITaskOverviewWithSource } from '../../sections/CipSection';
+import { TaskNode } from '@service/sp-cip';
 import { convertTask } from './utils';
+import { useRelink } from './useRelink';
 
 export interface ITaskCellProps {
     column: IColumn;
@@ -22,8 +30,17 @@ export interface ITaskCellProps {
 }
 
 export const TaskCell: React.FC<ITaskCellProps> = (props) => {
+    const { priorityChoices, statusChoices } = React.useContext(CipSectionContext);
     let result = null;
-    
+
+    const handleNavigateToTask = React.useCallback(() => {
+        window.open(
+            `${props.task?.service.source.pageUrl}#/task/${props.task.Id}`,
+            '_blank',
+            'noreferrer=true'
+        );
+    }, []);
+
     // Depending on column, render different cells
     switch (props.column.key) {
         case 'Title':
@@ -37,6 +54,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                     open={props.open}
                     onToggleOpen={(_id: number, open: boolean) => props.onOpen(open)}
                     onClick={() => console.log('finish?')}
+                    onDoubleClick={handleNavigateToTask}
                     taskId={props.task.Id}
                     prevSiblingId={props.prevSiblingId}
                     parentId={props.task.ParentId}
@@ -60,6 +78,10 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                             name: 'logTime',
                             onClick: () => console.log('Logging time'),
                         },
+                        {
+                            name: 'navigate',
+                            onClick: handleNavigateToTask,
+                        },
                     ]}
                 />
             );
@@ -75,8 +97,25 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                     <PriorityCell
                         calloutId={CALLOUT_ID}
                         task={props.task}
-                        choices={['None', 'Low', 'Medium', 'High']}
+                        choices={priorityChoices}
                         onChangePriority={(prio: string) => console.log(`new priority - ${prio}`)}
+                    />
+                </div>
+            );
+            break;
+        case 'Status':
+            result = (
+                <div
+                    style={{
+                        width: props.column.currentWidth,
+                        padding: '0.5em 8px 0.5em 12px',
+                    }}
+                >
+                    <StatusCell
+                        status={props.task.Status}
+                        statuses={statusChoices}
+                        onStatusChange={(status: string) => console.log(status)}
+                        calloutId={CALLOUT_ID}
                     />
                 </div>
             );
@@ -121,11 +160,10 @@ export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
         run().catch((err) => console.error(err));
     }, [open]);
 
-
     const handleOpen = React.useCallback((open: boolean) => {
         setOpen(open);
         // After we set nore open, we also relink parent
-        relinkAllUnderMain()
+        relinkAllUnderMain();
     }, []);
 
     // Render the whole row
@@ -144,7 +182,7 @@ export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
             );
         });
         return result;
-    }, [props.rowProps, open, relink]);
+    }, [props, open, relink]);
 
     // Render the subtasks
     const renderSubtasks = React.useMemo(() => {

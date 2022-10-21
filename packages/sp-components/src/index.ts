@@ -15,3 +15,4 @@ export { ActionsCell, IActionDetails, IActionsCellProps } from './components/Cip
 export { DueDateCell, IDueDateCellProps } from './components/CipTask/DueDateCell';
 export { TaskShimmer } from './components/CipTask/TaskShimmer';
 export { ParentStroke } from './components/CipTask/ParentStroke';
+export { StatusCell } from './components/CipTask/StatusCell';

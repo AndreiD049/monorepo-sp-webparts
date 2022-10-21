@@ -24,7 +24,7 @@ export default class IndexedDbCache {
      * If it doesn't exist, or is expired, call the getter and cache the new value.
      * Else, just return the cached value
      */
-    public async getCached<T>(key: string, getter: () => T): Promise<T> {
+    public async getCached<T>(key: string, getter: () => T, expiresIn?: number): Promise<T> {
         if (this.config.expiresIn === 0) {
             return getter();
         }
@@ -32,7 +32,7 @@ export default class IndexedDbCache {
         if (!cachedValue || isExpired(cachedValue)) {
             const newValue = await getter();
             await this.set(key, {
-                expires: Date.now() + this.config.expiresIn,
+                expires: Date.now() + (expiresIn || this.config.expiresIn),
                 value: newValue,
             });
             return newValue;

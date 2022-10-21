@@ -1,18 +1,20 @@
 import * as React from 'react';
-import { ISectionProps } from '../../components/Section';
-import { CipTask } from '../../components/CipTask';
-import styles from './CipSection.module.scss';
-import { IndexedDbCache } from 'indexeddb-manual-cache';
-import ISource from '../../models/ISource';
-import { TaskService, createTaskTree } from '@service/sp-cip';
 import HomepageWebPart from '../../HomepageWebPart';
-import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import ISource from '../../models/ISource';
+import styles from './CipSection.module.scss';
+import { CipTask } from '../../components/CipTask';
 import { GlobalContext } from '../../context/GlobalContext';
-import { flatten } from '@microsoft/sp-lodash-subset';
-import { MINUTE } from '../../constants';
 import { IColumn, DetailsList, SelectionMode, DetailsListLayoutMode } from 'office-ui-fabric-react';
-import { ISiteUserInfo } from 'sp-preset';
+import { IFieldInfo, ISiteUserInfo } from 'sp-preset';
+import { ISectionProps } from '../../components/Section';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import { IndexedDbCache } from 'indexeddb-manual-cache';
+import { MINUTE, HOUR } from '../../constants';
+import { TaskService, createTaskTree } from '@service/sp-cip';
+import { flatten } from '@microsoft/sp-lodash-subset';
 import { useGroups } from '../../components/CipTask/useGroups';
+import { CipSectionContext } from './CipSectionContext';
+import { NoData } from '../../components/NoData';
 
 export interface ICipSectionProps extends ISectionProps {
     // Props go here
@@ -23,6 +25,8 @@ export interface ICipService {
     getOpenTasks: (userId: number) => Promise<ITaskOverview[]>;
     getSubtasks: (task: ITaskOverview) => Promise<ITaskOverview[]>;
     getUser: (loginName: string) => Promise<ISiteUserInfo>;
+    getStatusChoice: () => Promise<IFieldInfo>;
+    getPriorityChoice: () => Promise<IFieldInfo>;
 }
 
 // Task details with information on it's original source
@@ -30,7 +34,7 @@ export interface ITaskOverviewWithSource extends ITaskOverview {
     service: ICipService;
 }
 
-const createCipService = (source: ISource): ICipService => {
+const createServiceWrapper = (source: ISource): ICipService => {
     const db = new IndexedDbCache('Homepage_Cache', location.host + location.pathname, {
         expiresIn: source.ttlMinutes * MINUTE,
     });
@@ -52,6 +56,24 @@ const createCipService = (source: ISource): ICipService => {
         getSubtasks: async (task: ITaskOverview) => {
             return taskService.getSubtasks(task);
         },
+        getStatusChoice: async () => {
+            return db.getCached(
+                `cipStatusChoice`,
+                async () => {
+                    return sp.web.lists.getByTitle(source.listName).fields.getByTitle('Status')();
+                },
+                HOUR * 24
+            );
+        },
+        getPriorityChoice: async () => {
+            return db.getCached(
+                `cipPriorityChoice`,
+                async () => {
+                    return sp.web.lists.getByTitle(source.listName).fields.getByTitle('Priority')();
+                },
+                HOUR * 24
+            );
+        },
         getUser: async (loginName: string) =>
             db.getCached(`cipCurrentUser/${source.rootUrl}/${loginName}`, async () => {
                 try {
@@ -68,9 +90,23 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
     const { selectedUser } = React.useContext(GlobalContext);
     const sources = props.section.sources;
     const services = React.useMemo(() => {
-        return sources.map((s) => createCipService(s));
+        return sources.map((s) => createServiceWrapper(s));
     }, [sources]);
     const [tasks, setTasks] = React.useState<ITaskOverviewWithSource[][]>([]);
+    const [status, setStatus] = React.useState<string[]>([]);
+    const [priority, setPriority] = React.useState<string[]>([]);
+
+    // Fetch field choices
+    React.useEffect(() => {
+        async function run(): Promise<void> {
+            const service = services[0];
+            const status = await service.getStatusChoice();
+            setStatus(status.Choices || []);
+            const priority = await service.getPriorityChoice();
+            setPriority(priority.Choices || []);
+        }
+        run().catch((err) => console.error(err));
+    }, [services]);
 
     /**
      * Get tasks for each source provided
@@ -111,7 +147,7 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
         );
     }, [treeRoots]);
 
-    const { groups } = useGroups(children, (c) => c.Category); 
+    const { groups } = useGroups(children, (c) => c.Category);
 
     const columns: IColumn[] = React.useMemo(() => {
         return [
@@ -124,6 +160,12 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
             {
                 key: 'Actions',
                 name: 'Actions',
+                minWidth: 100,
+                isResizable: false,
+            },
+            {
+                key: 'Status',
+                name: 'Status',
                 minWidth: 100,
                 isResizable: false,
             },
@@ -142,19 +184,32 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
         ];
     }, []);
 
+    if (children.length === 0) {
+        return <NoData />
+    }
+
     return (
-        <div className={styles.container}>
-            <DetailsList
-                groups={groups}
-                items={children}
-                getKey={(item) => `${item.getTask().service.source.rootUrl}/${item.getTask().Id}`}
-                columns={columns}
-                selectionMode={SelectionMode.none}
-                onRenderRow={(props) => {
-                    return <CipTask rowProps={props} />;
-                }}
-                layoutMode={DetailsListLayoutMode.fixedColumns}
-            />
-        </div>
+        <CipSectionContext.Provider
+            value={{
+                statusChoices: status,
+                priorityChoices: priority,
+            }}
+        >
+            <div className={styles.container}>
+                <DetailsList
+                    groups={groups}
+                    items={children}
+                    getKey={(item) =>
+                        `${item.getTask().service.source.rootUrl}/${item.getTask().Id}`
+                    }
+                    columns={columns}
+                    selectionMode={SelectionMode.none}
+                    onRenderRow={(props) => {
+                        return <CipTask rowProps={props} />;
+                    }}
+                    layoutMode={DetailsListLayoutMode.fixedColumns}
+                />
+            </div>
+        </CipSectionContext.Provider>
     );
 };
