@@ -1,4 +1,5 @@
 export const CALLOUT_ID = 'sp-homepage-callout';
+export const DIALOG_ID = 'sp-homepage-dialog';
 export const RELINK_EVT = 'sp-homepage-relink';
 export const MINUTE = 1000 * 60;
 export const HOUR = MINUTE * 60;

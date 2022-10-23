@@ -20,7 +20,7 @@ export const useRelink = (mainTaskId: number): [boolean, () => void] => {
     }, []);
 
     React.useEffect(() => {
-        function handler(evt: CustomEvent): void {
+        function handler(_evt: CustomEvent): void {
             setRelink((prev) => !prev);
         }
         document.addEventListener(evtName, handler);

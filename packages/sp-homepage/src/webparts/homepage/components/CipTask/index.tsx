@@ -3,14 +3,16 @@ import styles from './CipTask.module.scss';
 import {
     ActionsCell,
     DueDateCell,
+    hideDialog,
     PriorityCell,
+    showDialog,
     StatusCell,
     TaskShimmer,
     TitleCell,
 } from 'sp-components';
-import { CALLOUT_ID } from '../../constants';
+import { CALLOUT_ID, DIALOG_ID } from '../../constants';
 import { CipSectionContext } from '../../sections/CipSection/CipSectionContext';
-import { IColumn, IDetailsRowProps } from 'office-ui-fabric-react';
+import { DialogType, IColumn, IDetailsRowProps, PrimaryButton } from 'office-ui-fabric-react';
 import { ITaskOverviewWithSource } from '../../sections/CipSection';
 import { TaskNode } from '@service/sp-cip';
 import { convertTask } from './utils';
@@ -76,7 +78,26 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                     items={[
                         {
                             name: 'logTime',
-                            onClick: () => console.log('Logging time'),
+                            onClick: () =>
+                                showDialog({
+                                    id: DIALOG_ID,
+                                    content: <div>test</div>,
+                                    dialogProps: {
+                                        dialogContentProps: {
+                                            type: DialogType.normal,
+                                            title: 'Hello world',
+                                            subText: 'Do you want to test?',
+                                        },
+                                        modalProps: {
+                                            isBlocking: true,
+                                        },
+                                    },
+                                    footer: (
+                                        <>
+                                            <PrimaryButton onClick={() => hideDialog(DIALOG_ID)}>test</PrimaryButton>
+                                        </>
+                                    ),
+                                }),
                         },
                         {
                             name: 'navigate',

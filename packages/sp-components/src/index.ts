@@ -9,6 +9,7 @@ export {
     hideCallout,
     showCallout,
 } from './components/Callout';
+export { Dialog, hideDialog, showDialog, ISPDialogProps } from './components/Dialog';
 export { CheckExpandButton, ICheckExpandButtonProps } from './components/CipTask/CheckExpandButton';
 export { TitleCell, ITitleCellProps } from './components/CipTask/TitleCell';
 export { ActionsCell, IActionDetails, IActionsCellProps } from './components/CipTask/ActionsCell';
