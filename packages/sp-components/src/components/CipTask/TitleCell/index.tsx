@@ -4,25 +4,15 @@ import { Pill } from '../../Pill';
 import { CheckExpandButton } from '../CheckExpandButton';
 import { ParentStroke } from '../ParentStroke';
 import styles from './TitleCell.module.scss';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 export interface ITitleCellProps {
-    taskId: number;
-    title: string;
-    comments: number;
-    attachments: number;
-    orphan?: boolean;
-    level?: number;
-
-    // stroke props
-    parentId?: number;
-    prevSiblingId?: number;
-
-    totalSubtasks: number;
-    finishedSubtasks: number;
-    open?: boolean;
-    buttonDisabled?: boolean;
-    taskFinished?: boolean;
-
+    task: ITaskOverview;
+    parent: ITaskOverview | undefined;
+    level: number;
+    prevSiblingId: number | undefined;
+    open: boolean;
+    orphan: boolean;
     onDoubleClick?: () => void;
     onClick?: () => void;
     onToggleOpen?: (taskId: number, open: boolean) => void;
@@ -31,6 +21,13 @@ export interface ITitleCellProps {
 }
 
 export const TitleCell: React.FC<ITitleCellProps> = ({ level = 0, style = {}, ...props }) => {
+    const taskFinished = React.useMemo(() => Boolean(props.task.FinishDate), [props.task]);
+    const disabled = React.useMemo(() => {
+        if (!props.parent) return false;
+        if (Boolean(props.parent.FinishDate)) return true;
+        return false;
+    }, []);
+
     return (
         <div
             style={style}
@@ -46,18 +43,18 @@ export const TitleCell: React.FC<ITitleCellProps> = ({ level = 0, style = {}, ..
                 }}
             >
                 <CheckExpandButton
-                    finishedSubtasks={props.finishedSubtasks}
-                    totalSubtasks={props.totalSubtasks}
+                    finishedSubtasks={props.task.FinishedSubtasks}
+                    totalSubtasks={props.task.Subtasks}
                     onClick={props.onClick || (() => null)}
                     onToggleOpen={props.onToggleOpen || (() => null)}
-                    taskId={props.taskId}
+                    taskId={props.task.Id}
                     open={props.open}
-                    taskFinished={props.taskFinished}
-                    disabled={props.buttonDisabled}
+                    taskFinished={taskFinished}
+                    disabled={disabled}
                 />
                 <ParentStroke
-                    taskId={props.taskId}
-                    parentId={props.parentId}
+                    taskId={props.task.Id}
+                    parentId={props.parent?.Id}
                     prevSiblingId={props.prevSiblingId}
                 />
             </div>
@@ -67,18 +64,18 @@ export const TitleCell: React.FC<ITitleCellProps> = ({ level = 0, style = {}, ..
                     variant="medium"
                     block
                     className={`${styles.titleText} ${
-                        props.taskFinished ? styles.titleTextFinished : ''
+                        taskFinished ? styles.titleTextFinished : ''
                     }`}
-                    title={props.title}
+                    title={props.task.Title}
                 >
-                    {props.title}
+                    {props.task.Title}
                 </Text>
                 <div className={styles.titleCountIcons}>
                     <div>
-                        <Icon iconName="Comment" /> {props.comments}
+                        <Icon iconName="Comment" /> {props.task.CommentsCount}
                     </div>
                     <div>
-                        <Icon iconName="Attach" /> {props.attachments}
+                        <Icon iconName="Attach" /> {props.task.AttachmentsCount}
                     </div>
                 </div>
             </div>
