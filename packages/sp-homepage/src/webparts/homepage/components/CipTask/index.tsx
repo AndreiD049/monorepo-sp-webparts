@@ -20,12 +20,14 @@ import { useRelink } from './useRelink';
 
 export interface ITaskCellProps {
     column: IColumn;
+    parentFinished: boolean | undefined;
     task: ITaskOverviewWithSource;
 
     // Title props
     open: boolean;
     onOpen: (open: boolean) => void;
     level: number;
+    orphan: boolean;
 
     // stroke props
     prevSiblingId?: number;
@@ -33,6 +35,7 @@ export interface ITaskCellProps {
 
 export const TaskCell: React.FC<ITaskCellProps> = (props) => {
     const { priorityChoices, statusChoices } = React.useContext(CipSectionContext);
+    const taskFinished = React.useMemo(() => Boolean(props.task.FinishDate), [props.task]);
     let result = null;
 
     const handleNavigateToTask = React.useCallback(() => {
@@ -42,6 +45,22 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
             'noreferrer=true'
         );
     }, []);
+
+    // Clicking on the button next ot task title
+    // If not all subtasks are completed, toggles expanding/collapsing
+    // If task is finished, unfinish it
+    // else - finish the task
+    const handleTitleButtonClick = React.useCallback(async () => {
+        const { service } = props.task.service;
+        if (props.task.Subtasks !== props.task.FinishedSubtasks) {
+            return props.onOpen(!props.open);
+        }
+        if (taskFinished) {
+            await service.reopenTask(props.task.Id);
+        } else {
+            await service.finishTask(props.task.Id);
+        }
+    }, [props.task, props.open, taskFinished]);
 
     // Depending on column, render different cells
     switch (props.column.key) {
@@ -55,12 +74,15 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                     level={props.level}
                     open={props.open}
                     onToggleOpen={(_id: number, open: boolean) => props.onOpen(open)}
-                    onClick={() => console.log('finish?')}
+                    onClick={handleTitleButtonClick}
                     onDoubleClick={handleNavigateToTask}
                     taskId={props.task.Id}
                     prevSiblingId={props.prevSiblingId}
                     parentId={props.task.ParentId}
                     title={props.task.Title}
+                    orphan={props.orphan}
+                    buttonDisabled={Boolean(props.parentFinished)}
+                    taskFinished={taskFinished}
                     comments={props.task.CommentsCount}
                     attachments={props.task.AttachmentsCount}
                     totalSubtasks={props.task.Subtasks}
@@ -104,6 +126,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                             onClick: handleNavigateToTask,
                         },
                     ]}
+                    disabled={taskFinished}
                 />
             );
             break;
@@ -120,6 +143,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                         task={props.task}
                         choices={priorityChoices}
                         onChangePriority={(prio: string) => console.log(`new priority - ${prio}`)}
+                        disabled={taskFinished}
                     />
                 </div>
             );
@@ -137,6 +161,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                         statuses={statusChoices}
                         onStatusChange={(status: string) => console.log(status)}
                         calloutId={CALLOUT_ID}
+                        disabled={taskFinished}
                     />
                 </div>
             );
@@ -147,6 +172,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                     dueDate={new Date(props.task.DueDate)}
                     calloutId={CALLOUT_ID}
                     onDateChange={(date: Date) => console.log(date)}
+                    disabled={taskFinished}
                 />
             );
             break;
@@ -193,12 +219,14 @@ export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
         props.rowProps.columns.forEach((column: IColumn) => {
             result.push(
                 <TaskCell
+                    parentFinished={Boolean(node.getParent().getTask()?.FinishDate)}
                     level={level}
                     task={item}
                     column={column}
                     open={open}
-                    onOpen={handleOpen}
                     prevSiblingId={node.getPreviousSibling()?.Id}
+                    orphan={node.isOrphan}
+                    onOpen={handleOpen}
                 />
             );
         });
