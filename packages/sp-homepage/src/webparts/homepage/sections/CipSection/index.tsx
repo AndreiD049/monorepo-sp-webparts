@@ -22,6 +22,8 @@ export interface ICipSectionProps extends ISectionProps {
 
 export interface ICipService {
     source: ISource;
+    db: IndexedDbCache;
+    service: TaskService;
     getOpenTasks: (userId: number) => Promise<ITaskOverview[]>;
     getSubtasks: (task: ITaskOverview) => Promise<ITaskOverview[]>;
     getUser: (loginName: string) => Promise<ISiteUserInfo>;
@@ -46,6 +48,8 @@ const createServiceWrapper = (source: ISource): ICipService => {
 
     return {
         source,
+        db,
+        service: taskService,
         getOpenTasks: async (userId: number) => {
             const tasks = await db.getCached(`cipTasks/${userId}`, async () => {
                 const tasks: ITaskOverview[] = await taskService.getUserTasks(userId, 'Open');
@@ -138,6 +142,7 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
     }, [selectedUser]);
 
     const treeRoots = React.useMemo(() => {
+        console.log(tasks);
         return tasks.map((t) => createTaskTree(t));
     }, [tasks]);
 
@@ -185,7 +190,7 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
     }, []);
 
     if (children.length === 0) {
-        return <NoData />
+        return <NoData />;
     }
 
     return (
