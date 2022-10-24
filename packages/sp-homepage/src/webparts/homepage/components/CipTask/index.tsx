@@ -17,27 +17,29 @@ import { ITaskOverviewWithSource } from '../../sections/CipSection';
 import { TaskNode } from '@service/sp-cip';
 import { convertTask } from './utils';
 import { useRelink } from './useRelink';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 export interface ITaskCellProps {
     column: IColumn;
-    task: ITaskOverviewWithSource;
+    node: TaskNode;
 
     // Title props
     open: boolean;
-    onOpen: (open: boolean) => void;
     level: number;
 
-    // stroke props
-    prevSiblingId?: number;
+    onOpen: (open: boolean) => void;
+    onTaskUpdated: (task: ITaskOverview) => void;
 }
 
 export const TaskCell: React.FC<ITaskCellProps> = (props) => {
     const { priorityChoices, statusChoices } = React.useContext(CipSectionContext);
+    const task = props.node.getTask() as ITaskOverviewWithSource;
+    const parent = props.node.getParent().getTask() as ITaskOverviewWithSource;
     let result = null;
 
     const handleNavigateToTask = React.useCallback(() => {
         window.open(
-            `${props.task?.service.source.pageUrl}#/task/${props.task.Id}`,
+            `${task?.service.source.pageUrl}#/task/${task.Id}`,
             '_blank',
             'noreferrer=true'
         );
@@ -48,23 +50,19 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
         case 'Title':
             result = (
                 <TitleCell
+                    task={task}
+                    parent={parent}
+                    level={props.level}
+                    open={props.open}
+                    orphan={props.node.isOrphan}
+                    onToggleOpen={(_id: number, open: boolean) => props.onOpen(open)}
+                    onClick={() => console.log('finish?')}
+                    onDoubleClick={handleNavigateToTask}
+                    prevSiblingId={props.node.getPreviousSibling()?.Id}
                     style={{
                         width: props.column.currentWidth,
                         padding: '0.5em 8px 0.5em 12px',
                     }}
-                    level={props.level}
-                    open={props.open}
-                    onToggleOpen={(_id: number, open: boolean) => props.onOpen(open)}
-                    onClick={() => console.log('finish?')}
-                    onDoubleClick={handleNavigateToTask}
-                    taskId={props.task.Id}
-                    prevSiblingId={props.prevSiblingId}
-                    parentId={props.task.ParentId}
-                    title={props.task.Title}
-                    comments={props.task.CommentsCount}
-                    attachments={props.task.AttachmentsCount}
-                    totalSubtasks={props.task.Subtasks}
-                    finishedSubtasks={props.task.FinishedSubtasks}
                 />
             );
             break;
@@ -117,7 +115,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                 >
                     <PriorityCell
                         calloutId={CALLOUT_ID}
-                        task={props.task}
+                        task={task}
                         choices={priorityChoices}
                         onChangePriority={(prio: string) => console.log(`new priority - ${prio}`)}
                     />
@@ -133,7 +131,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                     }}
                 >
                     <StatusCell
-                        status={props.task.Status}
+                        status={task.Status}
                         statuses={statusChoices}
                         onStatusChange={(status: string) => console.log(status)}
                         calloutId={CALLOUT_ID}
@@ -144,7 +142,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
         case 'DueDate':
             result = (
                 <DueDateCell
-                    dueDate={new Date(props.task.DueDate)}
+                    dueDate={new Date(task.DueDate)}
                     calloutId={CALLOUT_ID}
                     onDateChange={(date: Date) => console.log(date)}
                 />
@@ -162,18 +160,18 @@ export interface ICipTaskProps {
 
 export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
     const node: TaskNode = props.rowProps.item;
-    const item: ITaskOverviewWithSource = node.getTask() as ITaskOverviewWithSource;
+    const [task, setTask] = React.useState(node.getTask() as ITaskOverviewWithSource);
     const [subtasks, setSubtasks] = React.useState<ITaskOverviewWithSource[]>([]);
     const [open, setOpen] = React.useState<boolean>(false);
-    const [relink, relinkAllUnderMain] = useRelink(item.MainTaskId);
+    const [relink, relinkAllUnderMain] = useRelink(task.MainTaskId);
 
     // Fetch data from API
     React.useEffect(() => {
         async function run(): Promise<void> {
             if (!open) return null;
             if (subtasks.length > 0) return null;
-            const resultSubtasks = (await item.service.getSubtasks(item)).map((t) =>
-                convertTask(t, item.service)
+            const resultSubtasks = (await task.service.getSubtasks(task)).map((t) =>
+                convertTask(t, task.service)
             );
             node.withChildren(resultSubtasks);
             setSubtasks(resultSubtasks);
@@ -194,11 +192,10 @@ export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
             result.push(
                 <TaskCell
                     level={level}
-                    task={item}
+                    node={node}
                     column={column}
                     open={open}
                     onOpen={handleOpen}
-                    prevSiblingId={node.getPreviousSibling()?.Id}
                 />
             );
         });
@@ -210,11 +207,11 @@ export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
         if (open && subtasks.length === 0) {
             // task is expanded but the subtasks are not yet loaded
             // showing shimmers instead
-            return Array(item.Subtasks)
+            return Array(task.Subtasks)
                 .fill(1)
                 .map((_t, idx) => (
                     <TaskShimmer
-                        key={`${item.service.source.rootUrl}/${item.Id}/${idx}`}
+                        key={`${task.service.source.rootUrl}/${task.Id}/${idx}`}
                         rowProps={props.rowProps}
                         parentNode={node}
                     />
