@@ -92,6 +92,7 @@ export class TaskNode implements IClonable<TaskNode> {
         const copy = new TaskNode(this.task)
             .withParent(this.parent)
             .withLevel(this.level);
+        copy.isOrphan = this.isOrphan;
         this.children.forEach((child) => copy.setChild(child));
         return copy;
     }

@@ -22,11 +22,7 @@ export interface ITitleCellProps {
 
 export const TitleCell: React.FC<ITitleCellProps> = ({ level = 0, style = {}, ...props }) => {
     const taskFinished = React.useMemo(() => Boolean(props.task.FinishDate), [props.task]);
-    const disabled = React.useMemo(() => {
-        if (!props.parent) return false;
-        if (Boolean(props.parent.FinishDate)) return true;
-        return false;
-    }, []);
+    const disabled = Boolean(props.parent?.FinishDate);
 
     return (
         <div

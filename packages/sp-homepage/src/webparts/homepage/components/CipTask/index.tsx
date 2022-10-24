@@ -10,14 +10,14 @@ import {
     TaskShimmer,
     TitleCell,
 } from 'sp-components';
-import { CALLOUT_ID, DIALOG_ID } from '../../constants';
+import { CALLOUT_ID, CIP_SPINNER_ID, DIALOG_ID } from '../../constants';
 import { CipSectionContext } from '../../sections/CipSection/CipSectionContext';
 import { DialogType, IColumn, IDetailsRowProps, PrimaryButton } from 'office-ui-fabric-react';
 import { ITaskOverviewWithSource } from '../../sections/CipSection';
 import { TaskNode } from '@service/sp-cip';
 import { convertTask } from './utils';
 import { useRelink } from './useRelink';
-import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
+import { hideSpinner, showSpinner } from '../LoadingSpinner';
 
 export interface ITaskCellProps {
     column: IColumn;
@@ -28,13 +28,14 @@ export interface ITaskCellProps {
     level: number;
 
     onOpen: (open: boolean) => void;
-    onTaskUpdated?: (task: ITaskOverview) => void;
+    onTaskUpdated?: (task: ITaskOverviewWithSource) => void;
 }
 
 export const TaskCell: React.FC<ITaskCellProps> = (props) => {
     const { priorityChoices, statusChoices } = React.useContext(CipSectionContext);
-    const task = props.node.getTask() as ITaskOverviewWithSource;
-    const parent = props.node.getParent().getTask() as ITaskOverviewWithSource;
+    const task = React.useMemo(() => ({ ...props.node.getTask()}) as ITaskOverviewWithSource, [props.node]);
+    const parent = React.useMemo(() => ({ ...props.node.getParent().getTask() }) as ITaskOverviewWithSource, [props.node]);
+    const taskFinished = React.useMemo(() => Boolean(task.FinishDate), [task]);
     let result = null;
 
     const handleNavigateToTask = React.useCallback(() => {
@@ -50,16 +51,23 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
     // If task is finished, unfinish it
     // else - finish the task
     const handleTitleButtonClick = React.useCallback(async () => {
-        const { service } = props.task.service;
-        if (props.task.Subtasks !== props.task.FinishedSubtasks) {
+        const { service } = task.service;
+        if (task.Subtasks !== task.FinishedSubtasks) {
             return props.onOpen(!props.open);
         }
+        showSpinner(CIP_SPINNER_ID);
         if (taskFinished) {
-            await service.reopenTask(props.task.Id);
+            await service.reopenTask(task.Id);
         } else {
-            await service.finishTask(props.task.Id);
+            await service.finishTask(task.Id);
         }
-    }, [props.task, props.open, taskFinished]);
+        // Test
+        if (props.onTaskUpdated) {
+            const newTask = await service.getTask(task.Id);
+            props.onTaskUpdated({ ...newTask, service: task.service });
+        }
+        hideSpinner(CIP_SPINNER_ID);
+    }, [task, props.open, taskFinished]);
 
     // Depending on column, render different cells
     switch (props.column.key) {
@@ -108,7 +116,9 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                                     },
                                     footer: (
                                         <>
-                                            <PrimaryButton onClick={() => hideDialog(DIALOG_ID)}>test</PrimaryButton>
+                                            <PrimaryButton onClick={() => hideDialog(DIALOG_ID)}>
+                                                test
+                                            </PrimaryButton>
                                         </>
                                     ),
                                 }),
@@ -179,8 +189,8 @@ export interface ICipTaskProps {
 }
 
 export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
-    const node: TaskNode = props.rowProps.item;
-    const [task, setTask] = React.useState(node.getTask() as ITaskOverviewWithSource);
+    const [node, setNode] = React.useState<TaskNode>(props.rowProps.item);
+    const task = React.useMemo(() => node.getTask() as ITaskOverviewWithSource, [node]);
     const [subtasks, setSubtasks] = React.useState<ITaskOverviewWithSource[]>([]);
     const [open, setOpen] = React.useState<boolean>(false);
     const [relink, relinkAllUnderMain] = useRelink(task.MainTaskId);
@@ -211,16 +221,20 @@ export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
         props.rowProps.columns.forEach((column: IColumn) => {
             result.push(
                 <TaskCell
+                    key={node.Id}
                     level={level}
                     node={node}
                     column={column}
                     open={open}
                     onOpen={handleOpen}
+                    onTaskUpdated={(task: ITaskOverviewWithSource) => {
+                        setNode((prev) => prev.clone().withTask(task));
+                    }}
                 />
             );
         });
         return result;
-    }, [props, open, relink]);
+    }, [props, node, open, relink]);
 
     // Render the subtasks
     const renderSubtasks = React.useMemo(() => {

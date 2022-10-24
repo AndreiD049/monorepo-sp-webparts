@@ -9,12 +9,13 @@ import { IFieldInfo, ISiteUserInfo } from 'sp-preset';
 import { ISectionProps } from '../../components/Section';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IndexedDbCache } from 'indexeddb-manual-cache';
-import { MINUTE, HOUR } from '../../constants';
+import { MINUTE, HOUR, CIP_SPINNER_ID } from '../../constants';
 import { TaskService, createTaskTree } from '@service/sp-cip';
 import { flatten } from '@microsoft/sp-lodash-subset';
 import { useGroups } from '../../components/CipTask/useGroups';
 import { CipSectionContext } from './CipSectionContext';
 import { NoData } from '../../components/NoData';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
 
 export interface ICipSectionProps extends ISectionProps {
     // Props go here
@@ -194,27 +195,30 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
     }
 
     return (
-        <CipSectionContext.Provider
-            value={{
-                statusChoices: status,
-                priorityChoices: priority,
-            }}
-        >
-            <div className={styles.container}>
-                <DetailsList
-                    groups={groups}
-                    items={children}
-                    getKey={(item) =>
-                        `${item.getTask().service.source.rootUrl}/${item.getTask().Id}`
-                    }
-                    columns={columns}
-                    selectionMode={SelectionMode.none}
-                    onRenderRow={(props) => {
-                        return <CipTask rowProps={props} />;
-                    }}
-                    layoutMode={DetailsListLayoutMode.fixedColumns}
-                />
-            </div>
-        </CipSectionContext.Provider>
+        <>
+            <CipSectionContext.Provider
+                value={{
+                    statusChoices: status,
+                    priorityChoices: priority,
+                }}
+            >
+                <div className={styles.container}>
+                    <DetailsList
+                        groups={groups}
+                        items={children}
+                        getKey={(item) =>
+                            `${item.getTask().service.source.rootUrl}/${item.getTask().Id}`
+                        }
+                        columns={columns}
+                        selectionMode={SelectionMode.none}
+                        onRenderRow={(props) => {
+                            return <CipTask rowProps={props} />;
+                        }}
+                        layoutMode={DetailsListLayoutMode.fixedColumns}
+                    />
+                </div>
+            </CipSectionContext.Provider>
+            <LoadingSpinner id={CIP_SPINNER_ID} />
+        </>
     );
 };
