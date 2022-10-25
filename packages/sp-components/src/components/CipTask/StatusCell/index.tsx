@@ -1,7 +1,8 @@
-import { TaskNode } from '@service/sp-cip';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import * as React from 'react';
 import { Callout, hideCallout, showCallout } from '../../Callout';
 import { Pill } from '../../Pill';
+import { Task } from '../../Task';
 import styles from './StatusCell.module.scss';
 
 const CALLOUT_ID = 'sp-components-status-callout';
@@ -29,9 +30,10 @@ const StatusCellCallout: React.FC<IStatusCellCalloutProps> = (props) => {
 };
 
 export interface IStatusCellProps {
-    status: string;
+    task: ITaskOverview;
     statuses: string[];
     onStatusChange: (status: string) => void;
+    onError: (err: string) => void;
 
     disabled?: boolean;
 
@@ -49,21 +51,33 @@ export const StatusCell: React.FC<IStatusCellProps> = (props) => {
                 target: pillRef,
             },
             content: (
-                <StatusCellCallout currentChoice={props.status} choices={props.statuses} onStatusChange={(status: string) => {
-                    props.onStatusChange(status);
+                <StatusCellCallout currentChoice={props.task.Status} choices={props.statuses} onStatusChange={(status: string) => {
+                    if (status === 'Finished' || status === 'Cancelled') {
+                        if (props.task.Subtasks !== props.task.FinishedSubtasks) {
+                            props.onError(`Not all subtasks are finished. Please close them first.`);
+                            return hideCallout(calloutId);
+                        }
+                        if (status === 'Finished' && props.task.Subtasks === 0 && props.task.EffectiveTime === 0) {
+                            props.onError('Effective time = 0. Some time should be registered first.');
+                            return hideCallout(calloutId);
+                        }
+                        props.onStatusChange(status);
+                    } else {
+                        props.onStatusChange(status);
+                    }
                     hideCallout(calloutId);
                 }} />
             ),
         });
-    }, []);
+    }, [props.task]);
 
     return (
         <span ref={pillRef}>
             <Pill
                 onClick={handleClick}
-                value={props.status}
+                value={props.task.Status}
                 disabled={props.disabled}
-                className={`sp-cip-pill-${props.status.toLowerCase()}`}
+                className={`sp-cip-pill-${props.task.Status.toLowerCase()}`}
             />
             {props.calloutId ? null : <Callout id={CALLOUT_ID} />}
         </span>

@@ -10,4 +10,5 @@ export default interface ISource {
     expand: string[];
     conditions: IConfigCondition[];
     ttlMinutes: number;
+    additionalSources?: { listName: string, type: 'actions' }[];
 }

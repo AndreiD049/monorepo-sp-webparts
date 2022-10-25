@@ -1,0 +1,23 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.input {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.inputButton {
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid;
+    color: "[theme: neutralPrimary, default: #ffffff]";
+    cursor: pointer;
+    padding: 6px 3px;
+    min-width: 45px;
+}
+
+.inputButtonWrapper {
+    display: flex;
+    flex-flow: row nowrap;
+}

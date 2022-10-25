@@ -1,35 +1,23 @@
 import * as React from 'react';
-import HomepageWebPart from '../../HomepageWebPart';
-import ISource from '../../models/ISource';
 import styles from './CipSection.module.scss';
 import { CipTask } from '../../components/CipTask';
 import { GlobalContext } from '../../context/GlobalContext';
 import { IColumn, DetailsList, SelectionMode, DetailsListLayoutMode } from 'office-ui-fabric-react';
-import { IFieldInfo, ISiteUserInfo } from 'sp-preset';
 import { ISectionProps } from '../../components/Section';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { IndexedDbCache } from 'indexeddb-manual-cache';
-import { MINUTE, HOUR, CIP_SPINNER_ID } from '../../constants';
-import { TaskService, createTaskTree } from '@service/sp-cip';
+import { CIP_SPINNER_ID } from '../../constants';
+import { createTaskTree } from '@service/sp-cip';
 import { flatten } from '@microsoft/sp-lodash-subset';
 import { useGroups } from '../../components/CipTask/useGroups';
 import { CipSectionContext } from './CipSectionContext';
 import { NoData } from '../../components/NoData';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { ICipService, useTasks } from './useTasks';
+import { ISiteUserInfo } from 'sp-preset';
+import { getSourceKey } from '../../utils';
 
 export interface ICipSectionProps extends ISectionProps {
     // Props go here
-}
-
-export interface ICipService {
-    source: ISource;
-    db: IndexedDbCache;
-    service: TaskService;
-    getOpenTasks: (userId: number) => Promise<ITaskOverview[]>;
-    getSubtasks: (task: ITaskOverview) => Promise<ITaskOverview[]>;
-    getUser: (loginName: string) => Promise<ISiteUserInfo>;
-    getStatusChoice: () => Promise<IFieldInfo>;
-    getPriorityChoice: () => Promise<IFieldInfo>;
 }
 
 // Task details with information on it's original source
@@ -37,114 +25,44 @@ export interface ITaskOverviewWithSource extends ITaskOverview {
     service: ICipService;
 }
 
-const createServiceWrapper = (source: ISource): ICipService => {
-    const db = new IndexedDbCache('Homepage_Cache', location.host + location.pathname, {
-        expiresIn: source.ttlMinutes * MINUTE,
-    });
-    const sp = HomepageWebPart.spBuilder.getSP(source.rootUrl);
-    const taskService = new TaskService({
-        sp,
-        listName: source.listName,
-    });
-
-    return {
-        source,
-        db,
-        service: taskService,
-        getOpenTasks: async (userId: number) => {
-            const tasks = await db.getCached(`cipTasks/${userId}`, async () => {
-                const tasks: ITaskOverview[] = await taskService.getUserTasks(userId, 'Open');
-                return tasks;
-            });
-            return tasks;
-        },
-        getSubtasks: async (task: ITaskOverview) => {
-            return taskService.getSubtasks(task);
-        },
-        getStatusChoice: async () => {
-            return db.getCached(
-                `cipStatusChoice`,
-                async () => {
-                    return sp.web.lists.getByTitle(source.listName).fields.getByTitle('Status')();
-                },
-                HOUR * 24
-            );
-        },
-        getPriorityChoice: async () => {
-            return db.getCached(
-                `cipPriorityChoice`,
-                async () => {
-                    return sp.web.lists.getByTitle(source.listName).fields.getByTitle('Priority')();
-                },
-                HOUR * 24
-            );
-        },
-        getUser: async (loginName: string) =>
-            db.getCached(`cipCurrentUser/${source.rootUrl}/${loginName}`, async () => {
-                try {
-                    const user = await sp.web.siteUsers.getByLoginName(loginName)();
-                    return user;
-                } catch {
-                    return null;
-                }
-            }),
-    };
-};
 
 export const CipSection: React.FC<ICipSectionProps> = (props) => {
     const { selectedUser } = React.useContext(GlobalContext);
-    const sources = props.section.sources;
-    const services = React.useMemo(() => {
-        return sources.map((s) => createServiceWrapper(s));
-    }, [sources]);
-    const [tasks, setTasks] = React.useState<ITaskOverviewWithSource[][]>([]);
     const [status, setStatus] = React.useState<string[]>([]);
     const [priority, setPriority] = React.useState<string[]>([]);
+    const [siteUsers, setSiteUsers] = React.useState<{ [key: string]: ISiteUserInfo[] }>({});
+    const { tasks, services } = useTasks(props.section.sources, props.section.name, selectedUser);
 
     // Fetch field choices
     React.useEffect(() => {
         async function run(): Promise<void> {
-            const service = services[0];
+            const firstKey = Object.keys(services)[0];
+            const service = services[firstKey];
             const status = await service.getStatusChoice();
             setStatus(status.Choices || []);
             const priority = await service.getPriorityChoice();
             setPriority(priority.Choices || []);
+            const siteUsers: { [key: string]: ISiteUserInfo[] } = {};
+            for (const key in services) {
+                if (Object.prototype.hasOwnProperty.call(services, key)) {
+                    const service = services[key];
+                    siteUsers[getSourceKey(service.source)] = await service.getSiteUsers();
+                }
+            }
+            setSiteUsers(siteUsers);
         }
         run().catch((err) => console.error(err));
     }, [services]);
 
-    /**
-     * Get tasks for each source provided
-     * WARNING: each site has separate site users.
-     * This means that responsible Id can be different for each source.
-     * This is why we get current user for each source separately.
-     * It is cached, so there should be not much additional load on the application.
-     */
-    React.useEffect(() => {
-        async function run(): Promise<void> {
-            if (!selectedUser) return null;
-            const tasks = await Promise.all(
-                // Find the open tasks for each service
-                services.map(async (s) => {
-                    // Get current source user
-                    const user = await s.getUser(selectedUser.LoginName);
-
-                    // If user was found, return his open tasks
-                    if (user) {
-                        return (await s.getOpenTasks(user.Id)).map((t) => ({ ...t, service: s }));
-                    } else {
-                        return [];
-                    }
-                })
-            );
-            setTasks(tasks);
-        }
-        run().catch((err) => console.error(err));
-    }, [selectedUser]);
-
     const treeRoots = React.useMemo(() => {
-        console.log(tasks);
-        return tasks.map((t) => createTaskTree(t));
+        const result = [];
+        for (const key in tasks) {
+            if (Object.prototype.hasOwnProperty.call(tasks, key)) {
+                const items = tasks[key];
+                result.push(createTaskTree(items));
+            }
+        }
+        return result;
     }, [tasks]);
 
     const children = React.useMemo(() => {
@@ -200,6 +118,7 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
                 value={{
                     statusChoices: status,
                     priorityChoices: priority,
+                    siteUsers,
                 }}
             >
                 <div className={styles.container}>

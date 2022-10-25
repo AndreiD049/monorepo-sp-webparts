@@ -2,6 +2,7 @@ import { DateTime } from 'luxon';
 import { MessageBarType } from 'office-ui-fabric-react';
 import { SPnotify } from 'sp-react-notifications';
 import ISection from './models/ISection';
+import ISource from './models/ISource';
 import ITaskItem from './models/ITaskItem';
 
 export function getMonthDayLabel(day: number, suffix: string = 'day'): string {
@@ -47,4 +48,8 @@ export function checkSourceTypes(section: ISection, supportedSourceTypes: string
         return true;
     });
     return supportetList.every((s) => s === true);
+}
+
+export function getSourceKey(source: ISource): string {
+    return `${source.rootUrl}/${source.listName}`;
 }

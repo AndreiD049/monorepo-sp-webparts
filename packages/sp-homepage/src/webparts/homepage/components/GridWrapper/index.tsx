@@ -40,27 +40,32 @@ export const GridWrapper: React.FC<IGridWrapperProps> = (props) => {
     return (
         <div>
             <div className={styles.commandBar}>
-                <Text variant="mediumPlus">Homepage</Text>
+                <div className={styles.commandBarNearItems}>
+                    <Text variant="xLarge">Homepage</Text>
+                    {props.team && (
+                        <TeamSelector
+                            teams={currentUserInfo.teams}
+                            selectedTeam={props.team}
+                            onTeamSelect={(team) => props.handleTeamSelect(team)}
+                        />
+                    )}
+                    {props.team && (
+                        <UserSelector
+                            users={users}
+                            selectedUser={props.user}
+                            handleUserSelect={async (user) =>
+                                props.handleUserSelect(await UserService.getUser(user.User.Id))
+                            }
+                        />
+                    )}
+                </div>
                 <IconButton
+                    style={{
+                        marginRight: '.5em',
+                    }}
                     onClick={() => props.handleLock(!props.locked)}
                     iconProps={{ iconName: !props.locked ? 'Lock' : 'Unlock' }}
                 />
-                {props.team && (
-                    <TeamSelector
-                        teams={currentUserInfo.teams}
-                        selectedTeam={props.team}
-                        onTeamSelect={(team) => props.handleTeamSelect(team)}
-                    />
-                )}
-                {props.team && (
-                    <UserSelector
-                        users={users}
-                        selectedUser={props.user}
-                        handleUserSelect={async (user) =>
-                            props.handleUserSelect(await UserService.getUser(user.User.Id))
-                        }
-                    />
-                )}
             </div>
             <Separator />
             {props.children}

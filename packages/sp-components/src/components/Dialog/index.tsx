@@ -8,8 +8,8 @@ const getEventName = (id: string) => `${EVENT_PREFIX}/${id}`;
 interface IDialogEventProps {
     id: string;
     dialogProps: IDialogProps;
-    content: JSX.Element;
-    footer: JSX.Element;
+    content?: JSX.Element;
+    footer?: JSX.Element;
     visible: boolean;
 }
 
@@ -35,8 +35,6 @@ export function hideDialog(id: string) {
                 visible: false,
                 id,
                 dialogProps: {},
-                content: null,
-                footer: null,
             },
         })
     );
@@ -53,15 +51,19 @@ export const Dialog: React.FC<ISPDialogProps> = (props) => {
         function handler(evt: CustomEvent<IDialogEventProps>) {
             setDialogProps(evt.detail.dialogProps);
             setVisible(evt.detail.visible);
-            setContent(evt.detail.content);
-            setFooter(evt.detail.footer);
+            if (evt.detail.content) {
+                setContent(evt.detail.content);
+            }
+            if (evt.detail.footer) {
+                setFooter(evt.detail.footer);
+            }
         }
         document.addEventListener(evtName, handler);
         return () => document.removeEventListener(evtName, handler);
     }, [props.id]);
 
     return (
-        <FluentDialog hidden={!visible} {...dialogProps} onDismiss={() => {
+        <FluentDialog hidden={!visible} minWidth="initial" maxWidth="initial" {...dialogProps} onDismiss={() => {
             dialogProps.onDismiss && dialogProps.onDismiss();
             hideDialog(props.id);
         }}>

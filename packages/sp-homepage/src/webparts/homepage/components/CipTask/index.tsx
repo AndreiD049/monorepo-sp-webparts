@@ -8,16 +8,23 @@ import {
     showDialog,
     StatusCell,
     TaskShimmer,
+    TimeLogGeneral,
     TitleCell,
+    userToPersonaProps,
 } from 'sp-components';
 import { CALLOUT_ID, CIP_SPINNER_ID, DIALOG_ID } from '../../constants';
 import { CipSectionContext } from '../../sections/CipSection/CipSectionContext';
-import { DialogType, IColumn, IDetailsRowProps, PrimaryButton } from 'office-ui-fabric-react';
+import { DialogType, IColumn, IDetailsRowProps, MessageBarType } from 'office-ui-fabric-react';
 import { ITaskOverviewWithSource } from '../../sections/CipSection';
 import { TaskNode } from '@service/sp-cip';
 import { convertTask } from './utils';
 import { useRelink } from './useRelink';
 import { hideSpinner, showSpinner } from '../LoadingSpinner';
+import { tasksUpdated } from '../../sections/CipSection/useTasks';
+import { SPnotify } from 'sp-react-notifications';
+import { GlobalContext } from '../../context/GlobalContext';
+import { getSourceKey } from '../../utils';
+import { IAction } from '@service/sp-cip/dist/services/action-service';
 
 export interface ITaskCellProps {
     column: IColumn;
@@ -32,10 +39,20 @@ export interface ITaskCellProps {
 }
 
 export const TaskCell: React.FC<ITaskCellProps> = (props) => {
-    const { priorityChoices, statusChoices } = React.useContext(CipSectionContext);
-    const task = React.useMemo(() => ({ ...props.node.getTask()}) as ITaskOverviewWithSource, [props.node]);
-    const parent = React.useMemo(() => ({ ...props.node.getParent().getTask() }) as ITaskOverviewWithSource, [props.node]);
+    const { currentUser } = React.useContext(GlobalContext);
+    const { priorityChoices, statusChoices, siteUsers } = React.useContext(CipSectionContext);
+    const task = React.useMemo(
+        () => ({ ...props.node.getTask() } as ITaskOverviewWithSource),
+        [props.node]
+    );
+    const parent = React.useMemo(
+        () => ({ ...props.node.getParent().getTask() } as ITaskOverviewWithSource),
+        [props.node]
+    );
     const taskFinished = React.useMemo(() => Boolean(task.FinishDate), [task]);
+    const sourceKey = React.useMemo(() => getSourceKey(task.service.source), [task]);
+    // Get the user info on the particular site
+    const currentSourceUser = React.useMemo(() => siteUsers[sourceKey]?.find((u) => u.LoginName === currentUser.LoginName), [currentUser, siteUsers]);
     let result = null;
 
     const handleNavigateToTask = React.useCallback(() => {
@@ -51,7 +68,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
     // If task is finished, unfinish it
     // else - finish the task
     const handleTitleButtonClick = React.useCallback(async () => {
-        const { service } = task.service;
+        const { taskService: service } = task.service;
         if (task.Subtasks !== task.FinishedSubtasks) {
             return props.onOpen(!props.open);
         }
@@ -68,6 +85,125 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
         }
         hideSpinner(CIP_SPINNER_ID);
     }, [task, props.open, taskFinished]);
+
+    const handleStatusChange = React.useCallback(
+        async (status: string) => {
+            try {
+                if (!currentSourceUser) {
+                    SPnotify({
+                        message: `User '${currentUser.Title}' is not member of this site.`,
+                        messageType: MessageBarType.error,
+                    });
+                    return;
+                }
+                showSpinner(CIP_SPINNER_ID);
+                const { taskService: service } = task.service;
+                // Finish the task
+                if (status === 'Finished' || status === 'Cancelled') {
+                    await service.finishTask(task.Id, status);
+                    await task.service.actionService.addAction(
+                        task.Id,
+                        'Finished',
+                        '',
+                        currentSourceUser.Id,
+                        new Date().toISOString()
+                    );
+                    if (task.ParentId) {
+                        const updatedParent = await service.getTask(task.ParentId);
+                        tasksUpdated(convertTask(updatedParent, task.service));
+                    }
+                } else {
+                    // Update task status
+                    await service.updateTask(task.Id, {
+                        Status: status,
+                    });
+                    await task.service.actionService.addAction(
+                        task.Id,
+                        'Status',
+                        `${task.Status}|${status}`,
+                        currentSourceUser.Id,
+                        new Date().toISOString()
+                    );
+                }
+                const updated = await service.getTask(task.Id);
+                tasksUpdated(convertTask(updated, task.service));
+            } finally {
+                hideSpinner(CIP_SPINNER_ID);
+            }
+        },
+        [task, currentSourceUser]
+    );
+
+    const handlePriorityChange = React.useCallback(
+        async (prio: typeof task.Priority) => {
+            try {
+                if (!currentSourceUser) {
+                    SPnotify({
+                        message: `User '${currentUser.Title}' is not member of this site.`,
+                        messageType: MessageBarType.error,
+                    });
+                    return;
+                }
+                showSpinner(CIP_SPINNER_ID);
+                await task.service.taskService.updateTask(task.Id, {
+                    Priority: prio,
+                });
+                await task.service.actionService.addAction(
+                    task.Id,
+                    'Priority',
+                    `${task.Priority}|${prio}`,
+                    currentSourceUser.Id,
+                    new Date().toISOString()
+                );
+                const updated = await task.service.taskService.getTask(task.Id);
+                tasksUpdated(convertTask(updated, task.service));
+            } finally {
+                hideSpinner(CIP_SPINNER_ID);
+            }
+        },
+        [task, currentSourceUser]
+    );
+
+    const handleDueDateChange = React.useCallback(
+        async (date: Date) => {
+            try {
+                if (!currentSourceUser) {
+                    SPnotify({
+                        message: `User '${currentUser.Title}' is not member of this site.`,
+                        messageType: MessageBarType.error,
+                    });
+                    return;
+                }
+                showSpinner(CIP_SPINNER_ID);
+                await task.service.taskService.updateTask(task.Id, {
+                    DueDate: date.toISOString(),
+                });
+                await task.service.actionService.addAction(
+                    task.Id,
+                    'Due date',
+                    `${task.DueDate}|${date.toISOString()}`,
+                    currentSourceUser.Id,
+                    new Date().toISOString()
+                );
+                const updated = await task.service.taskService.getTask(task.Id);
+                tasksUpdated(convertTask(updated, task.service));
+            } finally {
+                hideSpinner(CIP_SPINNER_ID);
+            }
+        },
+        [task, currentSourceUser]
+    );
+
+    const handleActionAdded = React.useCallback(async (action: Partial<IAction>) => {
+        const { actionService } = task.service;
+        await actionService.addAction(
+            task.Id,
+            'Time log',
+            action.Comment,
+            action.UserId,
+            action.Date
+        );
+    }, [task]);
 
     // Depending on column, render different cells
     switch (props.column.key) {
@@ -103,24 +239,42 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                             onClick: () =>
                                 showDialog({
                                     id: DIALOG_ID,
-                                    content: <div>test</div>,
+                                    content: (
+                                        <TimeLogGeneral
+                                            task={task}
+                                            disabled
+                                            currentUserId={currentSourceUser?.Id}
+                                            onActionAdd={handleActionAdded}
+                                            onTaskEffectiveTimeChange={async (
+                                                taskId: number,
+                                                time: number
+                                            ) => {
+                                                const { taskService } = task.service;
+                                                const latestTask = await taskService.getTask(
+                                                    taskId
+                                                );
+                                                await taskService.updateTask(taskId, {
+                                                    EffectiveTime: latestTask.EffectiveTime + time,
+                                                });
+                                            }}
+                                            beforeActions={() => hideDialog(DIALOG_ID)}
+                                            users={
+                                                siteUsers[sourceKey]
+                                                    ? userToPersonaProps(siteUsers[sourceKey])
+                                                    : []
+                                            }
+                                        />
+                                    ),
                                     dialogProps: {
                                         dialogContentProps: {
                                             type: DialogType.normal,
-                                            title: 'Hello world',
-                                            subText: 'Do you want to test?',
+                                            title: 'Log time',
                                         },
                                         modalProps: {
                                             isBlocking: true,
                                         },
                                     },
-                                    footer: (
-                                        <>
-                                            <PrimaryButton onClick={() => hideDialog(DIALOG_ID)}>
-                                                test
-                                            </PrimaryButton>
-                                        </>
-                                    ),
+                                    footer: null,
                                 }),
                         },
                         {
@@ -144,7 +298,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                         calloutId={CALLOUT_ID}
                         task={task}
                         choices={priorityChoices}
-                        onChangePriority={(prio: string) => console.log(`new priority - ${prio}`)}
+                        onChangePriority={handlePriorityChange}
                         disabled={taskFinished}
                     />
                 </div>
@@ -159,9 +313,15 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                     }}
                 >
                     <StatusCell
-                        status={task.Status}
+                        task={task}
+                        onError={(err) =>
+                            SPnotify({
+                                message: err,
+                                messageType: MessageBarType.error,
+                            })
+                        }
                         statuses={statusChoices}
-                        onStatusChange={(status: string) => console.log(status)}
+                        onStatusChange={handleStatusChange}
                         calloutId={CALLOUT_ID}
                         disabled={taskFinished}
                     />
@@ -173,7 +333,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                 <DueDateCell
                     dueDate={new Date(task.DueDate)}
                     calloutId={CALLOUT_ID}
-                    onDateChange={(date: Date) => console.log(date)}
+                    onDateChange={handleDueDateChange}
                     disabled={taskFinished}
                 />
             );
@@ -189,9 +349,8 @@ export interface ICipTaskProps {
 }
 
 export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
-    const [node, setNode] = React.useState<TaskNode>(props.rowProps.item);
+    const node: TaskNode = props.rowProps.item;
     const task = React.useMemo(() => node.getTask() as ITaskOverviewWithSource, [node]);
-    const [subtasks, setSubtasks] = React.useState<ITaskOverviewWithSource[]>([]);
     const [open, setOpen] = React.useState<boolean>(false);
     const [relink, relinkAllUnderMain] = useRelink(task.MainTaskId);
 
@@ -199,12 +358,11 @@ export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
     React.useEffect(() => {
         async function run(): Promise<void> {
             if (!open) return null;
-            if (subtasks.length > 0) return null;
+            if (node.getChildren().length > 0) return null;
             const resultSubtasks = (await task.service.getSubtasks(task)).map((t) =>
                 convertTask(t, task.service)
             );
-            node.withChildren(resultSubtasks);
-            setSubtasks(resultSubtasks);
+            tasksUpdated(...resultSubtasks);
         }
         run().catch((err) => console.error(err));
     }, [open]);
@@ -227,8 +385,15 @@ export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
                     column={column}
                     open={open}
                     onOpen={handleOpen}
-                    onTaskUpdated={(task: ITaskOverviewWithSource) => {
-                        setNode((prev) => prev.clone().withTask(task));
+                    onTaskUpdated={async (task: ITaskOverviewWithSource) => {
+                        tasksUpdated(task);
+                        if (task.ParentId) {
+                            const service = task.service;
+                            const taskService = service.taskService;
+                            tasksUpdated(
+                                convertTask(await taskService.getTask(task.ParentId), service)
+                            );
+                        }
                     }}
                 />
             );
@@ -238,7 +403,7 @@ export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
 
     // Render the subtasks
     const renderSubtasks = React.useMemo(() => {
-        if (open && subtasks.length === 0) {
+        if (open && node.getChildren().length === 0) {
             // task is expanded but the subtasks are not yet loaded
             // showing shimmers instead
             return Array(task.Subtasks)
@@ -250,24 +415,26 @@ export const CipTask: React.FC<ICipTaskProps> = ({ level = 0, ...props }) => {
                         parentNode={node}
                     />
                 ));
-        } else if (open && subtasks.length > 0) {
+        } else if (open && node.getChildren().length > 0) {
             // Now the subtasks are loaded
             // We can render them as well as redraw the link to
             // the parent task
             relinkAllUnderMain();
-            return subtasks.map((task) => (
+            return node.getChildren().map((node) => (
                 <CipTask
-                    key={`${task.service.source.rootUrl}/${task.Id}`}
+                    key={`${(node.getTask() as ITaskOverviewWithSource).service.source.rootUrl}/${
+                        node.Id
+                    }`}
                     rowProps={{
                         ...props.rowProps,
-                        item: node.getChildren().find((n) => n.Id === task.Id),
+                        item: node,
                     }}
                     level={level + 1}
                 />
             ));
         }
         return null;
-    }, [subtasks, props.rowProps, open]);
+    }, [props.rowProps, open]);
 
     return (
         <div className={styles.container}>

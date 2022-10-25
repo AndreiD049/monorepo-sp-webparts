@@ -13,7 +13,7 @@ export const Pill: React.FC<IPillProps> = ({ value, id, disabled, ...rest }) => 
             result += ` ${styles.disabled}`;
         }
         return result;
-    }, [disabled])
+    }, [disabled, rest.className])
 
     return (
         <div className={styles.pillContainer}>

@@ -1,4 +1,4 @@
-import { Dropdown, IDropdownOption } from 'office-ui-fabric-react';
+import { Dropdown, Icon, IDropdown, IDropdownOption } from 'office-ui-fabric-react';
 import * as React from 'react';
 import IUser from '../../models/IUser';
 import IUserCustom from '../../models/IUserCustom';
@@ -10,7 +10,9 @@ export interface IUserSelectorProps {
 }
 
 export const UserSelector: React.FC<IUserSelectorProps> = (props) => {
+    const dropdownRef = React.useRef<IDropdown>(null);
     const options: IDropdownOption[] = React.useMemo(() => {
+        if (!props.users) return [];
         return props.users.map((user) => ({
             key: user.User.Id,
             text: user.User.Title,
@@ -19,15 +21,40 @@ export const UserSelector: React.FC<IUserSelectorProps> = (props) => {
     }, [props.users]);
 
     return (
-        <Dropdown
-            options={options}
-            selectedKey={props.selectedUser.Id}
-            onChange={(ev, option) => props.handleUserSelect(option.data)}
-            styles={{
-                root: {
-                    minWidth: 150
-                }
+        <span
+            style={{
+                display: 'flex',
+                flexFlow: 'row nowrap',
+                alignItems: 'center',
+                justifyContent: 'center',
             }}
-        />
+        >
+            <Icon
+                styles={{
+                    root: {
+                        fontSize: '1.5em',
+                        marginRight: '.2em',
+                        cursor: 'pointer'
+                    },
+                }}
+                onClick={() => dropdownRef.current.focus(true)}
+                iconName="ReminderPerson"
+            />
+            <Dropdown
+                componentRef={dropdownRef}
+                options={options}
+                selectedKey={props.selectedUser?.Id}
+                onChange={(ev, option) => {
+                    if (option.key !== props.selectedUser.Id) {
+                        props.handleUserSelect(option.data)
+                    }
+                }}
+                styles={{
+                    root: {
+                        minWidth: 150,
+                    },
+                }}
+            />
+        </span>
     );
 };
