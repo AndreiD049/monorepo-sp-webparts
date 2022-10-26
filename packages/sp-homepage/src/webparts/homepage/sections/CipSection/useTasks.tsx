@@ -118,6 +118,7 @@ interface ITaskUpdatedEvent {
 interface ITaskDict {
     services: { [key: string]: ICipService };
     tasks: { [sourceKey: string]: ITaskOverviewWithSource[] };
+    loaded: boolean;
 }
 
 export function tasksUpdated(...tasks: ITaskOverviewWithSource[]): void {
@@ -138,6 +139,7 @@ export function useTasks(sources: ISource[], sectionName: string, selectedUser: 
         });
         return result;
     }, [selectedUser, sources]);
+    const [loaded, setLoaded] = React.useState(false);
     const [tasks, setTasks] = React.useState<{ [sourceKey: string]: ITaskOverviewWithSource[] }>(
         {}
     );
@@ -151,27 +153,27 @@ export function useTasks(sources: ISource[], sectionName: string, selectedUser: 
     // Fetch the tasks for each service
     React.useEffect(() => {
         async function run(): Promise<void> {
-            showSpinner(CIP_SPINNER_ID);
-            for (const key in services) {
-                if (Object.prototype.hasOwnProperty.call(services, key)) {
-                    console.log('Get task for service', key);
-                    const service = services[key];
-                    const user = await service.getUser(selectedUser.LoginName);
-                    if (user) {
-                        const tasks = await service.getOpenTasks(user.Id);
-                        setTasks((prev) => ({
-                            ...prev,
-                            [key]: tasks.map((t) => convertTask(t, service)),
-                        }));
-                    } else {
-                        setTasks((prev) => ({
-                            ...prev,
-                            [key]: [],
-                        }));
-                    }
+            setLoaded(false);
+            const calls = Object.keys(services).map(async (key) => {
+                const service = services[key];
+                const user = await service.getUser(selectedUser.LoginName);
+                if (user) {
+                    const tasks = await service.getOpenTasks(user.Id);
+                    setTasks((prev) => ({
+                        ...prev,
+                        [key]: tasks.map((t) => convertTask(t, service)),
+                    }));
+                } else {
+                    setTasks((prev) => ({
+                        ...prev,
+                        [key]: [],
+                    }));
                 }
-            }
-            // Hide the spinner if it is shown
+            });
+            // Wait until all data is fetched;
+            await Promise.all(calls);
+            setLoaded(true);
+            // Hide the spinner if it's running
             hideSpinner(CIP_SPINNER_ID);
         }
         if (selectedUser) {
@@ -235,5 +237,6 @@ export function useTasks(sources: ISource[], sectionName: string, selectedUser: 
     return {
         services,
         tasks,
+        loaded,
     };
 }

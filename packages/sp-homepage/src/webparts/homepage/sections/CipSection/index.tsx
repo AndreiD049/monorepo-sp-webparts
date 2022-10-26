@@ -5,16 +5,16 @@ import { GlobalContext } from '../../context/GlobalContext';
 import { IColumn, DetailsList, SelectionMode, DetailsListLayoutMode } from 'office-ui-fabric-react';
 import { ISectionProps } from '../../components/Section';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { CIP_SPINNER_ID } from '../../constants';
 import { createTaskTree } from '@service/sp-cip';
 import { flatten } from '@microsoft/sp-lodash-subset';
 import { useGroups } from '../../components/CipTask/useGroups';
 import { CipSectionContext } from './CipSectionContext';
 import { NoData } from '../../components/NoData';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ICipService, useTasks } from './useTasks';
 import { ISiteUserInfo } from 'sp-preset';
 import { getSourceKey } from '../../utils';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { CIP_SPINNER_ID } from '../../constants';
 
 export interface ICipSectionProps extends ISectionProps {
     // Props go here
@@ -31,9 +31,9 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
     const [status, setStatus] = React.useState<string[]>([]);
     const [priority, setPriority] = React.useState<string[]>([]);
     const [siteUsers, setSiteUsers] = React.useState<{ [key: string]: ISiteUserInfo[] }>({});
-    const { tasks, services } = useTasks(props.section.sources, props.section.name, selectedUser);
+    const { tasks, services, loaded } = useTasks(props.section.sources, props.section.name, selectedUser);
 
-    // Fetch field choices
+    // Fetch field choices and site users
     React.useEffect(() => {
         async function run(): Promise<void> {
             const firstKey = Object.keys(services)[0];
@@ -108,6 +108,10 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
         ];
     }, []);
 
+    if (!loaded) {
+        return <LoadingSpinner />
+    }
+
     if (children.length === 0) {
         return <NoData />;
     }
@@ -122,6 +126,7 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
                 }}
             >
                 <div className={styles.container}>
+                    <LoadingSpinner id={CIP_SPINNER_ID} />
                     <DetailsList
                         groups={groups}
                         items={children}
@@ -137,7 +142,6 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
                     />
                 </div>
             </CipSectionContext.Provider>
-            <LoadingSpinner id={CIP_SPINNER_ID} />
         </>
     );
 };

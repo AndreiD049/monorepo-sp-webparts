@@ -80,6 +80,8 @@ export const Homepage: React.FC<IHomepageProps> = (props) => {
 
     return (
         <GlobalContext.Provider value={context}>
+            <Callout id={CALLOUT_ID} />
+            <Dialog id={DIALOG_ID} />
             <GridWrapper
                 locked={locked}
                 handleLock={(locked) => setLocked(locked)}
@@ -105,8 +107,6 @@ export const Homepage: React.FC<IHomepageProps> = (props) => {
                     </ResponsiveGridLayout>
                 )}
             </GridWrapper>
-            <Callout id={CALLOUT_ID} />
-            <Dialog id={DIALOG_ID} />
         </GlobalContext.Provider>
     );
 };
