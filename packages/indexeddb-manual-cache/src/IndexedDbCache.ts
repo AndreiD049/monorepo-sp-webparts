@@ -1,9 +1,9 @@
-import { getValue, ICachedValue, ICacheOptions, isExpired, removeValue, setValue } from "./utils";
+import { getAllKeys, getValue, ICachedValue, ICacheOptions, isExpired, removeValue, setValue } from "./utils";
 
 export type KeyAccessor = {
-    get: <T>(getter: () => T) => Promise<T>;
-    update: <T>(setter: (prev: T) => T) => Promise<T>;
-    remove: () => Promise<boolean>;
+    get: <T>(getter: () => T, expiresIn?: number) => Promise<T>;
+    update: <T>(setter: (prev: T) => T) => Promise<T | null>;
+    remove: () => Promise<boolean | null>;
 }
 
 export default class IndexedDbCache {
@@ -11,9 +11,9 @@ export default class IndexedDbCache {
         this.test();
     }
 
-    public key(key: string) {
+    public key(key: string): KeyAccessor {
         return {
-            get: <T>(getter: () => T) => this.getCached(key, getter),
+            get: <T>(getter: () => T, expiresIn?: number) => this.getCached(key, getter, expiresIn),
             update: <T>(setter: (prev: T) => T) => this.updateCached(key, setter),
             remove: () => this.remove(key),
         }
@@ -62,6 +62,19 @@ export default class IndexedDbCache {
 
     public async invalidateCached(key: string) {
         await this.remove(key);
+    }
+
+    public async getAllKeys(): Promise<IDBValidKey[]> {
+        return getAllKeys(this.dbName, this.storeName);
+    }
+
+    /**
+     * Returns whether key is expired.
+     * If key doesn't exist, returns null
+     */
+    public async isExpired(key: string): Promise<boolean | null> {
+        const cachedValue = await this.get<any>(key);
+        return cachedValue ? isExpired(cachedValue) : null;
     }
 
     private async set(key: string, value: ICachedValue<any>) {

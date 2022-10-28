@@ -92,6 +92,7 @@ const PeriodDetails: React.FC<IPeriodDetailsProps> = (props) => {
                     setSelected={setCurrentUser}
                 />
             </StackItem>
+            {/* My Objectives */}
             <Stack
                 verticalAlign="center"
                 horizontalAlign="center"
@@ -102,7 +103,7 @@ const PeriodDetails: React.FC<IPeriodDetailsProps> = (props) => {
                 </Separator>
                 <ObjectiveItems user={currentUser} period={period} />
             </Stack>
-            {/* My Objectives */}
+            {/* Trainings requested by me of my TL */}
             <Stack
                 verticalAlign="center"
                 horizontalAlign="center"
@@ -113,14 +114,14 @@ const PeriodDetails: React.FC<IPeriodDetailsProps> = (props) => {
                 </Separator>
                 <TrainingItems user={currentUser} period={period} />
             </Stack>
-            {/* Trainings requested by me of my TL */}
+            {/* My self-evaluation */}
             <StackItem>
                 <Separator className={styles.itemDetailsSeparator}>
                     <Text variant="mediumPlus">SWOT</Text>
                 </Separator>
                 <SwotItems user={currentUser} period={period} />
             </StackItem>
-            {/* My self-evaluation */}
+            {/* Feedback */}
             <StackItem>
                 <Separator className={styles.itemDetailsSeparator}>
                     <Text variant="mediumPlus">Feedback</Text>

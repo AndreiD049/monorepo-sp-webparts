@@ -6,6 +6,7 @@ import { IUser } from '../../dal/IUser';
 import ItemContainer from './ItemContainer';
 import styles from './AppraisalItems.module.scss';
 import UserContext from '../../utils/UserContext';
+import { adoptOrphanItems } from './utils';
 
 export interface IObjectiveItemsProps {
     user: IUser;
@@ -15,6 +16,29 @@ export interface IObjectiveItemsProps {
 const TrainingItems: FC<IObjectiveItemsProps> = (props) => {
     const { ItemService } = React.useContext(UserContext);
     const [items, setItems] = React.useState<IItem[]>([]);
+
+    // Fetch items
+    React.useEffect(() => {
+        async function run() {
+            if (props.user && props.period) {
+                const result = await ItemService.getItems(
+                    'Training',
+                    props.period.ID,
+                    props.user?.Id
+                );
+                setItems(result);
+            }
+        }
+        run();
+    }, [props.user, props.period]);
+
+    // Adopt orphan trainings
+    React.useEffect(() => {
+        async function run() {
+            adoptOrphanItems(props.period, items, setItems, ItemService);
+        }
+        run();
+    }, [items]);
 
     const achieved = React.useMemo(() => {
         return items.filter(
@@ -31,20 +55,6 @@ const TrainingItems: FC<IObjectiveItemsProps> = (props) => {
                 +item.AchievedIn?.Id > +props.period.ID
         );
     }, [items]);
-
-    React.useEffect(() => {
-        async function run() {
-            if (props.user && props.period) {
-                const result = await ItemService.getItems(
-                    'Training',
-                    props.period.ID,
-                    props.user?.Id
-                );
-                setItems(result);
-            }
-        }
-        run();
-    }, [props.user, props.period]);
 
     if (!props.period) return null;
 

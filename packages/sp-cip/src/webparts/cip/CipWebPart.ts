@@ -18,6 +18,7 @@ import { getListId } from './utils/getListId';
 import { MessageBarType } from 'office-ui-fabric-react';
 import MainService from './services/main-service';
 import { IJsonConfig, PropertyPaneJsonConfiguration } from 'json-configuration';
+import { db } from './components/AttachmentSection';
 
 interface IConfiguration {
     rootSite: string;
@@ -70,6 +71,16 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
             this.properties.taskListId = await getListId(
                 this.properties.config.listName
             );
+
+            // Cleanup expired actions from past
+            const keys = await db.getAllKeys();
+            keys.forEach(async (k: string) => {
+                const expired = await db.isExpired(k);
+                if (expired) {
+                    await db.invalidateCached(k);
+                }
+            })
+            
         } catch (err) {
             SPnotify({
                 message: err.toString(),

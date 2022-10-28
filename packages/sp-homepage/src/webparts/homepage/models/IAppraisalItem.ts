@@ -6,6 +6,7 @@ export default interface IAppraisalItem {
         Id: number;
         Title: string;
     };
+    AchievedInId?: number;
     Content: string;
     ItemType: string;
     ItemStatus: AppraisalItemStatus;

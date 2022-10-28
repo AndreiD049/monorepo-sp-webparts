@@ -175,6 +175,7 @@ export {
     Items,
     IItemAddResult,
     IItemUpdateResult,
+    PagedItemCollection,
 } from '@pnp/sp/items';
 
 export { Caching, InjectHeaders } from '@pnp/queryable';

@@ -6,6 +6,7 @@ import { IUser } from '../../dal/IUser';
 import ItemContainer from './ItemContainer';
 import styles from './AppraisalItems.module.scss';
 import UserContext from '../../utils/UserContext';
+import { adoptOrphanItems } from './utils';
 
 export interface IObjectiveItemsProps {
     user: IUser;
@@ -15,8 +16,32 @@ export interface IObjectiveItemsProps {
 const ObjectiveItems: FC<IObjectiveItemsProps> = (props) => {
     const { ItemService } = React.useContext(UserContext);
     const [items, setItems] = React.useState<IItem[]>([]);
+    //
+    // Fetch items from list
+    React.useEffect(() => {
+        async function run() {
+            if (props.user && props.period) {
+                const result = await ItemService.getItems(
+                    'Objective',
+                    props.period.ID,
+                    props.user?.Id
+                );
+                setItems(result);
+            }
+        }
+        run();
+    }, [props.user, props.period]);
+
+    // Adopt orphan objectives
+    React.useEffect(() => {
+        async function run() {
+            adoptOrphanItems(props.period, items, setItems, ItemService);
+        }
+        run();
+    }, [items]);
 
     const achieved = React.useMemo(() => {
+        console.log(items);
         return items.filter(
             (item) =>
                 item.ItemStatus === 'Achieved' &&
@@ -31,20 +56,6 @@ const ObjectiveItems: FC<IObjectiveItemsProps> = (props) => {
                 +item.AchievedIn?.Id > +props.period.ID
         );
     }, [items]);
-
-    React.useEffect(() => {
-        async function run() {
-            if (props.user && props.period) {
-                const result = await ItemService.getItems(
-                    'Objective',
-                    props.period.ID,
-                    props.user?.Id
-                );
-                setItems(result);
-            }
-        }
-        run();
-    }, [props.user, props.period]);
 
     if (!props.period) return null;
 

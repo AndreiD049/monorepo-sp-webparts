@@ -1,8 +1,6 @@
 import { uniq } from '@microsoft/sp-lodash-subset';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import {
-    IAction,
-} from '@service/sp-cip/dist/services/action-service';
+import { IAction } from '@service/sp-cip/dist/services/action-service';
 import { IndexedDbCache } from 'indexeddb-manual-cache';
 import {
     DetailsList,
@@ -14,7 +12,7 @@ import {
 import * as React from 'react';
 import { ActionDropdownOption } from '..';
 import MainService from '../../../services/main-service';
-import { DAY, DB_NAME, STORE_NAME } from '../../../utils/constants';
+import { DAY, DB_NAME, MINUTE, STORE_NAME } from '../../../utils/constants';
 import { DIALOG_IDS, getDialog } from '../../AlertDialog';
 import { TimeLogGeneral } from '../../TimeLogGeneral';
 import { useColumns } from './useColumns';
@@ -32,6 +30,10 @@ export const db = new IndexedDbCache(DB_NAME, STORE_NAME, {
 });
 export const cache = {
     getTask: (taskId: number) => db.key(`actionLogTask/${taskId}`),
+    getActions: (dateFrom: Date, dateTo: Date) =>
+        db.key(
+            `actionLogActions/${dateFrom.toLocaleDateString()}/${dateTo.toLocaleDateString()}`
+        ),
 };
 
 export const ActionLogTable: React.FC<IActionLogTableProps> = (props) => {
@@ -46,11 +48,17 @@ export const ActionLogTable: React.FC<IActionLogTableProps> = (props) => {
 
     React.useEffect(() => {
         async function run(): Promise<void> {
-            // Get actions
-            const actions: IAction[] = await actionService.getActionsFromTo(
-                props.dateFrom,
-                props.dateTo,
-            );
+            // Get actions, cached every 5 minutes
+            const actions: IAction[] = await cache
+                .getActions(props.dateFrom, props.dateTo)
+                .get(
+                    async () =>
+                        actionService.getActionsFromTo(
+                            props.dateFrom,
+                            props.dateTo
+                        ),
+                    MINUTE * 5
+                );
             setActions(actions);
         }
         run().catch((err) => console.log(err));
@@ -114,7 +122,10 @@ export const ActionLogTable: React.FC<IActionLogTableProps> = (props) => {
     }, [filteredActions]);
 
     // Edit TimeLogs
-    const handleEditTimeLog = async (action: IAction, task?: ITaskOverview): Promise<void> => {
+    const handleEditTimeLog = async (
+        action: IAction,
+        task?: ITaskOverview
+    ): Promise<void> => {
         await getDialog({
             alertId: DIALOG_IDS.ACTIONLOG_PANEL,
             title: 'Log time',

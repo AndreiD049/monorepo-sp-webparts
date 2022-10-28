@@ -52,7 +52,7 @@ export async function setValue<T>(
     const os = transaction.objectStore(storeName);
     const writeRequest = os.put(val, key);
     writeRequest.onsuccess = () => resolve();
-    writeRequest.onerror = (ev) =>
+    writeRequest.onerror = () =>
       reject(Error("Cound't write value to indexeddb"));
   });
 }
@@ -63,13 +63,16 @@ export async function getValue<T>(
   key: string
 ): Promise<T | null> {
   let db = await openDB(dbName, storeName);
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const transaction = db.transaction(storeName, "readonly");
     const os = transaction.objectStore(storeName);
     const getRequest = os.get(key);
     getRequest.onsuccess = function () {
       resolve((this.result as T) || null);
     };
+    getRequest.onerror = function () {
+        resolve(null);
+    }
   });
 }
 
@@ -90,4 +93,22 @@ export async function removeValue(
       reject(false);
     };
   });
+}
+
+export async function getAllKeys(
+    dbName: string,
+    storeName: string,
+): Promise<IDBValidKey[]> {
+    let db = await openDB(dbName, storeName);
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(storeName, "readwrite");
+        const os = transaction.objectStore(storeName);
+        const letRequest = os.getAllKeys();
+        letRequest.onsuccess = function () {
+            resolve(this.result);
+        }
+        letRequest.onerror = function () {
+            reject(Error('Coundn\'t get all keys'));
+        }
+    });
 }

@@ -25,7 +25,7 @@
     "react-dom": "16.13.1",
     "react-router-dom": "6",
     "react-visibility-hook": "^1.0.0",
-    "sp-preset": "^2.0.17",
+    "sp-preset": "^2.0.18",
     "sp-react-notifications": "^1.0.22",
     "tslib": "2.3.1",
     "use-web-storage-api": "^1.0.6"

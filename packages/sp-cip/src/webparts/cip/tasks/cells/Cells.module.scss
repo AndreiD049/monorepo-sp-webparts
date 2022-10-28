@@ -58,6 +58,7 @@ $buttonSide: 30px;
     display: flex;
     flex-flow: row nowrap;
     font-size: .9em;
+    word-break: keep-all;
 }
 
 .title__subtask-delimiter {

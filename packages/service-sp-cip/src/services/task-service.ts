@@ -1,8 +1,8 @@
-import SPBuilder, { IList, SPFI } from 'sp-preset';
+import { IList, SPFI } from 'sp-preset';
 import { ICreateTask } from '../models/ICreateTask';
 import { IServiceProps } from '../models/IServiceProps';
 import { ITaskOverview, LIST_EXPAND, LIST_SELECT } from '../models/ITaskOverview';
-import { isFinished } from '../utils';
+import { getAllPaged, isFinished } from '../utils';
 
 /**
  * Tasks service
@@ -33,7 +33,7 @@ export class TaskService {
     };
 
     async getAll(team?: string): Promise<ITaskOverview[]> {
-        return this.getAllRequest()();
+        return getAllPaged(this.getAllRequest(team));
     };
 
     async getAllCategories(): Promise<string[]> {
@@ -59,10 +59,10 @@ export class TaskService {
         if (team) {
             filter += ` and ${this.teamFilter(team)}`;
         }
-        return this.list.items
+        return getAllPaged(this.list.items
             .filter(filter)
             .select(...LIST_SELECT)
-            .expand(...LIST_EXPAND)();
+            .expand(...LIST_EXPAND));
     };
 
     getTaskRequest(id: number) {
@@ -88,7 +88,7 @@ export class TaskService {
         if (team) {
             filter += ` and ${this.teamFilter(team)}`;
         }
-        return this.getMainsRequest(filter)();
+        return getAllPaged(this.getMainsRequest(filter));
     };
 
     async getFinishedMains(team?: string): Promise<ITaskOverview[]> {
@@ -96,7 +96,7 @@ export class TaskService {
         if (team) {
             filter += ` and ${this.teamFilter(team)}`;
         }
-        return this.getMainsRequest(filter)();
+        return getAllPaged(this.getMainsRequest(filter));
     };
 
     async getAllMains(team?: string): Promise<ITaskOverview[]> {
@@ -104,7 +104,7 @@ export class TaskService {
         if (team) {
             filter += ` and ${this.teamFilter(team)}`;
         }
-        return this.getMainsRequest(filter)();
+        return getAllPaged(this.getMainsRequest(filter));
     };
 
     getSubtasksRequest(id: number, team?: string) {
@@ -122,7 +122,7 @@ export class TaskService {
         parent: ITaskOverview,
         team?: string,
     ): Promise<ITaskOverview[]> {
-        let subtasks = await this.getSubtasksRequest(parent.Id)();
+        let subtasks = await getAllPaged<ITaskOverview[]>(this.getSubtasksRequest(parent.Id));
         // Guard if we have wrong number of subtasks
         if (subtasks.length !== parent.Subtasks) {
             await this.updateTask(parent.Id, {

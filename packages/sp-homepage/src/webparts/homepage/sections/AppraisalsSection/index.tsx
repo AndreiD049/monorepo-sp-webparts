@@ -5,6 +5,8 @@ import { ExpandHeader } from '../../components/ExpandHeader';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { NoData } from '../../components/NoData';
 import { Pill } from '../../components/Pill';
+import { listenSectionEvent } from '../../components/Section/section-events';
+import { GlobalContext } from '../../context/GlobalContext';
 import IAppraisalItem, { AppraisalItemStatus } from '../../models/IAppraisalItem';
 import ISectionProps from '../../models/ISectionProps';
 import SourceService from '../../services/SourceService';
@@ -41,13 +43,17 @@ const AppraisalItem: React.FC<{
 };
 
 export const AppraisalsSection: React.FC<IAppraisalsSectionProps> = (props) => {
+    const { selectedUser } = React.useContext(GlobalContext);
     const [loading, setLoading] = React.useState(true);
     const service = React.useMemo(
         () => new SourceService(props.section.sources[0], select, expand),
         [props.section]
     );
     const [data, setData] = React.useState<IAppraisalItem[]>([]);
+    const [reload, setReload] = React.useState<boolean>(false);
 
+    // Objectives and trainings are grouped by the period
+    // they were planned in
     const grouped = React.useMemo(() => {
         const sorted = [...data];
         sorted.sort((a, b) => a.PlannedIn.Id - b.PlannedIn.Id);
@@ -61,6 +67,7 @@ export const AppraisalsSection: React.FC<IAppraisalsSectionProps> = (props) => {
         return result;
     }, [data]);
 
+    // Fetch data
     React.useEffect(() => {
         async function run(): Promise<void> {
             try {
@@ -75,12 +82,31 @@ export const AppraisalsSection: React.FC<IAppraisalsSectionProps> = (props) => {
                 messageType: MessageBarType.error,
             })
         );
-    }, [props.section]);
+    }, [props.section, reload]);
+
+    // Listen events
+    React.useEffect(() => {
+        const listenHandlerRemove = listenSectionEvent(props.section.name, 'REFRESH', async () => {
+            setLoading(true);
+            // Clear cache
+            await service.clearCache();
+            // Reload and fetch data again
+            setReload((prev) => !prev);
+        });
+        return () => {
+            listenHandlerRemove();
+        };
+    }, [props.section, selectedUser]);
 
     const handleItemUpdate = async (id: number, status: AppraisalItemStatus): Promise<void> => {
-        const newItem = await service.updateItem<IAppraisalItem>(id, {
+        console.log('update', status);
+        const updateBody: Partial<IAppraisalItem> = {
             ItemStatus: status,
-        });
+        };
+        if (status === 'Planned') {
+            updateBody.AchievedInId = null;
+        }
+        const newItem = await service.updateItem<IAppraisalItem>(id, updateBody);
         setData((prev) => prev.map((i) => (i.Id === newItem.Id ? newItem : i)));
     };
 

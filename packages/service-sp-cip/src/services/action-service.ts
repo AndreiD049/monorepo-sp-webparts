@@ -1,6 +1,6 @@
 import { IItems, IList, SPFI } from 'sp-preset';
 import { IServiceProps } from '../models/IServiceProps';
-import { dateODataFormat } from '../utils';
+import { dateODataFormat, getAllPaged } from '../utils';
 
 export type ActionType =
     | 'Time log'
@@ -67,7 +67,7 @@ const wrap = (item: IItems) => {
     return item
         .select(...LIST_SELECT)
         .expand(...LIST_EXPAND)
-        .orderBy('Created', false)();
+        .orderBy('Created', false);
 };
 
 export interface IActionServiceProps extends IServiceProps {
@@ -97,13 +97,13 @@ export class ActionService {
             this.list.items.filter(
                 `ListId eq '${await this.taskListId}' and ItemId eq ${taskId} and ActivityType ne 'Comment'`
             )
-        );
+        )();
     };
 
     async getActionsFromTo(dateFrom: Date, dateTo: Date): Promise<IAction[]> {
-        return wrap(
+        return getAllPaged(wrap(
             this.list.items.filter(`ListId eq '${await this.taskListId}' and Date ge '${dateODataFormat(dateFrom)}' and Date lt '${dateODataFormat(dateTo)}'`)
-        );
+        ));
     }
 
     async addAction(

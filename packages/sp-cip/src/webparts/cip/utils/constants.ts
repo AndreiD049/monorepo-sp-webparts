@@ -1,4 +1,4 @@
-const VERSION = "1.0.0.32";
+const VERSION = "1.0.0.36";
 
 export const SECOND = 1000;
 export const MINUTE = SECOND * 60;

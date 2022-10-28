@@ -36,7 +36,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "16.13.1",
     "react-visibility-hook": "^1.0.0",
-    "sp-preset": "^2.0.17",
+    "sp-preset": "^2.0.18",
     "sp-react-notifications": "^1.0.23",
     "sp-components": "^1.0.0",
     "tslib": "2.3.1",

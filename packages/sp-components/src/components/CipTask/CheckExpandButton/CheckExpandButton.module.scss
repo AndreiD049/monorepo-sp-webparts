@@ -41,6 +41,7 @@ $buttonSide: 30px;
     display: flex;
     flex-flow: row nowrap;
     position: relative;
+    word-break: keep-all;
 }
 
 .containerEmpty {

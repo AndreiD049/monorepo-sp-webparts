@@ -25,11 +25,11 @@
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.33.0",
     "rollup-plugin-visualizer": "^5.8.1",
-    "sp-preset": "^2.0.17",
+    "sp-preset": "^2.0.18",
     "typescript": "^4.8.2"
   },
   "peerDependencies": {
-    "sp-preset": "^2.0.17"
+    "sp-preset": "^2.0.18"
   },
   "dependencies": {}
 }

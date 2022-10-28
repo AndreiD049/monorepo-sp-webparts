@@ -2,6 +2,7 @@
 import { MessageBarType } from 'office-ui-fabric-react';
 import { SPnotify } from 'sp-react-notifications';
 import IItem, { ItemStatus, ItemType } from '../../dal/IItem';
+import IPeriod from '../../dal/IPeriod';
 import ItemService from '../../dal/Items';
 const isEmpty = (item: IItem) => item.Id === '';
 
@@ -10,7 +11,6 @@ export type setItemAction = {
     item?: IItem;
     id: string;
 };
-
 
 const handleCreate = async (
     item: Partial<IItem>,
@@ -130,6 +130,55 @@ const emptyItem = (itype: ItemType): IItem => ({
     User: null,
 });
 
+async function adoptOrphanItems(
+    period: IPeriod,
+    items: IItem[],
+    setItems: React.Dispatch<React.SetStateAction<IItem[]>>,
+    ItemService: ItemService
+) {
+    // Objectives that are achieved but, don't have an achieved period
+    const orphanItems = items.filter(
+        (obj) => obj.ItemStatus === 'Achieved' && !obj.AchievedIn
+    );
+    // if period is open
+    if (period && period.Status !== 'Finished') {
+        const calls = orphanItems.map(async (obj) => {
+            try {
+                // if period Id is greater or equal than Planned in Period id
+                if (period.ID >= obj.PlannedIn.Id) {
+                    // Update the item via API
+                    const updatedObjective = await ItemService.updateItem(
+                        obj.Id,
+                        {
+                            AchievedInId: period.ID,
+                        }
+                    );
+                    // Update the state with the new item
+                    setItems((prev) =>
+                        prev.map((obj) =>
+                            obj.Id === updatedObjective.Id
+                                ? {
+                                      ...obj,
+                                      AchievedIn: {
+                                          Id: period.ID,
+                                          Title: period.Title,
+                                      },
+                                  }
+                                : obj
+                        )
+                    );
+                }
+            } catch (err) {
+                SPnotify({
+                    message: err,
+                    messageType: MessageBarType.error,
+                });
+            }
+        });
+        await Promise.all(calls);
+    }
+}
+
 export {
     isEmpty,
     handleItemUpdate,
@@ -137,4 +186,5 @@ export {
     handleUpdate,
     handleDelete,
     emptyItem,
+    adoptOrphanItems
 };
