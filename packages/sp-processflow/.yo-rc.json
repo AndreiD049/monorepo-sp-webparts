@@ -1,0 +1,16 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.15.2",
+    "libraryName": "sp-processflow",
+    "libraryId": "05b445ba-525a-43ea-a08e-a5b4a2b9a469",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "sp-processflow",
+    "solutionShortDescription": "sp-processflow description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

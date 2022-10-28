@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "sp-processflow-client-side-solution",
+    "id": "05b445ba-525a-43ea-a08e-a5b4a2b9a469",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.15.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "sp-processflow description"
+      },
+      "longDescription": {
+        "default": "sp-processflow description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "sp-processflow Feature",
+        "description": "The feature that activates elements of the sp-processflow solution.",
+        "id": "1f6b66f3-2973-4677-b85f-0316b61e436a",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/sp-processflow.sppkg"
+  }
+}
