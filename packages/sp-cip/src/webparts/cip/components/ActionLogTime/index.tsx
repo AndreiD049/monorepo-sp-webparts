@@ -3,9 +3,10 @@ import * as React from 'react';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IAction } from '@service/sp-cip/dist/services/action-service';
 import { formatHours } from '../../utils/hours-duration';
-import { DIALOG_IDS, getDialog } from '../AlertDialog';
 import { TimeLogGeneral } from '../TimeLogGeneral';
 import styles from './ActionLogTime.module.scss';
+import { showDialog } from 'sp-components';
+import { DIALOG_ID_PANEL } from '../../utils/constants';
 
 export interface IActionLogTimeProps {
     action: IAction;
@@ -33,11 +34,11 @@ export const ActionLogTime: React.FC<IActionLogTimeProps> = (props) => {
     }, []);
 
     const handleEdit = (): void => {
-        getDialog({
-            alertId: DIALOG_IDS.DETAILS_PANEL,
-            title: 'Log time',
-            Component: <TimeLogGeneral task={props.task} dialogId={DIALOG_IDS.DETAILS_PANEL} action={props.action} />,
-        }).catch((err) => console.error(err));
+        showDialog({
+                id: DIALOG_ID_PANEL,
+                dialogProps: { title: 'Log time', },
+                content: (<TimeLogGeneral task={props.task} dialogId={DIALOG_ID_PANEL} action={props.action} />)
+            })
     };
 
     return (

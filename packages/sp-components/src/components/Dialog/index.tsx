@@ -49,8 +49,8 @@ export const Dialog: React.FC<ISPDialogProps> = (props) => {
 
     React.useEffect(() => {
         function handler(evt: CustomEvent<IDialogEventProps>) {
-            setDialogProps(evt.detail.dialogProps);
             setVisible(evt.detail.visible);
+            setDialogProps(evt.detail.dialogProps);
             if (evt.detail.content) {
                 setContent(evt.detail.content);
             }

@@ -1,5 +1,11 @@
 import { IAttachmentFile } from '@service/sp-cip/dist/models/IAttachmentFile';
-import { ButtonType, Icon, IconButton, Text } from 'office-ui-fabric-react';
+import {
+    DefaultButton,
+    Icon,
+    IconButton,
+    PrimaryButton,
+    Text,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Draggable } from '@rast999/drag-and-drop';
 import { GlobalContext } from '../../../utils/GlobalContext';
@@ -9,7 +15,9 @@ import { loadingStart, loadingStop } from '../../utils/LoadingAnimation';
 import styles from './AttachmentFile.module.scss';
 import { taskUpdated } from '../../../utils/dom-events';
 import { getBasePath } from '../../../utils/path';
-import { DIALOG_IDS, getDialog } from '../../AlertDialog';
+import { hideDialog, showDialog } from 'sp-components';
+import { DIALOG_ID_PANEL } from '../../../utils/constants';
+import { Stack } from 'office-ui-fabric-react/lib/Stack';
 
 export interface IAttachmentFileProps {
     file: IAttachmentFile;
@@ -79,7 +87,10 @@ const getFileIconName = (name: string): string => {
     }
 };
 
-const getRootSite = (serverRelativeUrl: string, libraryName: string): string => {
+const getRootSite = (
+    serverRelativeUrl: string,
+    libraryName: string
+): string => {
     const rootSiteParts = serverRelativeUrl.split('/');
     const libraryIndex = rootSiteParts.indexOf(libraryName);
     return rootSiteParts.slice(0, libraryIndex + 1).join('/');
@@ -116,36 +127,42 @@ export const AttachmentFile: React.FC<IAttachmentFileProps> = (props) => {
     }, [props.file]);
 
     const handleDelete = React.useCallback(async () => {
-        console.log(props.file);
-        const answer = await getDialog({
-            alertId: DIALOG_IDS.DETAILS_PANEL,
-            title: 'Delete file?',
-            subText: `Do you really want to delete file '${props.file.Name}'?`,
-            buttons: [
-                {
-                    key: 'yes',
-                    text: 'Yes',
-                    type: ButtonType.primary,
-                },
-                {
-                    key: 'no',
-                    text: 'No',
-                    type: ButtonType.default,
-                },
-            ],
+        const handleDelete = async (): Promise<void> => {
+            hideDialog(DIALOG_ID_PANEL);
+            const service = MainService.getAttachmentService();
+            const taskService = MainService.getTaskService();
+            loadingStart('details');
+            await service.removeAttachment(props.file.ServerRelativeUrl);
+            props.setAttachments((files) =>
+                files.filter((f) => f.UniqueId !== props.file.UniqueId)
+            );
+            const latest = await taskService.attachmentsUpdated(
+                props.task.Id,
+                -1
+            );
+            props.onDelete(props.file);
+            taskUpdated(latest);
+            loadingStop('details');
+        };
+        showDialog({
+            id: DIALOG_ID_PANEL,
+            dialogProps: {
+                title: 'Delete file',
+                subText: `Do you really want to delete file '${props.file.Name}'?`,
+            },
+            footer: (
+                <Stack
+                    horizontal
+                    horizontalAlign="end"
+                    tokens={{ childrenGap: 5 }}
+                >
+                    <PrimaryButton onClick={handleDelete}>Yes</PrimaryButton>
+                    <DefaultButton onClick={() => hideDialog(DIALOG_ID_PANEL)}>
+                        No
+                    </DefaultButton>
+                </Stack>
+            ),
         });
-        if (answer === 'no' || !answer) return;
-        const service = MainService.getAttachmentService();
-        const taskService = MainService.getTaskService();
-        loadingStart('details');
-        await service.removeAttachment(props.file.ServerRelativeUrl);
-        props.setAttachments((files) =>
-            files.filter((f) => f.UniqueId !== props.file.UniqueId)
-        );
-        const latest = await taskService.attachmentsUpdated(props.task.Id, -1);
-        props.onDelete(props.file);
-        taskUpdated(latest);
-        loadingStop('details');
     }, []);
 
     return (

@@ -22,9 +22,10 @@ import { IAction } from '@service/sp-cip/dist/services/action-service';
 import { GlobalContext } from '../../utils/GlobalContext';
 import styles from './TimeLogGeneral.module.scss';
 import { IItemUpdateResult } from 'sp-preset';
+import { hideDialog } from 'sp-components';
 
 export interface ITimeLogGeneralProps {
-    dialogId: DIALOG_IDS;
+    dialogId: string;
     task?: ITaskOverview;
     action?: IAction;
     /* initial hours value */
@@ -140,7 +141,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
             } else {
                 action = handleLogUpdate();
             }
-            dismissDialog(props.dialogId, true);
+            hideDialog(props.dialogId);
             loadingStart();
             await action;
             // eslint-disable-next-line no-unused-expressions

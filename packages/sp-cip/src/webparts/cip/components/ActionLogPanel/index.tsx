@@ -9,14 +9,14 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DAY, SELECTED_USERS_KEY } from '../../utils/constants';
+import { DAY, DIALOG_ID_ACTIONLOG_PANEL, SELECTED_USERS_KEY } from '../../utils/constants';
 import { defaultCalendarStrings } from '../utils/defaultCalendarStrings';
 import { ActionDropdown } from './ActionDropdown';
 import { ActionLogTable } from './ActionLogTable';
 import useWebStorage from 'use-web-storage-api';
 import { PeoplePicker } from './PeoplePicker';
 import styles from './ActionLogPanel.module.scss';
-import { AlertDialog, DIALOG_IDS } from '../AlertDialog';
+import { Dialog } from 'sp-components';
 
 export interface IActionLogPanelProps {
     // Props go here
@@ -90,7 +90,7 @@ export const ActionLogPanel: React.FC<IActionLogPanelProps> = (props) => {
                     action={action}
                 />
             </div>
-            <AlertDialog alertId={DIALOG_IDS.ACTIONLOG_PANEL} />
+            <Dialog id={DIALOG_ID_ACTIONLOG_PANEL} />
         </Panel>
     );
 };

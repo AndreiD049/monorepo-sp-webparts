@@ -10,10 +10,16 @@ import {
     SelectionMode,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { showDialog } from 'sp-components';
 import { ActionDropdownOption } from '..';
 import MainService from '../../../services/main-service';
-import { DAY, DB_NAME, MINUTE, STORE_NAME } from '../../../utils/constants';
-import { DIALOG_IDS, getDialog } from '../../AlertDialog';
+import {
+    DAY,
+    DB_NAME,
+    DIALOG_ID_ACTIONLOG_PANEL,
+    MINUTE,
+    STORE_NAME,
+} from '../../../utils/constants';
 import { TimeLogGeneral } from '../../TimeLogGeneral';
 import { useColumns } from './useColumns';
 
@@ -126,13 +132,15 @@ export const ActionLogTable: React.FC<IActionLogTableProps> = (props) => {
         action: IAction,
         task?: ITaskOverview
     ): Promise<void> => {
-        await getDialog({
-            alertId: DIALOG_IDS.ACTIONLOG_PANEL,
-            title: 'Log time',
-            Component: (
+        showDialog({
+            id: DIALOG_ID_ACTIONLOG_PANEL,
+            dialogProps: {
+                title: 'Log time',
+            },
+            content: (
                 <TimeLogGeneral
                     task={task}
-                    dialogId={DIALOG_IDS.ACTIONLOG_PANEL}
+                    dialogId={DIALOG_ID_ACTIONLOG_PANEL}
                     action={action}
                     afterLog={async () => {
                         const newAction = await actionService.getAction(

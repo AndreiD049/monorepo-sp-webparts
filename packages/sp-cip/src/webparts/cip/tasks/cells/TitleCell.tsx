@@ -1,4 +1,11 @@
-import { Icon, IconButton, Text } from 'office-ui-fabric-react';
+import {
+    DefaultButton,
+    Icon,
+    IconButton,
+    PrimaryButton,
+    Stack,
+    Text,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
 import { finishTask } from '../../utils/task';
 import useParentStroke from '../../components/ParentStroke';
@@ -15,7 +22,9 @@ import MainService from '../../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { isFinished } from '@service/sp-cip';
 import { GlobalContext } from '../../utils/GlobalContext';
+import { hideDialog, showDialog } from 'sp-components';
 import styles from './Cells.module.scss';
+import { DIALOG_ID } from '../../utils/constants';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {
@@ -64,9 +73,7 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
             return <SubtaskCounter item={item} />;
         } else {
             return (
-                <Icon
-                    iconName={`${isTaskFinished ? 'Cancel' : 'CheckMark'}`}
-                />
+                <Icon iconName={`${isTaskFinished ? 'Cancel' : 'CheckMark'}`} />
             );
         }
     }, [node]);
@@ -121,22 +128,108 @@ export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
     const taskService = MainService.getTaskService();
 
     const handleFinishTask = async (node: TaskNode): Promise<void> => {
-        const newItem = await finishTask(node.getTask(), currentUser.Id);
-        if (newItem) {
+        const handleFinish = async (): Promise<void> => {
+            hideDialog(DIALOG_ID);
+            loadingStart();
+            const newItem = await finishTask(node.getTask(), currentUser.Id);
+            if (newItem) {
+                taskUpdated(newItem);
+                if (newItem.ParentId) {
+                    taskUpdated(await taskService.getTask(newItem.ParentId));
+                }
+            }
+        };
+
+        return new Promise((resolve, reject) => {
+            try {
+                showDialog({
+                    id: DIALOG_ID,
+                    dialogProps: {
+                        title: 'Finish task',
+                        subText: 'Task will become Finished. Are you sure?',
+                        isBlocking: true,
+                    },
+                    footer: (
+                        <Stack
+                            horizontal
+                            horizontalAlign="end"
+                            tokens={{ childrenGap: 5 }}
+                        >
+                            <PrimaryButton
+                                onClick={async () => {
+                                    await handleFinish();
+                                    resolve();
+                                }}
+                            >
+                                Yes
+                            </PrimaryButton>
+                            <DefaultButton
+                                onClick={() => {
+                                    hideDialog(DIALOG_ID);
+                                    resolve();
+                                }}
+                            >
+                                No
+                            </DefaultButton>
+                        </Stack>
+                    ),
+                });
+            } catch (err: unknown) {
+                reject(err);
+            }
+        });
+    };
+
+    const handleReopenTask = async (node: TaskNode): Promise<void> => {
+        const handleReopen = async (): Promise<void> => {
+            hideDialog(DIALOG_ID);
+            loadingStart();
+            await taskService.reopenTask(node.Id);
+            const newItem = await taskService.getTask(node.Id);
             taskUpdated(newItem);
             if (newItem.ParentId) {
                 taskUpdated(await taskService.getTask(newItem.ParentId));
             }
-        }
-    };
+        };
 
-    const handleReopenTask = async (node: TaskNode): Promise<void> => {
-        await taskService.reopenTask(node.Id);
-        const newItem = await taskService.getTask(node.Id);
-        taskUpdated(newItem);
-        if (newItem.ParentId) {
-            taskUpdated(await taskService.getTask(newItem.ParentId));
-        }
+        return new Promise((resolve, reject) => {
+            try {
+                showDialog({
+                    id: DIALOG_ID,
+                    dialogProps: {
+                        title: 'Finish task',
+                        subText: 'Are you sure to re-open this task?',
+                        isBlocking: true,
+                    },
+                    footer: (
+                        <Stack
+                            horizontal
+                            horizontalAlign="end"
+                            tokens={{ childrenGap: 5 }}
+                        >
+                            <PrimaryButton
+                                onClick={async () => {
+                                    await handleReopen();
+                                    resolve();
+                                }}
+                            >
+                                Yes
+                            </PrimaryButton>
+                            <DefaultButton
+                                onClick={() => {
+                                    hideDialog(DIALOG_ID);
+                                    resolve();
+                                }}
+                            >
+                                No
+                            </DefaultButton>
+                        </Stack>
+                    ),
+                });
+            } catch (err: any) {
+                reject(err);
+            }
+        });
     };
 
     return (
@@ -160,7 +253,6 @@ export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
                 node={node}
                 onClick={async () => {
                     if (item.Subtasks === item.FinishedSubtasks) {
-                        loadingStart();
                         if (!isTaskFinished) {
                             await handleFinishTask(node);
                         } else {

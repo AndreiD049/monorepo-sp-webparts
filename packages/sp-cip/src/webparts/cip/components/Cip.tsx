@@ -8,13 +8,13 @@ import { HashRouter, Outlet, Route, Routes } from 'react-router-dom';
 import CreateTaskPanel from '../tasks/panels/CreateTask';
 import { TaskDetails } from '../tasks/panels/TaskDetails';
 import { LoadingAnimation } from './utils/LoadingAnimation';
-import { AlertDialog } from './AlertDialog';
 import MainService from '../services/main-service';
 import styles from './Cip.module.scss';
-import { SELECTED_TEAM_KEY } from '../utils/constants';
+import { DIALOG_ID, SELECTED_TEAM_KEY } from '../utils/constants';
 import useWebStorage from 'use-web-storage-api';
 import { CipTimer } from './CipTimer';
 import { ActionLogPanel } from './ActionLogPanel';
+import { Dialog } from 'sp-components';
 
 interface ICipProps {
     properties: ICipWebPartProps;
@@ -90,7 +90,7 @@ const Cip: React.FC<ICipProps> = (props) => {
                         <Route path="actionlog" element={<ActionLogPanel />} />
                     </Route>
                 </Routes>
-                <AlertDialog alertId="MAIN" />
+                <Dialog id={DIALOG_ID}/>;
                 <CipTimer />
             </HashRouter>
         </GlobalContext.Provider>

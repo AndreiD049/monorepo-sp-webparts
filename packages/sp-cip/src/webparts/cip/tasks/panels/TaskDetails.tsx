@@ -14,11 +14,6 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import { ActionLog } from '../../actionlog/ActionLog';
 import { Comments } from '../../comments/Comments';
-import {
-    AlertDialog,
-    DIALOG_IDS,
-    getDialog,
-} from '../../components/AlertDialog';
 import { TimeLogGeneral } from '../../components/TimeLogGeneral';
 import {
     LoadingAnimation,
@@ -31,6 +26,8 @@ import MainService from '../../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { AttachmentSection } from '../../components/AttachmentSection';
 import { RelativeTasks } from '../../components/RelativeTasks';
+import { Dialog, showDialog } from 'sp-components';
+import { DIALOG_ID_PANEL } from '../../utils/constants';
 
 export const TaskDetails: React.FC = () => {
     const params = useParams();
@@ -171,13 +168,15 @@ export const TaskDetails: React.FC = () => {
                 iconName: 'Clock',
             },
             onClick: () =>
-                getDialog({
-                    alertId: DIALOG_IDS.DETAILS_PANEL,
-                    title: 'Log time',
-                    Component: (
+                showDialog({
+                    id: DIALOG_ID_PANEL,
+                    dialogProps: {
+                        title: 'Log time',
+                    },
+                    content: (
                         <TimeLogGeneral
                             task={task}
-                            dialogId={DIALOG_IDS.DETAILS_PANEL}
+                            dialogId={DIALOG_ID_PANEL}
                         />
                     ),
                 }),
@@ -221,7 +220,10 @@ export const TaskDetails: React.FC = () => {
                     <Stack>
                         {editableInformation}
                         <StackItem>
-                            <RelativeTasks task={task} onDismiss={handleDismiss} />
+                            <RelativeTasks
+                                task={task}
+                                onDismiss={handleDismiss}
+                            />
                         </StackItem>
                         <StackItem>
                             <AttachmentSection task={task} />
@@ -252,7 +254,7 @@ export const TaskDetails: React.FC = () => {
                     </Stack>
                 )}
             </div>
-            <AlertDialog alertId="DETAILS_PANEL" />
+            <Dialog id={DIALOG_ID_PANEL} />
             <LoadingAnimation elementId="details" initialOpen />
         </Panel>
     );
