@@ -12,7 +12,6 @@ import {
 import * as React from 'react';
 import { actionUpdated } from '../../actionlog/ActionLog';
 import { taskUpdated } from '../../utils/dom-events';
-import { DIALOG_IDS, dismissDialog } from '../AlertDialog';
 import { HoursInput } from '../HoursInput';
 import { SelectMainTask } from '../SelectMainTask';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';

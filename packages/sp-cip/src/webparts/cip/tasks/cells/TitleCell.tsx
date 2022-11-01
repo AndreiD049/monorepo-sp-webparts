@@ -226,7 +226,7 @@ export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
                         </Stack>
                     ),
                 });
-            } catch (err: any) {
+            } catch (err: unknown) {
                 reject(err);
             }
         });

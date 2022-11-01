@@ -238,3 +238,18 @@ export function userToPeoplePickerOption(user: IUser): IPersonaProps {
         imageUrl: `/_layouts/15/userphoto.aspx?AccountName=${user.User.EMail}&Size=M`,
     }
 }
+
+/**
+ * @param dateStr ISO String
+ * @param date Date that needs to be changed
+ * @returns The date having time from @dateStr and year/month/day of @date
+ */
+export function changeDateTo(dateStr: string, date: Date) {
+    const initial = DateTime.fromISO(dateStr);
+    const dt = DateTime.fromJSDate(date);
+    return initial.set({
+        year: dt.year,
+        month: dt.month,
+        day: dt.day,
+    });
+}

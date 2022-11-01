@@ -3,7 +3,7 @@ import TasksWebPart, { ITasksWebPartProps } from '../TasksWebPart';
 import UserService from './users';
 import { DateTime } from 'luxon';
 import ITask from '../models/ITask';
-import { processChangeResult } from '../utils/utils';
+import { changeDateTo, processChangeResult } from '../utils/utils';
 import { SPFI, IList, IItemAddResult, IItems } from 'sp-preset';
 
 const LOG_SELECT = [
@@ -204,7 +204,8 @@ export default class TaskLogsService {
 
     private castTaskToTaskLog(task: ITask, date: Date): Partial<ITaskLog> {
         const dt = DateTime.fromJSDate(date);
-        const time = DateTime.fromISO(task.Time).toUTC();
+        // Change date because of daylight savings, then convert to UTC
+        const time = changeDateTo(task.Time, date).toUTC();
         const dateString = dt.toISODate();
         const dateTime = DateTime.utc(dt.year, dt.month, dt.day, time.hour, time.minute, 0);
         return {

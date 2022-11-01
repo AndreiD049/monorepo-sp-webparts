@@ -17,6 +17,7 @@ import { CipStatusSelector, StatusSelected } from './StatusSelector';
 import { TIMER_VISIBLE_KEY } from '../../utils/constants';
 import useWebStorage from 'use-web-storage-api';
 import { TeamSelector } from '../TeamSelector';
+import { showDialog } from 'sp-components';
 
 interface ICipCommandBarProps {
     onSearch: (val: string) => void;
@@ -70,7 +71,7 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                         Component: (
                             <TimeLogGeneral dialogId={DIALOG_IDS.MAIN} />
                         ),
-                    }),
+                    })
             },
             {
                 key: 'timers',

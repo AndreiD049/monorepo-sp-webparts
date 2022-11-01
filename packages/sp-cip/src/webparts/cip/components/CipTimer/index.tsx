@@ -4,17 +4,26 @@ import { timerOptionsHandler, timerAddHandler } from '../../utils/dom-events';
 import ITimer from '../../models/ITimer';
 import { getDuration, pauseTimerItem } from '../TimerItem';
 import { Timer } from '../Timer';
-import { TIMER_VISIBLE_KEY, TIMER_RIGHT_POSITION,  HOUR, DB_NAME, STORE_NAME, TIMERS_KEY, ALL_TASKS_KEY  } from '../../utils/constants';
+import {
+    TIMER_VISIBLE_KEY,
+    TIMER_RIGHT_POSITION,
+    HOUR,
+    DB_NAME,
+    STORE_NAME,
+    TIMERS_KEY,
+    ALL_TASKS_KEY,
+    DIALOG_ID,
+} from '../../utils/constants';
 import { hoursFromMilliseconds } from '../../utils/hours-duration';
 import useWebStorage from 'use-web-storage-api';
 import MainService from '../../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IndexedDbCache } from 'indexeddb-manual-cache';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
-import { DIALOG_IDS, getDialog } from '../AlertDialog';
-import { ButtonType } from 'office-ui-fabric-react';
+import { DefaultButton, PrimaryButton, Stack } from 'office-ui-fabric-react';
 import { TimeLogGeneral } from '../TimeLogGeneral';
 import { GlobalContext } from '../../utils/GlobalContext';
+import { hideDialog, showDialog } from 'sp-components';
 
 export interface ICipTimerProps {
     // Props go here
@@ -48,7 +57,9 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
     });
     const [tasks, setTasks] = React.useState<ITaskOverview[]>([]);
     const [timers, setTimers] = useWebStorage<ITimer<ITaskOverview>[]>([], {
-        key: TIMERS_KEY(properties.config.rootSite + properties.config.listName),
+        key: TIMERS_KEY(
+            properties.config.rootSite + properties.config.listName
+        ),
     });
 
     /** Setup dom events for showing and hiding the timer */
@@ -66,7 +77,7 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
             const addedTimer = newTimer(options.task);
             setTimers((prev) => {
                 console.log(prev);
-                return [addedTimer, ...(prev.map((t) => pauseTimerItem(t)))];
+                return [addedTimer, ...prev.map((t) => pauseTimerItem(t))];
             });
         });
         return () => {
@@ -75,11 +86,14 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
         };
     }, []);
 
-    const handleTimerUpdated = React.useCallback((timer: ITimer<ITaskOverview>) => {
-        setTimers((prev) =>
-            prev.map((t) => (t.id === timer.id ? timer : t))
-        )
-    }, [])
+    const handleTimerUpdated = React.useCallback(
+        (timer: ITimer<ITaskOverview>) => {
+            setTimers((prev) =>
+                prev.map((t) => (t.id === timer.id ? timer : t))
+            );
+        },
+        []
+    );
 
     if (!visible) return null;
 
@@ -91,44 +105,56 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
             timers={timers}
             onTimerAdded={(timer) => setTimers((prev) => [timer, ...prev])}
             onTimerUpdated={handleTimerUpdated}
-            onTimerRemoved={async (timer) => {
-                const answer = await getDialog({
-                    alertId: DIALOG_IDS.MAIN,
-                    title: 'Remove timer',
-                    subText: 'Deleting timer. Are you sure?',
-                    buttons: [
-                        {
-                            type: ButtonType.primary,
-                            key: 'yes',
-                            text: 'Yes',
-                        },
-                        {
-                            type: ButtonType.default,
-                            key: 'no',
-                            text: 'No',
-                        },
-                    ],
-                });
-                if (answer === 'yes') {
-                    setTimers((prev) => prev.filter((t) => t.id !== timer.id));
-                }
-            }}
-            onTimerLogged={async (timer) => {
-                const timeLogged = await getDialog({
-                    alertId: DIALOG_IDS.MAIN,
-                    title: 'Log time',
-                    Component: (
-                        <TimeLogGeneral
-                            task={timer.task}
-                            dialogId={DIALOG_IDS.MAIN}
-                            time={hoursFromMilliseconds(getDuration(timer))}
-                            description={timer.description}
-                        />
+            onTimerRemoved={(timer) => {
+                showDialog({
+                    id: DIALOG_ID,
+                    dialogProps: {
+                        title: 'Remove timer',
+                        subText: 'Deleting timer. Are you sure?',
+                    },
+                    footer: (
+                        <Stack
+                            horizontal
+                            horizontalAlign="end"
+                            tokens={{ childrenGap: 5 }}
+                            styles={{ root: { width: 250 } }}
+                        >
+                            <PrimaryButton
+                                onClick={() => {
+                                    setTimers((prev) =>
+                                        prev.filter((t) => t.id !== timer.id)
+                                    );
+                                }}
+                            >
+                                Yes
+                            </PrimaryButton>
+                            <DefaultButton
+                                onClick={() => {
+                                    hideDialog(DIALOG_ID);
+                                }}
+                            >
+                                No
+                            </DefaultButton>
+                        </Stack>
                     ),
                 });
-                if (timeLogged) {
-                    setTimers((prev) => prev.filter((t) => t.id !== timer.id));
-                }
+            }}
+            onTimerLogged={(timer) => {
+                showDialog({
+                    id: DIALOG_ID,
+                    dialogProps: {
+                        title: 'Log time',
+                    },
+                    content: (
+                        <TimeLogGeneral
+                            task={timer.task}
+                            dialogId={DIALOG_ID}
+                            time={hoursFromMilliseconds(getDuration(timer))}
+                            description={timer.description}
+                            afterLog={() => setTimers((prev) => prev.filter((t) => t.id !== timer.id))}
+                        />
+                    )
+                });
             }}
             onPositionChange={(_el, translate, positionStyles) => {
                 setRight(-translate.x + (positionStyles?.right || 50));
