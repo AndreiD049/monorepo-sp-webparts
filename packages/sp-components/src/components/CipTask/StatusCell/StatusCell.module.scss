@@ -28,6 +28,18 @@
     border-color: #004e8c;
 }
 
+:global(.sp-cip-pill-waiting-for-3rd-party) {
+    background-color: #e180ff;
+    color: #60356e;
+    border-color: #a15ab8;
+}
+
+:global(.sp-cip-pill-waiting-for-requester) {
+    background-color: #42f5a1;
+    color: #000000;
+    border-color: #34c782;
+}
+
 :global(.sp-cip-pill-blocked), :global(.sp-cip-pill-high) {
     background-color: #f5cccf;
     color: #aa272b;

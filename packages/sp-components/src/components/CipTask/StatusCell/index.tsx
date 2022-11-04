@@ -2,7 +2,6 @@ import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import * as React from 'react';
 import { Callout, hideCallout, showCallout } from '../../Callout';
 import { Pill } from '../../Pill';
-import { Task } from '../../Task';
 import styles from './StatusCell.module.scss';
 
 const CALLOUT_ID = 'sp-components-status-callout';
@@ -22,7 +21,8 @@ const StatusCellCallout: React.FC<IStatusCellCalloutProps> = (props) => {
                     onClick={() => props.onStatusChange(choice)}
                     value={choice}
                     disabled={choice === props.currentChoice}
-                    className={`sp-cip-pill-${choice.toLowerCase()}`}
+                    className={`sp-cip-pill-${choice.toLowerCase().replace(/\s/g, '-')}`}
+                    style={{ lineHeight: '12px' }}
                 />
             ))}
         </div>
@@ -69,7 +69,7 @@ export const StatusCell: React.FC<IStatusCellProps> = (props) => {
                 }} />
             ),
         });
-    }, [props.task]);
+    }, [props.task, props.onStatusChange]);
 
     return (
         <span ref={pillRef}>
@@ -77,7 +77,8 @@ export const StatusCell: React.FC<IStatusCellProps> = (props) => {
                 onClick={handleClick}
                 value={props.task.Status}
                 disabled={props.disabled}
-                className={`sp-cip-pill-${props.task.Status.toLowerCase()}`}
+                className={`sp-cip-pill-${props.task.Status.toLowerCase().replace(/\s/g, '-')}`}
+                style={{ lineHeight: '12px' }}
             />
             {props.calloutId ? null : <Callout id={CALLOUT_ID} />}
         </span>
