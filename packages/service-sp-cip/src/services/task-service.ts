@@ -36,9 +36,28 @@ export class TaskService {
         return getAllPaged(this.getAllRequest(team));
     };
 
+    /**
+     * @deprecated this API retrieves only first 100 items. If there are more than 100 items,
+     * some categories might be missing. Instead, use getCategories and addCategory
+     */
     async getAllCategories(): Promise<string[]> {
         const all = await this.list.items.select('Category')();
         return Array.from(new Set(all.map((i) => i.Category).filter((c) => c !== 'NA')));
+    }
+
+    async getCategories(): Promise<string[]> {
+        const field = await this.list.fields.getByTitle('Category')();
+        return field.Choices || [];
+    }
+
+    async addCategory(item: string): Promise<void> {
+        const field = this.list.fields.getByTitle('Category');
+        const choices = (await field()).Choices || [];
+        if (choices.indexOf(item) === -1) {
+            await field.update({
+                Choices: [...choices, item]
+            });
+        }
     }
 
     async getUserTasks(

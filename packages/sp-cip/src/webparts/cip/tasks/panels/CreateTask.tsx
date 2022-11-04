@@ -36,7 +36,7 @@ const CreateTaskPanel: React.FC = () => {
     const params = useParams();
 
     /** Attachments */
-    const [attachments, ] = React.useState<File[]>([]);
+    const [attachments] = React.useState<File[]>([]);
     const attachmentService = MainService.getAttachmentService();
 
     /** Group labels */
@@ -44,14 +44,14 @@ const CreateTaskPanel: React.FC = () => {
     const [groupLabels, setGroupLabels] = React.useState([]);
     React.useEffect(() => {
         taskService
-            .getAllCategories()
+            .getCategories()
             .then((categories) => setGroupLabels(categories))
             .catch((err) => console.error(err));
     }, []);
 
     const groupOptions = React.useMemo(() => {
         if (!groupLabels) return [];
-        return ['NA', ...groupLabels].map((label) => ({
+        return groupLabels.map((label) => ({
             key: label,
             text: label,
         }));
@@ -199,6 +199,10 @@ const CreateTaskPanel: React.FC = () => {
                 );
                 tasksAdded([await taskService.getTask(createdId)]);
             }
+            // Create new category
+            if (groupLabels.indexOf(data.Category) === -1) {
+                await taskService.addCategory(data.Category);
+            }
             if (attachments.length > 0 && createdId) {
                 const createdTask = await taskService.getTask(createdId);
                 await attachmentService.addAttachments(
@@ -208,7 +212,7 @@ const CreateTaskPanel: React.FC = () => {
             }
             loadingStop('default');
         },
-        [data, validateData, attachments]
+        [data, validateData, attachments, groupLabels]
     );
 
     return (
@@ -372,10 +376,6 @@ const CreateTaskPanel: React.FC = () => {
                                             const target: HTMLInputElement =
                                                 evt.target as HTMLInputElement;
                                             category = target.value as string;
-                                            setGroupLabels((prev) => [
-                                                ...prev,
-                                                category,
-                                            ]);
                                         }
                                         setData((prev) => ({
                                             ...prev,
