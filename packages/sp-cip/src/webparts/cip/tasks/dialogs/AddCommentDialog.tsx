@@ -9,14 +9,18 @@ import {
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { dismissDialog } from '../../components/AlertDialog';
 import styles from '../../comments/Comments.module.scss';
 import MainService from '../../services/main-service';
 import { taskUpdated } from '../../utils/dom-events';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { GlobalContext } from '../../utils/GlobalContext';
 
-export const AddCommentDialog: React.FC<{ task: ITaskOverview }> = (props) => {
+export interface IAddCommentDialogProps {
+    task: ITaskOverview;
+    onAfterComment?: () => void;
+}
+
+export const AddCommentDialog: React.FC<IAddCommentDialogProps> = (props) => {
     const { currentUser } = React.useContext(GlobalContext);
     const commentService = MainService.getCommentService();
     const taskService = MainService.getTaskService();
@@ -60,7 +64,9 @@ export const AddCommentDialog: React.FC<{ task: ITaskOverview }> = (props) => {
         if (!newComment.trim()) return;
         await commentService.addComment(props.task, newComment, currentUser.Id, new Date().toISOString());
         taskUpdated(await taskService.getTask(props.task.Id));
-        dismissDialog('MAIN');
+        if (props.onAfterComment) { 
+            props.onAfterComment();
+        }
     }, [newComment]);
 
     return (

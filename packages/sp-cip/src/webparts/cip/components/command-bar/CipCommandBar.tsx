@@ -8,13 +8,12 @@ import * as React from 'react';
 import { useNavigate } from 'react-router';
 import { relinkParent, setTimerOptions } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
-import { DIALOG_IDS, getDialog } from '../AlertDialog';
 import { LinkRemoteDialog } from '../LinkRemoteDialog';
 import { TimeLogGeneral } from '../TimeLogGeneral';
 import { AssigneeSelected, CipAssigneeSelector } from './CipAssigneeSelector';
 import { CipCategoriesToggle } from './CipCategoriesToggle';
 import { CipStatusSelector, StatusSelected } from './StatusSelector';
-import { TIMER_VISIBLE_KEY } from '../../utils/constants';
+import { DIALOG_ID, TIMER_VISIBLE_KEY } from '../../utils/constants';
 import useWebStorage from 'use-web-storage-api';
 import { TeamSelector } from '../TeamSelector';
 import { showDialog } from 'sp-components';
@@ -65,13 +64,13 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                     iconName: 'Clock',
                 },
                 onClick: () =>
-                    getDialog({
-                        alertId: DIALOG_IDS.MAIN,
-                        title: 'Log time',
-                        Component: (
-                            <TimeLogGeneral dialogId={DIALOG_IDS.MAIN} />
-                        ),
-                    })
+                    showDialog({
+                        id: DIALOG_ID,
+                        dialogProps: {
+                            title: 'Log time',
+                        },
+                        content: <TimeLogGeneral dialogId={DIALOG_ID} />,
+                    }),
             },
             {
                 key: 'timers',
@@ -90,7 +89,7 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                     iconName: 'BacklogList',
                 },
                 onClick: () => navigate('actionlog'),
-            }
+            },
         ];
         if (properties.config.remotes.length > 0) {
             result.push({
@@ -100,10 +99,12 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                     iconName: 'Link12',
                 },
                 onClick: () =>
-                    getDialog({
-                        alertId: DIALOG_IDS.MAIN,
-                        title: 'Link task',
-                        Component: <LinkRemoteDialog />,
+                    showDialog({
+                        id: DIALOG_ID,
+                        dialogProps: {
+                            title: 'Link task',
+                        },
+                        content: <LinkRemoteDialog />,
                     }),
             });
         }
@@ -129,7 +130,11 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                         key: 'team',
                         onRender: () => (
                             <TeamSelector
-                                style={{ alignSelf: 'center', marginRight: '.5em', minWidth: 70 }}
+                                style={{
+                                    alignSelf: 'center',
+                                    marginRight: '.5em',
+                                    minWidth: 70,
+                                }}
                                 items={['All', ...teams]}
                                 selectedTeam={selectedTeam}
                                 getTeamText={(team) => team}

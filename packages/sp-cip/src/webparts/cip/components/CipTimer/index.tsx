@@ -121,9 +121,12 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
                         >
                             <PrimaryButton
                                 onClick={() => {
-                                    setTimers((prev) =>
-                                        prev.filter((t) => t.id !== timer.id)
-                                    );
+                                    setTimers((prev) => {
+                                        hideDialog(DIALOG_ID);
+                                        return prev.filter(
+                                            (t) => t.id !== timer.id
+                                        );
+                                    });
                                 }}
                             >
                                 Yes
@@ -151,9 +154,13 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
                             dialogId={DIALOG_ID}
                             time={hoursFromMilliseconds(getDuration(timer))}
                             description={timer.description}
-                            afterLog={() => setTimers((prev) => prev.filter((t) => t.id !== timer.id))}
+                            afterLog={() =>
+                                setTimers((prev) =>
+                                    prev.filter((t) => t.id !== timer.id)
+                                )
+                            }
                         />
-                    )
+                    ),
                 });
             }}
             onPositionChange={(_el, translate, positionStyles) => {

@@ -1,17 +1,23 @@
-import { ButtonType, IconButton } from 'office-ui-fabric-react';
+import {
+    IconButton,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
-import { DIALOG_IDS, getDialog } from '../../components/AlertDialog';
 import { useNavigate } from 'react-router';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
-import { loadingStart, loadingStop } from '../../components/utils/LoadingAnimation';
+import {
+    loadingStart,
+    loadingStop,
+} from '../../components/utils/LoadingAnimation';
 import { taskDeleted, addTimer } from '../../utils/dom-events';
 import { AddCommentDialog } from '../dialogs/AddCommentDialog';
 import { TaskNode } from '../graph/TaskNode';
 import { TimeLogGeneral } from '../../components/TimeLogGeneral';
 import MainService from '../../services/main-service';
+import { FooterOk, FooterYesNo, hideDialog, showDialog } from 'sp-components';
+import { DIALOG_ID } from '../../utils/constants';
 
-const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
+const ActionsCell: React.FC<{ node: TaskNode }> = ({ node }) => {
     const { isTaskFinished } = React.useContext(TaskNodeContext);
     const navigate = useNavigate();
     const taskService = MainService.getTaskService();
@@ -43,10 +49,15 @@ const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
                 title="Add comment"
                 disabled={isDisabled}
                 onClick={() =>
-                    getDialog({
-                        alertId: DIALOG_IDS.MAIN,
-                        title: 'Add comment',
-                        Component: (<AddCommentDialog task={node.getTask()} />)
+                    showDialog({
+                        id: DIALOG_ID,
+                        dialogProps: { title: 'Add comment' },
+                        content: (
+                            <AddCommentDialog
+                                task={node.getTask()}
+                                onAfterComment={() => hideDialog(DIALOG_ID)}
+                            />
+                        ),
                     })
                 }
             />
@@ -72,10 +83,15 @@ const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
                 title="Log time"
                 disabled={isDisabled}
                 onClick={() =>
-                    getDialog({
-                        alertId: DIALOG_IDS.MAIN,
-                        title: 'Log time',
-                        Component: (<TimeLogGeneral task={node.getTask()} dialogId={DIALOG_IDS.MAIN} />),
+                    showDialog({
+                        id: DIALOG_ID,
+                        dialogProps: { title: 'Log time' },
+                        content: (
+                            <TimeLogGeneral
+                                task={node.getTask()}
+                                dialogId={DIALOG_ID}
+                            />
+                        ),
                     })
                 }
             />
@@ -93,18 +109,30 @@ const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
                                 iconName: 'Delete',
                             },
                             onClick: async () => {
-                                const confirm = await getDialog({
-                                    alertId: DIALOG_IDS.MAIN,
-                                    title: 'Delete tasks',
-                                    subText: 'All subtasks will be deleted as well. Are you sure',
-                                    buttons: [{ key: 'yes', text: 'Yes' }, { key: 'no', text: 'No', type: ButtonType.default }],
+                                showDialog({
+                                    id: DIALOG_ID,
+                                    dialogProps: {
+                                        title: 'Delete tasks',
+                                        subText:
+                                            'All subtasks will be deleted as well. Are you sure',
+                                    },
+                                    footer: (
+                                        <FooterYesNo
+                                            onYes={async () => {
+                                                hideDialog(DIALOG_ID);
+                                                loadingStart('default');
+                                                await taskService.deleteTaskAndSubtasks(
+                                                    node.getTask()
+                                                );
+                                                taskDeleted(node.Id);
+                                                loadingStop('default');
+                                            }}
+                                            onNo={() => {
+                                                hideDialog(DIALOG_ID);
+                                            }}
+                                        />
+                                    ),
                                 });
-                                loadingStart('default');
-                                if (confirm === 'yes') {
-                                    await taskService.deleteTaskAndSubtasks(node.getTask())
-                                    taskDeleted(node.Id);
-                                }
-                                loadingStop('default');
                             },
                         },
                         {
@@ -114,12 +142,14 @@ const ActionsCell: React.FC<{node: TaskNode}> = ({node}) => {
                                 iconName: 'SIPMove',
                             },
                             onClick: () => {
-                                getDialog({
-                                    alertId: DIALOG_IDS.MAIN,
-                                    title: 'Work in progress',
-                                    subText: 'Work in progress',
-                                    buttons: [{ key: 'ok', text: 'Ok' }],
-                                }).catch((err) => console.error(err));
+                                showDialog({
+                                    id: DIALOG_ID,
+                                    dialogProps: {
+                                        title: 'Work in progress',
+                                        subText: 'Work in progress',
+                                    },
+                                    footer: (<FooterOk onOk={() => hideDialog(DIALOG_ID)} />)
+                                });
                             },
                         },
                     ],

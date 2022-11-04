@@ -1,4 +1,11 @@
-import { IDialogProps, Dialog as FluentDialog, DialogFooter } from 'office-ui-fabric-react';
+import {
+    IDialogProps,
+    Dialog as FluentDialog,
+    DialogFooter,
+    Stack,
+    PrimaryButton,
+    DefaultButton,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
 import styles from './Dialog.module.scss';
 
@@ -50,12 +57,10 @@ export const Dialog: React.FC<ISPDialogProps> = (props) => {
     React.useEffect(() => {
         function handler(evt: CustomEvent<IDialogEventProps>) {
             setVisible(evt.detail.visible);
-            setDialogProps(evt.detail.dialogProps);
-            if (evt.detail.content) {
-                setContent(evt.detail.content);
-            }
-            if (evt.detail.footer) {
-                setFooter(evt.detail.footer);
+            if (evt.detail.visible) {
+                setDialogProps(evt.detail.dialogProps);
+                setContent(evt.detail.content || null);
+                setFooter(evt.detail.footer || null);
             }
         }
         document.addEventListener(evtName, handler);
@@ -63,12 +68,50 @@ export const Dialog: React.FC<ISPDialogProps> = (props) => {
     }, [props.id]);
 
     return (
-        <FluentDialog hidden={!visible} minWidth="initial" maxWidth="initial" {...dialogProps} onDismiss={() => {
-            dialogProps.onDismiss && dialogProps.onDismiss();
-            hideDialog(props.id);
-        }}>
+        <FluentDialog
+            hidden={!visible}
+            minWidth="initial"
+            maxWidth="initial"
+            {...dialogProps}
+            onDismiss={() => {
+                dialogProps.onDismiss && dialogProps.onDismiss();
+                hideDialog(props.id);
+            }}
+        >
             {content}
-            {footer && <DialogFooter>{footer}</DialogFooter>}
+            {footer && (
+                <DialogFooter styles={{ actions: { lineHeight: 'initial' } }}>
+                    {footer}
+                </DialogFooter>
+            )}
         </FluentDialog>
+    );
+};
+
+export type Callback = () => void;
+
+export const FooterYesNo: React.FC<{ onYes: Callback; onNo: Callback }> = (props) => {
+    return (
+        <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 5 }}>
+            <PrimaryButton onClick={props.onYes}>Yes</PrimaryButton>
+            <DefaultButton onClick={props.onNo}>No</DefaultButton>
+        </Stack>
+    );
+};
+
+export const FooterOkCancel: React.FC<{ onOk: Callback; onCancel: Callback }> = (props) => {
+    return (
+        <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 5 }}>
+            <PrimaryButton onClick={props.onOk}>Ok</PrimaryButton>
+            <DefaultButton onClick={props.onCancel}>Cancel</DefaultButton>
+        </Stack>
+    );
+};
+
+export const FooterOk: React.FC<{ onOk: Callback }> = (props) => {
+    return (
+        <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 5 }}>
+            <PrimaryButton onClick={props.onOk}>Ok</PrimaryButton>
+        </Stack>
     );
 };
