@@ -181,6 +181,7 @@ export const useColumns = (
                     });
                 },
                 minWidth: 100,
+                isResizable: true,
             },
             {
                 key: 'Progress',

@@ -10,13 +10,9 @@
         border-radius: 16px;
         box-sizing: border-box;
         display: flex;
-        height: 24px;
         width: 100%;
         margin: 4px;
-        overflow: hidden;
         padding: 4px 8px 5px 8px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
         border: 1px solid;
     }
 }
@@ -43,6 +39,18 @@
     background-color: #80c6ff;
     color: #004e8c;
     border-color: #004e8c;
+}
+
+:global(.sp-cip-pill-waiting-for-3rd-party) {
+    background-color: #e180ff;
+    color: #60356e;
+    border-color: #a15ab8;
+}
+
+:global(.sp-cip-pill-waiting-for-requester) {
+    background-color: #42f5a1;
+    color: #000000;
+    border-color: #34c782;
 }
 
 :global(.sp-cip-pill-blocked), :global(.sp-cip-pill-high) {

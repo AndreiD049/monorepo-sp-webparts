@@ -12,7 +12,7 @@ const Pill: React.FC<IPillProps> = ({ value, id, disabled, ...rest }) => {
         if (disabled) {
             result += ` ${styles.disabled}`;
         } else {
-            result += ` sp-cip-pill-${value.toLowerCase()}`;
+            result += ` sp-cip-pill-${value.toLowerCase().replace(/\s/g, '-', )}`;
         }
         return result;
     }, [value, disabled])
