@@ -34,4 +34,5 @@ export const ALL_TASKS_KEY = `allTasks/${VERSION}`;
 
 export const SELECTED_TEAM_KEY = `/sp-cip-selected-team/${VERSION}`;
 export const SELECTED_USERS_KEY = `/sp-cip-selected-users/${VERSION}`;
+export const CATEGORIES_KEY = `/sp-cip-categories/${VERSION}`;
 export const TEAM_ALL = 'All';

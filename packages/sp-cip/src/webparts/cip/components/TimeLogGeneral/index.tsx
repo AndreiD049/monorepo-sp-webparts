@@ -13,7 +13,6 @@ import * as React from 'react';
 import { actionUpdated } from '../../actionlog/ActionLog';
 import { taskUpdated } from '../../utils/dom-events';
 import { HoursInput } from '../HoursInput';
-import { SelectMainTask } from '../SelectMainTask';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
 import MainService from '../../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
@@ -22,6 +21,7 @@ import { GlobalContext } from '../../utils/GlobalContext';
 import styles from './TimeLogGeneral.module.scss';
 import { IItemUpdateResult } from 'sp-preset';
 import { hideDialog } from 'sp-components';
+import { TaskPicker } from '../TaskPicker';
 
 export interface ITimeLogGeneralProps {
     dialogId: string;
@@ -161,7 +161,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
                 </MessageBar>
             )}
             <Label htmlFor="select-main-task">Task:</Label>
-            <SelectMainTask
+            <TaskPicker
                 id="select-main-task"
                 selectedTask={selected}
                 onTaskSelected={(task) => setSelected(task)}

@@ -200,7 +200,8 @@ const CreateTaskPanel: React.FC = () => {
                 tasksAdded([await taskService.getTask(createdId)]);
             }
             // Create new category
-            if (groupLabels.indexOf(data.Category) === -1) {
+            const oldCategories = await taskService.getCategories();
+            if (oldCategories.indexOf(data.Category) === -1) {
                 await taskService.addCategory(data.Category);
             }
             if (attachments.length > 0 && createdId) {
@@ -376,6 +377,7 @@ const CreateTaskPanel: React.FC = () => {
                                             const target: HTMLInputElement =
                                                 evt.target as HTMLInputElement;
                                             category = target.value as string;
+                                            setGroupLabels((prev) => [...prev, category]);
                                         }
                                         setData((prev) => ({
                                             ...prev,

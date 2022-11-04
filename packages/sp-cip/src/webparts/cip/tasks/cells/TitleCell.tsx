@@ -264,7 +264,7 @@ export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
                     }
                 }}
             />
-            {node.isOrphan && <Pill value="Subtask" />}
+            {node.isOrphan && <Pill value="Subtask" style={{  minWidth: '75px' }} />}
             <div className={styles['title-cell']}>
                 <Text
                     variant="medium"

@@ -14,8 +14,9 @@ import { AddCommentDialog } from '../dialogs/AddCommentDialog';
 import { TaskNode } from '../graph/TaskNode';
 import { TimeLogGeneral } from '../../components/TimeLogGeneral';
 import MainService from '../../services/main-service';
-import { FooterOk, FooterYesNo, hideDialog, showDialog } from 'sp-components';
+import { FooterYesNo, hideDialog, showDialog } from 'sp-components';
 import { DIALOG_ID } from '../../utils/constants';
+import { MoveForm } from '../../components/MoveForm';
 
 const ActionsCell: React.FC<{ node: TaskNode }> = ({ node }) => {
     const { isTaskFinished } = React.useContext(TaskNodeContext);
@@ -145,10 +146,9 @@ const ActionsCell: React.FC<{ node: TaskNode }> = ({ node }) => {
                                 showDialog({
                                     id: DIALOG_ID,
                                     dialogProps: {
-                                        title: 'Work in progress',
-                                        subText: 'Work in progress',
+                                        title: 'Move task',
                                     },
-                                    footer: (<FooterOk onOk={() => hideDialog(DIALOG_ID)} />)
+                                    content: (<MoveForm node={node} dialogId={DIALOG_ID} />),
                                 });
                             },
                         },
