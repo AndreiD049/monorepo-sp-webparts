@@ -70,7 +70,7 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
             if (!selectedUser) return;
             const tasks = await taskCache
                 .getTasks(selectedUser.Id)
-                .get(() => taskService.getTasksByUserId(selectedUser.Id,  new Date()));
+                .get(() => taskService.getTasksByUserId(selectedUser.Id, new Date()));
             const logs = await logService.getTaskLogsByUserId(new Date(), selectedUser.Id);
             const selected = selectTasks(tasks, new Date());
             const created = await checkTasksAndCreateTaskLogs(
@@ -120,9 +120,15 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
                         onChange={async (_ev, option) => {
                             try {
                                 setLoading(true);
-                                const newLog = await logService.updateTaskLog(t.ID, {
-                                    Status: option.key.toString() as TaskStatus,
-                                });
+                                const status = option.key.toString() as TaskStatus;
+                                const payload: Partial<ITaskLog> = {
+                                    Status: status,
+                                };
+                                // Make sure finished and cancelled tasks don't show up next days
+                                if (status === 'Finished' || status === 'Cancelled') {
+                                    payload.Completed = true;
+                                }
+                                const newLog = await logService.updateTaskLog(t.ID, payload);
                                 setTaskLogs((prev) =>
                                     prev.map((t) => (t.ID === newLog.ID ? newLog : t))
                                 );
