@@ -95,7 +95,7 @@ const handleItemUpdate = async (
     setItems: (action: setItemAction) => any
 ) => {
     /* Handle creation of new items */
-    if (isEmpty(item) && newValue !== '') {
+    if (isEmpty(item) && newValue.trim() !== '') {
         handleCreate(
             {
                 ...item,

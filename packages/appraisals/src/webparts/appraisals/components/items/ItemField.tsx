@@ -51,7 +51,7 @@ const ItemField: FC<IItemFieldProps> = (props) => {
                             borderRadius: 0,
                         },
                     }}
-                    multiline={value.length > LENGTH_TRESHOLD}
+                    multiline={value?.length > LENGTH_TRESHOLD}
                     resizable={false}
                     autoAdjustHeight
                     borderless
