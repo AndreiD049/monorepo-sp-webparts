@@ -46,6 +46,8 @@ export async function setupLists(
     await customers.createView();
   }
 
+  console.log(customersList);
+
   /** Process flow list */
   const processFlow = new ListBuilder(config.listName, sp, notify);
   await processFlow.ensureList();
