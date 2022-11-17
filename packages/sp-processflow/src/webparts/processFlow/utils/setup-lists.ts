@@ -46,8 +46,6 @@ export async function setupLists(
     await customers.createView();
   }
 
-  console.log(customersList);
-
   /** Process flow list */
   const processFlow = new ListBuilder(config.listName, sp, notify);
   await processFlow.ensureList();
@@ -73,7 +71,6 @@ export async function setupLists(
       description: "Sites where procedure is performed",
       choices: ["NA", "LB1227", "WVN", "119"],
       type: "MultiChoice",
-      indexed: true,
       required: false,
     });
     await processFlow.addChoiceField({
@@ -81,7 +78,6 @@ export async function setupLists(
       description: "Which party does the procedure",
       choices: ["All", "MOL", "BE", "SITE"],
       type: "MultiChoice",
-      indexed: true,
       required: false,
     });
     await processFlow.addChoiceField({
@@ -104,7 +100,6 @@ export async function setupLists(
       description: "",
       choices: ["All", ...countries],
       type: "MultiChoice",
-      indexed: false,
       required: false,
     });
     await processFlow.addLookupField({
@@ -128,6 +123,13 @@ export async function setupLists(
       description: "User who does the procedure",
       indexed: true,
       required: true,
+    });
+    await processFlow.addChoiceField({
+        name: "Team",
+        type: 'Choice',
+        choices: ['NA'],
+        required: false,
+        indexed: true,
     });
     await processFlow.addChoiceField({
       name: "State",

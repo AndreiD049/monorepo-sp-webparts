@@ -16,6 +16,7 @@
     "@microsoft/sp-property-pane": "1.15.2",
     "@microsoft/sp-webpart-base": "1.15.2",
     "@service/process-flow": "^1.0.0",
+    "@service/users": "^1.0.0",
     "duplicate-package-checker-webpack-plugin": "^3.0.0",
     "indexeddb-manual-cache": "^1.0.0",
     "json-configuration": "^0.0.1",

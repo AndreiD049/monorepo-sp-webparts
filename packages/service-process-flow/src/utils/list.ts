@@ -110,6 +110,9 @@ export class ListBuilder {
     public async addChoiceField(options: IChoiceFieldOptions) {
         const required = Boolean(options.required);
         const indexed = Boolean(options.indexed);
+        if (options.type === 'MultiChoice' && options.indexed) {
+            throw Error("'MultiChoice' columns cannot be indexed");
+        }
         const allowFillIn = Boolean(options.allowFillIn);
         const choiceBody = options.choices.reduce((prev, cur) => `${prev}<CHOICE>${cur}</CHOICE>`, '');
         const field = await this.getList().fields.createFieldAsXml(
