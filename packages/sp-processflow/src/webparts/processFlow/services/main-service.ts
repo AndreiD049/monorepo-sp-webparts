@@ -11,7 +11,7 @@ export class MainService {
     }) {
         this.UserService = new UserService({
             sp: options.sp,
-            listName: options.config.userList.name,
+            listName: options.config.userListName,
         });
     }
 }

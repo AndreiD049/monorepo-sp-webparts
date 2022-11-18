@@ -17,7 +17,7 @@ export async function setupLists(
   config: IJsonConfig<IProcessFlowConfig>
 ): Promise<void> {
   const sp = ProcessFlowWebPart.SPBuilder.getSP(config.rootSite);
-  const countries: string[] = COUNTRIES.map((c) => `${c.code} - ${c.name}`);
+  const countries: string[] = COUNTRIES.map((c) => `${c.name} - ${c.code}`);
   /** Customers list */
   const customers = new ListBuilder(config.customerListName, sp, notify);
   const customersList = await customers.ensureList();
@@ -29,122 +29,139 @@ export async function setupLists(
       required: true,
     });
     await customers.addChoiceField({
-      name: "Country",
-      description: "",
-      choices: countries,
+      name: "CustomerGroup",
+      type: "Choice",
+      choices: [],
+      allowFillIn: true,
+      indexed: false,
+      required: false,
+    });
+    await customers.addChoiceField({
+      name: "DBCustomers",
+      description: "Customer codes as they are created in the database",
       type: "MultiChoice",
+      choices: [],
+      allowFillIn: true,
       indexed: false,
       required: false,
     });
     await customers.addTextField({
-      name: "DBCustomers",
-      description:
-        "Pipe '|' separated list of customer codes as they are created in the database",
-      indexed: false,
-      required: false,
+        name: "Team",
+        description: "Team that is handling this customer",
+        indexed: true,
+        required: true,
     });
     await customers.createView();
   }
 
-  /** Process flow list */
-  const processFlow = new ListBuilder(config.listName, sp, notify);
-  await processFlow.ensureList();
-  if (processFlow.created) {
-    await processFlow.addChoiceField({
+  /** Procedure list */
+  const procedure = new ListBuilder(config.procedureListName, sp, notify);
+  const procedureList = await procedure.ensureList();
+  if (procedure.created) {
+    await procedure.addChoiceField({
       name: "System",
       description: "Where the procedure is performed",
+      type: "Choice",
       choices: ["PLATO", "SAP", "PLATO/SAP"],
-      type: "Choice",
       indexed: true,
-      required: false,
+      required: true,
     });
-    await processFlow.addChoiceField({
+    await procedure.addTextField({
       name: "Procedure",
-      description: "Procedure name",
-      choices: ["NA"],
-      type: "Choice",
+      description: "Name of the procedure",
       indexed: true,
-      required: false,
+      required: true,
     });
-    await processFlow.addChoiceField({
-      name: "Sites",
-      description: "Sites where procedure is performed",
-      choices: ["NA", "LB1227", "WVN", "119"],
-      type: "MultiChoice",
-      required: false,
-    });
-    await processFlow.addChoiceField({
-      name: "DoneBy",
-      description: "Which party does the procedure",
-      choices: ["All", "MOL", "BE", "SITE"],
-      type: "MultiChoice",
-      required: false,
-    });
-    await processFlow.addChoiceField({
+    await procedure.addChoiceField({
       name: "Category",
-      description: "",
-      choices: [
-        "Inbound",
-        "Outbound",
-        "Manipulation",
-        "Invoicing",
-        "Miscellaneous",
-        "SAP",
-      ],
       type: "Choice",
+      choices: ["Inbound", "Outbound", "Manipulation", "Other"],
       indexed: true,
-      required: false,
+      required: true,
     });
-    await processFlow.addChoiceField({
-      name: "Country",
-      description: "",
-      choices: ["All", ...countries],
-      type: "MultiChoice",
-      required: false,
-    });
-    await processFlow.addLookupField({
+    await procedure.addLookupField({
       name: "Customer",
-      description: "Customer for which the procedure is done",
-      required: false,
-      indexed: true,
       ListId: customersList.Id,
       LookupColumn: "Customer",
+      required: false,
+      indexed: true,
       type: "Lookup",
     });
-    await processFlow.addDateField({
-      name: "Date",
-      description: "Date when training was done",
-      format: "DateOnly",
-      indexed: true,
+    await procedure.addChoiceField({
+      name: "Manuals",
+      description: "Manual links",
+      type: "MultiChoice",
+      allowFillIn: true,
+      choices: [],
+    });
+    await procedure.addTextField({
+      name: "ProcedureOptions",
+      description: "Service only field. Leave empty. Only for storing the options.",
+      indexed: false,
       required: false,
     });
-    await processFlow.addUserField({
+    await procedure.createView();
+  }
+
+  /** Process flow list */
+  const userProcedure = new ListBuilder(
+    config.userProcedureListName,
+    sp,
+    notify
+  );
+  await userProcedure.ensureList();
+  if (userProcedure.created) {
+    await userProcedure.addLookupField({
+      name: "Customer",
+      ListId: customersList.Id,
+      LookupColumn: "Customer",
+      required: false,
+      indexed: true,
+      type: "Lookup",
+    });
+    await userProcedure.addLookupField({
+      name: "Procedure",
+      ListId: procedureList.Id,
+      LookupColumn: "Procedure",
+      type: "Lookup",
+      indexed: false,
+      required: true,
+    });
+    await userProcedure.addDateField({
+      name: "Date",
+      description: "Date of the next action. depends on status",
+      format: "DateOnly",
+      required: false,
+      indexed: false,
+    });
+    await userProcedure.addUserField({
       name: "User",
       description: "User who does the procedure",
       indexed: true,
       required: true,
     });
-    await processFlow.addChoiceField({
-        name: "Team",
-        type: 'Choice',
-        choices: ['NA'],
-        required: false,
-        indexed: true,
-    });
-    await processFlow.addChoiceField({
-      name: "State",
+    await userProcedure.addChoiceField({
+      name: "Status",
       description: "",
       choices: ["NA", "Planned", "On-going", "Completed"],
       type: "Choice",
       indexed: true,
       required: false,
     });
-    await processFlow.addNumberField({
+    await userProcedure.addChoiceField({
+      name: "Team",
+      type: "Choice",
+      choices: ["NA"],
+      allowFillIn: true,
+      required: false,
+      indexed: true,
+    });
+    await userProcedure.addNumberField({
       name: "Allocations",
       description: "How many minutes per UOM the task requires",
       min: 0,
     });
-    await processFlow.addChoiceField({
+    await userProcedure.addChoiceField({
       name: "UOM",
       description: "",
       choices: ["Order", "Day", "Week", "Month"],
@@ -152,6 +169,48 @@ export async function setupLists(
       indexed: false,
       required: false,
     });
-    await processFlow.createView();
+    await userProcedure.createView();
+  }
+
+  const location = new ListBuilder(config.locationListName, sp, notify);
+  await location.ensureList();
+  if (location.created) {
+    await location.addLookupField({
+      name: "Customer",
+      ListId: customersList.Id,
+      LookupColumn: "Customer",
+      required: false,
+      indexed: true,
+      type: "Lookup",
+    });
+    await location.addLookupField({
+      name: "Procedure",
+      ListId: procedureList.Id,
+      LookupColumn: "Procedure",
+      type: "Lookup",
+      indexed: false,
+      required: true,
+    });
+    await location.addChoiceField({
+      name: "Location",
+      description: "Location where procedure is done",
+      type: "Choice",
+      choices: [],
+    });
+    await location.addChoiceField({
+      name: "Country",
+      description: "Country where procedure is done",
+      type: "MultiChoice",
+      choices: countries,
+    });
+    await location.addChoiceField({
+      name: "DoneBy",
+      description: "Party that performs the procedure",
+      type: "MultiChoice",
+      choices: ["MOL", "COL", "Site"],
+      indexed: false,
+      required: false,
+    });
+    await location.createView();
   }
 }

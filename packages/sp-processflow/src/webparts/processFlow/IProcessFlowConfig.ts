@@ -1,8 +1,8 @@
 export interface IProcessFlowConfig {
     rootSite: string;
-    listName: string;
+    procedureListName: string;
     customerListName: string;
-    userList: {
-        name: string;
-    }
+    locationListName: string;
+    userProcedureListName: string;
+    userListName: string;
 }

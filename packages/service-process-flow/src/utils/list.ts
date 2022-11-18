@@ -116,7 +116,7 @@ export class ListBuilder {
         const allowFillIn = Boolean(options.allowFillIn);
         const choiceBody = options.choices.reduce((prev, cur) => `${prev}<CHOICE>${cur}</CHOICE>`, '');
         const field = await this.getList().fields.createFieldAsXml(
-            `<Field Indexed='${String(indexed).toUpperCase()}' Description='${options.description}' DisplayName='${options.name}' FillInChoice='${allowFillIn}' Format='Dropdown' IsModern='TRUE' Name='${options.name}' Required='${String(required).toUpperCase()}' Title='${options.name}' Type='${options.type}'><CHOICES>${choiceBody}</CHOICES></Field>`
+            `<Field Indexed='${String(indexed).toUpperCase()}' Description='${options.description}' DisplayName='${options.name}' FillInChoice='${String(allowFillIn).toUpperCase()}' Format='Dropdown' IsModern='TRUE' Name='${options.name}' Required='${String(required).toUpperCase()}' Title='${options.name}' Type='${options.type}'><CHOICES>${choiceBody}</CHOICES></Field>`
         );
         this.fields.push(field);
         this.onNotify(`Field ${field.data.InternalName} created!`);
