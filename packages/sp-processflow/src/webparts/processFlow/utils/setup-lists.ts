@@ -19,16 +19,16 @@ export async function setupLists(
   const sp = ProcessFlowWebPart.SPBuilder.getSP(config.rootSite);
   const countries: string[] = COUNTRIES.map((c) => `${c.name} - ${c.code}`);
   /** Customers list */
-  const customers = new ListBuilder(config.customerListName, sp, notify);
-  const customersList = await customers.ensureList();
-  if (customers.created) {
-    await customers.addTextField({
-      name: "Customer",
-      description: "Name of the customer",
+  const customerFlows = new ListBuilder(config.customerFlowListName, sp, notify);
+  const customerFlowsList = await customerFlows.ensureList();
+  if (customerFlows.created) {
+    await customerFlows.addTextField({
+      name: "Flow",
+      description: "Name of the flow linked to a customer",
       indexed: true,
       required: true,
     });
-    await customers.addChoiceField({
+    await customerFlows.addChoiceField({
       name: "CustomerGroup",
       type: "Choice",
       choices: [],
@@ -36,7 +36,7 @@ export async function setupLists(
       indexed: false,
       required: false,
     });
-    await customers.addChoiceField({
+    await customerFlows.addChoiceField({
       name: "DBCustomers",
       description: "Customer codes as they are created in the database",
       type: "MultiChoice",
@@ -45,13 +45,13 @@ export async function setupLists(
       indexed: false,
       required: false,
     });
-    await customers.addTextField({
+    await customerFlows.addTextField({
         name: "Team",
         description: "Team that is handling this customer",
         indexed: true,
         required: true,
     });
-    await customers.createView();
+    await customerFlows.createView();
   }
 
   /** Procedure list */
@@ -80,9 +80,10 @@ export async function setupLists(
       required: true,
     });
     await procedure.addLookupField({
-      name: "Customer",
-      ListId: customersList.Id,
-      LookupColumn: "Customer",
+      name: "Flow",
+      ListId: customerFlowsList.Id,
+      LookupColumn: "Flow",
+      IsRelationship: true,
       required: false,
       indexed: true,
       type: "Lookup",
@@ -112,9 +113,10 @@ export async function setupLists(
   await userProcedure.ensureList();
   if (userProcedure.created) {
     await userProcedure.addLookupField({
-      name: "Customer",
-      ListId: customersList.Id,
-      LookupColumn: "Customer",
+      name: "Flow",
+      ListId: customerFlowsList.Id,
+      LookupColumn: "Flow",
+      IsRelationship: true,
       required: false,
       indexed: true,
       type: "Lookup",
@@ -123,6 +125,7 @@ export async function setupLists(
       name: "Procedure",
       ListId: procedureList.Id,
       LookupColumn: "Procedure",
+      IsRelationship: true,
       type: "Lookup",
       indexed: false,
       required: true,
@@ -157,7 +160,7 @@ export async function setupLists(
       indexed: true,
     });
     await userProcedure.addNumberField({
-      name: "Allocations",
+      name: "Allocation",
       description: "How many minutes per UOM the task requires",
       min: 0,
     });
@@ -176,9 +179,10 @@ export async function setupLists(
   await location.ensureList();
   if (location.created) {
     await location.addLookupField({
-      name: "Customer",
-      ListId: customersList.Id,
-      LookupColumn: "Customer",
+      name: "Flow",
+      ListId: customerFlowsList.Id,
+      LookupColumn: "Flow",
+      IsRelationship: true,
       required: false,
       indexed: true,
       type: "Lookup",
@@ -187,6 +191,7 @@ export async function setupLists(
       name: "Procedure",
       ListId: procedureList.Id,
       LookupColumn: "Procedure",
+      IsRelationship: true,
       type: "Lookup",
       indexed: false,
       required: true,

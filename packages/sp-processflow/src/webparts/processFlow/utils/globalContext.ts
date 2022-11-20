@@ -1,7 +1,8 @@
+import { IUser } from "@service/users";
 import * as React from "react";
 
 export interface IGlobalContext {
-    currentUser: {}
+    currentUser: IUser;
 }
 
 const sentinelContext: IGlobalContext = {
