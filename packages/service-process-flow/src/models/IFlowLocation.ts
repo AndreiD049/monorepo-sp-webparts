@@ -8,14 +8,15 @@
 export interface IFlowLocation {
     Id: number;
     FlowId: number;
-    Procedure: {
+    ProcessId?: number;
+    Process: {
         Id: number;
-        Procedure: string;
+        Process: string;
     }
     // Location of the procedure. Not necessarily a phisical location
     Location: string;
     // Country of the location. (if applicable)
     Country?: string;
     // DoneBy showing the party handling the procedure in this partcular location
-    DoneBy: string;
+    DoneBy: string[];
 }

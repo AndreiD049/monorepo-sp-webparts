@@ -2,68 +2,85 @@ import * as React from 'react';
 import { IProcessFlowWebPartProps } from '../ProcessFlowWebPart';
 import { Header } from './Header';
 import { IUser } from '@service/users';
-import styles from './ProcessFlow.module.scss';
 import { MainService } from '../services/main-service';
 import { db } from '../utils/cache';
-import { Text } from 'office-ui-fabric-react';
-import { FlowSelector } from './FlowSelector';
-import { ICustomerFlow } from '@service/process-flow';
-import { GlobalContext } from '../utils/globalContext';
-import { ProcessFlowTable } from './ProcessFlowTable';
+import styles from './ProcessFlow.module.scss';
+import {
+    GlobalContext,
+    IGlobalContext,
+    sentinelContext,
+} from '../utils/globalContext';
+import {
+    CURRENT_USER,
+    HOUR,
+    MAIN_DIALOG,
+    TEAMS_CHOICES,
+    TEAM_USERS,
+} from '../utils/constants';
+import { CommandBar } from './CommandBar';
+import { Flows } from './Flows';
+import { Dialog } from 'sp-components';
 
 export interface IProcessFlowProps {
     properties: IProcessFlowWebPartProps;
 }
 
 export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
-    const service = MainService.UserService;
+    const userService = MainService.UserService;
     const [currentUser, setCurrentUser] = React.useState<IUser>(null);
-    const [selectedTeam, setSelectedTeam] = React.useState(null);
-    const [selectedFlow, setSelectedFlow] = React.useState<ICustomerFlow>(null);
+    const [context, setContext] =
+        React.useState<IGlobalContext>(sentinelContext);
 
     // Get current user
     React.useEffect(() => {
         async function run(): Promise<void> {
-            const current = await db.getCached('current', () =>
-                service.getCurrentUser()
+            const current = await db.getCached(CURRENT_USER, () =>
+                userService.getCurrentUser()
+            );
+            const teams = await db.getCached(
+                TEAMS_CHOICES,
+                () => userService.getTeamsChoices(),
+                HOUR
             );
             if (!current) {
                 await db.invalidateCached('current');
                 console.error(`Couldn't fetch current user info`);
             }
             setCurrentUser(current);
+            // Update context
+            setContext((prev) => ({
+                ...prev,
+                teams,
+                currentUser: current,
+            }));
         }
         run().catch((err) => console.error(err));
     }, []);
 
+    const handleTeamSelected = React.useCallback(
+        async (team: string) => {
+            const teamUsers = await db.getCached(TEAM_USERS(team), () =>
+                userService.getUsersByTeam(team)
+            );
+            setContext((prev) => ({
+                ...prev,
+                selectedTeam: team,
+                teamUsers,
+            }));
+        },
+        [userService]
+    );
+
     if (!currentUser) return null;
 
     return (
-        <GlobalContext.Provider value={{ currentUser }}>
+        <GlobalContext.Provider value={context}>
             <div className={styles.processFlow}>
                 <Header />
-                <Text variant="medium">{currentUser.Title}</Text>
-                <div>
-                    <label htmlFor="team">Select team: </label>
-                    <select
-                        value={selectedTeam}
-                        id="team"
-                        onChange={(ev) => setSelectedTeam(ev.target.value)}
-                    >
-                        <option value="" />
-                        {currentUser.ListInfo.Teams.map((team: string) => (
-                            <option key={team} value={team}>
-                                {team}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <FlowSelector
-                    team={selectedTeam}
-                    onFlowSelected={(flow) => setSelectedFlow(flow)}
-                />
+                <CommandBar onTeamSelected={handleTeamSelected} />
+                <Flows />
             </div>
-            <ProcessFlowTable flow={selectedFlow} />
+            <Dialog id={MAIN_DIALOG} />
         </GlobalContext.Provider>
     );
 };

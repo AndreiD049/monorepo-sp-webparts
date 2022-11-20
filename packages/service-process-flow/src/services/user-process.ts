@@ -1,11 +1,11 @@
 import { IList } from 'sp-preset';
-import { IUserProcedure } from '../models';
+import { IUserProcess } from '../models';
 import { IServiceProps } from '../models/IServiceProps';
 
 const SELECT = [
     'Id',
     'FlowId',
-    'ProcedureId',
+    'ProcessId',
     'Date',
     'User/Id',
     'User/Title',
@@ -17,25 +17,25 @@ const SELECT = [
 
 const EXPAND = ['User'];
 
-export class UserProcedureService {
+export class UserProcessService {
     private list: IList;
 
     constructor(private props: IServiceProps) {
         this.list = this.props.sp.web.lists.getByTitle(this.props.listName);
     }
 
-    async getByFlow(flowId: number): Promise<IUserProcedure[]> {
+    async getByFlow(flowId: number): Promise<IUserProcess[]> {
         return this.list.items
             .filter(`FlowId eq ${flowId}`)
             .select(...SELECT) 
             .expand(...EXPAND)();
     }
 
-    async addUserProcedure(payload: Omit<IUserProcedure, 'Id'>): Promise<void> {
+    async addUserProcess(payload: Omit<IUserProcess, 'Id'>): Promise<void> {
         await this.list.items.add(payload);
     }
 
-    async removeUserProcedure(id: number): Promise<void> {
+    async removeUserProcess(id: number): Promise<void> {
         await this.list.items.getById(id).recycle();
     }
 }

@@ -4,10 +4,10 @@
  * is capable of doing the procedure, or if the training was planned (and when),
  * or when the training was done + some remarks from the Trainer/manager
  */
-export interface IUserProcedure {
+export interface IUserProcess {
     Id: number;
     FlowId: number;
-    ProcedureId: number;
+    ProcessId: number;
     // Date - ISO formatted string
     // It's a string since sharepoint returns it as a string
     // Depending on status this date will ave different meanings

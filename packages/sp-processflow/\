@@ -2,7 +2,6 @@ import { ICustomerFlow, IFlowLocation, IProcess } from '@service/process-flow';
 import { Dialog, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { MainService } from '../../services/main-service';
-import { GlobalContext } from '../../utils/globalContext';
 import styles from './ProcessFlowTable.module.scss';
 
 export interface IProcessFlowTableProps {
@@ -99,58 +98,16 @@ const NewProcess: React.FC<{
     );
 };
 
-const NewLocationDialog: React.FC<{
-    hidden: boolean;
-    onHide: () => void;
-    processId: number;
-    flowId: number;
-    locationOptions: string[];
-    doneByOptions: string[];
-    onLocationAded: (id: number) => void;
-}> = (props) => {
-    const { FlowLocationService } = MainService;
-    const [location, setLocation] = React.useState('');
-    const [doneBy, setDoneBy] = React.useState('');
-
-    const handleCreate = async (): Promise<void> => {
-        const added = await FlowLocationService.addFlowLocation({
-            Location: location,
-            DoneBy: [doneBy],
-            ProcessId: props.processId,
-            FlowId: props.flowId,
-        });
-        props.onLocationAded(added.data.Id);
-        props.onHide();
-    };
-
+const NewLocationDialog: React.FC<{ hidden: boolean; onHide: () => void }> = (
+    props
+) => {
     return (
         <Dialog
             hidden={props.hidden}
             onDismiss={props.onHide}
             modalProps={{ isBlocking: false }}
         >
-            <div>
-                <label style={{ display: 'block' }} htmlFor="location">Location: </label>
-                <input list="locationChoices" id="location" onChange={(ev) => setLocation(ev.target.value)} />
-                <datalist id="locationChoices">
-                    {
-                        props.locationOptions.map((l) => (<option key={l} value={l} />))
-                    }
-                </datalist>
-            </div>
-
-            <div>
-                <label style={{ display: 'block' }} htmlFor="doneBy">Done by: </label>
-                <input list="doneByChoices" id="doneBy" onChange={(ev) => setDoneBy(ev.target.value)} />
-                <datalist id="doneByChoices">
-                    {
-                        props.doneByOptions.map((d) => (<option key={d} value={d} />))
-                    }
-                </datalist>
-            </div>
-            <div>
-                <button onClick={handleCreate}>Create</button>
-            </div>
+            test
         </Dialog>
     );
 };
@@ -159,11 +116,7 @@ const Process: React.FC<{
     process: IProcess;
     flow: ICustomerFlow;
     locations: IFlowLocation[];
-    locationOptions: string[];
-    doneByOptions: string[];
-    onLocationAdded: (id: number) => void;
 }> = (props) => {
-    const { teamUsers } = React.useContext(GlobalContext);
     const [newDialog, setNewDialog] = React.useState(false);
 
     return (
@@ -181,20 +134,11 @@ const Process: React.FC<{
             </div>
             <div>
                 <span>Locations: </span>
-                { props.locations.map((l) => (<span key={l.Id}>| {l.Location}: {l.DoneBy.join(', ')} |</span>)) }
                 <button onClick={() => setNewDialog(true)}>+</button>
                 <NewLocationDialog
                     hidden={!newDialog}
                     onHide={() => setNewDialog(false)}
-                    processId={props.process.Id}
-                    flowId={props.flow.Id}
-                    locationOptions={props.locationOptions}
-                    doneByOptions={props.doneByOptions}
-                    onLocationAded={props.onLocationAdded}
                 />
-            </div>
-            <div>
-                {teamUsers.map((u) => (<span key={u.User.Id} style={{ margin: '0 .3em' }}>|{u.User.Title}|</span>))}
             </div>
         </div>
     );
@@ -205,7 +149,6 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
     const [systems, setSystems] = React.useState([]);
     const [processOptions, setProcessOptions] = React.useState([]);
     const [locationOptions, setLocationOptions] = React.useState([]);
-    const [doneByOptions, setDoneByOptions] = React.useState([]);
     const [categories, setCategories] = React.useState([]);
     const [showNew, setShowNew] = React.useState<boolean>(false);
     const [processes, setProcesses] = React.useState<IProcess[]>([]);
@@ -218,10 +161,6 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
             setSystems(await ProcessService.getSystemChoices());
             setProcessOptions(await ProcessService.getProcessOptions());
             setCategories(await ProcessService.getCategoryOptions());
-            setLocationOptions(
-                await FlowLocationService.getLocationFieldChoices()
-            );
-            setDoneByOptions(await FlowLocationService.getDoneByFieldChoices());
         }
         run().catch((err) => console.error(err));
     }, []);
@@ -268,12 +207,6 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                     locations={flowLocations.filter(
                         (l) => l.Process.Id === p.Id
                     )}
-                    locationOptions={locationOptions}
-                    doneByOptions={doneByOptions}
-                    onLocationAdded={async (id: number) => {
-                        const added = await FlowLocationService.getLocation(id);
-                        setFlowLocations((prev) => [...prev, added]);
-                    }}
                 />
             ))}
         </div>

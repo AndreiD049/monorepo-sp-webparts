@@ -23,6 +23,7 @@
     "office-ui-fabric-react": "7.185.7",
     "react": "16.13.1",
     "react-dom": "16.13.1",
+    "sp-components": "^1.0.0",
     "sp-preset": "^2.0.18",
     "sp-react-notifications": "^1.0.23",
     "spfx-fast-serve": "^3.0.5",

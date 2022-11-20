@@ -54,8 +54,8 @@ export async function setupLists(
     await customerFlows.createView();
   }
 
-  /** Procedure list */
-  const procedure = new ListBuilder(config.procedureListName, sp, notify);
+  /** Process list */
+  const procedure = new ListBuilder(config.processListName, sp, notify);
   const procedureList = await procedure.ensureList();
   if (procedure.created) {
     await procedure.addChoiceField({
@@ -67,7 +67,7 @@ export async function setupLists(
       required: true,
     });
     await procedure.addTextField({
-      name: "Procedure",
+      name: "Process",
       description: "Name of the procedure",
       indexed: true,
       required: true,
@@ -95,9 +95,11 @@ export async function setupLists(
       allowFillIn: true,
       choices: [],
     });
-    await procedure.addTextField({
-      name: "ProcedureOptions",
+    await procedure.addChoiceField({
+      name: "ProcessOptions",
       description: "Service only field. Leave empty. Only for storing the options.",
+      type: 'Choice',
+      choices: [],
       indexed: false,
       required: false,
     });
@@ -105,14 +107,14 @@ export async function setupLists(
   }
 
   /** Process flow list */
-  const userProcedure = new ListBuilder(
-    config.userProcedureListName,
+  const userProcess = new ListBuilder(
+    config.userProcessListName,
     sp,
     notify
   );
-  await userProcedure.ensureList();
-  if (userProcedure.created) {
-    await userProcedure.addLookupField({
+  await userProcess.ensureList();
+  if (userProcess.created) {
+    await userProcess.addLookupField({
       name: "Flow",
       ListId: customerFlowsList.Id,
       LookupColumn: "Flow",
@@ -121,29 +123,29 @@ export async function setupLists(
       indexed: true,
       type: "Lookup",
     });
-    await userProcedure.addLookupField({
-      name: "Procedure",
+    await userProcess.addLookupField({
+      name: "Process",
       ListId: procedureList.Id,
-      LookupColumn: "Procedure",
+      LookupColumn: "Process",
       IsRelationship: true,
       type: "Lookup",
       indexed: false,
       required: true,
     });
-    await userProcedure.addDateField({
+    await userProcess.addDateField({
       name: "Date",
       description: "Date of the next action. depends on status",
       format: "DateOnly",
       required: false,
       indexed: false,
     });
-    await userProcedure.addUserField({
+    await userProcess.addUserField({
       name: "User",
       description: "User who does the procedure",
       indexed: true,
       required: true,
     });
-    await userProcedure.addChoiceField({
+    await userProcess.addChoiceField({
       name: "Status",
       description: "",
       choices: ["NA", "Planned", "On-going", "Completed"],
@@ -151,7 +153,7 @@ export async function setupLists(
       indexed: true,
       required: false,
     });
-    await userProcedure.addChoiceField({
+    await userProcess.addChoiceField({
       name: "Team",
       type: "Choice",
       choices: ["NA"],
@@ -159,12 +161,12 @@ export async function setupLists(
       required: false,
       indexed: true,
     });
-    await userProcedure.addNumberField({
+    await userProcess.addNumberField({
       name: "Allocation",
       description: "How many minutes per UOM the task requires",
       min: 0,
     });
-    await userProcedure.addChoiceField({
+    await userProcess.addChoiceField({
       name: "UOM",
       description: "",
       choices: ["Order", "Day", "Week", "Month"],
@@ -172,7 +174,7 @@ export async function setupLists(
       indexed: false,
       required: false,
     });
-    await userProcedure.createView();
+    await userProcess.createView();
   }
 
   const location = new ListBuilder(config.locationListName, sp, notify);
@@ -188,9 +190,9 @@ export async function setupLists(
       type: "Lookup",
     });
     await location.addLookupField({
-      name: "Procedure",
+      name: "Process",
       ListId: procedureList.Id,
-      LookupColumn: "Procedure",
+      LookupColumn: "Process",
       IsRelationship: true,
       type: "Lookup",
       indexed: false,

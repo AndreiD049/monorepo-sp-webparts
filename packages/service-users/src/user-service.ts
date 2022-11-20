@@ -45,4 +45,8 @@ export class UserService {
             .select(...select)
             .expand(...expand)();
     }
+
+    async getTeamsChoices(): Promise<string[]> {
+        return (await this.usersList.fields.getByTitle('Teams')()).Choices || [];
+    }
 }

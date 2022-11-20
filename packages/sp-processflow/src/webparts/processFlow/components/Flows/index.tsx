@@ -1,12 +1,11 @@
 import { ICustomerFlow } from '@service/process-flow';
+import { Pivot, PivotItem, PrimaryButton } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { MainService } from '../../services/main-service';
-import styles from './FlowSelector.module.scss';
+import { GlobalContext } from '../../utils/globalContext';
+import styles from './Flows.module.scss';
 
-export interface IFlowSelectorProps {
-    team?: string;
-    onFlowSelected: (flow: ICustomerFlow) => void;
-}
+export interface IFlowsProps {}
 
 const NewFlowForm: React.FC<{
     team: string;
@@ -90,11 +89,18 @@ const NewFlowForm: React.FC<{
                             </option>
                         ))}
                     </select>
-                    <button onClick={async () => {
-                        const newGroup = prompt('Enter new customer group');
-                        await flowService.addDBCustomer([newGroup]);
-                        setDbCustomersChoices((prev) => [...prev, newGroup]);
-                    }}>+</button>
+                    <button
+                        onClick={async () => {
+                            const newGroup = prompt('Enter new customer group');
+                            await flowService.addDBCustomer([newGroup]);
+                            setDbCustomersChoices((prev) => [
+                                ...prev,
+                                newGroup,
+                            ]);
+                        }}
+                    >
+                        +
+                    </button>
                 </div>
             </div>
             <button onClick={handleCreate}>Create</button>
@@ -102,30 +108,31 @@ const NewFlowForm: React.FC<{
     );
 };
 
-export const FlowSelector: React.FC<IFlowSelectorProps> = (props) => {
+export const Flows: React.FC<IFlowsProps> = (props) => {
     const flowService = MainService.CustomerFlowService;
+    const { selectedTeam } = React.useContext(GlobalContext);
     const [flows, setFlows] = React.useState<ICustomerFlow[]>([]);
     const [showNewForm, setShowNewForm] = React.useState(false);
 
     React.useEffect(() => {
         async function run(): Promise<void> {
-            if (props.team) {
-                const result = await flowService.getByTeam(props.team);
+            if (selectedTeam) {
+                const result = await flowService.getByTeam(selectedTeam);
                 if (result) setFlows(result);
             }
         }
         run().catch((err) => console.error(err));
-    }, [props.team]);
+    }, [selectedTeam]);
 
-    if (!props.team) {
-        return <h2>Team not chosen</h2>;
+    if (!selectedTeam) {
+        return null;
     }
 
     let newForm: JSX.Element = null;
     if (showNewForm) {
         newForm = (
             <NewFlowForm
-                team={props.team}
+                team={selectedTeam}
                 onFlowAdded={async (id: number) => {
                     const newFlow = await flowService.getById(id);
                     setFlows((prev) => [...prev, newFlow]);
@@ -137,13 +144,11 @@ export const FlowSelector: React.FC<IFlowSelectorProps> = (props) => {
 
     return (
         <div className={styles.container}>
-            {flows.map((flow) => (
-                <button key={flow.Id} style={{ marginRight: '.3em' }} onClick={() => props.onFlowSelected(flow)}>
-                    {flow.Flow}
-                </button>
-            ))}
-            <button onClick={() => setShowNewForm(true)}>+ New Flow</button>
-            {showNewForm && newForm}
+            <Pivot>
+                {flows.map((flow) => (
+                    <PivotItem headerText={flow.Flow} itemKey={flow.Id.toString()}>test</PivotItem>
+                ))}
+            </Pivot>
         </div>
     );
 };
