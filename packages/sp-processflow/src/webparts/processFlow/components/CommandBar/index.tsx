@@ -7,9 +7,10 @@ import {
     Label,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { FooterOkCancel, hideDialog, showDialog } from 'sp-components';
+import { showDialog } from 'sp-components';
 import { MAIN_DIALOG } from '../../utils/constants';
 import { GlobalContext } from '../../utils/globalContext';
+import { NewFlowForm } from '../NewFlowForm';
 import styles from './CommandBar.module.scss';
 
 export interface ICommandBarProps {
@@ -38,9 +39,10 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
         showDialog({
             id: MAIN_DIALOG,
             dialogProps: {
+                title: 'New flow',
                 isBlocking: false,
             },
-            content: <div>test</div>,
+            content: <NewFlowForm />,
         });
     }, [selectedTeam]);
 

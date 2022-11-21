@@ -3,10 +3,13 @@ export const STORE_NAME = location.origin + location.pathname;
 
 export const MAIN_DIALOG = 'sp-processflow-main-dialog';
 
+// Events
+export const FLOW_ADDED = 'sp-processflow-flow-added';
+
 // Cache keys
 export const CURRENT_USER = 'sp-processflow-current-user';
 export const TEAMS_CHOICES = 'sp-processflow-teams';
-export const TEAM_USERS = (team: string) => `sp-processflow-team-users/${team}`;
+export const TEAM_USERS = (team: string): string => `sp-processflow-team-users/${team}`;
 
 export const MINUTE = 1000 * 60;
 export const HOUR = MINUTE * 60;

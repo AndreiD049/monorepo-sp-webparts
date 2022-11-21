@@ -1,0 +1,11 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    min-width: 1px;
+}
+
+.topInfo {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: .5em;
+}
