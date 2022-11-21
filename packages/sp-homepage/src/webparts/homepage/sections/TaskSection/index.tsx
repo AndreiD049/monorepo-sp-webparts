@@ -112,6 +112,7 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
                             title: t.Title,
                             user: t.User,
                             remark: t.Remark,
+                            category: t.Task.Category,
                         }}
                         canEditOthers={false}
                         currentUserId={currentUser.Id}

@@ -84,7 +84,11 @@ export const setupLists = async (properties: ITasksWebPartProps) => {
 
         await taskExists.list.fields.createFieldAsXml(
             `<Field CommaSeparator='FALSE' Indexed='TRUE' CustomUnitOnRight='TRUE' Decimals='0' DisplayName='OriginalTaskId' Format='Dropdown' IsModern='TRUE' Name='OriginalTaskId' Percentage='FALSE' Required='FALSE' Title='OriginalTaskId' Type='Number' Unit='None'></Field>`
-        )
+        );
+
+        await taskExists.list.fields.createFieldAsXml(
+            `<Field DisplayName='Category' Format='Dropdown' IsModern='TRUE' MaxLength='50' Name='Category' Title='Category' Type='Text'></Field>`
+        );
     }
 
     const taskList: IListInfo = await sp.web.lists.getByTitle(properties.tasksListTitle)();

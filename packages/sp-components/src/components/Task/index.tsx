@@ -6,6 +6,8 @@ import * as React from 'react';
 import { TaskBody } from './TaskBody';
 import { TaskPersona } from './DefaultPersona/TaskPersona';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
+import { Pill } from '../Pill';
+import { textColor } from 'colored-text';
 
 const CLOSED_ICON = 'ChevronDown';
 const OPEN_ICON = 'ChevronUp';
@@ -61,6 +63,7 @@ export interface ITaskInfo {
     time: string;
     status: string;
     remark?: string;
+    category?: string;
 }
 
 export interface ITaskProps {
@@ -86,6 +89,7 @@ export const Task: React.FC<ITaskProps> = ({
     ...props
 }) => {
     const [open, setOpen] = React.useState<boolean>(false);
+    const categoryStyles = React.useMemo(() => textColor(info.category), [info.category]);
 
     const toggleOpen = React.useCallback(() => {
         setOpen((prev) => !prev);
@@ -118,6 +122,23 @@ export const Task: React.FC<ITaskProps> = ({
                 >
                     {info.title}
                 </Text>
+                {info.category && (
+                    <Pill
+                        value={info.category}
+                        containerStyles={{
+                            display: 'inline-flex',
+                        }}
+                        style={{
+                            color: categoryStyles.fg,
+                            backgroundColor: categoryStyles.bg,
+                            textAlign: 'center',
+                            lineHeight: '.9em',
+                            fontSize: '.9em',
+                            padding: '.3em 1em',
+                            margin: 0,
+                        }}
+                    />
+                )}
                 {props.TaskPersona ? (
                     props.TaskPersona
                 ) : (

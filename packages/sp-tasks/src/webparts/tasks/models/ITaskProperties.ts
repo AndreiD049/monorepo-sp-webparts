@@ -12,4 +12,5 @@ export interface ITaskInfo {
     date: string;
     time: string;
     status: TaskStatus;
+    category?: string;
 }

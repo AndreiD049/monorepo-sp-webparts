@@ -43,4 +43,5 @@ export default interface ITask {
     ActiveFrom: string;
     ActiveTo: string;
     OriginalTaskId?: number;
+        Category?: string;
 }

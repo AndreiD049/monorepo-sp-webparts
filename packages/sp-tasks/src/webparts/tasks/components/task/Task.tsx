@@ -41,6 +41,7 @@ const Task: FC<ITaskProps> = (props) => {
                     .toLocaleString(DateTime.DATE_SHORT),
                 time: DateTime.fromISO(props.task.Time).toLocaleString(DateTime.TIME_24_SIMPLE),
                 status: 'Open',
+                category: props.task.Category,
             };
         }
         return {
@@ -55,6 +56,7 @@ const Task: FC<ITaskProps> = (props) => {
                 DateTime.TIME_24_SIMPLE
             ),
             status: props.task.Status,
+            category: props.task.Task.Category,
         };
     }, [props.task]);
 

@@ -8,6 +8,7 @@ export default interface ITaskLog {
         Title: string;
         Time: string;
         Transferable: "0" | "1";
+        Category: string;
     };
     TaskId?: number;
     Date: string;

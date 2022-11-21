@@ -12,6 +12,7 @@ const LOG_SELECT = [
     'Task/ID',
     'Task/Title',
     'Task/Time',
+    'Task/Category',
     'Description',
     'Date',
     'DateTimeStarted',
