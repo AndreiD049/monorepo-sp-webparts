@@ -1,0 +1,21 @@
+{
+  "name": "colored-text",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Return fluent background color from text content",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "keywords": [
+    "Fluent",
+    "colors",
+    "hash"
+  ],
+  "author": "Dimitrascu Andrei",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  }
+}
