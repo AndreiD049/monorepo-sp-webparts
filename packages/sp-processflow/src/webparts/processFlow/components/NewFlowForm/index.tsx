@@ -3,7 +3,7 @@ import { PrimaryButton, Stack, TextField } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { hideDialog } from 'sp-components';
 import { MainService } from '../../services/main-service';
-import { FLOW_ADDED, MAIN_DIALOG } from '../../utils/constants';
+import { FLOW_ADDED, FLOW_UPDATED, MAIN_DIALOG } from '../../utils/constants';
 import { GlobalContext } from '../../utils/globalContext';
 import { CustomerGroupPicker } from '../CustomerGroupPicker';
 import { DBCustomersPicker } from '../DBCustomersPicker';
@@ -15,6 +15,12 @@ export interface INewFlowFormProps {
 
 export function newFlowAdded(id: number): void {
     document.dispatchEvent(new CustomEvent(FLOW_ADDED, {
+        detail: { id },
+    }))
+}
+
+export function flowUpdated(id: number): void {
+    document.dispatchEvent(new CustomEvent(FLOW_UPDATED, {
         detail: { id },
     }))
 }

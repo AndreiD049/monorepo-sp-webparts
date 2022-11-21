@@ -17,7 +17,16 @@ export interface IDBCustomersPickerProps {
 }
 
 export const DBCustomersPicker: React.FC<IDBCustomersPickerProps> = (props) => {
-    const selectedTags = props.selectedOptions?.map((s) => ({key: s, name: s}));
+    const controlled: boolean = React.useMemo(() => Boolean(props.selectedOptions?.length), [props.selectedOptions]);
+    const ctrSelected = React.useMemo(() => {
+        if (controlled) {
+            return props.selectedOptions.map((o) => ({
+                key: o,
+                name: o,
+            }));
+        }
+        return [];
+    }, [props.selectedOptions]);
     const [selected, setSelected] = React.useState<ITag[]>([]);
     const options: ITag[] = React.useMemo(
         () => props.options.map((o) => ({ name: o, key: o })),
@@ -39,16 +48,18 @@ export const DBCustomersPicker: React.FC<IDBCustomersPickerProps> = (props) => {
                 }
                 createGenericItem={(item) => {
                     return {
-                        key: item,
-                        name: item,
+                        key: item.trim(),
+                        name: item.trim(),
                     };
                 }}
                 onChange={(items) => {
-                    setSelected(items);
+                    if (!controlled) {
+                        setSelected(items);
+                    }
                     if (props.onSelect)
                         props.onSelect(items.map((i) => i.name));
                 }}
-                selectedItems={selectedTags ? selectedTags : selected}
+                selectedItems={controlled ? ctrSelected : selected}
                 onEmptyResolveSuggestions={() => options}
                 onResolveSuggestions={(filter, selected) => {
                     const f = filter.toLowerCase();

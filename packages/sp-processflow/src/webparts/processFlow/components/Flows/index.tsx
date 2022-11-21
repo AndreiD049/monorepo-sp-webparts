@@ -2,12 +2,14 @@ import { ICustomerFlow } from '@service/process-flow';
 import { Pivot, PivotItem } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { MainService } from '../../services/main-service';
-import { FLOW_ADDED } from '../../utils/constants';
+import { FLOW_ADDED, FLOW_UPDATED } from '../../utils/constants';
 import { GlobalContext } from '../../utils/globalContext';
 import { ProcessFlowContent } from '../ProcessFlowContent';
 import styles from './Flows.module.scss';
 
-export interface IFlowsProps {}
+export interface IFlowsProps {
+    onFlowSelected?: (flow: ICustomerFlow) => void;
+}
 
 export const Flows: React.FC<IFlowsProps> = (props) => {
     const flowService = MainService.CustomerFlowService;
@@ -29,13 +31,33 @@ export const Flows: React.FC<IFlowsProps> = (props) => {
     }, [selectedTeam]);
 
     React.useEffect(() => {
-        async function handler(ev: CustomEvent<{ id: number }>): Promise<void> {
-            const newFlow = await flowService.getById(ev.detail.id);
+        async function handlerAdded(ev: CustomEvent<{ id: number }>): Promise<void> {
+            const id = ev.detail.id;
+            const newFlow = await flowService.getById(id);
             setFlows((prev) => [...prev, newFlow]);
         }
-        document.addEventListener(FLOW_ADDED, handler);
-        return () => document.removeEventListener(FLOW_ADDED, handler);
+        async function handlerUpdated(ev: CustomEvent<{ id: number }>): Promise<void> {
+            const id = ev.detail.id;
+            const newFlow = await flowService.getById(id);
+            setFlows((prev) => [...prev.map((f) => f.Id === id ? newFlow : f)]);
+        }
+        document.addEventListener(FLOW_ADDED, handlerAdded);
+        document.addEventListener(FLOW_UPDATED, handlerUpdated);
+        return () => {
+            document.removeEventListener(FLOW_ADDED, handlerAdded);
+            document.removeEventListener(FLOW_UPDATED, handlerUpdated);
+        };
     }, []);
+
+    React.useEffect(() => {
+        setSelectedFlow((prev) => flows.find((f) => f.Id === prev?.Id));
+    }, [flows]);
+
+    React.useEffect(() => {
+        if (props.onFlowSelected && selectedFlow) {
+            props.onFlowSelected(selectedFlow);
+        }
+    }, [selectedFlow]);
 
     if (!selectedTeam) {
         return null;

@@ -1,4 +1,4 @@
-import { IField, IItemAddResult, IList } from 'sp-preset';
+import { IField, IItemAddResult, IItemUpdateResult, IList } from 'sp-preset';
 import { ICustomerFlow } from '../models';
 import { IServiceProps } from '../models/IServiceProps';
 
@@ -38,6 +38,16 @@ export class CustomerFlowService {
             await this.checkDBCustomers(payload.DBCustomers);
         }
         return this.list.items.add(payload);
+    }
+
+    async updateFlow(id: number, payload: Partial<ICustomerFlow>): Promise<IItemUpdateResult> {
+        if (payload.CustomerGroup) {
+            await this.checkCustomerGroup(payload.CustomerGroup);
+        }
+        if (payload.DBCustomers && payload.DBCustomers.length > 0) {
+            await this.checkDBCustomers(payload.DBCustomers);
+        }
+        return this.list.items.getById(id).update(payload);
     }
 
     async removeFlow(id: number): Promise<void> {

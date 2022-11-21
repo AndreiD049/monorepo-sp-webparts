@@ -5,6 +5,7 @@ export const MAIN_DIALOG = 'sp-processflow-main-dialog';
 
 // Events
 export const FLOW_ADDED = 'sp-processflow-flow-added';
+export const FLOW_UPDATED = 'sp-processflow-flow-updated';
 
 // Cache keys
 export const CURRENT_USER = 'sp-processflow-current-user';

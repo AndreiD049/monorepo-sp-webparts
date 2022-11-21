@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { IProcessFlowWebPartProps } from '../ProcessFlowWebPart';
-import { Header } from './Header';
 import { IUser } from '@service/users';
 import { MainService } from '../services/main-service';
 import { db } from '../utils/cache';
@@ -20,6 +19,7 @@ import {
 import { CommandBar } from './CommandBar';
 import { Flows } from './Flows';
 import { Dialog } from 'sp-components';
+import { Separator } from 'office-ui-fabric-react';
 
 export interface IProcessFlowProps {
     properties: IProcessFlowWebPartProps;
@@ -76,9 +76,16 @@ export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
     return (
         <GlobalContext.Provider value={context}>
             <div className={styles.processFlow}>
-                <Header />
                 <CommandBar onTeamSelected={handleTeamSelected} />
-                <Flows />
+                <Separator />
+                <Flows
+                    onFlowSelected={(flow) => {
+                        setContext((prev) => ({
+                            ...prev,
+                            selectedFlow: flow,
+                        }));
+                    }}
+                />
             </div>
             <Dialog id={MAIN_DIALOG} />
         </GlobalContext.Provider>

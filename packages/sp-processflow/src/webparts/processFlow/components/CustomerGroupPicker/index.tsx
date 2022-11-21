@@ -18,6 +18,20 @@ export interface ICustomerGroupPickerProps {
 export const CustomerGroupPicker: React.FC<ICustomerGroupPickerProps> = (
     props
 ) => {
+    const controlled: boolean = React.useMemo(() => {
+        return props.selectedOption !== undefined;
+    }, [props.selectedOption]);
+    const ctrSelected = React.useMemo(() => {
+        if (controlled && props.selectedOption) {
+            return [
+                {
+                    key: props.selectedOption,
+                    name: props.selectedOption,
+                },
+            ];
+        }
+        return [];
+    }, [props.selectedOption]);
     const [selected, setSelected] = React.useState(null);
     const options: ITag[] = React.useMemo(
         () => props.options.map((o) => ({ name: o, key: o })),
@@ -44,19 +58,12 @@ export const CustomerGroupPicker: React.FC<ICustomerGroupPickerProps> = (
                     };
                 }}
                 onChange={(items) => {
-                    setSelected([items[0]]);
-                    if (props.onSelect) props.onSelect(items[0].name);
+                    if (!controlled) {
+                        setSelected([items[0]]);
+                    }
+                    if (props.onSelect) props.onSelect(items.length > 0 ? items[0].name : null);
                 }}
-                selectedItems={
-                    props.selectedOption
-                        ? [
-                              {
-                                  key: props.selectedOption,
-                                  name: props.selectedOption,
-                              },
-                          ]
-                        : selected
-                }
+                selectedItems={controlled ? ctrSelected : selected}
                 onEmptyResolveSuggestions={(sel) => options}
                 onResolveSuggestions={(filter, selected) => {
                     const f = filter.toLowerCase();

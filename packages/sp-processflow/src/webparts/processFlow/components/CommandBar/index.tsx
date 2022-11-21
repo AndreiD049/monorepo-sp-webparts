@@ -5,12 +5,14 @@ import {
     IComboBoxStyles,
     Icon,
     Label,
+    Text,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { showDialog } from 'sp-components';
 import { MAIN_DIALOG } from '../../utils/constants';
 import { GlobalContext } from '../../utils/globalContext';
 import { NewFlowForm } from '../NewFlowForm';
+import { ProcessFlowHeader } from '../ProcessFlowHeader';
 import styles from './CommandBar.module.scss';
 
 export interface ICommandBarProps {
@@ -24,7 +26,8 @@ const comboBoxStyles: Partial<IComboBoxStyles> = {
 };
 
 export const CommandBar: React.FC<ICommandBarProps> = (props) => {
-    const { teams, selectedTeam } = React.useContext(GlobalContext);
+    const { teams, selectedTeam, selectedFlow } =
+        React.useContext(GlobalContext);
 
     const options: IComboBoxOption[] = React.useMemo(
         () =>
@@ -48,10 +51,14 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
 
     return (
         <div className={styles.container}>
-            <Label>
-                <Icon iconName="Teamwork" />
-            </Label>
+            <Text
+                style={{ fontWeight: 'bold', margin: '0 .5em .5em 0' }}
+                variant="mediumPlus"
+            >
+                Process flow
+            </Text>
             <ComboBox
+                label="Team"
                 options={options}
                 onChange={(_ev, option) =>
                     props.onTeamSelected(option.key.toString())
@@ -59,10 +66,12 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                 selectedKey={selectedTeam}
                 styles={comboBoxStyles}
             />
+            {selectedFlow && <ProcessFlowHeader flow={selectedFlow} />}
             <ActionButton
                 onClick={handleNewFlow}
                 disabled={!Boolean(selectedTeam)}
                 iconProps={{ iconName: 'Add' }}
+                styles={{ root: { maxHeight: 32 } }}
             >
                 New flow
             </ActionButton>
