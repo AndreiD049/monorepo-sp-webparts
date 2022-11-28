@@ -3,3 +3,13 @@
 .container {
     min-width: 1px;
 }
+
+.groupHeader {
+    background-color: "[theme: themeTertiary, default: #c86c70]";
+    color: "[theme: white, default: #000000]";
+
+    & > div:hover {
+        background-color: "[theme: themeSecondary, default: #c86c70]" !important;
+        color: "[theme: white, default: #000000]";
+    }
+}

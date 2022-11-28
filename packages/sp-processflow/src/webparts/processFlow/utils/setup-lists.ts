@@ -103,6 +103,19 @@ export async function setupLists(
       indexed: false,
       required: false,
     });
+    await procedure.addNumberField({
+      name: "Allocation",
+      description: "How many minutes per UOM the task requires",
+      min: 0,
+    });
+    await procedure.addChoiceField({
+      name: "UOM",
+      description: "",
+      choices: ["Order", "Day", "Week", "Month"],
+      type: "Choice",
+      indexed: false,
+      required: false,
+    });
     await procedure.createView();
   }
 
@@ -160,19 +173,6 @@ export async function setupLists(
       allowFillIn: true,
       required: false,
       indexed: true,
-    });
-    await userProcess.addNumberField({
-      name: "Allocation",
-      description: "How many minutes per UOM the task requires",
-      min: 0,
-    });
-    await userProcess.addChoiceField({
-      name: "UOM",
-      description: "",
-      choices: ["Order", "Day", "Week", "Month"],
-      type: "Choice",
-      indexed: false,
-      required: false,
     });
     await userProcess.createView();
   }

@@ -2,7 +2,7 @@ import { IField, IItemAddResult, IList } from 'sp-preset';
 import { IProcess } from '../models';
 import { IServiceProps } from '../models/IServiceProps';
 
-const SELECT = ['Id', 'System', 'Process', 'Category', 'FlowId', 'Manuals'];
+const SELECT = ['Id', 'System', 'Process', 'Category', 'FlowId', 'Manuals', 'Allocation', 'UOM'];
 
 export class ProcessService {
     private list: IList;

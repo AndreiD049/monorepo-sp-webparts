@@ -23,11 +23,5 @@ export interface IUserProcess {
         EMail: string;
     }
     Team: string;
-    // Number of minutes required for the task to be performed
-    // Depends on UOM (Unit of measure) field below
-    Allocation: number;
-    // UOM (Unit of measure) - the target of allocation definintion.
-    // Example: if Allocation is 10 (minutes), and UOM is Order, it means the task takes 
-    // on average 10 minutes per order etc...
-    UOM: string;
+    Status: 'NA' | 'On-going' | 'Planned' | 'Completed';
 }

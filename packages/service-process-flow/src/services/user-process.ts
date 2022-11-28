@@ -11,8 +11,7 @@ const SELECT = [
     'User/Title',
     'User/EMail',
     'Team',
-    'Allocation',
-    'UOM',
+    'Status',
 ]
 
 const EXPAND = ['User'];

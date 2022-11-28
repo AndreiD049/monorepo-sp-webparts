@@ -59,7 +59,7 @@ export const CustomerGroupPicker: React.FC<ICustomerGroupPickerProps> = (
                 }}
                 onChange={(items) => {
                     if (!controlled) {
-                        setSelected([items[0]]);
+                        setSelected(items.length > 0 ? [items[0]] : []);
                     }
                     if (props.onSelect) props.onSelect(items.length > 0 ? items[0].name : null);
                 }}

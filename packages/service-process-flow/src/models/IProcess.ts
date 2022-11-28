@@ -15,4 +15,7 @@ export interface IProcess {
     FlowId: number;
     // Manuals: links to the manuals for this exact procedure
     Manuals?: string[];
+    // How many minutes per UOM the task requires
+    Allocation?: number;
+    UOM?: string;
 }

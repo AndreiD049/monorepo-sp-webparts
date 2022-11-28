@@ -51,12 +51,6 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
 
     return (
         <div className={styles.container}>
-            <Text
-                style={{ fontWeight: 'bold', margin: '0 .5em .5em 0' }}
-                variant="mediumPlus"
-            >
-                Process flow
-            </Text>
             <ComboBox
                 label="Team"
                 options={options}

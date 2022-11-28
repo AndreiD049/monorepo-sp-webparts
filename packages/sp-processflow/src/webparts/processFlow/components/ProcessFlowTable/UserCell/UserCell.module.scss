@@ -1,0 +1,29 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    text-align: center;
+    height: 25px;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.na {
+    background-color: lightgray;
+}
+
+.planned {
+    color: white;
+    background-color: lightcoral;
+}
+
+.on-going {
+    color: black;
+    background-color: lightgoldenrodyellow;
+}
+
+.completed {
+    color: black;
+    background-color: lightgreen;
+}
