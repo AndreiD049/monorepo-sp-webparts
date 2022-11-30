@@ -7,11 +7,13 @@ import {
 import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
 import { TaskNode } from '../graph/TaskNode';
 import { TaskNodeContext } from '../TaskNodeContext';
-import styles from './Cells.module.scss';
 import MainService from '../../services/main-service';
 import { DAY } from '../../utils/constants';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { GlobalContext } from '../../utils/GlobalContext';
+import { Duration } from 'luxon';
+import { formatDueDuration } from '../../utils/hours-duration';
+import styles from './Cells.module.scss';
 
 const defaultCalendarStrings = {
     months: [
@@ -101,7 +103,7 @@ const DueDateCellCallout = (props: { node: TaskNode }): JSX.Element => {
                         'Due date',
                         `${task.DueDate}|${newTask.DueDate}`,
                         currentUser.Id,
-                        new Date().toISOString(),
+                        new Date().toISOString()
                     );
                     taskUpdated(newTask);
                     loadingStop();
@@ -117,6 +119,25 @@ export const DueDateCell = ({ node }: { node: TaskNode }): JSX.Element => {
     const { isTaskFinished } = React.useContext(TaskNodeContext);
     const task = node.getTask();
     const textRef = React.useRef(null);
+    const dueDuration = React.useMemo(() => {
+        const nowMillis = new Date().getTime();
+        const durMillis = new Date(task.DueDate).getTime();
+        let dur = Duration.fromMillis(durMillis - nowMillis).shiftTo(
+            'years',
+            'months',
+            'weeks',
+            'days'
+        );
+        // round days
+        dur = dur.set({days: Math.ceil(dur.days)}).normalize();
+        const durArray = [
+            { type: 'year', value: dur.years },
+            { type: 'month', value: dur.months },
+            { type: 'week', value: dur.weeks },
+            { type: 'day', value: dur.days },
+        ].filter((o) => o.value !== 0);
+        return formatDueDuration(durArray.slice(0, 2));
+    }, [task.DueDate]);
 
     const handleClick = React.useCallback(() => {
         calloutVisibility({
@@ -161,9 +182,13 @@ export const DueDateCell = ({ node }: { node: TaskNode }): JSX.Element => {
             onClick={handleClick}
             disabled={node.Display === 'disabled' || isTaskFinished}
             className={styles.button}
+            title={dueDuration}
         >
-            <Text variant="medium" className={dateClassName}>
+            <Text block variant="medium" className={dateClassName}>
                 {new Date(task.DueDate).toLocaleDateString()}
+            </Text>
+            <Text block className={styles.dueDateDurationText} variant="xSmall">
+                {dueDuration}
             </Text>
         </button>
     );

@@ -28,3 +28,10 @@ export const validateHours = (value: string): number => {
 export const hoursFromMilliseconds = (value: number): number => {
     return value / HOUR;
 }
+
+export const formatDueDuration = (val: { type: string, value: number }[]): string => {
+    if (val.length === 0) return null;
+    const negative = val[0].value < 0;
+    const values = val.map((v) => `${Math.abs(v.value)} ${v.type}${Math.abs(v.value) > 1 ? 's' : ''}`);
+    return `(${values.join(', ') + (negative ? ' overdue' : '')})`;
+}

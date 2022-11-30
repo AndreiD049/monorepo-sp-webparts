@@ -197,7 +197,7 @@ export const useColumns = (
                 key: 'DueDate',
                 name: 'Due Date',
                 fieldName: 'DueDate',
-                minWidth: 100,
+                minWidth: 110,
                 isSorted: isSorted('DueDate', filters.sorting),
                 isSortedDescending: isSortedDescending('DueDate', filters.sorting),
                 onColumnClick: () => dispatch({ type: 'SORT', column: 'DueDate' }),
