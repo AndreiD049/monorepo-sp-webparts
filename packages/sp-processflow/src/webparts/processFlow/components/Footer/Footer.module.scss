@@ -1,0 +1,10 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    min-height: 100px;
+    text-align: center;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: space-around;
+}

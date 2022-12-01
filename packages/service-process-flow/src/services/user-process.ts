@@ -1,4 +1,4 @@
-import { IList } from 'sp-preset';
+import { IItemAddResult, IItemUpdateResult, IList } from 'sp-preset';
 import { IUserProcess } from '../models';
 import { IServiceProps } from '../models/IServiceProps';
 
@@ -30,8 +30,19 @@ export class UserProcessService {
             .expand(...EXPAND)();
     }
 
-    async addUserProcess(payload: Omit<IUserProcess, 'Id'>): Promise<void> {
-        await this.list.items.add(payload);
+    async getById(flowId: number): Promise<IUserProcess> {
+        return this.list.items
+            .getById(flowId)
+            .select(...SELECT) 
+            .expand(...EXPAND)();
+    }
+
+    async addUserProcess(payload: Omit<IUserProcess, 'Id' | 'User'> & { UserId: number }): Promise<IItemAddResult> {
+        return this.list.items.add(payload);
+    }
+
+    async updateUserProcess(id: number, payload: Partial<IUserProcess>): Promise<IItemUpdateResult> {
+        return this.list.items.getById(id).update(payload);
     }
 
     async removeUserProcess(id: number): Promise<void> {

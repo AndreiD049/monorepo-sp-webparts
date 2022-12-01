@@ -3,7 +3,7 @@ import { PrimaryButton, Stack, TextField } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { hideDialog } from 'sp-components';
 import { MainService } from '../../services/main-service';
-import { FLOW_ADDED, FLOW_UPDATED, MAIN_DIALOG } from '../../utils/constants';
+import { MAIN_DIALOG } from '../../utils/constants';
 import { GlobalContext } from '../../utils/globalContext';
 import { CustomerGroupPicker } from '../CustomerGroupPicker';
 import { DBCustomersPicker } from '../DBCustomersPicker';
@@ -11,18 +11,7 @@ import styles from './NewFlowForm.module.scss';
 
 export interface INewFlowFormProps {
     onFlowAdded?: (id: number) => void;
-}
-
-export function newFlowAdded(id: number): void {
-    document.dispatchEvent(new CustomEvent(FLOW_ADDED, {
-        detail: { id },
-    }))
-}
-
-export function flowUpdated(id: number): void {
-    document.dispatchEvent(new CustomEvent(FLOW_UPDATED, {
-        detail: { id },
-    }))
+    onFlowUpdated?: (id: number) => void;
 }
 
 export const NewFlowForm: React.FC<INewFlowFormProps> = (props) => {
@@ -53,7 +42,6 @@ export const NewFlowForm: React.FC<INewFlowFormProps> = (props) => {
     const handleCreate = React.useCallback(async (body: Omit<ICustomerFlow, 'Id'>) => {
         const added = await CustomerFlowService.addFlow(body);
         if (props.onFlowAdded) props.onFlowAdded(added.data.Id);
-        newFlowAdded(added.data.Id);
         hideDialog(MAIN_DIALOG);
     }, []);
 

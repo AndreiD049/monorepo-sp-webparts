@@ -21,7 +21,7 @@ export interface IUserProcess {
         Id: number;
         Title: string;
         EMail: string;
-    }
+    };
     Team: string;
     Status: 'NA' | 'On-going' | 'Planned' | 'Completed';
 }

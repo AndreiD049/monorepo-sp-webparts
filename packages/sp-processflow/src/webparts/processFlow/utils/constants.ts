@@ -4,8 +4,8 @@ export const STORE_NAME = location.origin + location.pathname;
 export const MAIN_DIALOG = 'sp-processflow-main-dialog';
 
 // Events
-export const FLOW_ADDED = 'sp-processflow-flow-added';
-export const FLOW_UPDATED = 'sp-processflow-flow-updated';
+export const USER_PROCESS_UPDATE = 'sp-processflow-userprocess-updated';
+export const USER_PROCESS_ADDED = 'sp-processflow-userprocess-added';
 
 // Cache keys
 export const CURRENT_USER = 'sp-processflow-current-user';

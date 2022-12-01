@@ -3,7 +3,6 @@ import { IProcessFlowWebPartProps } from '../ProcessFlowWebPart';
 import { IUser } from '@service/users';
 import { MainService } from '../services/main-service';
 import { db } from '../utils/cache';
-import styles from './ProcessFlow.module.scss';
 import {
     GlobalContext,
     IGlobalContext,
@@ -17,9 +16,12 @@ import {
     TEAM_USERS,
 } from '../utils/constants';
 import { CommandBar } from './CommandBar';
-import { Flows } from './Flows';
 import { Dialog } from 'sp-components';
 import { Separator } from 'office-ui-fabric-react';
+import { ProcessFlowContent } from './ProcessFlowContent';
+import { ProcessFlowHeader } from './ProcessFlowHeader';
+import styles from './ProcessFlow.module.scss';
+import { Footer } from './Footer';
 
 export interface IProcessFlowProps {
     properties: IProcessFlowWebPartProps;
@@ -76,9 +78,8 @@ export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
     return (
         <GlobalContext.Provider value={context}>
             <div className={styles.processFlow}>
-                <CommandBar onTeamSelected={handleTeamSelected} />
-                <Separator />
-                <Flows
+                <CommandBar
+                    onTeamSelected={handleTeamSelected}
                     onFlowSelected={(flow) => {
                         setContext((prev) => ({
                             ...prev,
@@ -86,6 +87,10 @@ export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
                         }));
                     }}
                 />
+                <Separator />
+                <ProcessFlowHeader flow={context.selectedFlow} />
+                <ProcessFlowContent flow={context.selectedFlow} />
+                <Footer config={props.properties.config} />
             </div>
             <Dialog id={MAIN_DIALOG} />
         </GlobalContext.Provider>

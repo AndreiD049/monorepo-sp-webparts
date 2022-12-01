@@ -187,9 +187,6 @@ export const DueDateCell = ({ node }: { node: TaskNode }): JSX.Element => {
             <Text block variant="medium" className={dateClassName}>
                 {new Date(task.DueDate).toLocaleDateString()}
             </Text>
-            <Text block className={styles.dueDateDurationText} variant="xSmall">
-                {dueDuration}
-            </Text>
         </button>
     );
 };

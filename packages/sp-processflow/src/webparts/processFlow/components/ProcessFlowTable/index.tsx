@@ -17,6 +17,7 @@ import * as React from 'react';
 import { IProcessFlowRow } from '../../models/IProcessFlowRow';
 import ProcessFlowWebPart from '../../ProcessFlowWebPart';
 import { MainService } from '../../services/main-service';
+import { EventPayload, listenProcessAdded, listenProcessUpdated } from '../../utils/events';
 import { GlobalContext } from '../../utils/globalContext';
 import { headerProps, renderHeader } from './header';
 import styles from './ProcessFlowTable.module.scss';
@@ -27,175 +28,11 @@ export interface IProcessFlowTableProps {
     flow?: ICustomerFlow;
 }
 
-/**
-Id: number;
-System: string;
-Procedure: string;
-Category: string;
-FlowId: number;
-Manuals: string[];
- */
-const NewProcess: React.FC<{
-    systems: string[];
-    processes: string[];
-    categories: string[];
-    flow: ICustomerFlow;
-    onCloseForm: () => void;
-    onNewProcess: (id: number) => void;
-}> = (props) => {
-    const processService = MainService.ProcessService;
-    const [system, setSystem] = React.useState('');
-    const [category, setCategory] = React.useState('');
-    const [process, setProcess] = React.useState('');
-
-    const handleCreate = async (): Promise<void> => {
-        const newProcess = await processService.addProcess({
-            System: system,
-            Process: process,
-            Category: category,
-            FlowId: props.flow.Id,
-        });
-        props.onNewProcess(newProcess.data.Id);
-    };
-
-    return (
-        <div>
-            <div>
-                <label style={{ display: 'block' }} htmlFor="System">
-                    System:
-                </label>
-                <input
-                    list="systemChoices"
-                    id="system"
-                    value={system}
-                    onChange={(ev) => setSystem(ev.target.value)}
-                />
-
-                <datalist id="systemChoices">
-                    {props.systems.map((s) => (
-                        <option key={s} value={s} />
-                    ))}
-                </datalist>
-            </div>
-            <div>
-                <label style={{ display: 'block' }} htmlFor="Process">
-                    Process:
-                </label>
-                <input
-                    list="processList"
-                    id="Process"
-                    value={process}
-                    onChange={(ev) => setProcess(ev.target.value)}
-                />
-
-                <datalist id="processList">
-                    {props.processes.map((p) => (
-                        <option key={p} value={p} />
-                    ))}
-                </datalist>
-            </div>
-            <div>
-                <label style={{ display: 'block' }} htmlFor="Category">
-                    Category:
-                </label>
-                <input
-                    list="categoryChoices"
-                    id="Category"
-                    value={category}
-                    onChange={(ev) => setCategory(ev.target.value)}
-                />
-
-                <datalist id="categoryChoices">
-                    {props.categories.map((c) => (
-                        <option key={c} value={c} />
-                    ))}
-                </datalist>
-            </div>
-            <button onClick={handleCreate}>Create</button>
-            <button onClick={props.onCloseForm}>Cancel</button>
-        </div>
-    );
-};
-
-const NewLocationDialog: React.FC<{
-    hidden: boolean;
-    onHide: () => void;
-    processId: number;
-    flowId: number;
-    locationOptions: string[];
-    doneByOptions: string[];
-    onLocationAded: (id: number) => void;
-}> = (props) => {
-    const { FlowLocationService } = MainService;
-    const [location, setLocation] = React.useState('');
-    const [doneBy, setDoneBy] = React.useState('');
-
-    const handleCreate = async (): Promise<void> => {
-        const added = await FlowLocationService.addFlowLocation({
-            Location: location,
-            DoneBy: [doneBy],
-            ProcessId: props.processId,
-            FlowId: props.flowId,
-        });
-        props.onLocationAded(added.data.Id);
-        props.onHide();
-    };
-
-    return (
-        <Dialog
-            hidden={props.hidden}
-            onDismiss={props.onHide}
-            modalProps={{ isBlocking: false }}
-        >
-            <div>
-                <label style={{ display: 'block' }} htmlFor="location">
-                    Location:{' '}
-                </label>
-                <input
-                    list="locationChoices"
-                    id="location"
-                    onChange={(ev) => setLocation(ev.target.value)}
-                />
-                <datalist id="locationChoices">
-                    {props.locationOptions.map((l) => (
-                        <option key={l} value={l} />
-                    ))}
-                </datalist>
-            </div>
-
-            <div>
-                <label style={{ display: 'block' }} htmlFor="doneBy">
-                    Done by:{' '}
-                </label>
-                <input
-                    list="doneByChoices"
-                    id="doneBy"
-                    onChange={(ev) => setDoneBy(ev.target.value)}
-                />
-                <datalist id="doneByChoices">
-                    {props.doneByOptions.map((d) => (
-                        <option key={d} value={d} />
-                    ))}
-                </datalist>
-            </div>
-            <div>
-                <button onClick={handleCreate}>Create</button>
-            </div>
-        </Dialog>
-    );
-};
-
 export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
     const theme = ProcessFlowWebPart.currentTheme;
     const { ProcessService, FlowLocationService, UserProcessService } =
         MainService;
     const { teamUsers } = React.useContext(GlobalContext);
-    // const [systems, setSystems] = React.useState([]);
-    // const [processOptions, setProcessOptions] = React.useState([]);
-    // const [locationOptions, setLocationOptions] = React.useState([]);
-    // const [doneByOptions, setDoneByOptions] = React.useState([]);
-    // const [categories, setCategories] = React.useState([]);
-    // const [showNew, setShowNew] = React.useState<boolean>(false);
     const [processes, setProcesses] = React.useState<IProcess[]>([]);
     const [flowLocations, setFlowLocations] = React.useState<IFlowLocation[]>(
         []
@@ -312,6 +149,20 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
         run().catch((err) => console.error(err));
     }, [props.flow]);
 
+    // Process events
+    React.useEffect(() => {
+        async function handler(data: EventPayload): Promise<void> {
+            const newUserProcess = await UserProcessService.getById(data.id);
+            setUserProcesses((prev) => prev.filter((up) => up.Id !== data.id).concat(newUserProcess));
+        }
+        const update = listenProcessUpdated(handler);
+        const add = listenProcessAdded(handler);
+        return () => {
+            update();
+            add();
+        }
+    }, []);
+
     if (!props.flow) return null;
 
     return (
@@ -328,40 +179,6 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 selectionMode={SelectionMode.none}
                 layoutMode={DetailsListLayoutMode.fixedColumns}
             />
-            {/* <Text variant="medium" block>
-                {props.flow.Flow} selected
-            </Text>
-            <button onClick={() => setShowNew(true)}>New process</button>
-            {showNew ? (
-                <NewProcess
-                    systems={systems}
-                    processes={processOptions}
-                    categories={categories}
-                    flow={props.flow}
-                    onCloseForm={() => setShowNew(false)}
-                    onNewProcess={async (id) => {
-                        const newProcess = await ProcessService.getProcess(id);
-                        setProcesses((prev) => [...prev, newProcess]);
-                        setShowNew(false);
-                    }}
-                />
-            ) : null}
-            {processes.map((p) => (
-                <Process
-                    key={p.Id}
-                    process={p}
-                    flow={props.flow}
-                    locations={flowLocations.filter(
-                        (l) => l.Process.Id === p.Id
-                    )}
-                    locationOptions={locationOptions}
-                    doneByOptions={doneByOptions}
-                    onLocationAdded={async (id: number) => {
-                        const added = await FlowLocationService.getLocation(id);
-                        setFlowLocations((prev) => [...prev, added]);
-                    }}
-                />
-            ))} */}
         </div>
     );
 };

@@ -1,2 +1,2 @@
-export { IUser, IUserListInfo } from './models/IUser';
+export { IUser, IUserListInfo, IUserProps } from './models/IUser';
 export { UserService } from './user-service';

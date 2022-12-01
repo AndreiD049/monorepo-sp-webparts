@@ -3,27 +3,30 @@
 .container {
     text-align: center;
     height: 25px;
+    width: 100%;
+    border: none;
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
 
-.na {
-    background-color: lightgray;
+:global(.sp-processflow-na) {
+    background-color: #ECF0F1;
 }
 
-.planned {
+:global(.sp-processflow-planned) {
     color: white;
-    background-color: lightcoral;
+    background-color: #E74C3C;
 }
 
-.on-going {
-    color: black;
-    background-color: lightgoldenrodyellow;
+:global(.sp-processflow-on-going) {
+    color: white;
+    background-color: #F1C40F;
 }
 
-.completed {
-    color: black;
-    background-color: lightgreen;
+:global(.sp-processflow-completed) {
+    color: white;
+    background-color: #2ECC71;
 }

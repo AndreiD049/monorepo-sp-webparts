@@ -10,14 +10,9 @@ export interface IProcessFlowContentProps {
 export const ProcessFlowContent: React.FC<IProcessFlowContentProps> = (
     props
 ) => {
-    if (!props.flow) {
-        return null;
-    }
     return (
         <div className={styles.container}>
-            <div>
-                <ProcessFlowTable flow={props.flow} />
-            </div>
+            {props.flow && <ProcessFlowTable flow={props.flow} />}
         </div>
     );
 };

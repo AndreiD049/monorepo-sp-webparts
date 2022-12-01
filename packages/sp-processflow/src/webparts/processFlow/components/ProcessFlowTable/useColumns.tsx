@@ -3,6 +3,7 @@ import { IColumn, Icon } from 'office-ui-fabric-react';
 import { IUserListInfo } from '@service/users';
 import { UserColumnHeader } from './UserColumnHeader';
 import { UserCell } from './UserCell';
+import { IProcessFlowRow } from '../../models/IProcessFlowRow';
 
 interface IProcessColumnProps {
     locations: string[];
@@ -99,9 +100,9 @@ export const useColumns = (props: IProcessColumnProps): IColumn[] => {
                 },
             },
             isPadded: false,
-            onRender(item) {
+            onRender(item: IProcessFlowRow) {
                 const users = item.users;
-                return <UserCell userProcess={users[u.Id]} />
+                return <UserCell process={item.process} userProcess={users[u.Id]} user={u} />
             },
             onRenderHeader: (props, defaultRender) => {
                 return (<UserColumnHeader columnData={props} defaultRender={defaultRender} />)
