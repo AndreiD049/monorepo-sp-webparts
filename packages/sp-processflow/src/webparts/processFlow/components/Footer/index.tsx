@@ -18,7 +18,7 @@ export const Footer: React.FC<IFooterProps> = (props) => {
                     iconName="MailForwardMirrored"
                 />
                 <Text variant="medium">
-                    For support -{' '}
+                    Any questions -{' '}
                     <Link href={`mailto:${props.config.contactEmail}?Subject=Sharepoint ProcessFlow Webpart question`}>
                         Contact us
                     </Link>
