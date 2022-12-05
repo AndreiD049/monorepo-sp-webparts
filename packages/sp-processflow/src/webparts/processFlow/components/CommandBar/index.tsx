@@ -4,13 +4,15 @@ import {
     ComboBox,
     IComboBoxOption,
     IComboBoxStyles,
+    PanelType,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { showDialog } from 'sp-components';
+import { FooterOkCancel, hidePanel, showDialog, showPanel } from 'sp-components';
 import { MainService } from '../../services/main-service';
-import { MAIN_DIALOG } from '../../utils/constants';
+import { MAIN_DIALOG, MAIN_PANEL } from '../../utils/constants';
 import { GlobalContext } from '../../utils/globalContext';
 import { NewFlowForm } from '../NewFlowForm';
+import { NewProcesses } from '../NewProcesses';
 import { ProcessFlowHeader } from '../ProcessFlowHeader';
 import styles from './CommandBar.module.scss';
 
@@ -70,15 +72,29 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                 title: 'New flow',
                 isBlocking: false,
             },
-            content: <NewFlowForm onFlowAdded={async (flowId) => {
-                const flow = await flowService.getById(flowId);
-                setFlows((prev) => [...prev, flow]);
-                if (!selectedFlow) {
-                    props.onFlowSelected(flow);
-                }
-            }} />,
+            content: (
+                <NewFlowForm
+                    onFlowAdded={async (flowId) => {
+                        const flow = await flowService.getById(flowId);
+                        setFlows((prev) => [...prev, flow]);
+                        if (!selectedFlow) {
+                            props.onFlowSelected(flow);
+                        }
+                    }}
+                />
+            ),
         });
     }, [selectedTeam]);
+
+    const handleNewProcess = React.useCallback(() => {
+        showPanel(
+            MAIN_PANEL,
+            { headerText: 'Add new processes', type: PanelType.medium, onRenderFooter: () => <FooterOkCancel onOk={() => console.log('ok')} onCancel={() => hidePanel(MAIN_PANEL)} /> },
+            <NewProcesses />
+        );
+    }, [selectedFlow, selectedTeam]);
+
+    handleNewProcess();
 
     return (
         <div className={styles.container}>
@@ -94,9 +110,7 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
             <ComboBox
                 label="Flow"
                 options={flowOptions}
-                onChange={(_ev, option) =>
-                    props.onFlowSelected(option.data)
-                }
+                onChange={(_ev, option) => props.onFlowSelected(option.data)}
                 selectedKey={selectedFlow?.Flow}
                 styles={comboBoxStyles}
             />
@@ -107,7 +121,15 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                 iconProps={{ iconName: 'Add' }}
                 styles={{ root: { maxHeight: 32 } }}
             >
-                New flow
+                Add flow
+            </ActionButton>
+            <ActionButton
+                onClick={handleNewProcess}
+                disabled={!Boolean(selectedFlow)}
+                iconProps={{ iconName: 'Add' }}
+                styles={{ root: { maxHeight: 32 } }}
+            >
+                Add Process(es)
             </ActionButton>
         </div>
     );

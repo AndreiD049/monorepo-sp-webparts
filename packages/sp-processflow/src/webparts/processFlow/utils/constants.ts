@@ -2,6 +2,7 @@ export const DB_NAME = "SP-ProcessFlow";
 export const STORE_NAME = location.origin + location.pathname;
 
 export const MAIN_DIALOG = 'sp-processflow-main-dialog';
+export const MAIN_PANEL = 'sp-processflow-main-panel';
 
 // Events
 export const USER_PROCESS_UPDATE = 'sp-processflow-userprocess-updated';

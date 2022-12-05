@@ -12,11 +12,12 @@ import {
     CURRENT_USER,
     HOUR,
     MAIN_DIALOG,
+    MAIN_PANEL,
     TEAMS_CHOICES,
     TEAM_USERS,
 } from '../utils/constants';
 import { CommandBar } from './CommandBar';
-import { Dialog } from 'sp-components';
+import { Dialog, Panel } from 'sp-components';
 import { Separator } from 'office-ui-fabric-react';
 import { ProcessFlowContent } from './ProcessFlowContent';
 import { ProcessFlowHeader } from './ProcessFlowHeader';
@@ -93,6 +94,10 @@ export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
                 <Footer config={props.properties.config} />
             </div>
             <Dialog id={MAIN_DIALOG} />
+            <Panel id={MAIN_PANEL} defaultProps={{
+                isFooterAtBottom: true,
+                isLightDismiss: true,
+            }} />
         </GlobalContext.Provider>
     );
 };

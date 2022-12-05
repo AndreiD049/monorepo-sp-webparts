@@ -31,6 +31,6 @@ export const UserCell: React.FC<IUserCellProps> = (props) => {
     }, [props.process, props.userProcess]);
     
     return (
-        <button className={className} onClick={() => handleShowDialog()}>{isNa ? null : props.userProcess.Status}</button>
+        <button className={className} onClick={() => handleShowDialog()}>{isNa ? 'NA' : props.userProcess.Status}</button>
     );
 };
