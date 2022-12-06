@@ -2,6 +2,7 @@ import * as React from 'react';
 import styles from './Panel.module.scss';
 
 const EVENT_PREFIX = 'sp-panel-visibility';
+const CLICK_EVENT_PREFIX = 'sp-panel-button';
 const getEventName = (id: string) => `${EVENT_PREFIX}/${id}`;
 
 import { IPanelProps, Panel as FabrikPanel } from 'office-ui-fabric-react';
@@ -40,6 +41,20 @@ export function hidePanel(id: string) {
             },
         })
     );
+}
+
+export function handleButtonClick(id: string, buttonText: string, func: () => void) {    
+    const handler = (evt: CustomEvent) => {
+        func();
+    }
+    const eventName = `${CLICK_EVENT_PREFIX}/${buttonText}/${id}`;
+    document.addEventListener(eventName, handler);
+    return () => document.removeEventListener(eventName, handler);
+}
+
+export function dispatchButtonClick(id: string, buttonText: string) {
+    const eventName = `${CLICK_EVENT_PREFIX}/${buttonText}/${id}`;
+    document.dispatchEvent(new CustomEvent(eventName));
 }
 
 export const Panel: React.FC<ICustomPanelProps> = (props) => {

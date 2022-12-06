@@ -1,4 +1,4 @@
-import { USER_PROCESS_ADDED, USER_PROCESS_UPDATE } from "./constants";
+import { PROCESS_ADDED, USER_PROCESS_ADDED, USER_PROCESS_UPDATE } from "./constants";
 
 export type EventPayload = { id: number };
 
@@ -18,6 +18,10 @@ export function userProcessAdded(id: number): void {
     dispatchEvent(USER_PROCESS_ADDED, id);
 }
 
+export function processAdded(id: number): void {
+    dispatchEvent(PROCESS_ADDED, id);
+}
+
 export function listenEvent<T>(event: string, f: (data: T) => void): () => void {
     function handler(ev: CustomEvent<T>): void {
         f(ev.detail);
@@ -26,10 +30,14 @@ export function listenEvent<T>(event: string, f: (data: T) => void): () => void 
     return () => document.removeEventListener(event, handler);
 }
 
-export function listenProcessUpdated(f: (data: EventPayload) => void): () => void {
+export function listenUserProcessUpdated(f: (data: EventPayload) => void): () => void {
     return listenEvent<EventPayload>(USER_PROCESS_UPDATE, f);
 }
 
-export function listenProcessAdded(f: (data: EventPayload) => void): () => void {
+export function listenUserProcessAdded(f: (data: EventPayload) => void): () => void {
     return listenEvent<EventPayload>(USER_PROCESS_ADDED, f);
+}
+
+export function listenProcessAdded(f: (data: EventPayload) => void): () => void {
+    return listenEvent<EventPayload>(PROCESS_ADDED, f);
 }

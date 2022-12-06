@@ -8,21 +8,26 @@ import {
 import {
     DetailsList,
     DetailsListLayoutMode,
-    DetailsRow,
-    Dialog,
     IGroup,
     SelectionMode,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
+import useWebStorage from 'use-web-storage-api';
 import { IProcessFlowRow } from '../../models/IProcessFlowRow';
 import ProcessFlowWebPart from '../../ProcessFlowWebPart';
 import { MainService } from '../../services/main-service';
-import { EventPayload, listenProcessAdded, listenProcessUpdated } from '../../utils/events';
+import { GROUP_SORTING_KEY } from '../../utils/constants';
+import {
+    EventPayload,
+    listenProcessAdded,
+    listenUserProcessAdded,
+    listenUserProcessUpdated,
+} from '../../utils/events';
 import { GlobalContext } from '../../utils/globalContext';
 import { headerProps, renderHeader } from './header';
 import styles from './ProcessFlowTable.module.scss';
 import { useColumns } from './useColumns';
-import { UserCell } from './UserCell';
+import { useGroups } from './useGroups';
 
 export interface IProcessFlowTableProps {
     flow?: ICustomerFlow;
@@ -33,6 +38,14 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
     const { ProcessService, FlowLocationService, UserProcessService } =
         MainService;
     const { teamUsers } = React.useContext(GlobalContext);
+    const [groupSorting, setGroupSorting] = useWebStorage<{
+        [key: number]: string[];
+    }>(
+        {},
+        {
+            key: GROUP_SORTING_KEY,
+        }
+    );
     const [processes, setProcesses] = React.useState<IProcess[]>([]);
     const [flowLocations, setFlowLocations] = React.useState<IFlowLocation[]>(
         []
@@ -82,57 +95,43 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 },
                 {}
             );
-        return sortBy(
-            processes.map((p) => {
-                let locations: IProcessFlowRow['locations'] = {};
-                if (locationsByProcess[p.Id]) {
-                    locations = locationsByProcess[p.Id].reduce(
-                        (obj: IProcessFlowRow['locations'], location) => {
-                            obj[location.Location.toUpperCase()] = location;
-                            return obj;
-                        },
-                        {}
-                    );
-                }
-                const processes = userProcessesByProcess[p.Id];
-                const users = columnUsers.reduce<IProcessFlowRow['users']>(
-                    (obj, user) => {
-                        if (!obj[user.Id]) {
-                            obj[user.Id] = processes?.find(
-                                (p) => p.User.Id === user.Id
-                            );
-                        }
+        return processes.map((p) => {
+            let locations: IProcessFlowRow['locations'] = {};
+            if (locationsByProcess[p.Id]) {
+                locations = locationsByProcess[p.Id].reduce(
+                    (obj: IProcessFlowRow['locations'], location) => {
+                        obj[location.Location.toUpperCase()] = location;
                         return obj;
                     },
                     {}
                 );
-                return {
-                    process: p,
-                    locations,
-                    users,
-                };
-            }),
-            (o) => o.process.Category
-        );
-    }, [processes, flowLocations, userProcesses, columnUsers]);
-
-    const grouped = React.useMemo(
-        () => groupBy(items, (i) => i.process.Category),
-        [items]
-    );
-    const tableGroups: IGroup[] = React.useMemo(() => {
-        let startindex = 0;
-        return Object.keys(grouped).map((category) => {
-            const idx = startindex;
-            startindex += grouped[category].length;
+            }
+            const processes = userProcessesByProcess[p.Id];
+            const users = columnUsers.reduce<IProcessFlowRow['users']>(
+                (obj, user) => {
+                    if (!obj[user.Id]) {
+                        obj[user.Id] = processes?.find(
+                            (p) => p.User.Id === user.Id
+                        );
+                    }
+                    return obj;
+                },
+                {}
+            );
             return {
-                key: category,
-                name: category,
-                startIndex: idx,
-                count: grouped[category].length,
+                process: p,
+                locations,
+                users,
             };
         });
-    }, [grouped]);
+    }, [processes, flowLocations, userProcesses, columnUsers]);
+
+    const groupping = useGroups({
+        flow: props.flow,
+        groupSorting,
+        items,
+        setGroupSorting
+    });
 
     React.useEffect(() => {
         async function run(): Promise<void> {
@@ -153,14 +152,22 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
     React.useEffect(() => {
         async function handler(data: EventPayload): Promise<void> {
             const newUserProcess = await UserProcessService.getById(data.id);
-            setUserProcesses((prev) => prev.filter((up) => up.Id !== data.id).concat(newUserProcess));
+            setUserProcesses((prev) =>
+                prev.filter((up) => up.Id !== data.id).concat(newUserProcess)
+            );
         }
-        const update = listenProcessUpdated(handler);
-        const add = listenProcessAdded(handler);
+        async function processHandler(data: EventPayload): Promise<void> {
+            const newProcess = await ProcessService.getById(data.id);
+            setProcesses((prev) => [...prev, newProcess]);
+        }
+        const update = listenUserProcessUpdated(handler);
+        const add = listenUserProcessAdded(handler);
+        const addProcess = listenProcessAdded(processHandler);
         return () => {
             update();
             add();
-        }
+            addProcess();
+        };
     }, []);
 
     if (!props.flow) return null;
@@ -168,14 +175,11 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
     return (
         <div className={styles.container}>
             <DetailsList
-                groupProps={{
-                    onRenderHeader: renderHeader,
-                    headerProps: headerProps(theme),
-                }}
+                groupProps={groupping.groupProps}
                 compact
-                groups={tableGroups}
+                groups={groupping.groups}
                 columns={columns}
-                items={items}
+                items={groupping.sortedItems}
                 selectionMode={SelectionMode.none}
                 layoutMode={DetailsListLayoutMode.fixedColumns}
             />

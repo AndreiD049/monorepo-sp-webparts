@@ -1,8 +1,17 @@
-import { IField, IItemAddResult, IList } from 'sp-preset';
+import { IField, IItemAddResult, IList, SPFI } from 'sp-preset';
 import { IProcess } from '../models';
 import { IServiceProps } from '../models/IServiceProps';
 
-const SELECT = ['Id', 'System', 'Process', 'Category', 'FlowId', 'Manuals', 'Allocation', 'UOM'];
+const SELECT = [
+    'Id',
+    'System',
+    'Process',
+    'Category',
+    'FlowId',
+    'Manuals',
+    'Allocation',
+    'UOM',
+];
 
 export class ProcessService {
     private list: IList;
@@ -16,11 +25,12 @@ export class ProcessService {
     constructor(private props: IServiceProps) {
         this.list = this.props.sp.web.lists.getByTitle(this.props.listName);
         this.systemField = this.list.fields.getByTitle('System');
-        this.processOptionsField = this.list.fields.getByTitle('ProcessOptions');
+        this.processOptionsField =
+            this.list.fields.getByTitle('ProcessOptions');
         this.categoryField = this.list.fields.getByTitle('Category');
     }
-    
-    async getProcess(id: number): Promise<IProcess> {
+
+    async getById(id: number): Promise<IProcess> {
         return this.list.items.getById(id).select(...SELECT)();
     }
 
@@ -34,6 +44,22 @@ export class ProcessService {
         await this.updateSystemChoices(payload.System);
         await this.updateProcessOptions(payload.Process);
         return this.list.items.add(payload);
+    }
+
+    async addProcesses(
+        payload: Omit<IProcess, 'Id'>[]
+    ): Promise<IItemAddResult[]> {
+        const [batchedSP, execute] = this.props.sp.batched();
+        const result: IItemAddResult[] = [];
+        for (const process of payload) {
+            console.log(process);
+            const added = batchedSP.web.lists
+                .getByTitle(this.props.listName)
+                .items.add(process)
+                .then((res) => result.push(res));
+        }
+        await execute();
+        return result;
     }
 
     async removeProcess(id: number): Promise<void> {
@@ -62,7 +88,7 @@ export class ProcessService {
         if (!this.systemChoices.includes(system)) {
             await this.systemField.update({
                 Choices: [...this.systemChoices, system],
-            })
+            });
             this.systemChoices = [];
         }
     }
@@ -74,7 +100,7 @@ export class ProcessService {
         if (!this.processChoices.includes(process)) {
             await this.processOptionsField.update({
                 Choices: [...this.processChoices, process],
-            })
+            });
             this.processChoices = [];
         }
     }

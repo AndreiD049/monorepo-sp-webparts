@@ -19,4 +19,4 @@ export { ParentStroke } from './components/CipTask/ParentStroke';
 export { StatusCell } from './components/CipTask/StatusCell';
 export { ITimeLogGeneralProps, TimeLogGeneral } from './components/CipTask/TimeLogGeneral';
 export { userToPersonaProps } from './utils';
-export { Panel, hidePanel, showPanel, ICustomPanelProps } from './components/Panel';
+export { Panel, hidePanel, showPanel, dispatchButtonClick, handleButtonClick, ICustomPanelProps } from './components/Panel';

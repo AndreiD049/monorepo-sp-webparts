@@ -3,10 +3,15 @@ export const STORE_NAME = location.origin + location.pathname;
 
 export const MAIN_DIALOG = 'sp-processflow-main-dialog';
 export const MAIN_PANEL = 'sp-processflow-main-panel';
+export const MAIN_PANEL_FORM = 'sp-processflow-newprocess';
 
 // Events
 export const USER_PROCESS_UPDATE = 'sp-processflow-userprocess-updated';
 export const USER_PROCESS_ADDED = 'sp-processflow-userprocess-added';
+export const PROCESS_ADDED = 'sp-processflow-process-added';
+
+// LocalStorage keys
+export const GROUP_SORTING_KEY = 'sp-processflow-group-sorting';
 
 // Cache keys
 export const CURRENT_USER = 'sp-processflow-current-user';

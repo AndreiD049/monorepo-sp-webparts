@@ -1,5 +1,8 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
 
 .container {
-    min-width: 1px;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    justify-content: space-between;
 }

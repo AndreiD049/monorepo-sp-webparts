@@ -1,12 +1,15 @@
 import { IProcess } from '@service/process-flow';
 import {
+    ActionButton,
     IconButton,
-    Position,
-    SpinButton,
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { handleButtonClick, hidePanel } from 'sp-components';
+import { IItemAddResult } from 'sp-preset';
 import { MainService } from '../../services/main-service';
+import { MAIN_PANEL, MAIN_PANEL_FORM } from '../../utils/constants';
+import { processAdded } from '../../utils/events';
 import { GlobalContext } from '../../utils/globalContext';
 import styles from './NewProcesses.module.scss';
 
@@ -14,10 +17,110 @@ export interface INewProcessesProps {
     // Props go here
 }
 
+interface INewProcessRowProps {
+    idx: number;
+    onPaste: (
+        idx: number,
+        property: keyof IProcess,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        convert?: (val: string) => any
+    ) => React.ClipboardEventHandler<HTMLElement>;
+    onUpdate: (
+        idx: number,
+        property: keyof IProcess
+    ) => (
+        event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+        newValue?: string
+    ) => void;
+    rows: Partial<IProcess>[];
+    row: Partial<IProcess>;
+    setRows: React.Dispatch<React.SetStateAction<Partial<IProcess>[]>>;
+}
+
+export const NewProcessRow: React.FC<INewProcessRowProps> = (props) => {
+    return (
+        <div
+            style={{
+                display: 'flex',
+                flexFlow: 'row nowrap',
+                justifyContent: 'flex-start',
+                alignItems: 'flex-start',
+                gap: '.5em',
+            }}
+        >
+            <TextField
+                required
+                label="Category"
+                styles={{ root: { maxWidth: 150 } }}
+                list="newProcessCategories"
+                onPaste={props.onPaste(props.idx, 'Category')}
+                onChange={props.onUpdate(props.idx, 'Category')}
+                value={props.rows[props.idx].Category?.toString()}
+                autoComplete="off"
+            />
+            <TextField
+                required
+                label="System"
+                autoComplete="off"
+                onPaste={props.onPaste(props.idx, 'System')}
+                onChange={props.onUpdate(props.idx, 'System')}
+                value={props.row.System?.toString()}
+                list="newProcessSystem"
+                styles={{ root: { maxWidth: 100 } }}
+            />
+            <TextField
+                required
+                label="Process"
+                autoComplete="off"
+                styles={{ root: { flexGrow: 2, maxWidth: 400 } }}
+                onPaste={props.onPaste(props.idx, 'Process')}
+                onChange={props.onUpdate(props.idx, 'Process')}
+                value={props.row.Process?.toString()}
+            />
+            <TextField
+                label="Allocation"
+                type="number"
+                autoComplete="off"
+                onPaste={props.onPaste(props.idx, 'Allocation', (val) => Number.parseInt(val))}
+                onChange={(ev, value) =>
+                    props.setRows((prev) => {
+                        const copy = [...prev];
+                        const val = Number.isNaN(value)
+                            ? 0
+                            : Number.parseInt(value);
+                        copy[props.idx].Allocation = val;
+                        return copy;
+                    })
+                }
+                value={props.rows[props.idx].Allocation?.toString()}
+                styles={{ root: { maxWidth: 100 } }}
+            />
+            <TextField
+                label="UOM"
+                autoComplete="off"
+                list="newProcessUOM"
+                onPaste={props.onPaste(props.idx, 'UOM')}
+                onChange={props.onUpdate(props.idx, 'UOM')}
+                value={props.rows[props.idx].UOM?.toString()}
+                styles={{ root: { maxWidth: 100 } }}
+            />
+            <IconButton
+                styles={{ root: { alignSelf: 'flex-end' } }}
+                iconProps={{ iconName: 'Delete' }}
+                onClick={() =>
+                    props.setRows((prev) =>
+                        prev.filter((_p, idx) => idx !== props.idx)
+                    )
+                }
+            />
+        </div>
+    );
+};
+
 export const NewProcesses: React.FC<INewProcessesProps> = (props) => {
     const { ProcessService } = MainService;
     const { selectedFlow, selectedTeam } = React.useContext(GlobalContext);
-    const [rows, setRows] = React.useState<{ [key: string]: string | number }[]>([{}]);
+    const [rows, setRows] = React.useState<Partial<IProcess>[]>([{}]);
     const [categories, setCategories] = React.useState([]);
     const [systems, setSystems] = React.useState([]);
     const uom = React.useMemo(() => ['Order', 'Day', 'Week', 'Month'], []);
@@ -35,32 +138,65 @@ export const NewProcesses: React.FC<INewProcessesProps> = (props) => {
         []
     );
 
-    const handlePaste = React.useCallback((idx: number, property: string) => (evt: React.ClipboardEvent<HTMLElement>) => {
-        const data = evt.clipboardData.getData('text').split(/\r?\n/).filter((d) => Boolean(d));
-        const maxIndex = idx + data.length;
-        evt.preventDefault();
-        setRows((prev: { [key: string]: string }[]) => {
-            const copy = [...prev];
-            for (let i = idx, d = 0; i < maxIndex; i++) {
-                const element = prev[i];
-                if (element) {
-                    copy[i][property] = data[d];
-                } else {
-                    copy[i] = { [property]: data[d] }
-                }
-                d++;
-            }
-            return copy;
-        });
-    }, []);
+    const handlePaste = React.useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (idx: number, property: keyof IProcess, convert?: (val: string) => any) =>
+            (evt: React.ClipboardEvent<HTMLElement>) => {
+                const data = evt.clipboardData.getData('text').split(/\r?\n/);
+                const maxIndex = idx + data.length;
+                evt.preventDefault();
+                setRows((prev: { [key: string]: string }[]) => {
+                    const copy = [...prev];
+                    for (let i = idx, d = 0; i < maxIndex; i++) {
+                        const element = prev[i];
+                        const value = convert ? convert(data[d]) : data[d];
+                        if (element) {
+                            copy[i][property] = value;
+                        } else {
+                            copy[i] = { [property]: value };
+                        }
+                        d++;
+                    }
+                    return copy;
+                });
+            },
+        []
+    );
 
-    const handleUpdate = React.useCallback((idx: number, property: string) => (_ev: {}, newValue: string) => {
-        setRows((prev) => {
-            const copy = [...prev];
-            copy[idx][property] = newValue;
-            return copy;
-        });
-    }, []);
+    const handleUpdate = React.useCallback(
+        (idx: number, property: keyof IProcess) =>
+            (_ev: {}, newValue: string) => {
+                setRows((prev) => {
+                    const copy = [...prev];
+                    const process = copy[idx] as any;
+                    process[property] = newValue;
+                    return copy;
+                });
+            },
+        []
+    );
+
+    const handleSubmit = React.useCallback(async (evt: React.FormEvent) => {
+        evt.preventDefault();
+        const newProcesses: Omit<IProcess, 'Id'>[] = rows.map((row) => ({
+            FlowId: selectedFlow.Id,
+            Category: row.Category,
+            Process: row.Process,
+            System: row.System,
+            Allocation: row.Allocation,
+            UOM: row.UOM,
+        }));
+        // console.log(newProcesses);
+        // const calls = newProcesses.map(async (row) => await ProcessService.addProcess(row));
+        // console.log(calls);
+        // const newItems = await Promise.all(calls);
+        // console.log(newItems);
+        console.log('before', newProcesses);
+        const newItems: IItemAddResult[] = await ProcessService.addProcesses(newProcesses);
+        console.log(newItems);
+        newItems.forEach((i) => processAdded(i.data.Id));
+        hidePanel(MAIN_PANEL);
+    }, [rows]);
 
     const options = React.useMemo(
         () => (
@@ -86,71 +222,26 @@ export const NewProcesses: React.FC<INewProcessesProps> = (props) => {
     );
 
     return (
-        <div className={styles.container}>
+        <form className={styles.container} id={MAIN_PANEL_FORM} onSubmit={handleSubmit}>
             {rows.map((row, idx) => (
-                <div
+                <NewProcessRow
                     key={idx}
-                    style={{
-                        display: 'flex',
-                        flexFlow: 'row nowrap',
-                        justifyContent: 'flex-start',
-                        alignItems: 'flex-start',
-                        gap: '.5em',
-                    }}
-                >
-                    <TextField
-                        label="Category"
-                        styles={{ root: { maxWidth: 150 } }}
-                        list="newProcessCategories"
-                        onPaste={handlePaste(idx, 'Category')}
-                        onChange={handleUpdate(idx, 'Category')}
-                        value={rows[idx].Category?.toString()}
-                        autoComplete="off"
-                    />
-                    <TextField
-                        label="System"
-                        autoComplete="off"
-                        onPaste={handlePaste(idx, 'System')}
-                        onChange={handleUpdate(idx, 'System')}
-                        value={row.System?.toString()}
-                        list="newProcessSystem"
-                        styles={{ root: { maxWidth: 100 } }}
-                    />
-                    <TextField
-                        label="Process"
-                        autoComplete="off"
-                        onPaste={handlePaste(idx, 'Process')}
-                        onChange={handleUpdate(idx, 'Process')}
-                        value={row.Process?.toString()}
-                    />
-                    <TextField
-                        label="Allocation"
-                        type='number'
-                        onPaste={handlePaste(idx, 'Allocation')}
-                        onChange={(ev, value) => setRows((prev) => {
-                            const copy = [...prev];
-                            const val = Number.isNaN(value) ? 0 : Number.parseInt(value);
-                            copy[idx].Allocation = val;
-                            return copy;
-                        })}
-                        value={rows[idx].Allocation?.toString()}
-                        styles={{ root: { maxWidth: 100 } }}
-                    />
-                    <TextField
-                        label="UOM"
-                        list="newProcessUOM"
-                        onPaste={handlePaste(idx, 'UOM')}
-                        onChange={handleUpdate(idx, 'UOM')}
-                        value={rows[idx].UOM?.toString()}
-                        styles={{ root: { maxWidth: 100 } }}
-                    />
-                </div>
+                    idx={idx}
+                    rows={rows}
+                    row={row}
+                    onPaste={handlePaste}
+                    onUpdate={handleUpdate}
+                    setRows={setRows}
+                />
             ))}
-            <IconButton
+            <ActionButton
+                styles={{ root: { marginTop: '.5em' } }}
                 onClick={handleAddNewRow}
                 iconProps={{ iconName: 'Add' }}
-            />
+            >
+                Add line
+            </ActionButton>
             {options}
-        </div>
+        </form>
     );
 };

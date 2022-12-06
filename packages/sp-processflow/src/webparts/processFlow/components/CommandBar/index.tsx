@@ -7,13 +7,18 @@ import {
     PanelType,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { FooterOkCancel, hidePanel, showDialog, showPanel } from 'sp-components';
+import {
+    dispatchButtonClick,
+    FooterOkCancel,
+    hidePanel,
+    showDialog,
+    showPanel,
+} from 'sp-components';
 import { MainService } from '../../services/main-service';
-import { MAIN_DIALOG, MAIN_PANEL } from '../../utils/constants';
+import { MAIN_DIALOG, MAIN_PANEL, MAIN_PANEL_FORM } from '../../utils/constants';
 import { GlobalContext } from '../../utils/globalContext';
 import { NewFlowForm } from '../NewFlowForm';
 import { NewProcesses } from '../NewProcesses';
-import { ProcessFlowHeader } from '../ProcessFlowHeader';
 import styles from './CommandBar.module.scss';
 
 export interface ICommandBarProps {
@@ -89,12 +94,22 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
     const handleNewProcess = React.useCallback(() => {
         showPanel(
             MAIN_PANEL,
-            { headerText: 'Add new processes', type: PanelType.medium, onRenderFooter: () => <FooterOkCancel onOk={() => console.log('ok')} onCancel={() => hidePanel(MAIN_PANEL)} /> },
+            {
+                headerText: 'Add new processes',
+                type: PanelType.large,
+                onRenderFooter: () => (
+                    <div style={{ padding: '.5em' }}>
+                        <FooterOkCancel
+                            onOk={() => null}
+                            onCancel={() => hidePanel(MAIN_PANEL)}
+                            form={MAIN_PANEL_FORM}
+                        />
+                    </div>
+                ),
+            },
             <NewProcesses />
         );
     }, [selectedFlow, selectedTeam]);
-
-    handleNewProcess();
 
     return (
         <div className={styles.container}>

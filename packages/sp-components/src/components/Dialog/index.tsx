@@ -99,10 +99,10 @@ export const FooterYesNo: React.FC<{ onYes: Callback; onNo: Callback }> = (props
     );
 };
 
-export const FooterOkCancel: React.FC<{ onOk: Callback; onCancel: Callback }> = (props) => {
+export const FooterOkCancel: React.FC<{ onOk?: Callback; onCancel: Callback, form?: string }> = (props) => {
     return (
-        <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 5 }}>
-            <PrimaryButton onClick={props.onOk}>Ok</PrimaryButton>
+        <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 5 }}>
+            <PrimaryButton onClick={props.onOk ? props.onOk : null} form={props.form} type="submit">Ok</PrimaryButton>
             <DefaultButton onClick={props.onCancel}>Cancel</DefaultButton>
         </Stack>
     );

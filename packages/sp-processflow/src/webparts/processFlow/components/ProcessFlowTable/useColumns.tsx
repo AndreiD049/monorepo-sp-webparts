@@ -67,14 +67,14 @@ const uomColumn: IColumn = {
     key: 'UOM',
     name: 'UOM',
     minWidth: 50,
-    onRender: (item) => item.process?.UOM || 'N/A',
+    onRender: (item) => item.process?.UOM || null,
 }
 
 const allocationColumns: IColumn = {
     key: 'Allocation',
     name: 'Allocation',
     minWidth: 75,
-    onRender: (item) => item.process?.Allocation || 'N/A',
+    onRender: (item) => item.process?.Allocation || null,
 }
 
 export const useColumns = (props: IProcessColumnProps): IColumn[] => {
