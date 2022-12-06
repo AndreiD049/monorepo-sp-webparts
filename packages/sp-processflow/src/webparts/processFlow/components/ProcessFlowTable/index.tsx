@@ -1,4 +1,4 @@
-import { groupBy, sortBy, uniq } from '@microsoft/sp-lodash-subset';
+import { uniq } from '@microsoft/sp-lodash-subset';
 import {
     ICustomerFlow,
     IFlowLocation,
@@ -8,13 +8,11 @@ import {
 import {
     DetailsList,
     DetailsListLayoutMode,
-    IGroup,
     SelectionMode,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import useWebStorage from 'use-web-storage-api';
 import { IProcessFlowRow } from '../../models/IProcessFlowRow';
-import ProcessFlowWebPart from '../../ProcessFlowWebPart';
 import { MainService } from '../../services/main-service';
 import { GROUP_SORTING_KEY } from '../../utils/constants';
 import {
@@ -24,7 +22,6 @@ import {
     listenUserProcessUpdated,
 } from '../../utils/events';
 import { GlobalContext } from '../../utils/globalContext';
-import { headerProps, renderHeader } from './header';
 import styles from './ProcessFlowTable.module.scss';
 import { useColumns } from './useColumns';
 import { useGroups } from './useGroups';
@@ -34,7 +31,7 @@ export interface IProcessFlowTableProps {
 }
 
 export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
-    const theme = ProcessFlowWebPart.currentTheme;
+
     const { ProcessService, FlowLocationService, UserProcessService } =
         MainService;
     const { teamUsers } = React.useContext(GlobalContext);
@@ -74,6 +71,7 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
         locations,
         users: columnUsers,
     });
+
     const items: IProcessFlowRow[] = React.useMemo(() => {
         const locationsByProcess: { [id: number]: IFlowLocation[] } = {};
         flowLocations.forEach((l) => {
