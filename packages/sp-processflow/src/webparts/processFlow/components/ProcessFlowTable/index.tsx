@@ -1,3 +1,4 @@
+import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import { uniq } from '@microsoft/sp-lodash-subset';
 import {
     ICustomerFlow,
@@ -8,15 +9,21 @@ import {
 import {
     DetailsList,
     DetailsListLayoutMode,
+    IDetailsListStyleProps,
+    IDetailsListStyles,
+    IStyleFunctionOrObject,
     SelectionMode,
 } from 'office-ui-fabric-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import * as React from 'react';
 import useWebStorage from 'use-web-storage-api';
 import { IProcessFlowRow } from '../../models/IProcessFlowRow';
+import ProcessFlowWebPart from '../../ProcessFlowWebPart';
 import { MainService } from '../../services/main-service';
 import { GROUP_SORTING_KEY } from '../../utils/constants';
 import {
     EventPayload,
+    listenLocationAdded,
     listenProcessAdded,
     listenUserProcessAdded,
     listenUserProcessUpdated,
@@ -30,8 +37,64 @@ export interface IProcessFlowTableProps {
     flow?: ICustomerFlow;
 }
 
-export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
+const listStyles: (
+    theme: IReadonlyTheme
+) => IStyleFunctionOrObject<IDetailsListStyleProps, IDetailsListStyles> = (
+    currentTheme: IReadonlyTheme
+) => ({
+    root: {
+        overflowX: 'auto',
+        '& [role=grid]': {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'start',
+            height: '70vh',
+        },
+        "& [role=gridcell][aria-colindex='3']": {
+            borderRight: '1px solid ' + currentTheme.palette.neutralLighterAlt,
+        },
+        '&::-webkit-scrollbar': {
+            width: '10px',
+            height: '10px',
+        },
+        '&::-webkit-scrollbar-track': {
+            backgroundColor: currentTheme.palette.neutralLighter,
+        },
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: currentTheme.palette.neutralTertiary,
+            borderRadius: '6px',
+        },
+        '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: '#555',
+        },
+    },
+    headerWrapper: {
+        flex: '0 0 auto',
+    },
+    contentWrapper: {
+        flex: '1 1 auto',
+        overflowX: 'hidden',
+        overflowY: 'auto',
+        '&::-webkit-scrollbar': {
+            width: '10px',
+            height: '10px',
+        },
+        '&::-webkit-scrollbar-track': {
+            backgroundColor: currentTheme.palette.neutralLighter,
+        },
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: currentTheme.palette.neutralTertiary,
+            borderRadius: '6px',
+        },
+        '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: '#555',
+        },
+    },
+});
 
+export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
     const { ProcessService, FlowLocationService, UserProcessService } =
         MainService;
     const { teamUsers } = React.useContext(GlobalContext);
@@ -64,7 +127,7 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
     }, [userProcesses]);
 
     const locations = React.useMemo(
-        () => uniq(flowLocations.map((l) => l.Location)),
+        () => uniq(flowLocations.map((l) => l.Title)),
         [flowLocations]
     );
     const columns = useColumns({
@@ -98,7 +161,7 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
             if (locationsByProcess[p.Id]) {
                 locations = locationsByProcess[p.Id].reduce(
                     (obj: IProcessFlowRow['locations'], location) => {
-                        obj[location.Location.toUpperCase()] = location;
+                        obj[location.Title.toUpperCase()] = location;
                         return obj;
                     },
                     {}
@@ -128,7 +191,7 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
         flow: props.flow,
         groupSorting,
         items,
-        setGroupSorting
+        setGroupSorting,
     });
 
     React.useEffect(() => {
@@ -158,15 +221,22 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
             const newProcess = await ProcessService.getById(data.id);
             setProcesses((prev) => [...prev, newProcess]);
         }
+        async function locationsHandler(): Promise<void> {
+            setFlowLocations(
+                await FlowLocationService.getByFlow(props.flow.Id)
+            );
+        }
         const update = listenUserProcessUpdated(handler);
         const add = listenUserProcessAdded(handler);
         const addProcess = listenProcessAdded(processHandler);
+        const addLocations = listenLocationAdded(locationsHandler);
         return () => {
             update();
             add();
             addProcess();
+            addLocations();
         };
-    }, []);
+    }, [props.flow]);
 
     if (!props.flow) return null;
 
@@ -180,6 +250,10 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 items={groupping.sortedItems}
                 selectionMode={SelectionMode.none}
                 layoutMode={DetailsListLayoutMode.fixedColumns}
+                styles={listStyles(ProcessFlowWebPart.currentTheme)}
+                onItemInvoked={(item) => {
+                    navigate(`/process/${item.process.Id}?${searchParams.toString()}`);
+                }}
             />
         </div>
     );

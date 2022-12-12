@@ -9,6 +9,7 @@ export const MAIN_PANEL_FORM = 'sp-processflow-newprocess';
 export const USER_PROCESS_UPDATE = 'sp-processflow-userprocess-updated';
 export const USER_PROCESS_ADDED = 'sp-processflow-userprocess-added';
 export const PROCESS_ADDED = 'sp-processflow-process-added';
+export const LOCATION_ADDED = 'sp-processflow-location-added';
 
 // LocalStorage keys
 export const GROUP_SORTING_KEY = 'sp-processflow-group-sorting';

@@ -4,20 +4,26 @@ import {
     ComboBox,
     IComboBoxOption,
     IComboBoxStyles,
+    IContextualMenuProps,
     PanelType,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
-    dispatchButtonClick,
     FooterOkCancel,
     hidePanel,
     showDialog,
     showPanel,
 } from 'sp-components';
 import { MainService } from '../../services/main-service';
-import { MAIN_DIALOG, MAIN_PANEL, MAIN_PANEL_FORM } from '../../utils/constants';
+import {
+    MAIN_DIALOG,
+    MAIN_PANEL,
+    MAIN_PANEL_FORM,
+} from '../../utils/constants';
 import { GlobalContext } from '../../utils/globalContext';
 import { NewFlowForm } from '../NewFlowForm';
+import { NewLocationForm } from '../NewLocationForm';
 import { NewProcesses } from '../NewProcesses';
 import styles from './CommandBar.module.scss';
 
@@ -37,6 +43,28 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
     const { teams, selectedTeam, selectedFlow } =
         React.useContext(GlobalContext);
     const [flows, setFlows] = React.useState<ICustomerFlow[]>([]);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const handleFlowSelected = React.useCallback(
+        (flow: ICustomerFlow) => {
+            props.onFlowSelected(flow);
+            setSearchParams((prev) => ({ flow: flow?.Id.toString(), team: prev.get('team') }));
+        },
+        [selectedTeam]
+    );
+
+    const handleTeamSelected = React.useCallback(
+        (team: string) => {
+            props.onTeamSelected(team);
+            setSearchParams((prev) => {
+                return {
+                    flow: prev.get('flow'),
+                    team,
+                };
+            });
+        },
+        [selectedFlow]
+    );
 
     React.useEffect(() => {
         async function run(): Promise<void> {
@@ -44,12 +72,24 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                 const result = await flowService.getByTeam(selectedTeam);
                 if (result) {
                     setFlows(result);
-                    props.onFlowSelected(result[0]);
+                    const urlFlow = +searchParams.get('flow');
+                    let selectedFlow = result[0];
+                    if (urlFlow && Number.isInteger(urlFlow)) {
+                        const foundFlow = result.find((f) => f.Id === urlFlow);
+                        console.log(foundFlow);
+                        selectedFlow = foundFlow || result[0];
+                    }
+                    handleFlowSelected(selectedFlow);
+                }
+            } else {
+                const urlTeam = searchParams.get('team');
+                if (urlTeam && teams.indexOf(urlTeam) !== -1) {
+                    handleTeamSelected(urlTeam);
                 }
             }
         }
         run().catch((err) => console.error(err));
-    }, [selectedTeam]);
+    }, [selectedTeam, teams]);
 
     const teamOptions: IComboBoxOption[] = React.useMemo(
         () =>
@@ -63,8 +103,8 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
     const flowOptions: IComboBoxOption[] = React.useMemo(
         () =>
             flows.map((flow) => ({
-                key: flow.Flow,
-                text: flow.Flow,
+                key: flow.Title,
+                text: flow.Title,
                 data: flow,
             })),
         [flows]
@@ -83,7 +123,7 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                         const flow = await flowService.getById(flowId);
                         setFlows((prev) => [...prev, flow]);
                         if (!selectedFlow) {
-                            props.onFlowSelected(flow);
+                            handleFlowSelected(flow);
                         }
                     }}
                 />
@@ -111,13 +151,56 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
         );
     }, [selectedFlow, selectedTeam]);
 
+    const handleNewLocation = React.useCallback(() => {
+        showDialog({
+            id: MAIN_DIALOG,
+            dialogProps: {
+                title: 'New location',
+                isBlocking: true,
+            },
+            content: <NewLocationForm />,
+        });
+    }, []);
+
+    const menuProps: IContextualMenuProps = React.useMemo(
+        () => ({
+            items: [
+                {
+                    key: 'flow',
+                    text: 'Add flow',
+                    onClick: handleNewFlow,
+                    iconProps: {
+                        iconName: 'Dataflows',
+                    },
+                },
+                {
+                    key: 'process',
+                    text: 'Add process(es)',
+                    onClick: handleNewProcess,
+                    iconProps: {
+                        iconName: 'Processing',
+                    },
+                },
+                {
+                    key: 'location',
+                    text: 'Add location',
+                    onClick: handleNewLocation,
+                    iconProps: {
+                        iconName: 'CityNext',
+                    },
+                },
+            ],
+        }),
+        []
+    );
+
     return (
         <div className={styles.container}>
             <ComboBox
                 label="Team"
                 options={teamOptions}
                 onChange={(_ev, option) =>
-                    props.onTeamSelected(option.key.toString())
+                    handleTeamSelected(option.key.toString())
                 }
                 selectedKey={selectedTeam}
                 styles={comboBoxStyles}
@@ -125,26 +208,18 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
             <ComboBox
                 label="Flow"
                 options={flowOptions}
-                onChange={(_ev, option) => props.onFlowSelected(option.data)}
-                selectedKey={selectedFlow?.Flow}
+                onChange={(_ev, option) => handleFlowSelected(option.data)}
+                selectedKey={selectedFlow?.Title}
                 styles={comboBoxStyles}
             />
             {/* {selectedFlow && <ProcessFlowHeader flow={selectedFlow} />} */}
             <ActionButton
-                onClick={handleNewFlow}
                 disabled={!Boolean(selectedTeam)}
                 iconProps={{ iconName: 'Add' }}
                 styles={{ root: { maxHeight: 32 } }}
+                menuProps={menuProps}
             >
-                Add flow
-            </ActionButton>
-            <ActionButton
-                onClick={handleNewProcess}
-                disabled={!Boolean(selectedFlow)}
-                iconProps={{ iconName: 'Add' }}
-                styles={{ root: { maxHeight: 32 } }}
-            >
-                Add Process(es)
+                Add
             </ActionButton>
         </div>
     );

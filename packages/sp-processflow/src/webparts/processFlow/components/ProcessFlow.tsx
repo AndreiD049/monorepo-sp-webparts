@@ -2,27 +2,21 @@ import * as React from 'react';
 import { IProcessFlowWebPartProps } from '../ProcessFlowWebPart';
 import { IUser } from '@service/users';
 import { MainService } from '../services/main-service';
-import { db } from '../utils/cache';
 import {
     GlobalContext,
     IGlobalContext,
     sentinelContext,
 } from '../utils/globalContext';
-import {
-    CURRENT_USER,
-    HOUR,
-    MAIN_DIALOG,
-    MAIN_PANEL,
-    TEAMS_CHOICES,
-    TEAM_USERS,
-} from '../utils/constants';
+import { MAIN_DIALOG, MAIN_PANEL } from '../utils/constants';
 import { CommandBar } from './CommandBar';
 import { Dialog, Panel } from 'sp-components';
 import { Separator } from 'office-ui-fabric-react';
 import { ProcessFlowContent } from './ProcessFlowContent';
 import { ProcessFlowHeader } from './ProcessFlowHeader';
-import styles from './ProcessFlow.module.scss';
 import { Footer } from './Footer';
+import { HashRouter, Routes, Route, Outlet } from 'react-router-dom';
+import styles from './ProcessFlow.module.scss';
+import { ProcessDetails } from './ProcessDetails';
 
 export interface IProcessFlowProps {
     properties: IProcessFlowWebPartProps;
@@ -37,16 +31,9 @@ export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
     // Get current user
     React.useEffect(() => {
         async function run(): Promise<void> {
-            const current = await db.getCached(CURRENT_USER, () =>
-                userService.getCurrentUser()
-            );
-            const teams = await db.getCached(
-                TEAMS_CHOICES,
-                () => userService.getTeamsChoices(),
-                HOUR
-            );
+            const current = await userService.getCurrentUser();
+            const teams = await userService.getTeamsChoices();
             if (!current) {
-                await db.invalidateCached('current');
                 console.error(`Couldn't fetch current user info`);
             }
             setCurrentUser(current);
@@ -62,9 +49,7 @@ export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
 
     const handleTeamSelected = React.useCallback(
         async (team: string) => {
-            const teamUsers = await db.getCached(TEAM_USERS(team), () =>
-                userService.getUsersByTeam(team)
-            );
+            const teamUsers = await userService.getUsersByTeam(team);
             setContext((prev) => ({
                 ...prev,
                 selectedTeam: team,
@@ -77,27 +62,51 @@ export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
     if (!currentUser) return null;
 
     return (
-        <GlobalContext.Provider value={context}>
-            <div className={styles.processFlow}>
-                <CommandBar
-                    onTeamSelected={handleTeamSelected}
-                    onFlowSelected={(flow) => {
-                        setContext((prev) => ({
-                            ...prev,
-                            selectedFlow: flow,
-                        }));
-                    }}
-                />
-                <Separator />
-                <ProcessFlowHeader flow={context.selectedFlow} />
-                <ProcessFlowContent flow={context.selectedFlow} />
-                <Footer config={props.properties.config} />
-            </div>
-            <Dialog id={MAIN_DIALOG} />
-            <Panel id={MAIN_PANEL} defaultProps={{
-                isFooterAtBottom: true,
-                isLightDismiss: true,
-            }} />
-        </GlobalContext.Provider>
+        <div className={styles.processFlow}>
+            <GlobalContext.Provider value={context}>
+                <HashRouter>
+                    <Dialog id={MAIN_DIALOG} />
+                    <Panel
+                        id={MAIN_PANEL}
+                        defaultProps={{
+                            isFooterAtBottom: true,
+                            isLightDismiss: true,
+                        }}
+                    />
+                    <CommandBar
+                        onTeamSelected={handleTeamSelected}
+                        onFlowSelected={(flow) => {
+                            setContext((prev) => ({
+                                ...prev,
+                                selectedFlow: flow,
+                            }));
+                        }}
+                    />
+                    <Separator />
+                    <Routes>
+                        <Route
+                            path="/"
+                            element={
+                                <div>
+                                    <ProcessFlowHeader
+                                        flow={context.selectedFlow}
+                                    />
+                                    <ProcessFlowContent
+                                        flow={context.selectedFlow}
+                                    />
+                                    <Outlet />
+                                </div>
+                            }
+                        >
+                            <Route
+                                path="/process/:id"
+                                element={<ProcessDetails />}
+                            />
+                        </Route>
+                    </Routes>
+                    <Footer config={props.properties.config} />
+                </HashRouter>
+            </GlobalContext.Provider>
+        </div>
     );
 };

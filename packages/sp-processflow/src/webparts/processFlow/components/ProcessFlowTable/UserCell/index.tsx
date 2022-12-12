@@ -23,7 +23,7 @@ export const UserCell: React.FC<IUserCellProps> = (props) => {
             content: <ChangeStatusDialog process={props.process} user={props.user} userProcess={props.userProcess} />,
             dialogProps: {
                 dialogContentProps: {
-                    title: props.process.Process,
+                    title: props.process.Title,
                 },
                 minWidth: 400,
             },

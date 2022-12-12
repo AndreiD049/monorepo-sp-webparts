@@ -1,3 +1,4 @@
+import { IUserProps } from '@service/users';
 import {
     IDetailsColumnProps,
     PersonaCoin,
@@ -12,13 +13,14 @@ export interface IUserColumnHeaderProps {
 }
 
 export const UserColumnHeader: React.FC<IUserColumnHeaderProps> = (props) => {
+    const user: IUserProps = props.columnData.column.data;
     return (
-        <div className={styles.container}>
+        <div className={styles.container} title={user.Title}>
             <PersonaCoin
                 size={PersonaSize.size32}
-                imageUrl={`/_layouts/15/userphoto.aspx?accountname=${props.columnData.column.data.EMail}&Size=S`}
+                imageUrl={`/_layouts/15/userphoto.aspx?accountname=${user.EMail}&Size=S`}
             />
-            {props.defaultRender(props.columnData)}
+            <div className={styles.userTitle}>{user.Title}</div>
         </div>
     );
 };

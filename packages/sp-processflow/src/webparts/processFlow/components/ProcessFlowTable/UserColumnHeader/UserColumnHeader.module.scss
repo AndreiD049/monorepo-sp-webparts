@@ -7,3 +7,9 @@
     justify-content: flex-start;
     gap: .3em;
 }
+
+.userTitle {
+    font-size: .8em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

@@ -1,4 +1,4 @@
-import { PROCESS_ADDED, USER_PROCESS_ADDED, USER_PROCESS_UPDATE } from "./constants";
+import { LOCATION_ADDED, PROCESS_ADDED, USER_PROCESS_ADDED, USER_PROCESS_UPDATE } from "./constants";
 
 export type EventPayload = { id: number };
 
@@ -22,6 +22,10 @@ export function processAdded(id: number): void {
     dispatchEvent(PROCESS_ADDED, id);
 }
 
+export function locationsAdded(): void {
+    dispatchEvent(LOCATION_ADDED, 0);
+}
+
 export function listenEvent<T>(event: string, f: (data: T) => void): () => void {
     function handler(ev: CustomEvent<T>): void {
         f(ev.detail);
@@ -40,4 +44,8 @@ export function listenUserProcessAdded(f: (data: EventPayload) => void): () => v
 
 export function listenProcessAdded(f: (data: EventPayload) => void): () => void {
     return listenEvent<EventPayload>(PROCESS_ADDED, f);
+}
+
+export function listenLocationAdded(f: (data: EventPayload) => void): () => void {
+    return listenEvent<EventPayload>(LOCATION_ADDED, f);
 }

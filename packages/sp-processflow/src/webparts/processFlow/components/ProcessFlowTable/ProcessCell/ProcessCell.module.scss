@@ -1,0 +1,14 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+}
+
+.manualInfo {
+    position: absolute !important;
+    top: 1px;
+    right: 0px;
+    background-color: "[theme: white, default: #ffffff]";
+}

@@ -5,7 +5,7 @@ import {
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { handleButtonClick, hidePanel } from 'sp-components';
+import { hidePanel } from 'sp-components';
 import { IItemAddResult } from 'sp-preset';
 import { MainService } from '../../services/main-service';
 import { MAIN_PANEL, MAIN_PANEL_FORM } from '../../utils/constants';
@@ -73,9 +73,9 @@ export const NewProcessRow: React.FC<INewProcessRowProps> = (props) => {
                 label="Process"
                 autoComplete="off"
                 styles={{ root: { flexGrow: 2, maxWidth: 400 } }}
-                onPaste={props.onPaste(props.idx, 'Process')}
-                onChange={props.onUpdate(props.idx, 'Process')}
-                value={props.row.Process?.toString()}
+                onPaste={props.onPaste(props.idx, 'Title')}
+                onChange={props.onUpdate(props.idx, 'Title')}
+                value={props.row.Title?.toString()}
             />
             <TextField
                 label="Allocation"
@@ -103,6 +103,13 @@ export const NewProcessRow: React.FC<INewProcessRowProps> = (props) => {
                 onChange={props.onUpdate(props.idx, 'UOM')}
                 value={props.rows[props.idx].UOM?.toString()}
                 styles={{ root: { maxWidth: 100 } }}
+            />
+            <TextField
+                label="Manual"
+                onPaste={props.onPaste(props.idx, 'Manual')}
+                onChange={props.onUpdate(props.idx, 'Manual')}
+                value={props.rows[props.idx].Manual?.toString()}
+                styles={{ root: { maxWidth: 200 } }}
             />
             <IconButton
                 styles={{ root: { alignSelf: 'flex-end' } }}
@@ -168,6 +175,7 @@ export const NewProcesses: React.FC<INewProcessesProps> = (props) => {
             (_ev: {}, newValue: string) => {
                 setRows((prev) => {
                     const copy = [...prev];
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const process = copy[idx] as any;
                     process[property] = newValue;
                     return copy;
@@ -181,19 +189,14 @@ export const NewProcesses: React.FC<INewProcessesProps> = (props) => {
         const newProcesses: Omit<IProcess, 'Id'>[] = rows.map((row) => ({
             FlowId: selectedFlow.Id,
             Category: row.Category,
-            Process: row.Process,
+            Title: row.Title,
             System: row.System,
             Allocation: row.Allocation,
+            Manual: row.Manual,
+            Team: selectedTeam,
             UOM: row.UOM,
         }));
-        // console.log(newProcesses);
-        // const calls = newProcesses.map(async (row) => await ProcessService.addProcess(row));
-        // console.log(calls);
-        // const newItems = await Promise.all(calls);
-        // console.log(newItems);
-        console.log('before', newProcesses);
         const newItems: IItemAddResult[] = await ProcessService.addProcesses(newProcesses);
-        console.log(newItems);
         newItems.forEach((i) => processAdded(i.data.Id));
         hidePanel(MAIN_PANEL);
     }, [rows]);

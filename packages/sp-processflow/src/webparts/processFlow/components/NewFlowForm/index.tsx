@@ -19,11 +19,11 @@ export const NewFlowForm: React.FC<INewFlowFormProps> = (props) => {
     const { CustomerFlowService } = MainService;
     const [choiceDBCustomers, setChoiceDBCustomers] = React.useState([]);
     const [choiceCustomerGroups, setChoiceCustomerGroups] = React.useState([]);
-    const [payload, setPayload] = React.useState({
+    const [payload, setPayload] = React.useState<Omit<ICustomerFlow, 'Id'>>({
         CustomerGroup: '',
         DBCustomers: [],
         Team: selectedTeam,
-        Flow: '',
+        Title: '',
     });
 
     // Fetch choice fields
@@ -50,11 +50,11 @@ export const NewFlowForm: React.FC<INewFlowFormProps> = (props) => {
             <Stack verticalAlign="center" horizontalAlign="stretch">
                 <TextField
                     label="Flow"
-                    value={payload.Flow}
+                    value={payload.Title}
                     onChange={(_ev, value) =>
                         setPayload((prev) => ({
                             ...prev,
-                            Flow: value,
+                            Title: value,
                         }))
                     }
                 />
@@ -76,7 +76,7 @@ export const NewFlowForm: React.FC<INewFlowFormProps> = (props) => {
                         }))
                     }
                 />
-                <PrimaryButton style={{ marginTop: '.5em' }} onClick={() => handleCreate(payload)}>Create</PrimaryButton>
+                <PrimaryButton style={{ marginTop: '1em' }} onClick={() => handleCreate(payload)}>Create</PrimaryButton>
             </Stack>
         </div>
     );

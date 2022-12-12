@@ -22,12 +22,6 @@ export async function setupLists(
   const customerFlows = new ListBuilder(config.customerFlowListName, sp, notify);
   const customerFlowsList = await customerFlows.ensureList();
   if (customerFlows.created) {
-    await customerFlows.addTextField({
-      name: "Flow",
-      description: "Name of the flow linked to a customer",
-      indexed: true,
-      required: true,
-    });
     await customerFlows.addChoiceField({
       name: "CustomerGroup",
       type: "Choice",
@@ -66,12 +60,6 @@ export async function setupLists(
       indexed: true,
       required: true,
     });
-    await procedure.addTextField({
-      name: "Process",
-      description: "Name of the procedure",
-      indexed: true,
-      required: true,
-    });
     await procedure.addChoiceField({
       name: "Category",
       type: "Choice",
@@ -88,12 +76,9 @@ export async function setupLists(
       indexed: true,
       type: "Lookup",
     });
-    await procedure.addChoiceField({
-      name: "Manuals",
-      description: "Manual links",
-      type: "MultiChoice",
-      allowFillIn: true,
-      choices: [],
+    await procedure.addTextField({
+      name: "Manual",
+      description: "Manual link",
     });
     await procedure.addChoiceField({
       name: "ProcessOptions",
@@ -114,6 +99,11 @@ export async function setupLists(
       choices: ["Order", "Day", "Week", "Month"],
       type: "Choice",
       indexed: false,
+      required: false,
+    });
+    await procedure.addTextField({
+      name: 'Team',
+      indexed: true,
       required: false,
     });
     await procedure.createView();
@@ -197,12 +187,6 @@ export async function setupLists(
       type: "Lookup",
       indexed: false,
       required: true,
-    });
-    await location.addChoiceField({
-      name: "Location",
-      description: "Location where procedure is done",
-      type: "Choice",
-      choices: [],
     });
     await location.addChoiceField({
       name: "Country",

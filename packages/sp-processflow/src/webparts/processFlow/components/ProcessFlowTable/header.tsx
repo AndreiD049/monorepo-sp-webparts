@@ -1,5 +1,4 @@
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
-import * as _ from 'lodash';
 import {
     GroupHeader,
     IconButton,
