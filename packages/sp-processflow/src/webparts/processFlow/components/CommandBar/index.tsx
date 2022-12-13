@@ -23,7 +23,7 @@ import {
 } from '../../utils/constants';
 import { GlobalContext } from '../../utils/globalContext';
 import { NewFlowForm } from '../NewFlowForm';
-import { NewLocationForm } from '../NewLocationForm';
+import { LocationDialog } from '../LocationDialog';
 import { NewProcesses } from '../NewProcesses';
 import styles from './CommandBar.module.scss';
 
@@ -158,7 +158,7 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                 title: 'New location',
                 isBlocking: true,
             },
-            content: <NewLocationForm />,
+            content: <LocationDialog dialogId={MAIN_DIALOG} operation='addMultiple' />,
         });
     }, []);
 

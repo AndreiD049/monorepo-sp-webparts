@@ -1,13 +1,15 @@
 import {
     ITag,
     Label,
+    TagItem,
     TagPicker,
+    Text,
     ValidationState,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import styles from './DoneByPicker.module.scss';
+import styles from './CountryPicker.module.scss';
 
-export interface IDoneByPickerProps {
+export interface ICountryPickerProps {
     disabled?: boolean;
     selectedOptions?: string[];
     options: string[];
@@ -15,7 +17,7 @@ export interface IDoneByPickerProps {
     required?: boolean;
 }
 
-export const DoneByPicker: React.FC<IDoneByPickerProps> = (props) => {
+export const CountryPicker: React.FC<ICountryPickerProps> = (props) => {
     const controlled: boolean = React.useMemo(
         () => Boolean(props.selectedOptions?.length),
         [props.selectedOptions]
@@ -39,11 +41,13 @@ export const DoneByPicker: React.FC<IDoneByPickerProps> = (props) => {
 
     return (
         <div className={styles.container}>
-            <Label required={props.required} htmlFor="newFlowCustomerGroup">Done by</Label>
+            <Label required={props.required} htmlFor="newFlowCountries">
+                Countries
+            </Label>
             <TagPicker
                 disabled={props.disabled}
                 inputProps={{
-                    id: 'newFlowCustomerGroup',
+                    id: 'newFlowCountries',
                 }}
                 onValidateInput={(input) =>
                     input.trim() !== ''
@@ -74,6 +78,23 @@ export const DoneByPicker: React.FC<IDoneByPickerProps> = (props) => {
                     return options
                         .filter((o) => s.indexOf(o.name) === -1)
                         .filter((o) => o.name.toLowerCase().includes(f));
+                }}
+                onRenderItem={(props) => {
+                    const tokens = props.item.key.toString().split(' - ');
+                    return (
+                        <TagItem {...props}>
+                            <div style={{
+                                display: 'flex',
+                                flexFlow: 'row nowrap',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                gap: '4px',
+                            }}>
+                                <img src={`https://flagcdn.com/24x18/${tokens[1].toLowerCase()}.png`} title={tokens[0]} />
+                                <Text variant="medium">{props.item.key}</Text>
+                            </div>
+                        </TagItem>
+                    );
                 }}
             />
             <input

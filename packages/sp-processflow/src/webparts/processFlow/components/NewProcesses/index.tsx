@@ -199,7 +199,7 @@ export const NewProcesses: React.FC<INewProcessesProps> = (props) => {
         const newItems: IItemAddResult[] = await ProcessService.addProcesses(newProcesses);
         newItems.forEach((i) => processAdded(i.data.Id));
         hidePanel(MAIN_PANEL);
-    }, [rows]);
+    }, [rows, selectedTeam]);
 
     const options = React.useMemo(
         () => (

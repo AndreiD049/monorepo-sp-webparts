@@ -2,6 +2,7 @@ export const DB_NAME = "SP-ProcessFlow";
 export const STORE_NAME = location.origin + location.pathname;
 
 export const MAIN_DIALOG = 'sp-processflow-main-dialog';
+export const PANEL_DIALOG = 'sp-processflow-panel-dialog';
 export const MAIN_PANEL = 'sp-processflow-main-panel';
 export const MAIN_PANEL_FORM = 'sp-processflow-newprocess';
 
@@ -9,7 +10,10 @@ export const MAIN_PANEL_FORM = 'sp-processflow-newprocess';
 export const USER_PROCESS_UPDATE = 'sp-processflow-userprocess-updated';
 export const USER_PROCESS_ADDED = 'sp-processflow-userprocess-added';
 export const PROCESS_ADDED = 'sp-processflow-process-added';
+export const LOCATIONS_ADDED = 'sp-processflow-locations-added';
 export const LOCATION_ADDED = 'sp-processflow-location-added';
+export const LOCATION_UPDATED = 'sp-processflow-location-updated';
+export const LOCATION_DELETED = 'sp-processflow-location-deleted';
 
 // LocalStorage keys
 export const GROUP_SORTING_KEY = 'sp-processflow-group-sorting';

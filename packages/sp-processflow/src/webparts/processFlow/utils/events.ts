@@ -1,12 +1,9 @@
-import { LOCATION_ADDED, PROCESS_ADDED, USER_PROCESS_ADDED, USER_PROCESS_UPDATE } from "./constants";
+import { IFlowLocation } from "@service/process-flow";
+import { LOCATIONS_ADDED, LOCATION_ADDED, LOCATION_DELETED, LOCATION_UPDATED, PROCESS_ADDED, USER_PROCESS_ADDED, USER_PROCESS_UPDATE } from "./constants";
 
-export type EventPayload = { id: number };
-
-function dispatchEvent(event: string, id: number): void {
-    document.dispatchEvent(new CustomEvent<EventPayload>(event, {
-        detail: {
-            id,
-        }
+function dispatchEvent<T>(event: string, data: T): void {
+    document.dispatchEvent(new CustomEvent<T>(event, {
+        detail: data
     }))
 }
 
@@ -23,7 +20,19 @@ export function processAdded(id: number): void {
 }
 
 export function locationsAdded(): void {
-    dispatchEvent(LOCATION_ADDED, 0);
+    dispatchEvent(LOCATIONS_ADDED, 0);
+}
+
+export function locationAdded(location: IFlowLocation): void {
+    dispatchEvent(LOCATION_ADDED, location);
+}
+
+export function locationUpdated(id: IFlowLocation): void {
+    dispatchEvent(LOCATION_UPDATED, id);
+}
+
+export function locationDeleted(id: number): void {
+    dispatchEvent(LOCATION_DELETED, id);
 }
 
 export function listenEvent<T>(event: string, f: (data: T) => void): () => void {
@@ -34,18 +43,30 @@ export function listenEvent<T>(event: string, f: (data: T) => void): () => void 
     return () => document.removeEventListener(event, handler);
 }
 
-export function listenUserProcessUpdated(f: (data: EventPayload) => void): () => void {
-    return listenEvent<EventPayload>(USER_PROCESS_UPDATE, f);
+export function listenUserProcessUpdated(f: (data: number) => void): () => void {
+    return listenEvent<number>(USER_PROCESS_UPDATE, f);
 }
 
-export function listenUserProcessAdded(f: (data: EventPayload) => void): () => void {
-    return listenEvent<EventPayload>(USER_PROCESS_ADDED, f);
+export function listenUserProcessAdded(f: (data: number) => void): () => void {
+    return listenEvent<number>(USER_PROCESS_ADDED, f);
 }
 
-export function listenProcessAdded(f: (data: EventPayload) => void): () => void {
-    return listenEvent<EventPayload>(PROCESS_ADDED, f);
+export function listenProcessAdded(f: (data: number) => void): () => void {
+    return listenEvent<number>(PROCESS_ADDED, f);
 }
 
-export function listenLocationAdded(f: (data: EventPayload) => void): () => void {
-    return listenEvent<EventPayload>(LOCATION_ADDED, f);
+export function listenLocationsAdded(f: (data: number) => void): () => void {
+    return listenEvent<number>(LOCATIONS_ADDED, f);
+}
+
+export function listenLocationAdded<T>(f: (data: T) => void): () => void {
+    return listenEvent<T>(LOCATION_ADDED, f);
+}
+
+export function listenLocationUpdated(f: (data: IFlowLocation) => void): () => void {
+    return listenEvent<IFlowLocation>(LOCATION_UPDATED, f);
+}
+
+export function listenLocationDeleted(f: (data: number) => void): () => void {
+    return listenEvent<number>(LOCATION_DELETED, f);
 }

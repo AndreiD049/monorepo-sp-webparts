@@ -3,3 +3,49 @@
 .container {
     min-width: 1px;
 }
+
+.topButtonBar {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.locationContainer td {
+    padding: 0 2em;
+}
+
+.locationsTable {
+    border-spacing: 0;
+    & th {
+        text-align: center;
+        padding-bottom: 1em;
+    }
+
+    & td {
+        border-right: 1px solid $ms-color-neutralPrimary;
+    }
+
+    & td:last-child {
+        border-right: none;
+    }
+}
+
+.overviewTable {
+    & .categoryCell {
+        padding: .7em 0;
+        text-decoration: underline;
+    }
+
+    & td:first-child {
+        padding-right: 3em;
+    }
+}
+
+.overviewCategoryText {
+    font-weight: bold;
+}
+
+.countryFlag {
+    margin-right: .3em;
+}

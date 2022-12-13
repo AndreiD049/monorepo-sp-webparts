@@ -1,6 +1,7 @@
 import {
     CustomerFlowService,
     FlowLocationService,
+    IFlowLocation,
     IUserProcess,
     ProcessService,
     UserProcessService,
@@ -15,6 +16,11 @@ import {
     updateCached,
 } from 'idb-proxy';
 import { DB_NAME, HOUR, STORE_NAME } from '../utils/constants';
+import {
+    locationAdded,
+    locationDeleted,
+    locationUpdated,
+} from '../utils/events';
 
 const userCacheOptions: ICacheProxyOptions<UserService> = {
     dbName: DB_NAME,
@@ -93,16 +99,20 @@ const userProcessCacheOptions: ICacheProxyOptions<UserProcessService> = {
     storeName: STORE_NAME,
     prefix: 'UserProcessService',
     props: {
-        getByFlow: { isCached: true, expiresIn: HOUR * 3 },
+        'getBy.*': { isPattern: true, isCached: true, expiresIn: HOUR * 3 },
         addUserProcess: {
             after: async (db, service, args, returnValue) => {
                 const flowId = args[0].FlowId;
+                const processId = args[0].ProcessId;
                 const addedProcess = await service.getById(returnValue.data.Id);
                 await updateCached(
                     db,
-                    /UserProcessService\/getByFlow/,
+                    /UserProcessService\/getBy.*/,
                     (values, key) => {
-                        if (key.endsWith(flowId)) {
+                        if (/getByFlow/.test(key) && key.endsWith(flowId)) {
+                            return [...values, addedProcess];
+                        }
+                        if (/getByProcess/.test(key) && key.endsWith(processId)) {
                             return [...values, addedProcess];
                         }
                         return values;
@@ -114,11 +124,18 @@ const userProcessCacheOptions: ICacheProxyOptions<UserProcessService> = {
             after: async (db, service, args) => {
                 const updatedId = args[0];
                 const updatedItem = await service.getById(updatedId);
+                const flowId = updatedItem.FlowId.toString();
+                const processId = updatedItem.ProcessId.toString();
                 await updateCached(
                     db,
-                    /UserProcessService\/getByFlow/,
+                    /UserProcessService\/getBy.*/,
                     (values, key) => {
-                        if (key.endsWith(updatedItem.FlowId.toString())) {
+                        if (/getByFlow/.test(key) && key.endsWith(flowId)) {
+                            return values.map((v: IUserProcess) =>
+                                v.Id === updatedItem.Id ? updatedItem : v
+                            );
+                        }
+                        if (/getByProcess/.test(key) && key.endsWith(processId)) {
                             return values.map((v: IUserProcess) =>
                                 v.Id === updatedItem.Id ? updatedItem : v
                             );
@@ -133,7 +150,7 @@ const userProcessCacheOptions: ICacheProxyOptions<UserProcessService> = {
                 const removedId = +args[0];
                 await updateCached(
                     db,
-                    /UserProcessService\/getByFlow/,
+                    /UserProcessService\/getBy.*/,
                     (values: IUserProcess[]) =>
                         values.filter((v) => v.Id !== removedId)
                 );
@@ -147,17 +164,65 @@ const locationCacheOptions: ICacheProxyOptions<FlowLocationService> = {
     storeName: STORE_NAME,
     prefix: 'FlowLocationService',
     props: {
-        '(getByFlow|get.*Choices)': {
+        '(getBy.*|get.*Choices)': {
             isPattern: true,
             isCached: true,
             expiresIn: HOUR * 12,
         },
         '(addFlowLocation|addFlowLocations)': {
             isPattern: true,
-            after: async (db) => {
-                await removeCached(db, /FlowLocationService.*getByFlow/);
-                await removeCached(db, /FlowLocationService.*DoneBy*Choices/);
-                await removeCached(db, /FlowLocationService.*Location*Choices/);
+            after: async (db, service, args, returnValue) => {
+                await removeCached(db, /FlowLocationService.*getBy.*/);
+                await removeCached(db, /FlowLocationService.*DoneBy.*Choices/);
+                await removeCached(
+                    db,
+                    /FlowLocationService.*Location.*Choices/
+                );
+                if (!Array.isArray(args[0])) {
+                    locationAdded(
+                        await service.getLocation(returnValue.data.Id)
+                    );
+                }
+            },
+        },
+        updateFlowLocation: {
+            isPattern: true,
+            after: async (db, service, args) => {
+                const id: number = args[0];
+                const updatedItem = await service.getLocation(id);
+                const flowId = updatedItem.FlowId.toString();
+                const processId = updatedItem.Process.Id.toString();
+                await updateCached(
+                    db,
+                    /FlowLocationService.*getBy.*/,
+                    (values, key) => {
+                        if (
+                            (/getByFlow/.test(key) && key.includes(flowId)) ||
+                            (/getByProcess/.test(key) &&
+                                key.includes(processId))
+                        ) {
+                            return values.map((v: IFlowLocation) =>
+                                v.Id === id ? updatedItem : v
+                            );
+                        }
+                        return values;
+                    }
+                );
+                locationUpdated(updatedItem);
+            },
+        },
+        removeFlowLocation: {
+            isPattern: true,
+            after: async (db, service, args) => {
+                const id: number = args[0];
+                await updateCached(
+                    db,
+                    /FlowLocationService.*getBy.*/,
+                    (values) => {
+                        return values.filter((v: IFlowLocation) => v.Id !== id);
+                    }
+                );
+                locationDeleted(id);
             },
         },
     },

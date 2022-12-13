@@ -22,11 +22,13 @@ import ProcessFlowWebPart from '../../ProcessFlowWebPart';
 import { MainService } from '../../services/main-service';
 import { GROUP_SORTING_KEY } from '../../utils/constants';
 import {
-    EventPayload,
-    listenLocationAdded,
+    listenLocationsAdded,
+    listenLocationDeleted,
+    listenLocationUpdated,
     listenProcessAdded,
     listenUserProcessAdded,
     listenUserProcessUpdated,
+    listenLocationAdded,
 } from '../../utils/events';
 import { GlobalContext } from '../../utils/globalContext';
 import styles from './ProcessFlowTable.module.scss';
@@ -211,14 +213,14 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
 
     // Process events
     React.useEffect(() => {
-        async function handler(data: EventPayload): Promise<void> {
-            const newUserProcess = await UserProcessService.getById(data.id);
+        async function handler(data: number): Promise<void> {
+            const newUserProcess = await UserProcessService.getById(data);
             setUserProcesses((prev) =>
-                prev.filter((up) => up.Id !== data.id).concat(newUserProcess)
+                prev.filter((up) => up.Id !== data).concat(newUserProcess)
             );
         }
-        async function processHandler(data: EventPayload): Promise<void> {
-            const newProcess = await ProcessService.getById(data.id);
+        async function processHandler(data: number): Promise<void> {
+            const newProcess = await ProcessService.getById(data);
             setProcesses((prev) => [...prev, newProcess]);
         }
         async function locationsHandler(): Promise<void> {
@@ -226,15 +228,30 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 await FlowLocationService.getByFlow(props.flow.Id)
             );
         }
+        async function locationAddedHandler(data: IFlowLocation): Promise<void> {
+            setFlowLocations((prev) => [...prev, data]);
+        }
+        async function updateLocationHandler(data: IFlowLocation): Promise<void> {
+            setFlowLocations((prev) => prev.map((p) => p.Id === data.Id ? data : p));
+        }
+        async function locationDeleteHandler(data: number): Promise<void> {
+            setFlowLocations((prev) => prev.filter((l) => l.Id !== data));
+        }
         const update = listenUserProcessUpdated(handler);
         const add = listenUserProcessAdded(handler);
         const addProcess = listenProcessAdded(processHandler);
-        const addLocations = listenLocationAdded(locationsHandler);
+        const addLocations = listenLocationsAdded(locationsHandler);
+        const addLocation = listenLocationAdded(locationAddedHandler);
+        const updateLocation = listenLocationUpdated(updateLocationHandler);
+        const deleteLocation = listenLocationDeleted(locationDeleteHandler);
         return () => {
             update();
             add();
             addProcess();
+            addLocation();
             addLocations();
+            updateLocation();
+            deleteLocation();
         };
     }, [props.flow]);
 
