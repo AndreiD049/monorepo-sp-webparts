@@ -1,8 +1,9 @@
+import { getAllPaged } from '@service/sp-cip';
 import { IField, IItemAddResult, IItemUpdateResult, IList } from 'sp-preset';
 import { ICustomerFlow } from '../models';
 import { IServiceProps } from '../models/IServiceProps';
 
-const SELECT = ['Id', 'Flow', 'CustomerGroup', 'DBCustomers', 'Team'];
+const SELECT = ['Id', 'Title', 'CustomerGroup', 'DBCustomers', 'Team'];
 
 export class CustomerFlowService {
     private list: IList;
@@ -20,15 +21,15 @@ export class CustomerFlowService {
     }
 
     async getAll(): Promise<ICustomerFlow[]> {
-        return this.list.items.select(...SELECT)();
+        return getAllPaged(this.list.items.select(...SELECT));
     }
 
     async getByTeam(team: string): Promise<ICustomerFlow[]> {
-        return this.list.items.filter(`Team eq '${team}'`).select(...SELECT)();
+        return getAllPaged(this.list.items.filter(`Team eq '${team}'`).select(...SELECT));
     }
 
     async addFlow(payload: Omit<ICustomerFlow, 'Id'>): Promise<IItemAddResult> {
-        if (!payload.Flow || !payload.Team) {
+        if (!payload.Title || !payload.Team) {
             throw Error('Not all necessary info.');
         } 
         if (payload.CustomerGroup) {

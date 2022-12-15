@@ -6,6 +6,7 @@ import {
     IComboBoxStyles,
     IContextualMenuProps,
     PanelType,
+    SearchBox,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -17,15 +18,19 @@ import {
 } from 'sp-components';
 import { MainService } from '../../services/main-service';
 import {
+    DB_NAME,
     MAIN_DIALOG,
     MAIN_PANEL,
     MAIN_PANEL_FORM,
+    STORE_NAME,
 } from '../../utils/constants';
 import { GlobalContext } from '../../utils/globalContext';
 import { NewFlowForm } from '../NewFlowForm';
 import { LocationDialog } from '../LocationDialog';
 import { NewProcesses } from '../NewProcesses';
+import { openDatabase, removeCached } from 'idb-proxy';
 import styles from './CommandBar.module.scss';
+import { debounce } from '@microsoft/sp-lodash-subset';
 
 export interface ICommandBarProps {
     onTeamSelected: (team: string) => void;
@@ -44,11 +49,16 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
         React.useContext(GlobalContext);
     const [flows, setFlows] = React.useState<ICustomerFlow[]>([]);
     const [searchParams, setSearchParams] = useSearchParams();
+    const [refreshed, setRefreshed] = React.useState(false);
 
     const handleFlowSelected = React.useCallback(
         (flow: ICustomerFlow) => {
             props.onFlowSelected(flow);
-            setSearchParams((prev) => ({ flow: flow?.Id.toString(), team: prev.get('team') }));
+            setSearchParams((prev) => ({
+                flow: flow?.Id.toString(),
+                team: prev.get('team'),
+                search: '',
+            }));
         },
         [selectedTeam]
     );
@@ -60,6 +70,7 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                 return {
                     flow: prev.get('flow'),
                     team,
+                    search: '',
                 };
             });
         },
@@ -76,7 +87,6 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                     let selectedFlow = result[0];
                     if (urlFlow && Number.isInteger(urlFlow)) {
                         const foundFlow = result.find((f) => f.Id === urlFlow);
-                        console.log(foundFlow);
                         selectedFlow = foundFlow || result[0];
                     }
                     handleFlowSelected(selectedFlow);
@@ -115,7 +125,7 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
             id: MAIN_DIALOG,
             dialogProps: {
                 title: 'New flow',
-                isBlocking: false,
+                isBlocking: true,
             },
             content: (
                 <NewFlowForm
@@ -137,6 +147,7 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
             {
                 headerText: 'Add new processes',
                 type: PanelType.large,
+                isLightDismiss: false,
                 onRenderFooter: () => (
                     <div style={{ padding: '.5em' }}>
                         <FooterOkCancel
@@ -158,9 +169,21 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                 title: 'New location',
                 isBlocking: true,
             },
-            content: <LocationDialog dialogId={MAIN_DIALOG} operation='addMultiple' />,
+            content: (
+                <LocationDialog
+                    dialogId={MAIN_DIALOG}
+                    operation="addMultiple"
+                />
+            ),
         });
     }, []);
+
+    const handleRefresh = React.useCallback(async () => {
+        const db = await openDatabase(DB_NAME, STORE_NAME);
+        await removeCached(db, /.*/);
+        props.onFlowSelected({ ...selectedFlow });
+        setRefreshed(true);
+    }, [selectedFlow]);
 
     const menuProps: IContextualMenuProps = React.useMemo(
         () => ({
@@ -196,31 +219,55 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
 
     return (
         <div className={styles.container}>
-            <ComboBox
-                label="Team"
-                options={teamOptions}
-                onChange={(_ev, option) =>
-                    handleTeamSelected(option.key.toString())
-                }
-                selectedKey={selectedTeam}
-                styles={comboBoxStyles}
-            />
-            <ComboBox
-                label="Flow"
-                options={flowOptions}
-                onChange={(_ev, option) => handleFlowSelected(option.data)}
-                selectedKey={selectedFlow?.Title}
-                styles={comboBoxStyles}
-            />
-            {/* {selectedFlow && <ProcessFlowHeader flow={selectedFlow} />} */}
-            <ActionButton
-                disabled={!Boolean(selectedTeam)}
-                iconProps={{ iconName: 'Add' }}
-                styles={{ root: { maxHeight: 32 } }}
-                menuProps={menuProps}
-            >
-                Add
-            </ActionButton>
+            <div className={styles.nearItems}>
+                <ComboBox
+                    label="Team"
+                    options={teamOptions}
+                    onChange={(_ev, option) =>
+                        handleTeamSelected(option.key.toString())
+                    }
+                    selectedKey={selectedTeam}
+                    styles={comboBoxStyles}
+                    useComboBoxAsMenuWidth
+                />
+                <ComboBox
+                    label="Flow"
+                    options={flowOptions}
+                    onChange={(_ev, option) => handleFlowSelected(option.data)}
+                    selectedKey={selectedFlow?.Title}
+                    styles={comboBoxStyles}
+                    useComboBoxAsMenuWidth
+                />
+                {/* {selectedFlow && <ProcessFlowHeader flow={selectedFlow} />} */}
+                <ActionButton
+                    disabled={!Boolean(selectedTeam)}
+                    iconProps={{ iconName: 'Add' }}
+                    styles={{ root: { maxHeight: 32 } }}
+                    menuProps={menuProps}
+                >
+                    Add
+                </ActionButton>
+            </div>
+            <div className={styles.farItems}>
+                <ActionButton
+                    iconProps={{ iconName: 'Refresh' }}
+                    styles={{ root: { maxHeight: 32 } }}
+                    onClick={handleRefresh}
+                    disabled={refreshed}
+                >
+                    Refresh
+                </ActionButton>
+                <SearchBox
+                    placeholder="Search..."
+                    value={searchParams.get('search') || ''}
+                    onChange={debounce((_ev, newValue) => {
+                        setSearchParams((prev) => {
+                            prev.set('search', newValue);
+                            return prev;
+                        });
+                    }, 500)}
+                />
+            </div>
         </div>
     );
 };

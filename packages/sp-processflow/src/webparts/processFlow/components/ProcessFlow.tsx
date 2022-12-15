@@ -7,9 +7,9 @@ import {
     IGlobalContext,
     sentinelContext,
 } from '../utils/globalContext';
-import { MAIN_DIALOG, MAIN_PANEL } from '../utils/constants';
+import { LOADING_SPINNER, MAIN_DIALOG, MAIN_PANEL } from '../utils/constants';
 import { CommandBar } from './CommandBar';
-import { Dialog, Panel } from 'sp-components';
+import { Dialog, LoadingSpinner, Panel } from 'sp-components';
 import { Separator } from 'office-ui-fabric-react';
 import { ProcessFlowContent } from './ProcessFlowContent';
 import { ProcessFlowHeader } from './ProcessFlowHeader';
@@ -73,6 +73,7 @@ export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
                             isLightDismiss: true,
                         }}
                     />
+                    <LoadingSpinner id={LOADING_SPINNER} />
                     <CommandBar
                         onTeamSelected={handleTeamSelected}
                         onFlowSelected={(flow) => {

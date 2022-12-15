@@ -5,12 +5,13 @@ import {
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { hidePanel } from 'sp-components';
+import { hidePanel, hideSpinner, showSpinner } from 'sp-components';
 import { IItemAddResult } from 'sp-preset';
 import { MainService } from '../../services/main-service';
-import { MAIN_PANEL, MAIN_PANEL_FORM } from '../../utils/constants';
+import { LOADING_SPINNER, MAIN_PANEL, MAIN_PANEL_FORM } from '../../utils/constants';
 import { processAdded } from '../../utils/events';
 import { GlobalContext } from '../../utils/globalContext';
+import { CategoryTextField, SystemTextField, UomTextField } from '../TextFields';
 import styles from './NewProcesses.module.scss';
 
 export interface INewProcessesProps {
@@ -35,6 +36,8 @@ interface INewProcessRowProps {
     rows: Partial<IProcess>[];
     row: Partial<IProcess>;
     setRows: React.Dispatch<React.SetStateAction<Partial<IProcess>[]>>;
+    systems: string[];
+    categories: string[];
 }
 
 export const NewProcessRow: React.FC<INewProcessRowProps> = (props) => {
@@ -48,7 +51,7 @@ export const NewProcessRow: React.FC<INewProcessRowProps> = (props) => {
                 gap: '.5em',
             }}
         >
-            <TextField
+            <CategoryTextField
                 required
                 label="Category"
                 styles={{ root: { maxWidth: 150 } }}
@@ -57,16 +60,17 @@ export const NewProcessRow: React.FC<INewProcessRowProps> = (props) => {
                 onChange={props.onUpdate(props.idx, 'Category')}
                 value={props.rows[props.idx].Category?.toString()}
                 autoComplete="off"
+                options={props.categories}
             />
-            <TextField
+            <SystemTextField
                 required
                 label="System"
                 autoComplete="off"
                 onPaste={props.onPaste(props.idx, 'System')}
                 onChange={props.onUpdate(props.idx, 'System')}
                 value={props.row.System?.toString()}
-                list="newProcessSystem"
                 styles={{ root: { maxWidth: 100 } }}
+                options={props.systems}
             />
             <TextField
                 required
@@ -95,7 +99,7 @@ export const NewProcessRow: React.FC<INewProcessRowProps> = (props) => {
                 value={props.rows[props.idx].Allocation?.toString()}
                 styles={{ root: { maxWidth: 100 } }}
             />
-            <TextField
+            <UomTextField
                 label="UOM"
                 autoComplete="off"
                 list="newProcessUOM"
@@ -130,7 +134,6 @@ export const NewProcesses: React.FC<INewProcessesProps> = (props) => {
     const [rows, setRows] = React.useState<Partial<IProcess>[]>([{}]);
     const [categories, setCategories] = React.useState([]);
     const [systems, setSystems] = React.useState([]);
-    const uom = React.useMemo(() => ['Order', 'Day', 'Week', 'Month'], []);
 
     React.useEffect(() => {
         async function run(): Promise<void> {
@@ -185,44 +188,26 @@ export const NewProcesses: React.FC<INewProcessesProps> = (props) => {
     );
 
     const handleSubmit = React.useCallback(async (evt: React.FormEvent) => {
-        evt.preventDefault();
-        const newProcesses: Omit<IProcess, 'Id'>[] = rows.map((row) => ({
-            FlowId: selectedFlow.Id,
-            Category: row.Category,
-            Title: row.Title,
-            System: row.System,
-            Allocation: row.Allocation,
-            Manual: row.Manual,
-            Team: selectedTeam,
-            UOM: row.UOM,
-        }));
-        const newItems: IItemAddResult[] = await ProcessService.addProcesses(newProcesses);
-        newItems.forEach((i) => processAdded(i.data.Id));
-        hidePanel(MAIN_PANEL);
+        try {
+            hidePanel(MAIN_PANEL);
+            showSpinner(LOADING_SPINNER);
+            evt.preventDefault();
+            const newProcesses: Omit<IProcess, 'Id'>[] = rows.map((row) => ({
+                FlowId: selectedFlow.Id,
+                Category: row.Category,
+                Title: row.Title,
+                System: row.System,
+                Allocation: row.Allocation,
+                Manual: row.Manual,
+                Team: selectedTeam,
+                UOM: row.UOM,
+            }));
+            const newItems: IItemAddResult[] = await ProcessService.addProcesses(newProcesses);
+            newItems.forEach((i) => processAdded(i.data.Id));
+        } finally {
+            hideSpinner(LOADING_SPINNER);
+        }
     }, [rows, selectedTeam]);
-
-    const options = React.useMemo(
-        () => (
-            <>
-                <datalist id="newProcessSystem">
-                    {systems.map((system) => (
-                        <option key={system}>{system}</option>
-                    ))}
-                </datalist>
-                <datalist id="newProcessCategories">
-                    {categories.map((category) => (
-                        <option key={category}>{category}</option>
-                    ))}
-                </datalist>
-                <datalist id="newProcessUOM">
-                    {uom.map((unit) => (
-                        <option key={unit}>{unit}</option>
-                    ))}
-                </datalist>
-            </>
-        ),
-        [systems, categories, uom]
-    );
 
     return (
         <form className={styles.container} id={MAIN_PANEL_FORM} onSubmit={handleSubmit}>
@@ -235,6 +220,8 @@ export const NewProcesses: React.FC<INewProcessesProps> = (props) => {
                     onPaste={handlePaste}
                     onUpdate={handleUpdate}
                     setRows={setRows}
+                    systems={systems}
+                    categories={categories}
                 />
             ))}
             <ActionButton
@@ -244,7 +231,6 @@ export const NewProcesses: React.FC<INewProcessesProps> = (props) => {
             >
                 Add line
             </ActionButton>
-            {options}
         </form>
     );
 };

@@ -27,9 +27,10 @@ import {
     listenLocationAdded,
     listenLocationDeleted,
     listenLocationUpdated,
+    listenProcessUpdated,
 } from '../../utils/events';
 import { LocationDialog } from '../LocationDialog';
-import { SystemTextField } from '../SystemTextField';
+import { CategoryTextField, SystemTextField, UomTextField } from '../TextFields';
 import styles from './ProcessDetails.module.scss';
 
 export interface IProcessDetailsProps {
@@ -234,36 +235,75 @@ const Details: React.FC<{ processId: number }> = (props) => {
                 prev.map((l) => (l.Id === data.Id ? data : l))
             );
         }
+        async function processUpdated(data: IProcess): Promise<void> {
+            if (process.Id === data.Id) {
+                setProcess(data);
+            }
+        }
         async function locationDeleteHandler(data: number): Promise<void> {
             setLocations((prev) => prev.filter((l) => l.Id !== data));
         }
+        const removeProcessUpdated = listenProcessUpdated(processUpdated);
         const removeLocationAdd = listenLocationAdded(locationAddedHandler);
         const removeLocationUpd = listenLocationUpdated(locationUpdatedHandler);
         const removeLocationDel = listenLocationDeleted(locationDeleteHandler);
         return () => {
+            removeProcessUpdated();
             removeLocationAdd();
             removeLocationUpd();
             removeLocationDel();
         };
-    }, [locations]);
+    }, [locations, process]);
+
+    const handleSave = React.useCallback(async () => {
+        const keys = Object.keys(data);
+        let changed = false;
+        keys.forEach((k: keyof IProcess) => {
+            if (data[k] !== process[k]) changed = true;
+        });
+        if (changed) {
+            await ProcessService.updateProcess(process.Id, data);
+        }
+        setEditable(false);
+    }, [data, process]);
 
     const editButtons = React.useMemo(() => {
         if (editable) {
             return (
                 <>
-                    <ActionButton iconProps={{ iconName: 'Save' }}>
+                    <ActionButton iconProps={{ iconName: 'Save' }} onClick={handleSave}>
                         Save
                     </ActionButton>
-                    <ActionButton iconProps={{ iconName: 'Cancel' }} onClick={() => setEditable(false)}>
+                    <ActionButton
+                        iconProps={{ iconName: 'Cancel' }}
+                        onClick={() => setEditable(false)}
+                    >
                         Cancel
                     </ActionButton>
                 </>
             );
         }
         return (
-            <ActionButton iconProps={{ iconName: 'Edit' }} onClick={() => setEditable(true)}>Edit</ActionButton>
+            <ActionButton
+                iconProps={{ iconName: 'Edit' }}
+                onClick={() => setEditable(true)}
+            >
+                Edit
+            </ActionButton>
         );
-    }, [editable]);
+    }, [editable, handleSave]);
+
+    const handleFieldChange = React.useCallback(
+        (property: keyof IProcess) => (_ev: {}, value: string) => {
+            if (editable) {
+                setData((prev) => ({
+                    ...prev,
+                    [property]: value,
+                }));
+            }
+        },
+        [editable]
+    );
 
     if (!process) return null;
 
@@ -298,55 +338,55 @@ const Details: React.FC<{ processId: number }> = (props) => {
                 {editButtons}
             </div>
             <Separator>General</Separator>
-            <SystemTextField 
+            <SystemTextField
                 label="System"
                 value={editable ? data.System : process.System}
                 title={process.System}
                 readOnly={!editable}
-                onChange={(_ev, value) => {
-                    if (editable) {
-                        setData((prev) => ({
-                            ...prev,
-                            System: value,
-                        }));
-                    }
-                }}
+                onChange={handleFieldChange("System")}
             />
             <TextField
                 label="Process"
-                value={process.Title}
+                value={editable ? data.Title : process.Title}
                 title={process.Title}
-                readOnly
+                readOnly={!editable}
+                onChange={handleFieldChange("Title")}
             />
-            <TextField
+            <CategoryTextField
                 label="Category"
-                value={process.Category}
+                value={editable ? data.Category : process.Category}
                 title={process.Category}
-                readOnly
+                readOnly={!editable}
+                onChange={handleFieldChange("Category")}
             />
             <TextField
                 label="Team"
                 value={process.Team}
                 title={process.Team}
                 readOnly
+                disabled={editable}
             />
             <TextField
                 label="Manual"
-                value={process.Manual}
+                value={editable ? data.Manual : process.Manual}
                 title={process.Manual}
-                readOnly
+                readOnly={!editable}
+                onChange={handleFieldChange("Manual")}
             />
             <TextField
                 label="Allocation"
-                value={process.Allocation?.toString()}
+                value={editable ? data.Allocation?.toString() : process.Allocation?.toString()}
                 title={process.Allocation?.toString()}
-                readOnly
+                type="number"
+                readOnly={!editable}
+                onChange={handleFieldChange("Allocation")}
             />
-            <TextField
+            <UomTextField
                 label="UOM"
-                value={process.UOM}
+                value={editable ? data.UOM : process.UOM}
                 title={process.UOM}
-                readOnly
+                readOnly={!editable}
+                onChange={handleFieldChange("UOM")}
             />
             {locations.length > 0 && (
                 <>

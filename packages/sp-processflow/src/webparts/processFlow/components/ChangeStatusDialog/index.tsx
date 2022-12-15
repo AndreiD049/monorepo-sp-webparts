@@ -14,7 +14,6 @@ import * as React from 'react';
 import { hideDialog } from 'sp-components';
 import { MainService } from '../../services/main-service';
 import { MAIN_DIALOG } from '../../utils/constants';
-import { userProcessAdded, userProcessUpdated } from '../../utils/events';
 import { GlobalContext } from '../../utils/globalContext';
 import styles from './ChangeStatusDialog.module.scss';
 
@@ -67,7 +66,7 @@ export const ChangeStatusDialog: React.FC<IChangeStatusDialogProps> = (
         hideDialog(MAIN_DIALOG);
         if (!props.userProcess?.Id) {
             // Create a new userprocess
-            const added = await UserProcessService.addUserProcess({
+            await UserProcessService.addUserProcess({
                 FlowId: props.process.FlowId,
                 ProcessId: props.process.Id,
                 Team: selectedTeam,
@@ -75,13 +74,11 @@ export const ChangeStatusDialog: React.FC<IChangeStatusDialogProps> = (
                 Status: data.Status,
                 Date: data.Date,
             });
-            userProcessAdded(added.data.Id);
         } else {
             await UserProcessService.updateUserProcess(
                 props.userProcess.Id,
                 data
             );
-            userProcessUpdated(props.userProcess.Id);
         }
     }, [data, selectedTeam]);
 

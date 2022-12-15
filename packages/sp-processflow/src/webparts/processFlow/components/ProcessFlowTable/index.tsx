@@ -20,7 +20,7 @@ import useWebStorage from 'use-web-storage-api';
 import { IProcessFlowRow } from '../../models/IProcessFlowRow';
 import ProcessFlowWebPart from '../../ProcessFlowWebPart';
 import { MainService } from '../../services/main-service';
-import { GROUP_SORTING_KEY } from '../../utils/constants';
+import { GROUP_SORTING_KEY, LOADING_SPINNER } from '../../utils/constants';
 import {
     listenLocationsAdded,
     listenLocationDeleted,
@@ -29,11 +29,14 @@ import {
     listenUserProcessAdded,
     listenUserProcessUpdated,
     listenLocationAdded,
+    listenProcessUpdated,
 } from '../../utils/events';
 import { GlobalContext } from '../../utils/globalContext';
 import styles from './ProcessFlowTable.module.scss';
 import { useColumns } from './useColumns';
 import { useGroups } from './useGroups';
+import { useCopyPaste } from './useCopyPaste';
+import { hideSpinner, showSpinner } from 'sp-components';
 
 export interface IProcessFlowTableProps {
     flow?: ICustomerFlow;
@@ -96,6 +99,9 @@ const listStyles: (
 
 export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
     const [searchParams] = useSearchParams();
+    const [search, setSearch] = React.useState(
+        searchParams.get('search') || ''
+    );
     const navigate = useNavigate();
     const { ProcessService, FlowLocationService, UserProcessService } =
         MainService;
@@ -115,6 +121,13 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
     const [userProcesses, setUserProcesses] = React.useState<IUserProcess[]>(
         []
     );
+
+    React.useEffect(() => {
+        const value = searchParams.get('search');
+        if (value !== search) {
+            setSearch(value || '');
+        }
+    }, [searchParams, search]);
 
     const columnUsers = React.useMemo(() => {
         const userSet = new Set(teamUsers.map((u) => u.User.Id));
@@ -136,6 +149,8 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
         locations,
         users: columnUsers,
     });
+    // Copy paste of cells
+    useCopyPaste();
 
     const items: IProcessFlowRow[] = React.useMemo(() => {
         const locationsByProcess: { [id: number]: IFlowLocation[] } = {};
@@ -158,7 +173,14 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 },
                 {}
             );
-        return processes.map((p) => {
+        const searchVal = search.toLowerCase();
+        const filteredProcesses =
+            searchVal === ''
+                ? processes
+                : processes.filter((p) =>
+                      p.Title.toLowerCase().includes(searchVal)
+                  );
+        return filteredProcesses.map((p) => {
             let locations: IProcessFlowRow['locations'] = {};
             if (locationsByProcess[p.Id]) {
                 locations = locationsByProcess[p.Id].reduce(
@@ -187,7 +209,7 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 users,
             };
         });
-    }, [processes, flowLocations, userProcesses, columnUsers]);
+    }, [processes, flowLocations, userProcesses, columnUsers, search]);
 
     const groupping = useGroups({
         flow: props.flow,
@@ -198,14 +220,19 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
 
     React.useEffect(() => {
         async function run(): Promise<void> {
-            if (props.flow) {
-                setProcesses(await ProcessService.getByFlow(props.flow.Id));
-                setFlowLocations(
-                    await FlowLocationService.getByFlow(props.flow.Id)
-                );
-                setUserProcesses(
-                    await UserProcessService.getByFlow(props.flow.Id)
-                );
+            try {
+                showSpinner(LOADING_SPINNER);
+                if (props.flow) {
+                    setProcesses(await ProcessService.getByFlow(props.flow.Id));
+                    setFlowLocations(
+                        await FlowLocationService.getByFlow(props.flow.Id)
+                    );
+                    setUserProcesses(
+                        await UserProcessService.getByFlow(props.flow.Id)
+                    );
+                }
+            } finally {
+                hideSpinner(LOADING_SPINNER);
             }
         }
         run().catch((err) => console.error(err));
@@ -213,33 +240,46 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
 
     // Process events
     React.useEffect(() => {
-        async function handler(data: number): Promise<void> {
-            const newUserProcess = await UserProcessService.getById(data);
+        async function userProcessAddedHandler(
+            data: IUserProcess
+        ): Promise<void> {
             setUserProcesses((prev) =>
-                prev.filter((up) => up.Id !== data).concat(newUserProcess)
+                prev.filter((up) => up.Id !== data.Id).concat(data)
             );
         }
-        async function processHandler(data: number): Promise<void> {
+        async function processAddedHandler(data: number): Promise<void> {
             const newProcess = await ProcessService.getById(data);
             setProcesses((prev) => [...prev, newProcess]);
+        }
+        async function processUpdatedHandler(data: IProcess): Promise<void> {
+            setProcesses((prev) =>
+                prev.map((p) => (p.Id === data.Id ? data : p))
+            );
         }
         async function locationsHandler(): Promise<void> {
             setFlowLocations(
                 await FlowLocationService.getByFlow(props.flow.Id)
             );
         }
-        async function locationAddedHandler(data: IFlowLocation): Promise<void> {
+        async function locationAddedHandler(
+            data: IFlowLocation
+        ): Promise<void> {
             setFlowLocations((prev) => [...prev, data]);
         }
-        async function updateLocationHandler(data: IFlowLocation): Promise<void> {
-            setFlowLocations((prev) => prev.map((p) => p.Id === data.Id ? data : p));
+        async function updateLocationHandler(
+            data: IFlowLocation
+        ): Promise<void> {
+            setFlowLocations((prev) =>
+                prev.map((p) => (p.Id === data.Id ? data : p))
+            );
         }
         async function locationDeleteHandler(data: number): Promise<void> {
             setFlowLocations((prev) => prev.filter((l) => l.Id !== data));
         }
-        const update = listenUserProcessUpdated(handler);
-        const add = listenUserProcessAdded(handler);
-        const addProcess = listenProcessAdded(processHandler);
+        const update = listenUserProcessUpdated(userProcessAddedHandler);
+        const add = listenUserProcessAdded(userProcessAddedHandler);
+        const addProcess = listenProcessAdded(processAddedHandler);
+        const updateProcess = listenProcessUpdated(processUpdatedHandler);
         const addLocations = listenLocationsAdded(locationsHandler);
         const addLocation = listenLocationAdded(locationAddedHandler);
         const updateLocation = listenLocationUpdated(updateLocationHandler);
@@ -248,6 +288,7 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
             update();
             add();
             addProcess();
+            updateProcess();
             addLocation();
             addLocations();
             updateLocation();
@@ -269,7 +310,9 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 layoutMode={DetailsListLayoutMode.fixedColumns}
                 styles={listStyles(ProcessFlowWebPart.currentTheme)}
                 onItemInvoked={(item) => {
-                    navigate(`/process/${item.process.Id}?${searchParams.toString()}`);
+                    navigate(
+                        `/process/${item.process.Id}?${searchParams.toString()}`
+                    );
                 }}
             />
         </div>

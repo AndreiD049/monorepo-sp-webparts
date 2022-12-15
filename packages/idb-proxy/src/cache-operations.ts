@@ -52,14 +52,14 @@ export async function removeCached(db: ICacheDB, key: string | RegExp): Promise<
     }
 }
 
-export async function updateCached(db: ICacheDB, key: string | RegExp, update: (value: any) => any): Promise<string|string[]> {
+export async function updateCached(db: ICacheDB, key: string | RegExp, update: (value: any, key: string) => any): Promise<string|string[]> {
     if (typeof key === 'string') {
         // if key is a string, update this single value
         const currentValue = await get<ICachedValue<any>>(db, key);
         if (currentValue) {
             return set(db, key, {
                 ...currentValue,
-                value: update(currentValue.value)
+                value: update(currentValue.value, key)
             });
         }
         return '';
@@ -72,7 +72,7 @@ export async function updateCached(db: ICacheDB, key: string | RegExp, update: (
             if (cachedItem) {
                 return set(db, k, {
                     ...cachedItem,
-                    value: update(cachedItem.value)
+                    value: update(cachedItem.value, k)
                 });
             }
             return '';

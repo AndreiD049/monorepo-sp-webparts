@@ -1,4 +1,5 @@
-import { IField, IItem, IItemAddResult, IList } from 'sp-preset';
+import { getAllPaged } from '@service/sp-cip';
+import { IField, IItem, IItemAddResult, IItemUpdateResult, IList } from 'sp-preset';
 import { IFlowLocation } from '../models';
 import { IServiceProps } from '../models/IServiceProps';
 
@@ -6,8 +7,8 @@ const SELECT = [
     'Id',
     'FlowId',
     'Process/Id',
-    'Process/Process',
-    'Location',
+    'Process/Title',
+    'Title',
     'Country',
     'DoneBy',
 ];
@@ -16,7 +17,6 @@ const EXPAND = ['Process'];
 
 export class FlowLocationService {
     private list: IList;
-    private locationField: IField;
     private locationChoices: string[] = [];
     private countryField: IField;
     private countryChoices: string[] = [];
@@ -25,7 +25,6 @@ export class FlowLocationService {
 
     constructor(private props: IServiceProps) {
         this.list = this.props.sp.web.lists.getByTitle(this.props.listName);
-        this.locationField = this.list.fields.getByTitle('Location');
         this.countryField = this.list.fields.getByTitle('Country');
         this.doneByField = this.list.fields.getByTitle('DoneBy');
     }
@@ -38,26 +37,59 @@ export class FlowLocationService {
     }
 
     async getByFlow(flowId: number): Promise<IFlowLocation[]> {
-        return this.list.items
-            .filter(`FlowId eq ${flowId}`)
-            .select(...SELECT)
-            .expand(...EXPAND)();
+        return getAllPaged(
+            this.list.items
+                .filter(`FlowId eq ${flowId}`)
+                .select(...SELECT)
+                .expand(...EXPAND)
+        );
+    }
+
+    async getByProcess(processId: number): Promise<IFlowLocation[]> {
+        return getAllPaged(
+            this.list.items
+                .filter(`ProcessId eq ${processId}`)
+                .select(...SELECT)
+                .expand(...EXPAND)
+        );
     }
 
     async addFlowLocation(
         payload: Omit<IFlowLocation, 'Id' | 'Process'>
     ): Promise<IItemAddResult> {
-        await this.updateLocationOptions(payload.Location);
+        await this.updateDoneByOptions(payload.DoneBy);
         return this.list.items.add(payload);
+    }
+
+    async addFlowLocations(payload: Omit<IFlowLocation, 'Id' | 'Process'>[]) {
+        const [batchedSP, execute] = this.props.sp.batched();
+        const result: IItemAddResult[] = [];
+        await this.updateDoneByOptions(
+            payload.reduce<string[]>(
+                (prev, curr) =>
+                    curr.DoneBy ? [...prev, ...curr.DoneBy] : prev,
+                []
+            )
+        );
+        for (const location of payload) {
+            batchedSP.web.lists
+                .getByTitle(this.props.listName)
+                .items.add(location)
+                .then((res) => result.push(res));
+        }
+        await execute();
+        return result;
+    }
+
+    async updateFlowLocation(id: number, payload: Partial<IFlowLocation>): Promise<IItemUpdateResult> {
+        if (payload.DoneBy && payload.DoneBy.length > 0) {
+            await this.updateDoneByOptions(payload.DoneBy);
+        }
+        return this.list.items.getById(id).update(payload);
     }
 
     async removeFlowLocation(id: number): Promise<void> {
         await this.list.items.getById(id).recycle();
-    }
-
-    async getLocationFieldChoices(): Promise<string[]> {
-        this.locationChoices = (await this.locationField()).Choices || [];
-        return this.locationChoices;
     }
 
     async getCountryFieldChoices(): Promise<string[]> {
@@ -70,15 +102,29 @@ export class FlowLocationService {
         return this.doneByChoices;
     }
 
-    private async updateLocationOptions(location: string) {
-        if (this.locationChoices.length === 0) {
-            this.locationChoices = await this.getLocationFieldChoices();
+    private async updateDoneByOptions(doneBy: string[]) {
+        return this.updateChoices(doneBy, this.doneByChoices, this.doneByField);
+    }
+
+    private async updateChoices(
+        items: string[],
+        existing_choices: string[],
+        field: IField
+    ) {
+        if (existing_choices.length === 0) {
+            existing_choices = (await (await field()).Choices) || [];
         }
-        if (!this.locationChoices.includes(location)) {
-            await this.locationField.update({
-                Choices: [...this.locationChoices, location],
+        const newItems = items.filter(
+            (c) => existing_choices.indexOf(c) === -1
+        );
+        if (newItems.length > 0) {
+            const toUpdate = Array.from(
+                new Set([...existing_choices, ...newItems])
+            );
+            await field.update({
+                Choices: toUpdate,
             });
-            this.locationChoices = [];
+            existing_choices = [];
         }
     }
 }

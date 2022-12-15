@@ -1,3 +1,4 @@
+import { getAllPaged } from '@service/sp-cip';
 import { IItemAddResult, IItemUpdateResult, IList } from 'sp-preset';
 import { IUserProcess } from '../models';
 import { IServiceProps } from '../models/IServiceProps';
@@ -24,15 +25,29 @@ export class UserProcessService {
     }
 
     async getByFlow(flowId: number): Promise<IUserProcess[]> {
-        return this.list.items
+        return getAllPaged(this.list.items
             .filter(`FlowId eq ${flowId}`)
             .select(...SELECT) 
-            .expand(...EXPAND)();
+            .expand(...EXPAND));
     }
 
     async getById(flowId: number): Promise<IUserProcess> {
         return this.list.items
             .getById(flowId)
+            .select(...SELECT) 
+            .expand(...EXPAND)();
+    }
+
+    async getByProcess(processId: number): Promise<IUserProcess[]> {
+        return getAllPaged(this.list.items
+            .filter(`ProcessId eq ${processId}`)
+            .select(...SELECT) 
+            .expand(...EXPAND));
+    }
+
+    async getByUserProcess(processId: number, userId: number): Promise<IUserProcess[]> {
+        return this.list.items
+            .filter(`ProcessId eq ${processId} and UserId eq ${userId}`)
             .select(...SELECT) 
             .expand(...EXPAND)();
     }

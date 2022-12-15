@@ -6,6 +6,7 @@ import { UserCell } from './UserCell';
 import { IProcessFlowRow } from '../../models/IProcessFlowRow';
 import styles from './ProcessFlowTable.module.scss';
 import { ProcessCell } from './ProcessCell';
+import { LocationCell } from './LocationCell';
 
 interface IProcessColumnProps {
     locations: string[];
@@ -40,7 +41,7 @@ const defaultColumns: IColumn[] = [
             },
         },
         onRender(item) {
-            return <ProcessCell process={item.process} />
+            return <ProcessCell process={item.process} />;
         },
         onRenderHeader: fixedHeader,
     },
@@ -70,7 +71,13 @@ export const useColumns = (props: IProcessColumnProps): IColumn[] => {
             isResizable: true,
             minWidth: 50,
             onRender(item, _index, column) {
-                return item.locations[column.name]?.DoneBy.join('/') || 'N/A';
+                return (
+                    <LocationCell
+                        location={item.locations[column.name]}
+                        processId={item.process.Id}
+                        title={l}
+                    />
+                );
             },
             onRenderHeader: fixedHeader,
         }));

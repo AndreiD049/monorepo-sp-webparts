@@ -14,9 +14,9 @@ export interface IFlowLocation {
         Process: string;
     }
     // Location of the procedure. Not necessarily a phisical location
-    Location: string;
+    Title: string;
     // Country of the location. (if applicable)
-    Country?: string;
+    Country?: string[];
     // DoneBy showing the party handling the procedure in this partcular location
     DoneBy: string[];
 }

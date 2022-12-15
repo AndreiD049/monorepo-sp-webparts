@@ -5,7 +5,7 @@
  */
 export interface ICustomerFlow {
     Id: number;
-    Flow: string;
+    Title: string;
     CustomerGroup: string;
     DBCustomers: string[];
     Team: string;

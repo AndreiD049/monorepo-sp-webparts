@@ -8,7 +8,7 @@ export interface IUserProps {
 
 export interface IUserListInfo {
     Role?: string;
-    Teams?: string[];
+    Team?: string[];
     User: IUserProps;
 }
 

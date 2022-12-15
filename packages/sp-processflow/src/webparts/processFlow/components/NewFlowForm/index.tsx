@@ -1,9 +1,9 @@
 import { ICustomerFlow } from '@service/process-flow';
 import { PrimaryButton, Stack, TextField } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { hideDialog } from 'sp-components';
+import { hideDialog, hideSpinner, showSpinner } from 'sp-components';
 import { MainService } from '../../services/main-service';
-import { MAIN_DIALOG } from '../../utils/constants';
+import { LOADING_SPINNER, MAIN_DIALOG } from '../../utils/constants';
 import { GlobalContext } from '../../utils/globalContext';
 import { CustomerGroupPicker } from '../CustomerGroupPicker';
 import { DBCustomersPicker } from '../DBCustomersPicker';
@@ -40,9 +40,14 @@ export const NewFlowForm: React.FC<INewFlowFormProps> = (props) => {
     }, []);
 
     const handleCreate = React.useCallback(async (body: Omit<ICustomerFlow, 'Id'>) => {
-        const added = await CustomerFlowService.addFlow(body);
-        if (props.onFlowAdded) props.onFlowAdded(added.data.Id);
-        hideDialog(MAIN_DIALOG);
+        try  {
+            hideDialog(MAIN_DIALOG);
+            showSpinner(LOADING_SPINNER);
+            const added = await CustomerFlowService.addFlow(body);
+            if (props.onFlowAdded) props.onFlowAdded(added.data.Id);
+        } finally {
+            hideSpinner(LOADING_SPINNER);
+        }
     }, []);
 
     return (

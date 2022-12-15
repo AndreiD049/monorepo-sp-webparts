@@ -27,5 +27,8 @@
   },
   "peerDependencies": {
     "sp-preset": "^2.0.18"
+  },
+  "dependencies": {
+    "@service/sp-cip": "^1.0.0"
   }
 }

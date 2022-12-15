@@ -10,6 +10,7 @@ export interface IProcessFlowConfig {
     userProcessListName: string;
     // List of users using the webpart
     userListName: string;
+    userListRootSite?: string;
     // Contact email
     contactEmail: string;
 }

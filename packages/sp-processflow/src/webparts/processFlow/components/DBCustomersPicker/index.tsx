@@ -60,7 +60,10 @@ export const DBCustomersPicker: React.FC<IDBCustomersPickerProps> = (props) => {
                         props.onSelect(items.map((i) => i.name));
                 }}
                 selectedItems={controlled ? ctrSelected : selected}
-                onEmptyResolveSuggestions={() => options}
+                onEmptyResolveSuggestions={(selected) => {
+                    const s = selected.map((s) => s.name);
+                    return options.filter((o) => s.indexOf(o.name) === -1);
+                }}
                 onResolveSuggestions={(filter, selected) => {
                     const f = filter.toLowerCase();
                     const s = selected.map((s) => s.name);

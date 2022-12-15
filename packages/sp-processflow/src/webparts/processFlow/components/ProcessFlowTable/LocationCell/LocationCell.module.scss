@@ -1,0 +1,12 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    height: 25px;
+    text-align: left;
+    line-height: 25px;
+    cursor: pointer;
+
+    &:focus {
+        outline: 3px solid $ms-color-neutralPrimary;
+    }
+}

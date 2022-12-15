@@ -43,10 +43,10 @@ export function hidePanel(id: string) {
     );
 }
 
-export function handleButtonClick(id: string, buttonText: string, func: () => void) {    
+export function handleButtonClick(id: string, buttonText: string, func: () => void) {
     const handler = (evt: CustomEvent) => {
         func();
-    }
+    };
     const eventName = `${CLICK_EVENT_PREFIX}/${buttonText}/${id}`;
     document.addEventListener(eventName, handler);
     return () => document.removeEventListener(eventName, handler);
@@ -62,6 +62,13 @@ export const Panel: React.FC<ICustomPanelProps> = (props) => {
     const [panelProps, setPanelProps] = React.useState<IPanelProps>(null);
     const [content, setContent] = React.useState(null);
 
+    const className = React.useMemo(() => {
+        if (panelProps?.isOpen) {
+            return styles.fade;
+        }
+        return styles.invisible;
+    }, [panelProps?.isOpen]);
+
     React.useEffect(() => {
         function handler(ev: CustomEvent<IPanelEventProps>) {
             setPanelProps(ev.detail.props);
@@ -73,16 +80,15 @@ export const Panel: React.FC<ICustomPanelProps> = (props) => {
         return () => document.removeEventListener(event, handler);
     }, []);
 
-    const handleDismiss = React.useCallback(() => {
-        console.log(props.id);
-        hidePanel(props.id);
-    }, []);
-
-    console.log(panelProps?.isOpen);
+    const handleDismiss = React.useCallback((ev) => {
+        panelProps.onDismiss ? panelProps.onDismiss(ev) : hidePanel(props.id);
+    }, [panelProps]);
 
     return (
         <FabrikPanel {...props.defaultProps} {...panelProps} onDismiss={handleDismiss}>
-            {content}
+            <div className={className}>
+                {content}
+            </div>
         </FabrikPanel>
     );
 };

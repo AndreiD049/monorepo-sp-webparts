@@ -43,13 +43,15 @@ export class ListBuilder {
         this.created = false;
     }
 
-    public async ensureList(): Promise<IListInfo> {
+    public async ensureList(hideTitle: boolean = false): Promise<IListInfo> {
         const result = await this.sp.web.lists.ensure(this.listName);
-        const title = this.getList().fields.getByTitle('Title');
-        await title.update({
-            Hidden: true,
-            Required: false,
-        });
+        if (hideTitle) {
+            const title = this.getList().fields.getByTitle('Title');
+            await title.update({
+                Hidden: true,
+                Required: false,
+            });
+        }
         this.onNotify(`List ${this.listName} created!`);
         this.created = result.created;
         if (!result.created) {
@@ -155,6 +157,7 @@ export class ListBuilder {
                         </OrderBy>
                     </Query>
                     <ViewFields>
+                        <FieldRef Name="Title"/>
                         ${body}
                         <FieldRef Name="Author"/>
                         <FieldRef Name="Created"/>

@@ -2,7 +2,7 @@ import { IList, SPFI } from 'sp-preset';
 import { IServiceProps } from './models/IServiceProps';
 import { IUser, IUserListInfo } from './models/IUser';
 
-const select = ['User/Id', 'User/EMail', 'User/Title', 'Role', 'Teams'];
+const select = ['User/Id', 'User/EMail', 'User/Title', 'Role', 'Team'];
 const expand = ['User'];
 
 export class UserService {
@@ -41,12 +41,12 @@ export class UserService {
 
     async getUsersByTeam(team: string): Promise<IUserListInfo[]> {
         return this.usersList.items
-            .filter(`Teams eq '${team}'`)
+            .filter(`Team eq '${team}'`)
             .select(...select)
             .expand(...expand)();
     }
 
     async getTeamsChoices(): Promise<string[]> {
-        return (await this.usersList.fields.getByTitle('Teams')()).Choices || [];
+        return (await this.usersList.fields.getByTitle('Team')()).Choices || [];
     }
 }

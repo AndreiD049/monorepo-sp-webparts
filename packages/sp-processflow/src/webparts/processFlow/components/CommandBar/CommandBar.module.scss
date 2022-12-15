@@ -4,7 +4,23 @@
     display: flex;
     flex-flow: row nowrap;
     align-items: flex-end;
+    justify-content: space-between;
+}
+
+.nearItems {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-end;
     justify-content: flex-start;
     gap: .5em;
     margin: .5em 0;
+}
+
+.farItems {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: .5em;
+    margin: .5em .5em .5em 0;
 }

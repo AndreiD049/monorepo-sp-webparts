@@ -5,15 +5,21 @@ export const MAIN_DIALOG = 'sp-processflow-main-dialog';
 export const PANEL_DIALOG = 'sp-processflow-panel-dialog';
 export const MAIN_PANEL = 'sp-processflow-main-panel';
 export const MAIN_PANEL_FORM = 'sp-processflow-newprocess';
+export const LOADING_SPINNER = 'sp-processflow-loadingspinner';
 
 // Events
 export const USER_PROCESS_UPDATE = 'sp-processflow-userprocess-updated';
 export const USER_PROCESS_ADDED = 'sp-processflow-userprocess-added';
 export const PROCESS_ADDED = 'sp-processflow-process-added';
+export const PROCESS_UPDATED = 'sp-processflow-process-updated';
 export const LOCATIONS_ADDED = 'sp-processflow-locations-added';
 export const LOCATION_ADDED = 'sp-processflow-location-added';
 export const LOCATION_UPDATED = 'sp-processflow-location-updated';
 export const LOCATION_DELETED = 'sp-processflow-location-deleted';
+export const COPY_USER_PROCESS = 'sp-processflow-userprocess-copy';
+export const PASTE_USER_PROCESS = 'sp-processflow-userprocess-paste';
+export const COPY_LOCATION = 'sp-processflow-location-copy';
+export const PASTE_LOCATION = 'sp-processflow-location-paste';
 
 // LocalStorage keys
 export const GROUP_SORTING_KEY = 'sp-processflow-group-sorting';

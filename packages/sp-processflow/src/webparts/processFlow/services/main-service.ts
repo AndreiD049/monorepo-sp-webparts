@@ -2,6 +2,7 @@ import {
     CustomerFlowService,
     FlowLocationService,
     IFlowLocation,
+    IProcess,
     IUserProcess,
     ProcessService,
     UserProcessService,
@@ -20,6 +21,9 @@ import {
     locationAdded,
     locationDeleted,
     locationUpdated,
+    processUpdated,
+    userProcessAdded,
+    userProcessUpdated,
 } from '../utils/events';
 
 const userCacheOptions: ICacheProxyOptions<UserService> = {
@@ -91,6 +95,21 @@ const processCacheOptions: ICacheProxyOptions<ProcessService> = {
                 );
             },
         },
+        'updateProcess': {
+            isPattern: true,
+            after: async (db, service, args, returnValue) => {
+                const id: number = args[0];
+                const newProcess = await service.getById(id);
+                await removeCached(
+                    db,
+                    new RegExp('(get.*Choices|get.*Options)')
+                );
+                await updateCached(db, /ProcessService.*getBy.*/, (values) => {
+                    return values.map((process: IProcess) => process.Id === id ? newProcess : process);
+                });
+                processUpdated(newProcess);
+            }
+        }
     },
 };
 
@@ -99,7 +118,7 @@ const userProcessCacheOptions: ICacheProxyOptions<UserProcessService> = {
     storeName: STORE_NAME,
     prefix: 'UserProcessService',
     props: {
-        'getBy.*': { isPattern: true, isCached: true, expiresIn: HOUR * 3 },
+        '(getByFlow|getByProcess)': { isPattern: true, isCached: true, expiresIn: HOUR * 3 },
         addUserProcess: {
             after: async (db, service, args, returnValue) => {
                 const flowId = args[0].FlowId;
@@ -118,6 +137,7 @@ const userProcessCacheOptions: ICacheProxyOptions<UserProcessService> = {
                         return values;
                     }
                 );
+                userProcessAdded(addedProcess);
             },
         },
         updateUserProcess: {
@@ -143,6 +163,7 @@ const userProcessCacheOptions: ICacheProxyOptions<UserProcessService> = {
                         return values;
                     }
                 );
+                userProcessUpdated(updatedItem);
             },
         },
         removeUserProcess: {
@@ -237,11 +258,12 @@ export class MainService {
 
     public static InitServices(options: {
         sp: SPFI;
+        userSP: SPFI;
         config: IProcessFlowConfig;
     }): void {
         this.UserService = createCacheProxy(
             new UserService({
-                sp: options.sp,
+                sp: options.userSP,
                 listName: options.config.userListName,
             }),
             userCacheOptions

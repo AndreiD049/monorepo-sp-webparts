@@ -4,6 +4,7 @@ import { CommentService } from './services/comment-service';
 import { isFinished } from "./utils";
 import { AttachmentService } from "./services/attachment-service";
 import { createTaskTree, TaskNode } from './graph';
+import { getAllPaged } from './utils';
 
 
 export {
@@ -13,5 +14,6 @@ export {
     ActionService,
     AttachmentService,
     createTaskTree,
-    TaskNode
+    TaskNode,
+    getAllPaged
 };

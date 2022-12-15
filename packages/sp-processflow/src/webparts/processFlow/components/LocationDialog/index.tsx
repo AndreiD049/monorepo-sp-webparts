@@ -2,8 +2,9 @@ import { IFlowLocation } from '@service/process-flow';
 import { uniq } from 'lodash';
 import { PrimaryButton, TextField } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { hideDialog } from 'sp-components';
+import { hideDialog, hideSpinner, showSpinner } from 'sp-components';
 import { MainService } from '../../services/main-service';
+import { LOADING_SPINNER } from '../../utils/constants';
 import { locationsAdded } from '../../utils/events';
 import { GlobalContext } from '../../utils/globalContext';
 import { CountryPicker } from '../CountryPicker';
@@ -63,56 +64,61 @@ export const LocationDialog: React.FC<ILocationDialogProps> = (props) => {
 
     const handleSubmit = React.useCallback(
         async (evt: React.FormEvent<HTMLElement>) => {
-            evt.preventDefault();
-            hideDialog(props.dialogId);
-            if (props.operation === 'addMultiple') {
-                // Get all current processes
-                const processes = await ProcessService.getByFlow(
-                    selectedFlow.Id
-                );
-                const alreadyCreatedPId = new Set(
-                    (await FlowLocationService.getByFlow(selectedFlow.Id))
-                        .filter((l) => l.Title === data.Title)
-                        .map((l) => l.Process.Id)
-                );
-                const missingProcesses = processes.filter(
-                    (p) => !alreadyCreatedPId.has(p.Id)
-                );
-                const payloads: Omit<IFlowLocation, 'Id' | 'Process'>[] =
-                    missingProcesses.map((p) => ({
+            try {
+                showSpinner(LOADING_SPINNER);
+                evt.preventDefault();
+                hideDialog(props.dialogId);
+                if (props.operation === 'addMultiple') {
+                    // Get all current processes
+                    const processes = await ProcessService.getByFlow(
+                        selectedFlow.Id
+                    );
+                    const alreadyCreatedPId = new Set(
+                        (await FlowLocationService.getByFlow(selectedFlow.Id))
+                            .filter((l) => l.Title === data.Title)
+                            .map((l) => l.Process.Id)
+                    );
+                    const missingProcesses = processes.filter(
+                        (p) => !alreadyCreatedPId.has(p.Id)
+                    );
+                    const payloads: Omit<IFlowLocation, 'Id' | 'Process'>[] =
+                        missingProcesses.map((p) => ({
+                            FlowId: selectedFlow.Id,
+                            ProcessId: p.Id,
+                            DoneBy: data.DoneBy,
+                            Title: data.Title,
+                            Country: data.Country,
+                        }));
+                    await FlowLocationService.addFlowLocations(payloads);
+                    locationsAdded();
+                    return null;
+                } else if (props.operation === 'update') {
+                    // Update the location
+                    await FlowLocationService.updateFlowLocation(
+                        props.location.Id,
+                        data
+                    );
+                } else if (props.operation === 'add') {
+                    const existingLocations =
+                        await FlowLocationService.getByProcess(props.processId);
+                    const alreadyCreated = existingLocations.find(
+                        (l) => l.Title === data.Title
+                    );
+                    if (alreadyCreated) {
+                        await FlowLocationService.removeFlowLocation(
+                            alreadyCreated.Id
+                        );
+                    }
+                    await FlowLocationService.addFlowLocation({
                         FlowId: selectedFlow.Id,
-                        ProcessId: p.Id,
+                        ProcessId: props.processId,
                         DoneBy: data.DoneBy,
                         Title: data.Title,
                         Country: data.Country,
-                    }));
-                await FlowLocationService.addFlowLocations(payloads);
-                locationsAdded();
-                return null;
-            } else if (props.operation === 'update') {
-                // Update the location
-                await FlowLocationService.updateFlowLocation(
-                    props.location.Id,
-                    data
-                );
-            } else if (props.operation === 'add') {
-                const existingLocations =
-                    await FlowLocationService.getByProcess(props.processId);
-                const alreadyCreated = existingLocations.find(
-                    (l) => l.Title === data.Title
-                );
-                if (alreadyCreated) {
-                    await FlowLocationService.removeFlowLocation(
-                        alreadyCreated.Id
-                    );
+                    });
                 }
-                await FlowLocationService.addFlowLocation({
-                    FlowId: selectedFlow.Id,
-                    ProcessId: props.processId,
-                    DoneBy: data.DoneBy,
-                    Title: data.Title,
-                    Country: data.Country,
-                });
+            } finally {
+                hideSpinner(LOADING_SPINNER);
             }
         },
         [selectedFlow, data, props.location]

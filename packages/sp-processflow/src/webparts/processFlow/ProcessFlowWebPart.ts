@@ -15,9 +15,7 @@ import { ProcessFlow } from './components/ProcessFlow';
 import { IJsonConfig, PropertyPaneJsonConfiguration } from 'json-configuration';
 import { IProcessFlowConfig } from './IProcessFlowConfig';
 import { SPnotify } from 'sp-react-notifications';
-import {
-    MessageBarType,
-} from 'office-ui-fabric-react';
+import { MessageBarType } from 'office-ui-fabric-react';
 import { setupLists } from './utils/setup-lists';
 import { MainService } from './services/main-service';
 
@@ -51,7 +49,8 @@ export default class ProcessFlowWebPart extends BaseClientSideWebPart<IProcessFl
                     }),
                 ]);
             MainService.InitServices({
-                sp: ProcessFlowWebPart.SPBuilder.getSP(),
+                sp: ProcessFlowWebPart.SPBuilder.getSP(this.properties.config.rootSite),
+                userSP: ProcessFlowWebPart.SPBuilder.getSP(this.properties.config.userListRootSite),
                 config: this.properties.config,
             });
         } catch (err) {

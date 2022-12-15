@@ -1,32 +1,30 @@
-import { IField, IItemAddResult, IList, SPFI } from 'sp-preset';
+import { getAllPaged } from '@service/sp-cip';
+import { IField, IItemAddResult, IItemUpdateResult, IList, SPFI } from 'sp-preset';
 import { IProcess } from '../models';
 import { IServiceProps } from '../models/IServiceProps';
 
 const SELECT = [
     'Id',
     'System',
-    'Process',
+    'Title',
     'Category',
     'FlowId',
-    'Manuals',
+    'Manual',
     'Allocation',
     'UOM',
+    'Team',
 ];
 
 export class ProcessService {
     private list: IList;
     private systemChoices: string[] = [];
     private systemField: IField;
-    private processChoices: string[] = [];
-    private processOptionsField: IField;
-    private categorChoices: string[] = [];
+    private categoryChoices: string[] = [];
     private categoryField: IField;
 
     constructor(private props: IServiceProps) {
         this.list = this.props.sp.web.lists.getByTitle(this.props.listName);
         this.systemField = this.list.fields.getByTitle('System');
-        this.processOptionsField =
-            this.list.fields.getByTitle('ProcessOptions');
         this.categoryField = this.list.fields.getByTitle('Category');
     }
 
@@ -35,14 +33,14 @@ export class ProcessService {
     }
 
     async getByFlow(flowId: number): Promise<IProcess[]> {
-        return this.list.items
+        return getAllPaged(this.list.items
             .filter(`FlowId eq ${flowId}`)
-            .select(...SELECT)();
+            .select(...SELECT));
     }
 
     async addProcess(payload: Omit<IProcess, 'Id'>): Promise<IItemAddResult> {
-        await this.updateSystemChoices(payload.System);
-        await this.updateProcessOptions(payload.Process);
+        await this.updateSystemChoices([payload.System]);
+        await this.updateCategoryOptions([payload.Category]);
         return this.list.items.add(payload);
     }
 
@@ -51,15 +49,22 @@ export class ProcessService {
     ): Promise<IItemAddResult[]> {
         const [batchedSP, execute] = this.props.sp.batched();
         const result: IItemAddResult[] = [];
+        await this.updateSystemChoices(payload.map((p) => p.System));
+        await this.updateCategoryOptions(payload.map((p) => p.Category));
         for (const process of payload) {
-            console.log(process);
-            const added = batchedSP.web.lists
+            batchedSP.web.lists
                 .getByTitle(this.props.listName)
                 .items.add(process)
                 .then((res) => result.push(res));
         }
         await execute();
         return result;
+    }
+
+    async updateProcess(id: number, payload: Partial<IProcess>): Promise<IItemUpdateResult> {
+        if (payload.System) await this.updateSystemChoices([payload.System]);
+        if (payload.Category) await this.updateCategoryOptions([payload.Category]);
+        return this.list.items.getById(id).update(payload);
     }
 
     async removeProcess(id: number): Promise<void> {
@@ -71,37 +76,45 @@ export class ProcessService {
         return this.systemChoices;
     }
 
-    async getProcessOptions(): Promise<string[]> {
-        this.processChoices = (await this.processOptionsField()).Choices || [];
-        return this.processChoices;
-    }
-
     async getCategoryOptions(): Promise<string[]> {
-        this.categorChoices = (await this.categoryField()).Choices || [];
-        return this.categorChoices;
+        this.categoryChoices = (await this.categoryField()).Choices || [];
+        return this.categoryChoices;
     }
 
-    private async updateSystemChoices(system: string): Promise<void> {
+    private async updateSystemChoices(systems: string[]): Promise<void> {
         if (this.systemChoices.length === 0) {
             this.systemChoices = await this.getSystemChoices();
         }
-        if (!this.systemChoices.includes(system)) {
+        // Find the systems that are new
+        const newSystems = systems.filter(
+            (s) => this.systemChoices.indexOf(s) === -1
+        );
+        if (newSystems.length > 0) {
+            const toUpdate = Array.from(
+                new Set([...this.systemChoices, ...newSystems])
+            );
             await this.systemField.update({
-                Choices: [...this.systemChoices, system],
+                Choices: toUpdate,
             });
             this.systemChoices = [];
         }
     }
 
-    private async updateProcessOptions(process: string): Promise<void> {
-        if (this.processChoices.length === 0) {
-            this.processChoices = await this.getProcessOptions();
+    private async updateCategoryOptions(categories: string[]): Promise<void> {
+        if (this.categoryChoices.length === 0) {
+            this.categoryChoices = await this.getCategoryOptions();
         }
-        if (!this.processChoices.includes(process)) {
-            await this.processOptionsField.update({
-                Choices: [...this.processChoices, process],
+        const newCategories = categories.filter(
+            (c) => this.categoryChoices.indexOf(c) === -1
+        );
+        if (newCategories.length > 0) {
+            const toUpdate = Array.from(
+                new Set([...this.categoryChoices, ...newCategories])
+            );
+            await this.categoryField.update({
+                Choices: toUpdate,
             });
-            this.processChoices = [];
+            this.categoryChoices = [];
         }
     }
 }

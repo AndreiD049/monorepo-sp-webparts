@@ -1,6 +1,5 @@
 interface CssExports {
-    fade: string;
-    invisible: string;
+    container: string;
 }
 const styles: CssExports;
 export default styles;

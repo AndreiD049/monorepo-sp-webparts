@@ -1,19 +1,19 @@
 import { ITextFieldProps, TextField } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { MainService } from '../../services/main-service';
-import styles from './SystemTextField.module.scss';
 
-export interface ISystemTextFieldProps extends ITextFieldProps {
+export interface IGenericTextFieldProps extends ITextFieldProps {
+    options: string[];
+    getOptions: () => Promise<string[]>;
+    listId: string;
 }
 
-export const SystemTextField: React.FC<ISystemTextFieldProps> = (props) => {
-    const { ProcessService } = MainService;
-    const [choices, setChoices] = React.useState<string[]>([]);
+export const GenericTextField: React.FC<IGenericTextFieldProps> = ({ options = [], ...props }) => {
+    const [choices, setChoices] = React.useState<string[]>(options);
 
     React.useEffect(() => {
         async function run(): Promise<void> {
             if (!props.readOnly && !props.disabled && choices.length === 0) {
-                setChoices(await ProcessService.getSystemChoices());
+                setChoices(await props.getOptions());
             }
         }
         run().catch((err) => console.error(err));
@@ -23,9 +23,9 @@ export const SystemTextField: React.FC<ISystemTextFieldProps> = (props) => {
         <div>
             <TextField
                 {...props}
-                list='SystemTextField'
+                list={props.listId}
             />
-            <datalist id='SystemTextField'>
+            <datalist id={props.listId}>
                 {
                     choices.map((c) => <option key={c}>{c}</option>)
                 }
