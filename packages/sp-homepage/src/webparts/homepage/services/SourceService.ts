@@ -18,7 +18,7 @@ export default class SourceService {
     private cache;
 
     public constructor(
-        private source: ISource,
+        public source: ISource,
         private select?: string[],
         private expand?: string[]
     ) {

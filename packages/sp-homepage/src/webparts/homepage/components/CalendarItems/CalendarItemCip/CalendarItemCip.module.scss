@@ -1,0 +1,14 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .5em;
+    min-height: 40px;
+
+    &:hover {
+        background-color: '[theme: neutralLighterAlt, default: #c86c70]';
+    }
+}

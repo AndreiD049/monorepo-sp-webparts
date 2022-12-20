@@ -74,15 +74,32 @@ export class ConditionChecker {
     private compare(configValue: string | string[], userValue: string | string[]): boolean {
         // if we compare arrays, then all configValues should be found in userValues
         if (Array.isArray(configValue) && Array.isArray(userValue)) {
-            const userSet = new Set(userValue.map((uv) => uv.toLowerCase()));
-            return configValue.every((v) => userSet.has(v.toLowerCase()));
+            return this.compareLists(configValue, userValue);
         } else if (typeof configValue === 'string' && typeof userValue === 'string') {
-            return configValue.toLowerCase() === userValue.toLowerCase();
+            return this.compareString(configValue, userValue);
         } else {
             this.error(
                 `Invalid configuration. Cannot compare different types for values '${configValue}' and '${userValue}'`
             );
         }
+    }
+
+    private compareString(configValue: string, userValue: string): boolean {
+        if (configValue.startsWith("!")) {
+            return configValue.slice(1) !== userValue;
+        }
+        return configValue === userValue;
+    }
+
+    private compareLists(configValues: string[], userValues: string[]): boolean {
+        const userSet = new Set(userValues.map((userValue) => userValue.toLowerCase()));
+        return configValues.every((configValue) => {
+            const value = configValue.slice(1).toLowerCase();
+            if (configValue.startsWith("!")) {
+                return !userSet.has(value);
+            }
+            return userSet.has(configValue.toLowerCase());
+        })
     }
 
     private error(message: string): void {

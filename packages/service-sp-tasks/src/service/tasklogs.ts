@@ -71,7 +71,7 @@ export class TaskLogsService {
         });
         // Additional query for incomplete tasks
         this._wrap(
-            list.items.filter(this.getIncompleteUserTasks(dt))
+            list.items.filter(this.getIncompleteTasks(dt))
         )().then((r) => (res = res.concat(r)));
 
         await execute();
@@ -79,9 +79,10 @@ export class TaskLogsService {
     }
 
     async getTaskLogsByUserId(date: Date, userId: number): Promise<ITaskLog[]> {
-        let res: ITaskLog[] = [];
         const dt = DateTime.fromJSDate(date);
-        // Additional query for incomplete tasks
+        let res: ITaskLog[] = await this._wrap(
+            this.list.items.filter(this.getIncompleteUserTasks(userId, dt))
+        )();
         return this._wrap(
             this.list.items.filter(this.getTaskLogFilter(userId, dt))
         )().then((r) => (res = res.concat(r)));
@@ -192,7 +193,11 @@ export class TaskLogsService {
      * @param dt upper date for incomplete tasks filter
      * @returns 
      */
-    private getIncompleteUserTasks(dt: DateTime) {
+    private getIncompleteTasks(dt: DateTime) {
         return `(Completed eq false) and (Date le '${dt.toISODate()}')`;
+    }
+
+    private getIncompleteUserTasks(userId: number, dt: DateTime) {
+        return `(Completed eq false) and (UserId eq ${userId}) and (Date le '${dt.toISODate()}')`;
     }
 }

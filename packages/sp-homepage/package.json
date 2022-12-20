@@ -17,6 +17,7 @@
     "@microsoft/sp-webpart-base": "1.15.2",
     "@service/sp-cip": "^1.0.0",
     "@service/sp-tasks": "^1.0.0",
+    "colored-text": "^1.0.0",
     "indexeddb-manual-cache": "^1.0.0",
     "json-configuration": "^0.0.1",
     "office-ui-fabric-react": "7.185.7",

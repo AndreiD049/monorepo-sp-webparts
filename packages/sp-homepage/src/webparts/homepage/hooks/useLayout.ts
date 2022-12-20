@@ -2,6 +2,7 @@ import React from 'react';
 import { Layout, Layouts } from 'react-grid-layout';
 import useWebStorage from 'use-web-storage-api';
 import IConfig from '../models/IConfig';
+import ISection from '../models/ISection';
 import IUser from '../models/IUser';
 
 export function getLayoutKey(currentUser?: IUser, selectedUser?: IUser): string {
@@ -14,7 +15,7 @@ export function getLayoutKey(currentUser?: IUser, selectedUser?: IUser): string 
 export const useLayout = (
     currentUser: IUser,
     selectedUser: IUser,
-    config: IConfig
+    config: IConfig,
 ): { layout: Layouts; handleLayoutChange: (l: Layout[], all: Layouts) => void } => {
     const [layouts, setLayouts] = useWebStorage<{ [key: string]: Layouts }>(
         {

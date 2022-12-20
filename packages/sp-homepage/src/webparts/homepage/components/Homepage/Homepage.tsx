@@ -12,7 +12,7 @@ import { filterSections } from '../../services/SectionService';
 import { SectionFactory } from '../SectionFactory';
 import { ConditionChecker } from '../../services/ConditionChecker';
 import { SectionPreProcessor } from '../../services/SectionPreProcessor';
-import { Callout, Dialog } from 'sp-components';
+import { Callout, Dialog, ErrorBoundary } from 'sp-components';
 import { CALLOUT_ID, DIALOG_ID } from '../../constants';
 import { useLayout } from '../../hooks/useLayout';
 
@@ -28,8 +28,6 @@ export const Homepage: React.FC<IHomepageProps> = (props) => {
         selectedTeam: team,
         selectedUser: selectedUser,
     });
-    const { layout, handleLayoutChange } = useLayout(context.currentUser, selectedUser, props.properties.config);
-
     const sections = React.useMemo(() => {
         if (selectedUser && team && context.currentUser) {
             const conditionChecker = new ConditionChecker(context.currentUser, selectedUser, team);
@@ -42,6 +40,11 @@ export const Homepage: React.FC<IHomepageProps> = (props) => {
         }
         return [];
     }, [selectedUser, team, context.currentUser]);
+    const { layout, handleLayoutChange } = useLayout(
+        context.currentUser,
+        selectedUser,
+        props.properties.config
+    );
 
     const body = React.useMemo(() => {
         return sections.map((s) => (
@@ -79,34 +82,36 @@ export const Homepage: React.FC<IHomepageProps> = (props) => {
     }, [team]);
 
     return (
-        <GlobalContext.Provider value={context}>
-            <Callout id={CALLOUT_ID} />
-            <Dialog id={DIALOG_ID} />
-            <GridWrapper
-                locked={locked}
-                handleLock={(locked) => setLocked(locked)}
-                team={team}
-                handleTeamSelect={(team) => setTeam(team)}
-                user={selectedUser}
-                handleUserSelect={(user) => setSelectedUser(user)}
-            >
-                {sections.length > 0 && (
-                    <ResponsiveGridLayout
-                        className="layout"
-                        rowHeight={30}
-                        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-                        layouts={layout}
-                        measureBeforeMount={false}
-                        // preventCollision
-                        useCSSTransforms
-                        isResizable={!locked}
-                        isDraggable={!locked}
-                        onLayoutChange={handleLayoutChange}
-                    >
-                        {body}
-                    </ResponsiveGridLayout>
-                )}
-            </GridWrapper>
-        </GlobalContext.Provider>
+        <ErrorBoundary>
+            <GlobalContext.Provider value={context}>
+                <Callout id={CALLOUT_ID} />
+                <Dialog id={DIALOG_ID} />
+                <GridWrapper
+                    locked={locked}
+                    handleLock={(locked) => setLocked(locked)}
+                    team={team}
+                    handleTeamSelect={(team) => setTeam(team)}
+                    user={selectedUser}
+                    handleUserSelect={(user) => setSelectedUser(user)}
+                >
+                    {sections.length > 0 && (
+                        <ResponsiveGridLayout
+                            className="layout"
+                            rowHeight={30}
+                            cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+                            layouts={layout}
+                            measureBeforeMount={false}
+                            // preventCollision
+                            useCSSTransforms
+                            isResizable={!locked}
+                            isDraggable={!locked}
+                            onLayoutChange={handleLayoutChange}
+                        >
+                            {body}
+                        </ResponsiveGridLayout>
+                    )}
+                </GridWrapper>
+            </GlobalContext.Provider>
+        </ErrorBoundary>
     );
 };
