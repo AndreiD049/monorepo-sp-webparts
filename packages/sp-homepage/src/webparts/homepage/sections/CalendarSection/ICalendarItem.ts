@@ -18,6 +18,10 @@ export interface ICalendarProcessFlowItem {
     Id: number;
     User: UserExanded;
     Status: string;
+    Flow: {
+        Id: number;
+    };
+    Team: string;
     Date: string;
     Process: {
         Id: number;
@@ -29,6 +33,7 @@ export type CalendarItemTypes = ICalendarCipItem | ICalendarProcessFlowItem;
 
 export interface IWrappedCalendarItem {
     type: CalendarTypes;
+    pageUrl: string;
     date: string;
     item: CalendarItemTypes;
 }

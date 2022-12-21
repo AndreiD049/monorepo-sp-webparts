@@ -7,7 +7,7 @@ export function getExpandString(source: ISource): string[] {
         case "cip":
             return ['Responsible'];
         case "processflow":
-            return ['User', 'Process']
+            return ['User', 'Process', 'Flow']
         default:
             throw Error(`Unknown source type ${sourceType}`);
     }
@@ -19,7 +19,7 @@ export function getSelectString(source: ISource): string[] {
         case "cip":
             return ['Responsible/Id', 'Responsible/Title', 'Responsible/EMail', 'DueDate', 'Status', 'ID', 'Title'];
         case "processflow":
-            return ['User/Id', 'User/Title', 'User/EMail', 'Date', 'Status', 'ID', 'Process/Id', 'Process/Title']
+            return ['User/Id', 'User/Title', 'User/EMail', 'Date', 'Team', 'Flow/Id', 'Status', 'ID', 'Process/Id', 'Process/Title']
         default:
             throw Error(`Unknown source type ${sourceType}`);
     }

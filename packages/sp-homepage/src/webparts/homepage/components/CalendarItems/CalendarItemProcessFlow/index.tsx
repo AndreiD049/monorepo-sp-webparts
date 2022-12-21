@@ -2,28 +2,29 @@ import { textColor } from 'colored-text';
 import { IconButton, Persona, PersonaSize } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Pill } from 'sp-components';
-import { ICalendarProcessFlowItem } from '../../../sections/CalendarSection/ICalendarItem';
+import { ICalendarProcessFlowItem, IWrappedCalendarItem } from '../../../sections/CalendarSection/ICalendarItem';
 import styles from './CalendarItemProcessFlow.module.scss';
 
 export interface ICalendarItemProcessFlowProps {
-    item: ICalendarProcessFlowItem;
+    wrapped: IWrappedCalendarItem;
 }
 
 export const CalendarItemProcessFlow: React.FC<ICalendarItemProcessFlowProps> = (props) => {
-    const type = "PROC";
-    const typeColor = React.useMemo(() => textColor(type), [props.item]);
-    const statusColor = React.useMemo(() => textColor(props.item.Status), [props.item]);
+    const item = props.wrapped.item as ICalendarProcessFlowItem;
+    const type = "PF";
+    const typeColor = React.useMemo(() => textColor(type), [item]);
+    const statusColor = React.useMemo(() => textColor(item.Status), [item]);
     return (
         <div className={styles.container}>
             <Persona 
                 size={PersonaSize.size32}
-                text={props.item.User.Title}
-                imageUrl={`/_layouts/15/userphoto.aspx?accountname=${props.item.User.EMail}&Size=L`}
+                text={item.User.Title}
+                imageUrl={`/_layouts/15/userphoto.aspx?accountname=${item.User.EMail}&Size=L`}
             />
             <Pill title="Process-flow" value={type} style={{ color: typeColor.fg, backgroundColor: typeColor.bg, minWidth: 60 }} />
-            <Pill style={{ color: statusColor.fg, backgroundColor: statusColor.bg }} value={props.item.Status} />
-            <div>{props.item.Process.Title}</div>
-            <IconButton iconProps={{ iconName: 'OpenInNewTab'}} />
+            <Pill style={{ color: statusColor.fg, backgroundColor: statusColor.bg }} value={item.Status} />
+            <div>{item.Process.Title}</div>
+            <IconButton iconProps={{ iconName: 'OpenInNewTab'}} onClick={() => window.open(`${props.wrapped.pageUrl}#/process/${item.Process.Id}?flow=${item.Flow.Id}&team=${item.Team}`)} />
         </div>
     );
 };

@@ -13,9 +13,9 @@ export interface ICalendarItemsProps {
 const CalendarItem: React.FC<{ wrapped: IWrappedCalendarItem }> = (props) => {
     switch (props.wrapped.type) {
         case 'cip':
-            return <CalendarItemCip item={props.wrapped.item as ICalendarCipItem} />
+            return <CalendarItemCip wrapped={props.wrapped} />
         case 'processflow':
-            return <CalendarItemProcessFlow item={props.wrapped.item as ICalendarProcessFlowItem} />
+            return <CalendarItemProcessFlow wrapped={props.wrapped} />
         default:
             return <div>Unknwon item type. Check with Support.</div>
     }
