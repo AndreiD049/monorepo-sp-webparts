@@ -1,8 +1,8 @@
 import { Checkbox, MessageBarType, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { LoadingSpinner } from 'sp-components';
 import { SPnotify } from 'sp-react-notifications';
 import { ExpandHeader } from '../../components/ExpandHeader';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { NoData } from '../../components/NoData';
 import { Pill } from '../../components/Pill';
 import { listenSectionEvent } from '../../components/Section/section-events';

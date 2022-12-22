@@ -54,7 +54,7 @@ export const TitleCell: React.FC<ITitleCellProps> = ({ level = 0, style = {}, ..
                     prevSiblingId={props.prevSiblingId}
                 />
             </div>
-            {props.orphan && <Pill value="Subtask" />}
+            {props.orphan && <Pill value="Subtask" className={styles.subtaskPill} />}
             <div className={styles.titleCell}>
                 <Text
                     variant="medium"

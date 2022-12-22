@@ -4,8 +4,10 @@ import {
     ActionsCell,
     DueDateCell,
     hideDialog,
+    hideSpinner,
     PriorityCell,
     showDialog,
+    showSpinner,
     StatusCell,
     TaskShimmer,
     TimeLogGeneral,
@@ -19,12 +21,12 @@ import { ITaskOverviewWithSource } from '../../sections/CipSection';
 import { TaskNode } from '@service/sp-cip';
 import { convertTask } from './utils';
 import { useRelink } from './useRelink';
-import { hideSpinner, showSpinner } from '../LoadingSpinner';
 import { tasksUpdated } from '../../sections/CipSection/useTasks';
 import { SPnotify } from 'sp-react-notifications';
 import { GlobalContext } from '../../context/GlobalContext';
 import { getSourceKey } from '../../utils';
 import { IAction } from '@service/sp-cip/dist/services/action-service';
+import { dispatchSectionHandler } from '../Section/section-events';
 
 export interface ITaskCellProps {
     column: IColumn;
@@ -127,6 +129,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                 }
                 const updated = await service.getTask(task.Id);
                 tasksUpdated(convertTask(updated, task.service));
+                dispatchSectionHandler('Calendar', 'REFRESH');
             } finally {
                 hideSpinner(CIP_SPINNER_ID);
             }
@@ -187,6 +190,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                 );
                 const updated = await task.service.taskService.getTask(task.Id);
                 tasksUpdated(convertTask(updated, task.service));
+                dispatchSectionHandler('Calendar', 'REFRESH');
             } finally {
                 hideSpinner(CIP_SPINNER_ID);
             }

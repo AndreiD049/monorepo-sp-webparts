@@ -13,8 +13,8 @@ import { NoData } from '../../components/NoData';
 import { ICipService, useTasks } from './useTasks';
 import { ISiteUserInfo } from 'sp-preset';
 import { getSourceKey } from '../../utils';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { CIP_SPINNER_ID } from '../../constants';
+import { LoadingSpinner } from 'sp-components';
 
 export interface ICipSectionProps extends ISectionProps {
     // Props go here

@@ -1,7 +1,7 @@
 import { Persona, PersonaSize, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { LoadingSpinner } from 'sp-components';
 import { GlobalContext } from '../../context/GlobalContext';
-import { LoadingSpinner } from '../LoadingSpinner';
 import styles from './UserInfo.module.scss';
 
 export interface IUserInfoProps {

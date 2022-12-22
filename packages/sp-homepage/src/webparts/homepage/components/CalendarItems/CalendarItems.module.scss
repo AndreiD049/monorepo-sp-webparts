@@ -1,7 +1,25 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
 
 .container {
-    margin-left: 1em;
+    width: 100%;
+    padding: 4px;
+    border-spacing: 4px;
+}
+
+.cell20 {
+    width: 20%;
+}
+
+.cell10 {
+    width: 10%;
+}
+
+.cell5 {
+    width: 5%;
+}
+
+.paddedCell {
+    padding-left: 8px;
 }
 
 .dateGroup {

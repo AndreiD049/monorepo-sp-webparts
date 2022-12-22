@@ -25,13 +25,13 @@ export function getSelectString(source: ISource): string[] {
     }
 }
 
-export function getSourceDate(source: ISource, item: CalendarItemTypes): string {
+export function getSourceDate(source: ISource, item: CalendarItemTypes): Date {
     const sourceType = source.type.toLowerCase() as CalendarTypes;
     switch (sourceType) {
         case "cip":
-            return new Date((item as ICalendarCipItem).DueDate).toLocaleDateString();
+            return new Date((item as ICalendarCipItem).DueDate);
         case "processflow":
-            return new Date((item as ICalendarProcessFlowItem).Date).toLocaleDateString();
+            return new Date((item as ICalendarProcessFlowItem).Date);
         default:
             throw Error(`Unknown source type ${sourceType}`);
     }

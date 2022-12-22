@@ -13,6 +13,36 @@ const SectionHeader: React.FC<{
     section: ISection;
 }> = ({ section }) => {
     if (!section.header) return null;
+
+    const controls = React.useMemo(() => {
+        const controls: JSX.Element[] = [];
+        if (!section.headerControls || section.headerControls.length === 0) return controls;
+        const lowerButtonsSet = new Set(section.headerControls.map((b) => b.toLowerCase()));
+        if (lowerButtonsSet.has('refresh')) {
+            controls.push(
+                <IconButton
+                    onClick={() => dispatchSectionHandler(section.name, 'REFRESH')}
+                    iconProps={{ iconName: 'Refresh' }}
+                />
+            );
+        }
+        if (lowerButtonsSet.has('goto')) {
+            controls.push(
+                <IconButton
+                    onClick={() => {
+                        if (section.sources.length > 0 && section.sources[0].pageUrl) {
+                            return window.open(section.sources[0].pageUrl, '_blank', 'noreferrer');
+                        }
+                        return null;
+                    }}
+                    className={styles.openNewTabButton}
+                    iconProps={{ iconName: 'OpenInNewTab' }}
+                />
+            );
+        }
+        return controls;
+    }, [section.headerControls]);
+
     return (
         <div className={styles.header}>
             <div className={styles.headerContent}>
@@ -22,20 +52,7 @@ const SectionHeader: React.FC<{
                 </div>
                 {/* Far items */}
                 <div>
-                    <IconButton
-                        onClick={() => dispatchSectionHandler(section.name, 'REFRESH')}
-                        iconProps={{ iconName: 'Refresh' }}
-                    />
-                    <IconButton
-                        onClick={() => {
-                            if (section.sources.length > 0 && section.sources[0].pageUrl) {
-                                return window.open(section.sources[0].pageUrl, '_blank', 'noreferrer');
-                            }
-                            return null;
-                        }}
-                        className={styles.openNewTabButton}
-                        iconProps={{ iconName: 'OpenInNewTab' }}
-                    />
+                    {controls}
                 </div>
             </div>
         </div>

@@ -1,7 +1,7 @@
 import { groupBy } from '@microsoft/sp-lodash-subset';
 import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { ICalendarCipItem, ICalendarProcessFlowItem, IWrappedCalendarItem } from '../../sections/CalendarSection/ICalendarItem';
+import { IWrappedCalendarItem } from '../../sections/CalendarSection/ICalendarItem';
 import { CalendarItemCip } from './CalendarItemCip';
 import { CalendarItemProcessFlow } from './CalendarItemProcessFlow';
 import styles from './CalendarItems.module.scss';
@@ -23,20 +23,20 @@ const CalendarItem: React.FC<{ wrapped: IWrappedCalendarItem }> = (props) => {
 
 export const CalendarItems: React.FC<ICalendarItemsProps> = (props) => {
     const groupedItems = React.useMemo(() => {
-        return groupBy(props.items, (item) => item.date);
+        return groupBy(props.items, (item) => item.date.toLocaleDateString());
     }, [props.items]);
     const groups = React.useMemo(() => Object.keys(groupedItems), [groupedItems]);
 
     return (
-        <div className={styles.container}>
+        <table className={styles.container}>
             {
                 groups.map((groupDate) => (
-                    <div key={groupDate} className={styles.dateGroup}>
+                    <>
                         <Text block variant='mediumPlus' className={styles.groupText}>{groupDate}</Text>
                         { groupedItems[groupDate].map((item) => (<CalendarItem key={item.item.Id} wrapped={item} />))}
-                    </div>
+                    </>
                 ))
             }
-        </div>
+        </table>
     );
 };

@@ -6,6 +6,9 @@ export const TASK_UPDATED_EVT = 'sp-homepage-cip-task-updated';
 export const CALLOUT_ID = 'sp-homepage-callout';
 export const DIALOG_ID = 'sp-homepage-dialog';
 export const CIP_SPINNER_ID = `sp-homepage-cip-spinner`;
+export const TASKS_SPINNER_ID = `sp-homepage-tasks-spinner`;
+export const CALENDAR_SPINNER_ID = `sp-homepage-calendar-spinner`;
+export const APPRAISAL_SPINNER_ID = `sp-homepage-appraisal-spinner`;
 
 // Time
 export const MINUTE = 1000 * 60;

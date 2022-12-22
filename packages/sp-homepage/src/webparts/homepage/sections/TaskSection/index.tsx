@@ -9,12 +9,12 @@ import {
 import HomepageWebPart from '../../HomepageWebPart';
 import { GlobalContext } from '../../context/GlobalContext';
 import ITaskLog, { TaskStatus } from '@service/sp-tasks/dist/models/ITaskLog';
-import { Task } from 'sp-components';
+import { LoadingSpinner, Task } from 'sp-components';
 import styles from './TaskSection.module.scss';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { Text } from 'office-ui-fabric-react';
 import { IndexedDbCache } from 'indexeddb-manual-cache';
 import { listenSectionEvent } from '../../components/Section/section-events';
+import { TASKS_SPINNER_ID } from '../../constants';
 
 export interface ITaskSectionProps extends ISectionProps {
     // Props go here

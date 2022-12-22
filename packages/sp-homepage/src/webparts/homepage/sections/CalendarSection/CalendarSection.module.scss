@@ -4,9 +4,21 @@
     min-width: 1px;
 }
 
+.header {
+    text-align: center;
+    font-weight: bold;
+}
+
+.monthCalendar {
+    button[role='gridcell'][aria-selected='true'] {
+        background-color: "[theme: themePrimary, default: #a4262c]";
+        color: "[theme: white, default: #ffffff]";
+    }
+}
+
 .calendarContainer {
     display: flex;
     flex-flow: row nowrap;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
 }

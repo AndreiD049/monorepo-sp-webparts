@@ -34,6 +34,6 @@ export type CalendarItemTypes = ICalendarCipItem | ICalendarProcessFlowItem;
 export interface IWrappedCalendarItem {
     type: CalendarTypes;
     pageUrl: string;
-    date: string;
+    date: Date;
     item: CalendarItemTypes;
 }
