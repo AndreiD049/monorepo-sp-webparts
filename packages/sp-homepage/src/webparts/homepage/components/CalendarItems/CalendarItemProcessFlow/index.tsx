@@ -6,7 +6,6 @@ import {
     ICalendarProcessFlowItem,
     IWrappedCalendarItem,
 } from '../../../sections/CalendarSection/ICalendarItem';
-import styles from './CalendarItemProcessFlow.module.scss';
 import tableStyles from '../CalendarItems.module.scss';
 import { getStatusStyles } from '../statusStyles';
 
@@ -31,40 +30,39 @@ export const CalendarItemProcessFlow: React.FC<ICalendarItemProcessFlowProps> = 
         };
     }, [item.Status]);
 
+    const handleGotoClick = React.useCallback(() => {
+        window.open(
+            `${props.wrapped.pageUrl}#/process/${item.Process.Id}?flow=${item.Flow.Id}&team=${item.Team}`,
+            '_blank',
+            'noreferrer'
+        );
+    }, []);
+
     return (
-        <tr className={styles.container}>
-            <td className={tableStyles.cell20}>
+        <>
+            <td className={`${tableStyles.cell20} ${tableStyles.paddedl5}`}>
                 <Persona
                     size={PersonaSize.size32}
                     text={item.User.Title}
                     imageUrl={`/_layouts/15/userphoto.aspx?accountname=${item.User.EMail}&Size=L`}
                 />
             </td>
-            <td className={tableStyles.cell10}>
+            <td className={`${tableStyles.cell10} ${tableStyles.paddedl5}`}>
                 <Pill
                     title="Process-flow"
                     value={type}
                     style={{ color: typeColor.fg, backgroundColor: typeColor.bg, minWidth: 60 }}
                 />
             </td>
-            <td className={tableStyles.cell10}>
-                <Pill
-                    style={statusStyles}
-                    title={item.Status}
-                    value={item.Status}
-                />
+            <td className={`${tableStyles.cell10} ${tableStyles.paddedl5}`}>
+                <Pill style={statusStyles} title={item.Status} value={item.Status} />
             </td>
-            <td className={tableStyles.paddedCell}><Text variant='medium'>{item.Process.Title}</Text></td>
+            <td className={`${tableStyles.paddedCell} ${tableStyles.paddedl5}`}>
+                <Text variant="medium">{item.Process.Title}</Text>
+            </td>
             <td className={tableStyles.cell5}>
-                <IconButton
-                    iconProps={{ iconName: 'OpenInNewTab' }}
-                    onClick={() =>
-                        window.open(
-                            `${props.wrapped.pageUrl}#/process/${item.Process.Id}?flow=${item.Flow.Id}&team=${item.Team}`
-                        )
-                    }
-                />
+                <IconButton iconProps={{ iconName: 'OpenInNewTab' }} onClick={handleGotoClick} />
             </td>
-        </tr>
+        </>
     );
 };

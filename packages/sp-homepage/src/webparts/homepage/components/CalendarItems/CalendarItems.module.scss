@@ -3,7 +3,7 @@
 .container {
     width: 100%;
     padding: 4px;
-    border-spacing: 4px;
+    border-spacing: 0px;
 }
 
 .cell20 {
@@ -16,6 +16,18 @@
 
 .cell5 {
     width: 5%;
+}
+
+.paddedl5 {
+    padding-left: .5em;
+}
+
+.row {
+    margin-left: 1em;
+
+    &:hover {
+        background-color: '[theme: neutralLighter, default: #c86c70]';
+    }
 }
 
 .paddedCell {

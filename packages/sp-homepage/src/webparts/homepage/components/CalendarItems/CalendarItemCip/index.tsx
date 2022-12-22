@@ -6,7 +6,6 @@ import {
 import { textColor } from 'colored-text';
 import { Pill } from 'sp-components';
 import { IconButton, Persona, PersonaSize, Text } from 'office-ui-fabric-react';
-import styles from './CalendarItemCip.module.scss';
 import tableStyles from '../CalendarItems.module.scss';
 import { getStatusStyles } from '../statusStyles';
 
@@ -31,16 +30,20 @@ export const CalendarItemCip: React.FC<ICalendarItemCipProps> = (props) => {
         };
     }, [item.Status]);
 
+    const handleGotoClick = React.useCallback(() => {
+        window.open(`${props.wrapped.pageUrl}#/task/${item.Id}`, '_blank', 'noreferrer');
+    }, []);
+
     return (
-        <tr className={styles.container}>
-            <td className={tableStyles.cell20}>
+        <>
+            <td className={`${tableStyles.cell20} ${tableStyles.paddedl5}`}>
                 <Persona
                     size={PersonaSize.size32}
                     text={item.Responsible.Title}
                     imageUrl={`/_layouts/15/userphoto.aspx?accountname=${item.Responsible.EMail}&Size=L`}
                 />
             </td>
-            <td className={tableStyles.cell10}>
+            <td className={`${tableStyles.cell10} ${tableStyles.paddedl5}`}>
                 <Pill
                     title="Cip"
                     value={type}
@@ -51,24 +54,15 @@ export const CalendarItemCip: React.FC<ICalendarItemCipProps> = (props) => {
                     }}
                 />
             </td>
-            <td className={tableStyles.cell10}>
+            <td className={`${tableStyles.cell10} ${tableStyles.paddedl5}`}>
                 <Pill style={statusStyles} title={item.Status} value={item.Status} />
             </td>
-            <td className={tableStyles.paddedCell}>
+            <td className={tableStyles.paddedl5}>
                 <Text variant="medium">{item.Title}</Text>
             </td>
             <td className={tableStyles.cell5}>
-                <IconButton
-                    iconProps={{ iconName: 'OpenInNewTab' }}
-                    onClick={() =>
-                        window.open(
-                            `${props.wrapped.pageUrl}#/task/${item.Id}`,
-                            '_blank',
-                            'noreferrer'
-                        )
-                    }
-                />
+                <IconButton iconProps={{ iconName: 'OpenInNewTab' }} onClick={handleGotoClick} />
             </td>
-        </tr>
+        </>
     );
 };

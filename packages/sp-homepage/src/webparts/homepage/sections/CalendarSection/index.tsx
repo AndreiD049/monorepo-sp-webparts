@@ -9,11 +9,32 @@ import { DateTime } from 'luxon';
 import { ISectionProps } from '../../components/Section';
 import { defaultCalendarStrings } from './defaultCalendarStrings';
 import { getExpandString, getSelectString, getSourceDate } from './service-helper';
-import styles from './CalendarSection.module.scss';
 import { NoData } from '../../components/NoData';
 import { listenSectionEvent } from '../../components/Section/section-events';
 import { LoadingSpinner, showSpinner, hideSpinner } from 'sp-components';
 import { CALENDAR_SPINNER_ID } from '../../constants';
+import styles from './CalendarSection.module.scss';
+
+interface IHeaderProps {
+    calendarType: ChoiceDisplayType;
+    startDate: DateTime;
+    endDate: DateTime;
+}
+
+const Header: React.FC<IHeaderProps> = (props) => {
+    const headerText = React.useMemo(() => {
+        if (props.calendarType === 'week') {
+            return `${props.startDate.toFormat('EEE, d MMM')} - ${props.endDate.toFormat('d MMM')}`;
+        }
+        return props.startDate.toFormat('MMMM yyyy');
+    }, [props.calendarType, props.startDate]);
+
+    return (
+        <Text block variant="mediumPlus" className={styles.header}>
+            {headerText}
+        </Text>
+    );
+};
 
 export interface ICalendarSectionProps extends ISectionProps {
     // Props go here
@@ -76,7 +97,6 @@ export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
         });
     }, [selectedDate, items, startDate, endDate]);
 
-
     React.useEffect(() => {
         const listenHandlerRemove = listenSectionEvent(props.section.name, 'REFRESH', async () => {
             showSpinner(CALENDAR_SPINNER_ID);
@@ -91,56 +111,36 @@ export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
         };
     }, [props.section]);
 
-    const calendarWeekly = React.useMemo(() => {
-        if (choice !== 'week') return null;
+    const calendar = React.useMemo(() => {
         return (
             <Calendar
+                key={choice}
                 strings={defaultCalendarStrings}
                 value={selectedDate}
                 onSelectDate={(date) => setSelectedDate(date)}
-                isMonthPickerVisible={false}
-                isDayPickerVisible={true}
-            />
-        );
-    }, [choice, selectedDate]);
-
-    const calendarMonthly = React.useMemo(() => {
-        if (choice !== 'month') return null;
-        return (
-            <Calendar
+                isMonthPickerVisible={choice === 'month'}
+                isDayPickerVisible={choice === 'week'}
                 className={styles.monthCalendar}
-                strings={{ ...defaultCalendarStrings }}
-                value={selectedDate}
-                onSelectDate={(date) =>
-                    setSelectedDate(DateTime.fromJSDate(date).startOf('month').toJSDate())
-                }
-                isMonthPickerVisible={true}
-                isDayPickerVisible={false}
-                showGoToToday={false}
             />
         );
     }, [choice, selectedDate]);
 
     return (
         <div className={styles.container}>
-            <LoadingSpinner id={CALENDAR_SPINNER_ID} />
-            <Text block variant="mediumPlus" className={styles.header}>
-                {choice === 'week'
-                    ? `${startDate.toFormat('EEE, d MMM')} - ${endDate.toFormat('EEE, d MMM')}`
-                    : DateTime.fromJSDate(selectedDate).toFormat('MMMM yyyy')}
-            </Text>
+            <Header startDate={startDate} endDate={endDate} calendarType={choice} />
+
             <div className={styles.calendarContainer}>
                 <CalendarChoiceGroup
                     selectedChoice={choice}
                     onChoiceChange={(choice) => setChoice(choice)}
                 />
-                {calendarWeekly}
-                {calendarMonthly}
+                {calendar}
             </div>
+
             <Separator />
-            <div>
-                {filteredItems.length > 0 ? <CalendarItems items={filteredItems} /> : <NoData />}
-            </div>
+
+            {filteredItems.length > 0 ? <CalendarItems items={filteredItems} /> : <NoData />}
+            <LoadingSpinner id={CALENDAR_SPINNER_ID} />
         </div>
     );
 };
