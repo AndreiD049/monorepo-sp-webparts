@@ -23,17 +23,18 @@ export async function openDB(
   storeName: string,
   version?: number
 ): Promise<IDBDatabase> {
+  const store = storeName.toLowerCase();
   const request = window.indexedDB.open(name, version);
-  request.onupgradeneeded = getOnUpgradeNeeded(storeName);
+  request.onupgradeneeded = getOnUpgradeNeeded(store);
   return new Promise((resolve, reject) => {
     request.onerror = function (ev) {
       return reject(ev);
     };
     request.onsuccess = async function (_ev) {
       const db = this.result;
-      if (!db.objectStoreNames.contains(storeName) && !version) {
+      if (!db.objectStoreNames.contains(store) && !version) {
         db.close();
-        return resolve(await openDB(name, storeName, db.version + 1));
+        return resolve(await openDB(name, store, db.version + 1));
       }
       return resolve(db);
     };
@@ -46,10 +47,11 @@ export async function setValue<T>(
   val: T,
   key: string
 ): Promise<void> {
-  let db = await openDB(dbName, storeName);
+  const store = storeName.toLowerCase();
+  let db = await openDB(dbName, store);
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, "readwrite");
-    const os = transaction.objectStore(storeName);
+    const transaction = db.transaction(store, "readwrite");
+    const os = transaction.objectStore(store);
     const writeRequest = os.put(val, key);
     writeRequest.onsuccess = () => resolve();
     writeRequest.onerror = () =>
@@ -62,10 +64,11 @@ export async function getValue<T>(
   storeName: string,
   key: string
 ): Promise<T | null> {
-  let db = await openDB(dbName, storeName);
+  const store = storeName.toLowerCase();
+  let db = await openDB(dbName, store);
   return new Promise((resolve) => {
-    const transaction = db.transaction(storeName, "readonly");
-    const os = transaction.objectStore(storeName);
+    const transaction = db.transaction(store, "readonly");
+    const os = transaction.objectStore(store);
     const getRequest = os.get(key);
     getRequest.onsuccess = function () {
       resolve((this.result as T) || null);
@@ -81,10 +84,11 @@ export async function removeValue(
   storeName: string,
   key: string
 ): Promise<boolean> {
-  let db = await openDB(dbName, storeName);
+  const store = storeName.toLowerCase();
+  let db = await openDB(dbName, store);
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, "readwrite");
-    const os = transaction.objectStore(storeName);
+    const transaction = db.transaction(store, "readwrite");
+    const os = transaction.objectStore(store);
     const removeRequest = os.delete(key);
     removeRequest.onsuccess = function () {
       resolve(true);
@@ -99,10 +103,11 @@ export async function getAllKeys(
     dbName: string,
     storeName: string,
 ): Promise<IDBValidKey[]> {
-    let db = await openDB(dbName, storeName);
+    const store = storeName.toLowerCase();
+    let db = await openDB(dbName, store);
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(storeName, "readwrite");
-        const os = transaction.objectStore(storeName);
+        const transaction = db.transaction(store, "readwrite");
+        const os = transaction.objectStore(store);
         const letRequest = os.getAllKeys();
         letRequest.onsuccess = function () {
             resolve(this.result);

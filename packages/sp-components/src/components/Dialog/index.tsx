@@ -67,25 +67,29 @@ export const Dialog: React.FC<ISPDialogProps> = (props) => {
         return () => document.removeEventListener(evtName, handler);
     }, [props.id]);
 
-    return (
-        <FluentDialog
-            hidden={!visible}
-            minWidth="initial"
-            maxWidth="initial"
-            {...dialogProps}
-            onDismiss={() => {
-                dialogProps.onDismiss && dialogProps.onDismiss();
-                hideDialog(props.id);
-            }}
-        >
-            {content}
-            {footer && (
-                <DialogFooter styles={{ actions: { lineHeight: 'initial' } }}>
-                    {footer}
-                </DialogFooter>
-            )}
-        </FluentDialog>
-    );
+    const dialog = React.useMemo(() => {
+        return (
+            <FluentDialog
+                minWidth="initial"
+                maxWidth="initial"
+                {...dialogProps}
+                hidden={!visible}
+                onDismiss={() => {
+                    dialogProps.onDismiss && dialogProps.onDismiss();
+                    hideDialog(props.id);
+                }}
+            >
+                {content}
+                {footer && (
+                    <DialogFooter styles={{ actions: { lineHeight: 'initial' } }}>
+                        {footer}
+                    </DialogFooter>
+                )}
+            </FluentDialog>
+        );
+    }, [visible, dialogProps, content]);
+
+    return dialog;
 };
 
 export type Callback = () => void;
@@ -99,10 +103,14 @@ export const FooterYesNo: React.FC<{ onYes: Callback; onNo: Callback }> = (props
     );
 };
 
-export const FooterOkCancel: React.FC<{ onOk?: Callback; onCancel: Callback, form?: string }> = (props) => {
+export const FooterOkCancel: React.FC<{ onOk?: Callback; onCancel: Callback; form?: string }> = (
+    props
+) => {
     return (
         <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 5 }}>
-            <PrimaryButton onClick={props.onOk ? props.onOk : null} form={props.form} type="submit">Ok</PrimaryButton>
+            <PrimaryButton onClick={props.onOk ? props.onOk : null} form={props.form} type="submit">
+                Ok
+            </PrimaryButton>
             <DefaultButton onClick={props.onCancel}>Cancel</DefaultButton>
         </Stack>
     );

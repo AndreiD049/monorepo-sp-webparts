@@ -7,9 +7,9 @@ import {
     IGlobalContext,
     sentinelContext,
 } from '../utils/globalContext';
-import { LOADING_SPINNER, MAIN_DIALOG, MAIN_PANEL } from '../utils/constants';
+import { MAIN_CALLOUT, LOADING_SPINNER, MAIN_DIALOG, MAIN_PANEL } from '../utils/constants';
 import { CommandBar } from './CommandBar';
-import { Dialog, LoadingSpinner, Panel } from 'sp-components';
+import { Callout, Dialog, LoadingSpinner, Panel } from 'sp-components';
 import { Separator } from 'office-ui-fabric-react';
 import { ProcessFlowContent } from './ProcessFlowContent';
 import { ProcessFlowHeader } from './ProcessFlowHeader';
@@ -65,6 +65,7 @@ export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
         <div className={styles.processFlow}>
             <GlobalContext.Provider value={context}>
                 <HashRouter>
+                    <Callout id={MAIN_CALLOUT} />
                     <Dialog id={MAIN_DIALOG} />
                     <Panel
                         id={MAIN_PANEL}
@@ -74,21 +75,21 @@ export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
                         }}
                     />
                     <LoadingSpinner id={LOADING_SPINNER} />
-                    <CommandBar
-                        onTeamSelected={handleTeamSelected}
-                        onFlowSelected={(flow) => {
-                            setContext((prev) => ({
-                                ...prev,
-                                selectedFlow: flow,
-                            }));
-                        }}
-                    />
-                    <Separator />
                     <Routes>
                         <Route
                             path="/"
                             element={
                                 <div>
+                                    <CommandBar
+                                        onTeamSelected={handleTeamSelected}
+                                        onFlowSelected={(flow) => {
+                                            setContext((prev) => ({
+                                                ...prev,
+                                                selectedFlow: flow,
+                                            }));
+                                        }}
+                                    />
+                                    <Separator />
                                     <ProcessFlowHeader
                                         flow={context.selectedFlow}
                                     />
@@ -99,10 +100,14 @@ export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
                                 </div>
                             }
                         >
-                            <Route
-                                path="/process/:id"
-                                element={<ProcessDetails />}
-                            />
+                            <Route path="/team/:team">
+                                <Route path="/team/:team/flow/:flowId">
+                                    <Route
+                                        path="/team/:team/flow/:flowId/process/:id"
+                                        element={<ProcessDetails />}
+                                    />
+                                </Route>
+                            </Route>
                         </Route>
                     </Routes>
                     <Footer config={props.properties.config} />

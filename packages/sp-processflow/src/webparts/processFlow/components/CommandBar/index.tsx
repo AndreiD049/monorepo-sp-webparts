@@ -9,7 +9,7 @@ import {
     SearchBox,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
     FooterOkCancel,
     hidePanel,
@@ -26,7 +26,7 @@ import {
 } from '../../utils/constants';
 import { GlobalContext } from '../../utils/globalContext';
 import { NewFlowForm } from '../NewFlowForm';
-import { LocationDialog } from '../LocationDialog';
+import { addLocations } from '../LocationDialog';
 import { NewProcesses } from '../NewProcesses';
 import { openDatabase, removeCached } from 'idb-proxy';
 import styles from './CommandBar.module.scss';
@@ -50,15 +50,13 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
     const [flows, setFlows] = React.useState<ICustomerFlow[]>([]);
     const [searchParams, setSearchParams] = useSearchParams();
     const [refreshed, setRefreshed] = React.useState(false);
+    const params = useParams();
+    const navigate = useNavigate();
 
     const handleFlowSelected = React.useCallback(
         (flow: ICustomerFlow) => {
             props.onFlowSelected(flow);
-            setSearchParams((prev) => ({
-                flow: flow?.Id.toString(),
-                team: prev.get('team'),
-                search: '',
-            }));
+            navigate(`/team/${selectedTeam}/flow/${flow.Id}`);
         },
         [selectedTeam]
     );
@@ -66,15 +64,9 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
     const handleTeamSelected = React.useCallback(
         (team: string) => {
             props.onTeamSelected(team);
-            setSearchParams((prev) => {
-                return {
-                    flow: prev.get('flow'),
-                    team,
-                    search: '',
-                };
-            });
+            navigate(`/team/${team}`);
         },
-        [selectedFlow]
+        []
     );
 
     React.useEffect(() => {
@@ -83,23 +75,22 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                 const result = await flowService.getByTeam(selectedTeam);
                 if (result) {
                     setFlows(result);
-                    const urlFlow = +searchParams.get('flow');
-                    let selectedFlow = result[0];
-                    if (urlFlow && Number.isInteger(urlFlow)) {
-                        const foundFlow = result.find((f) => f.Id === urlFlow);
-                        selectedFlow = foundFlow || result[0];
+                    const { flowId } = params;
+                    if (flowId && Number.isInteger(+flowId)) {
+                        const foundFlow = result.find((f) => f.Id === +flowId);
+                        const selectedFlow = foundFlow || result[0];
+                        props.onFlowSelected(selectedFlow)
                     }
-                    handleFlowSelected(selectedFlow);
                 }
             } else {
-                const urlTeam = searchParams.get('team');
-                if (urlTeam && teams.indexOf(urlTeam) !== -1) {
-                    handleTeamSelected(urlTeam);
+                const { team } = params;
+                if (team) {
+                    props.onTeamSelected(team);
                 }
             }
         }
         run().catch((err) => console.error(err));
-    }, [selectedTeam, teams]);
+    }, [selectedTeam]);
 
     const teamOptions: IComboBoxOption[] = React.useMemo(
         () =>
@@ -163,19 +154,7 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
     }, [selectedFlow, selectedTeam]);
 
     const handleNewLocation = React.useCallback(() => {
-        showDialog({
-            id: MAIN_DIALOG,
-            dialogProps: {
-                title: 'New location',
-                isBlocking: true,
-            },
-            content: (
-                <LocationDialog
-                    dialogId={MAIN_DIALOG}
-                    operation="addMultiple"
-                />
-            ),
-        });
+        addLocations(null, MAIN_DIALOG);
     }, []);
 
     const handleRefresh = React.useCallback(async () => {
@@ -206,7 +185,7 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                 },
                 {
                     key: 'location',
-                    text: 'Add location',
+                    text: 'Add locations',
                     onClick: handleNewLocation,
                     iconProps: {
                         iconName: 'CityNext',

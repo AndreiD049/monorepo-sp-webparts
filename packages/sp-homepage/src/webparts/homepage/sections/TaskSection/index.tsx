@@ -14,7 +14,6 @@ import styles from './TaskSection.module.scss';
 import { Text } from 'office-ui-fabric-react';
 import { IndexedDbCache } from 'indexeddb-manual-cache';
 import { listenSectionEvent } from '../../components/Section/section-events';
-import { TASKS_SPINNER_ID } from '../../constants';
 
 export interface ITaskSectionProps extends ISectionProps {
     // Props go here

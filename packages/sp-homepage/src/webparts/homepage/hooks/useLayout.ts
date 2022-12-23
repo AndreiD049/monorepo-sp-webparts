@@ -2,7 +2,6 @@ import React from 'react';
 import { Layout, Layouts } from 'react-grid-layout';
 import useWebStorage from 'use-web-storage-api';
 import IConfig from '../models/IConfig';
-import ISection from '../models/ISection';
 import IUser from '../models/IUser';
 
 export function getLayoutKey(currentUser?: IUser, selectedUser?: IUser): string {

@@ -3,6 +3,7 @@ export const STORE_NAME = location.origin + location.pathname;
 
 export const MAIN_DIALOG = 'sp-processflow-main-dialog';
 export const PANEL_DIALOG = 'sp-processflow-panel-dialog';
+export const MAIN_CALLOUT = 'sp-processflow-main-callout';
 export const MAIN_PANEL = 'sp-processflow-main-panel';
 export const MAIN_PANEL_FORM = 'sp-processflow-newprocess';
 export const LOADING_SPINNER = 'sp-processflow-loadingspinner';

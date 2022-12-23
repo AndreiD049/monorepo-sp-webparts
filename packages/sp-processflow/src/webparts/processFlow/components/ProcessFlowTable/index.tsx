@@ -105,7 +105,7 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
     const navigate = useNavigate();
     const { ProcessService, FlowLocationService, UserProcessService } =
         MainService;
-    const { teamUsers } = React.useContext(GlobalContext);
+    const { teamUsers, selectedTeam, selectedFlow } = React.useContext(GlobalContext);
     const [groupSorting, setGroupSorting] = useWebStorage<{
         [key: number]: string[];
     }>(
@@ -311,7 +311,7 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 styles={listStyles(ProcessFlowWebPart.currentTheme)}
                 onItemInvoked={(item) => {
                     navigate(
-                        `/process/${item.process.Id}?${searchParams.toString()}`
+                        `/team/${selectedTeam}/flow/${selectedFlow.Id}/process/${item.process.Id}?${searchParams.toString()}`
                     );
                 }}
             />

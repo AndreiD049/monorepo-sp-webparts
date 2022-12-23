@@ -15,6 +15,7 @@ export interface IPreProcessorContext {
 const tagMap: { [key: string]: (ctx: IPreProcessorContext) => string } = {
     '@me': (context: IPreProcessorContext) => context.currentUser.Email,
     '@selectedUserId': (context: IPreProcessorContext) => context.selectedUser.Id.toString(),
+    '@selectedUserEmail': (context: IPreProcessorContext) => context.selectedUser.Email,
     '@selectedTeam': (context: IPreProcessorContext) => context.selectedTeam,
     '@today': (_context: IPreProcessorContext) => DateTime.now().toISODate(),
     '@monday': (_context: IPreProcessorContext) => DateTime.now().set({ weekday: 1 }).toISODate(),

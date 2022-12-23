@@ -4,7 +4,7 @@ import { IClientStorage } from "./IClientStorage";
 function onUpgradeNeeded(ev: IDBVersionChangeEvent) {
     // @ts-ignore
     const db: IDBDatabase = ev.target.result;
-    db.createObjectStore(IndexedDbClientStorage.storeName);
+    db.createObjectStore(IndexedDbClientStorage.storeName.toLowerCase());
 }
 
 async function openDb(name: string): Promise<IDBDatabase> {
@@ -28,8 +28,8 @@ export class IndexedDbClientStorage implements IClientStorage {
     async get(key: string): Promise<string | null> {
         const db = await openDb(IndexedDbClientStorage.dbName);
         return new Promise((resolve) => {
-            const transaction = db.transaction(IndexedDbClientStorage.storeName, 'readonly');
-            const os = transaction.objectStore(IndexedDbClientStorage.storeName);
+            const transaction = db.transaction(IndexedDbClientStorage.storeName.toLowerCase(), 'readonly');
+            const os = transaction.objectStore(IndexedDbClientStorage.storeName.toLowerCase());
             const readRequest = os.get(key);
             readRequest.onsuccess = (ev) => {
                 // @ts-ignore
@@ -41,8 +41,8 @@ export class IndexedDbClientStorage implements IClientStorage {
     async set(key: string, val: string): Promise<void> {
         const db = await openDb(IndexedDbClientStorage.dbName);
         return new Promise((resolve) => {
-            const transaction = db.transaction(IndexedDbClientStorage.storeName, 'readwrite');
-            const os = transaction.objectStore(IndexedDbClientStorage.storeName);
+            const transaction = db.transaction(IndexedDbClientStorage.storeName.toLowerCase(), 'readwrite');
+            const os = transaction.objectStore(IndexedDbClientStorage.storeName.toLowerCase());
             const readRequest = os.put(val, key);
             readRequest.onsuccess = (ev) => { resolve() }
         });
@@ -51,8 +51,8 @@ export class IndexedDbClientStorage implements IClientStorage {
     async remove(key: string): Promise<void> {
         const db = await openDb(IndexedDbClientStorage.dbName);
         return new Promise((resolve) => {
-            const transaction = db.transaction(IndexedDbClientStorage.storeName, 'readwrite');
-            const os = transaction.objectStore(IndexedDbClientStorage.storeName);
+            const transaction = db.transaction(IndexedDbClientStorage.storeName.toLowerCase(), 'readwrite');
+            const os = transaction.objectStore(IndexedDbClientStorage.storeName.toLowerCase());
             const readRequest = os.delete(key);
             readRequest.onsuccess = (ev) => { resolve() }
         });
@@ -61,8 +61,8 @@ export class IndexedDbClientStorage implements IClientStorage {
     async has(key: string): Promise<boolean> {
         const db = await openDb(IndexedDbClientStorage.dbName);
         return new Promise((resolve) => {
-            const request = db.transaction(IndexedDbClientStorage.storeName, 'readonly')
-                .objectStore(IndexedDbClientStorage.storeName)
+            const request = db.transaction(IndexedDbClientStorage.storeName.toLowerCase(), 'readonly')
+                .objectStore(IndexedDbClientStorage.storeName.toLowerCase())
                 .getKey(key)
             request.onsuccess = (ev) => { 
                 // @ts-ignore
@@ -87,8 +87,8 @@ export class IndexedDbClientStorage implements IClientStorage {
                 request.onsuccess = (ev) => {
                     // @ts-ignore
                     const db: IDBDatabase = ev.target.result
-                    const transaction = db.transaction(IndexedDbClientStorage.storeName, 'readwrite');
-                    const os = transaction.objectStore(IndexedDbClientStorage.storeName);
+                    const transaction = db.transaction(IndexedDbClientStorage.storeName.toLowerCase(), 'readwrite');
+                    const os = transaction.objectStore(IndexedDbClientStorage.storeName.toLowerCase());
                     const request = os.add('test', 'test');
                     request.onerror = () => resolve(false);
                     request.onsuccess = () => {

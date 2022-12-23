@@ -15,8 +15,9 @@ export interface ICacheDB {
 export async function openDatabase(
   dbName: string,
   storeName: string,
-  version: number = 1
+  version: number | undefined =  undefined
 ): Promise<ICacheDB> {
+  storeName = storeName.toLowerCase();
   // Indexeddb not supported
   if (!indexedDB && !window.indexedDB)
     return {
@@ -34,7 +35,7 @@ export async function openDatabase(
       store.transaction.oncomplete = () =>
         resolve({
           db,
-          storeName,
+          storeName: storeName,
         });
     };
 
@@ -48,7 +49,7 @@ export async function openDatabase(
         resolve({
           // @ts-ignore
           db: ev.target.result,
-          storeName,
+          storeName: storeName,
         });
       }
     };
@@ -111,7 +112,21 @@ export async function getAllKeys(cacheDb: ICacheDB): Promise<string[]> {
 }
 
 function getObjectStore(cacheDb: ICacheDB): IDBObjectStore | null {
-  const { db, storeName } = cacheDb;
+  const { db } = cacheDb;
+  let storeName = cacheDb.storeName;
   if (!db) return null;
+  if (!db.objectStoreNames.contains(storeName)) {
+      let found = false;
+      for (const item of db.objectStoreNames) {
+          if (item.toLowerCase() === storeName.toLowerCase()) {
+              storeName = item;
+              found = true;
+          }
+      }
+      if (!found) {
+          indexedDB.deleteDatabase(db.name);
+          return null;
+      }
+  }
   return db.transaction(storeName, "readwrite").objectStore(storeName);
 }

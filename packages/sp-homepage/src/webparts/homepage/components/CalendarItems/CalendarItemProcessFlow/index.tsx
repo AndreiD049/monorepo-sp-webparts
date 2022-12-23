@@ -34,7 +34,7 @@ export const CalendarItemProcessFlow: React.FC<ICalendarItemProcessFlowProps> = 
 
     const handleGotoClick = React.useCallback(() => {
         window.open(
-            `${props.wrapped.pageUrl}#/process/${item.Process.Id}?flow=${item.Flow.Id}&team=${item.Team}`,
+            `${props.wrapped.pageUrl}#/team/${item.Team}/flow/${item.Flow.Id}/process/${item.Process.Id}`,
             '_blank',
             'noreferrer'
         );

@@ -2,9 +2,18 @@ import { IFlowLocation } from '@service/process-flow';
 import { uniq } from 'lodash';
 import { PrimaryButton, TextField } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { hideDialog, hideSpinner, showSpinner } from 'sp-components';
+import {
+    FooterYesNo,
+    hideDialog,
+    hideSpinner,
+    showDialog,
+    showSpinner,
+} from 'sp-components';
 import { MainService } from '../../services/main-service';
-import { LOADING_SPINNER } from '../../utils/constants';
+import {
+    LOADING_SPINNER,
+    MAIN_DIALOG,
+} from '../../utils/constants';
 import { locationsAdded } from '../../utils/events';
 import { GlobalContext } from '../../utils/globalContext';
 import { CountryPicker } from '../CountryPicker';
@@ -17,6 +26,7 @@ export interface ILocationDialogProps {
     location?: IFlowLocation;
     dialogId: string;
     operation: 'addMultiple' | 'add' | 'update';
+    title?: string;
 }
 
 export const LocationDialog: React.FC<ILocationDialogProps> = (props) => {
@@ -24,7 +34,7 @@ export const LocationDialog: React.FC<ILocationDialogProps> = (props) => {
     const { selectedFlow } = React.useContext(GlobalContext);
     const [data, setData] = React.useState<Partial<IFlowLocation>>({
         DoneBy: [],
-        Title: '',
+        Title: props.title || '',
         Country: [],
     });
     const [optionsDoneBy, setOptionsDoneBy] = React.useState([]);
@@ -131,7 +141,7 @@ export const LocationDialog: React.FC<ILocationDialogProps> = (props) => {
             onSubmit={handleSubmit}
         >
             <TextField
-                disabled={props.location !== undefined}
+                disabled={props.location !== undefined || Boolean(props.title)}
                 required
                 label="Location"
                 value={data.Title}
@@ -180,3 +190,111 @@ export const LocationDialog: React.FC<ILocationDialogProps> = (props) => {
         </form>
     );
 };
+
+export function addLocations(
+    title: string | undefined,
+    dialogId: string = MAIN_DIALOG
+): void {
+    showDialog({
+        id: dialogId,
+        content: (
+            <LocationDialog
+                dialogId={dialogId}
+                title={title}
+                operation="addMultiple"
+            />
+        ),
+        dialogProps: {
+            modalProps: {
+                isBlocking: false,
+            },
+            dialogContentProps: {
+                title: 'Add Locations',
+            },
+        },
+    });
+}
+
+export function addLocation(
+    title: string | undefined,
+    processId: number,
+    dialogId: string = MAIN_DIALOG
+): void {
+    showDialog({
+        id: dialogId,
+        content: (
+            <LocationDialog
+                dialogId={dialogId}
+                processId={processId}
+                title={title}
+                operation="add"
+            />
+        ),
+        dialogProps: {
+            modalProps: {
+                isBlocking: false,
+            },
+            dialogContentProps: {
+                title: 'Add Location',
+            },
+        },
+    });
+}
+
+export function editLocation(
+    location: IFlowLocation,
+    dialogId: string = MAIN_DIALOG
+): void {
+    showDialog({
+        id: dialogId,
+        content: (
+            <LocationDialog
+                dialogId={dialogId}
+                location={location}
+                operation="update"
+            />
+        ),
+        dialogProps: {
+            modalProps: {
+                isBlocking: false,
+            },
+            dialogContentProps: {
+                title: 'Edit Location',
+            },
+        },
+    });
+}
+
+export function deleteLocation(
+    location: IFlowLocation,
+    dialogId: string = MAIN_DIALOG
+): void {
+    showDialog({
+        id: dialogId,
+        dialogProps: {
+            modalProps: {
+                isBlocking: true,
+            },
+            dialogContentProps: {
+                title: 'Delete Location',
+                subText: `Are you sure you want to delete '${location.Title}'`,
+            },
+        },
+        footer: (
+            <FooterYesNo
+                onNo={() => hideDialog(dialogId)}
+                onYes={async () => {
+                    hideDialog(dialogId);
+                    try {
+                        showSpinner(LOADING_SPINNER);
+                        await MainService.FlowLocationService.removeFlowLocation(
+                            location.Id
+                        );
+                    } finally {
+                        hideSpinner(LOADING_SPINNER);
+                    }
+                }}
+            />
+        ),
+    });
+}

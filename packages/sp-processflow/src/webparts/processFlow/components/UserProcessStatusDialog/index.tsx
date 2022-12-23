@@ -11,21 +11,22 @@ import {
     PrimaryButton,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { hideDialog } from 'sp-components';
+import { hideDialog, showDialog } from 'sp-components';
 import { MainService } from '../../services/main-service';
 import { MAIN_DIALOG } from '../../utils/constants';
 import { GlobalContext } from '../../utils/globalContext';
-import styles from './ChangeStatusDialog.module.scss';
+import styles from './UserProcessStatusDialog.module.scss';
 
-export interface IChangeStatusDialogProps {
+export interface IUserProcessStatusDialogProps {
     userProcess: IUserProcess | undefined;
     user: IUserProps;
     process: IProcess;
+    dialogId: string;
 }
 
-export const ChangeStatusDialog: React.FC<IChangeStatusDialogProps> = (
-    props
-) => {
+export const UserProcessStatusDialog: React.FC<
+    IUserProcessStatusDialogProps
+> = ({ dialogId = MAIN_DIALOG, ...props }) => {
     const { selectedTeam } = React.useContext(GlobalContext);
     const { UserProcessService } = MainService;
     const [data, setData] = React.useState<Partial<IUserProcess>>({
@@ -63,7 +64,7 @@ export const ChangeStatusDialog: React.FC<IChangeStatusDialogProps> = (
         } else {
             setError(null);
         }
-        hideDialog(MAIN_DIALOG);
+        hideDialog(dialogId);
         if (!props.userProcess?.Id) {
             // Create a new userprocess
             await UserProcessService.addUserProcess({
@@ -83,12 +84,15 @@ export const ChangeStatusDialog: React.FC<IChangeStatusDialogProps> = (
     }, [data, selectedTeam]);
 
     const handleChangeStatus = React.useCallback(
-        (prevStatus: IUserProcess['Status'], status: IUserProcess['Status']) => {
+        (
+            prevStatus: IUserProcess['Status'],
+            status: IUserProcess['Status']
+        ) => {
             if (prevStatus === status) return;
             switch (status) {
                 case 'NA':
                 case 'Completed':
-                    setData((prev) => ({ Status: status, Date: null }));
+                    setData((prev) => ({ Status: status, Date: new Date().toISOString() }));
                     break;
                 default:
                     setData((prev) => ({ ...prev, Status: status }));
@@ -123,7 +127,7 @@ export const ChangeStatusDialog: React.FC<IChangeStatusDialogProps> = (
                 options={statusOptions}
                 selectedKey={data.Status}
                 onChange={(_ev, option) => {
-                    handleChangeStatus(data.Status ,option.data);
+                    handleChangeStatus(data.Status, option.data);
                 }}
             />
             <DatePicker
@@ -151,3 +155,28 @@ export const ChangeStatusDialog: React.FC<IChangeStatusDialogProps> = (
         </div>
     );
 };
+
+export function editUserProcess(
+    process: IProcess,
+    user: IUserProps,
+    userProcess: IUserProcess,
+    dialogId: string = MAIN_DIALOG
+): void {
+    showDialog({
+        id: dialogId,
+        content: (
+            <UserProcessStatusDialog
+                process={process}
+                user={user}
+                userProcess={userProcess}
+                dialogId={dialogId}
+            />
+        ),
+        dialogProps: {
+            dialogContentProps: {
+                title: process.Title,
+            },
+            minWidth: 400,
+        },
+    });
+}

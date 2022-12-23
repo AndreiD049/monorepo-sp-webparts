@@ -2,11 +2,10 @@ import { IProcess, IUserProcess } from '@service/process-flow';
 import { IUserProps } from '@service/users';
 import { MessageBarType } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { showDialog } from 'sp-components';
 import { SPnotify } from 'sp-react-notifications';
 import { MAIN_DIALOG } from '../../../utils/constants';
 import { copyUserProcess, pasteUserProcess } from '../../../utils/events';
-import { ChangeStatusDialog } from '../../ChangeStatusDialog';
+import { editUserProcess } from '../../UserProcessStatusDialog';
 import styles from './UserCell.module.scss';
 
 export interface IUserCellProps {
@@ -27,22 +26,7 @@ export const UserCell: React.FC<IUserCellProps> = (props) => {
     );
 
     const handleShowDialog = React.useCallback(() => {
-        showDialog({
-            id: MAIN_DIALOG,
-            content: (
-                <ChangeStatusDialog
-                    process={props.process}
-                    user={props.user}
-                    userProcess={props.userProcess}
-                />
-            ),
-            dialogProps: {
-                dialogContentProps: {
-                    title: props.process.Title,
-                },
-                minWidth: 400,
-            },
-        });
+        editUserProcess(props.process, props.user, props.userProcess, MAIN_DIALOG);
     }, [props.process, props.userProcess]);
 
     const content = React.useMemo(() => {

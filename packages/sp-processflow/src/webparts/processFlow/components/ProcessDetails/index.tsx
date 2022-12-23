@@ -13,14 +13,7 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import {
-    Dialog,
-    FooterYesNo,
-    hideDialog,
-    hidePanel,
-    showDialog,
-    showPanel,
-} from 'sp-components';
+import { Dialog, hidePanel, showPanel } from 'sp-components';
 import { MainService } from '../../services/main-service';
 import { MAIN_PANEL, PANEL_DIALOG } from '../../utils/constants';
 import {
@@ -28,9 +21,16 @@ import {
     listenLocationDeleted,
     listenLocationUpdated,
     listenProcessUpdated,
+    listenUserProcessUpdated,
 } from '../../utils/events';
-import { LocationDialog } from '../LocationDialog';
-import { CategoryTextField, SystemTextField, UomTextField } from '../TextFields';
+import { GlobalContext } from '../../utils/globalContext';
+import { addLocation, deleteLocation, editLocation } from '../LocationDialog';
+import {
+    CategoryTextField,
+    SystemTextField,
+    UomTextField,
+} from '../TextFields';
+import { editUserProcess } from '../UserProcessStatusDialog';
 import styles from './ProcessDetails.module.scss';
 
 export interface IProcessDetailsProps {
@@ -38,7 +38,6 @@ export interface IProcessDetailsProps {
 }
 
 const LocationDetails: React.FC<{ location: IFlowLocation }> = (props) => {
-    const { FlowLocationService } = MainService;
     const countries: string[][] = React.useMemo(() => {
         if (props.location.Country?.length) {
             return props.location.Country.map((c) => c.split(' - '));
@@ -77,50 +76,14 @@ const LocationDetails: React.FC<{ location: IFlowLocation }> = (props) => {
                 <IconButton
                     iconProps={{ iconName: 'Edit' }}
                     onClick={() => {
-                        showDialog({
-                            id: PANEL_DIALOG,
-                            content: (
-                                <LocationDialog
-                                    dialogId={PANEL_DIALOG}
-                                    location={props.location}
-                                    operation="update"
-                                />
-                            ),
-                            dialogProps: {
-                                modalProps: {
-                                    isBlocking: false,
-                                },
-                                dialogContentProps: {
-                                    title: 'Edit Location',
-                                },
-                            },
-                        });
+                        editLocation(props.location, PANEL_DIALOG);
                     }}
                 />
                 <IconButton
                     style={{ marginLeft: '4px' }}
                     iconProps={{ iconName: 'Delete' }}
                     onClick={() => {
-                        showDialog({
-                            id: PANEL_DIALOG,
-                            dialogProps: {
-                                dialogContentProps: {
-                                    title: 'Delete Location',
-                                    subText: `Are you sure you want to delete '${props.location.Title}'`,
-                                },
-                            },
-                            footer: (
-                                <FooterYesNo
-                                    onNo={() => hideDialog(PANEL_DIALOG)}
-                                    onYes={async () => {
-                                        await FlowLocationService.removeFlowLocation(
-                                            props.location.Id
-                                        );
-                                        hideDialog(PANEL_DIALOG);
-                                    }}
-                                />
-                            ),
-                        });
+                        deleteLocation(props.location, PANEL_DIALOG);
                     }}
                 />
             </td>
@@ -130,6 +93,7 @@ const LocationDetails: React.FC<{ location: IFlowLocation }> = (props) => {
 
 const StatusTable: React.FC<{
     groupped: Dictionary<IUserProcess[]>;
+    process: IProcess;
     status: string;
 }> = (props) => {
     if (!(props.status in props.groupped)) return null;
@@ -157,13 +121,20 @@ const StatusTable: React.FC<{
                             />
                         </td>
                         <td>{new Date(i.Date).toLocaleDateString()}</td>
+                        <td>
+                            <IconButton
+                                className={styles.userEditButton}
+                                iconProps={{ iconName: 'Edit' }}
+                                onClick={() => editUserProcess(props.process, i.User, i, PANEL_DIALOG)}
+                            />
+                        </td>
                     </tr>
                 ))}
         </>
     );
 };
 
-const UserProcessOverview: React.FC<{ items: IUserProcess[] }> = (props) => {
+const UserProcessOverview: React.FC<{ items: IUserProcess[], process: IProcess }> = (props) => {
     const groupped = React.useMemo(() => {
         return groupBy(props.items, (i) => i.Status);
     }, [props.items]);
@@ -172,9 +143,9 @@ const UserProcessOverview: React.FC<{ items: IUserProcess[] }> = (props) => {
         <div>
             <table className={styles.overviewTable}>
                 <tbody>
-                    <StatusTable groupped={groupped} status="Planned" />
-                    <StatusTable groupped={groupped} status="On-going" />
-                    <StatusTable groupped={groupped} status="Completed" />
+                    <StatusTable groupped={groupped} process={props.process} status="Planned" />
+                    <StatusTable groupped={groupped} process={props.process} status="On-going" />
+                    <StatusTable groupped={groupped} process={props.process} status="Completed" />
                 </tbody>
             </table>
         </div>
@@ -243,15 +214,20 @@ const Details: React.FC<{ processId: number }> = (props) => {
         async function locationDeleteHandler(data: number): Promise<void> {
             setLocations((prev) => prev.filter((l) => l.Id !== data));
         }
+        async function userProcessUpdatedHandler(data: IUserProcess): Promise<void> {
+            setUserProcesses((prev) => prev.map((up) => up.Id === data.Id ? data : up));
+        }
         const removeProcessUpdated = listenProcessUpdated(processUpdated);
         const removeLocationAdd = listenLocationAdded(locationAddedHandler);
         const removeLocationUpd = listenLocationUpdated(locationUpdatedHandler);
         const removeLocationDel = listenLocationDeleted(locationDeleteHandler);
+        const removeUserProcessUpdated = listenUserProcessUpdated(userProcessUpdatedHandler)
         return () => {
             removeProcessUpdated();
             removeLocationAdd();
             removeLocationUpd();
             removeLocationDel();
+            removeUserProcessUpdated();
         };
     }, [locations, process]);
 
@@ -271,7 +247,10 @@ const Details: React.FC<{ processId: number }> = (props) => {
         if (editable) {
             return (
                 <>
-                    <ActionButton iconProps={{ iconName: 'Save' }} onClick={handleSave}>
+                    <ActionButton
+                        iconProps={{ iconName: 'Save' }}
+                        onClick={handleSave}
+                    >
                         Save
                     </ActionButton>
                     <ActionButton
@@ -313,24 +292,7 @@ const Details: React.FC<{ processId: number }> = (props) => {
                 <ActionButton
                     iconProps={{ iconName: 'Add' }}
                     onClick={() => {
-                        showDialog({
-                            id: PANEL_DIALOG,
-                            content: (
-                                <LocationDialog
-                                    dialogId={PANEL_DIALOG}
-                                    processId={props.processId}
-                                    operation="add"
-                                />
-                            ),
-                            dialogProps: {
-                                modalProps: {
-                                    isBlocking: false,
-                                },
-                                dialogContentProps: {
-                                    title: 'Add Location',
-                                },
-                            },
-                        });
+                        addLocation(null, process.Id, PANEL_DIALOG);
                     }}
                 >
                     Add location
@@ -343,21 +305,21 @@ const Details: React.FC<{ processId: number }> = (props) => {
                 value={editable ? data.System : process.System}
                 title={process.System}
                 readOnly={!editable}
-                onChange={handleFieldChange("System")}
+                onChange={handleFieldChange('System')}
             />
             <TextField
                 label="Process"
                 value={editable ? data.Title : process.Title}
                 title={process.Title}
                 readOnly={!editable}
-                onChange={handleFieldChange("Title")}
+                onChange={handleFieldChange('Title')}
             />
             <CategoryTextField
                 label="Category"
                 value={editable ? data.Category : process.Category}
                 title={process.Category}
                 readOnly={!editable}
-                onChange={handleFieldChange("Category")}
+                onChange={handleFieldChange('Category')}
             />
             <TextField
                 label="Team"
@@ -371,22 +333,26 @@ const Details: React.FC<{ processId: number }> = (props) => {
                 value={editable ? data.Manual : process.Manual}
                 title={process.Manual}
                 readOnly={!editable}
-                onChange={handleFieldChange("Manual")}
+                onChange={handleFieldChange('Manual')}
             />
             <TextField
                 label="Allocation"
-                value={editable ? data.Allocation?.toString() : process.Allocation?.toString()}
+                value={
+                    editable
+                        ? data.Allocation?.toString()
+                        : process.Allocation?.toString()
+                }
                 title={process.Allocation?.toString()}
                 type="number"
                 readOnly={!editable}
-                onChange={handleFieldChange("Allocation")}
+                onChange={handleFieldChange('Allocation')}
             />
             <UomTextField
                 label="UOM"
                 value={editable ? data.UOM : process.UOM}
                 title={process.UOM}
                 readOnly={!editable}
-                onChange={handleFieldChange("UOM")}
+                onChange={handleFieldChange('UOM')}
             />
             {locations.length > 0 && (
                 <>
@@ -409,7 +375,7 @@ const Details: React.FC<{ processId: number }> = (props) => {
             {userProcesses.length > 0 && (
                 <>
                     <Separator>Overview</Separator>
-                    {<UserProcessOverview items={userProcesses} />}
+                    {<UserProcessOverview items={userProcesses} process={process} />}
                 </>
             )}
             <Dialog id={PANEL_DIALOG} />
@@ -418,6 +384,7 @@ const Details: React.FC<{ processId: number }> = (props) => {
 };
 
 export const ProcessDetails: React.FC<IProcessDetailsProps> = (props) => {
+    const { selectedFlow, selectedTeam } = React.useContext(GlobalContext);
     const [searchParams] = useSearchParams();
     const { id } = useParams();
     const navigate = useNavigate();
@@ -429,13 +396,13 @@ export const ProcessDetails: React.FC<IProcessDetailsProps> = (props) => {
                 headerText: 'Process details',
                 type: PanelType.medium,
                 onDismiss: () => {
-                    navigate(`/?${searchParams.toString()}`);
+                    navigate(`/team/${selectedTeam}/flow/${selectedFlow.Id}?${searchParams.toString()}`);
                     hidePanel(MAIN_PANEL);
                 },
             },
             <Details processId={+id} />
         );
-    }, [id]);
+    }, [id, selectedFlow, selectedTeam]);
 
     return null;
 };
