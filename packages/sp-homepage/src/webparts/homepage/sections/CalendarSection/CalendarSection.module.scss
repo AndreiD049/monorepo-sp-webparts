@@ -11,8 +11,8 @@
 }
 
 .monthCalendar {
-    button[role='gridcell'][aria-selected='true'] {
-        background-color: "[theme: themePrimary, default: #a4262c]";
+    :global(button[role='gridcell'].ms-DatePicker-day--highlighted), :global(td.ms-DatePicker-day--highlighted) {
+        background-color: "[theme: themePrimary, default: #a4262c]" !important;
         color: "[theme: white, default: #ffffff]";
     }
 }

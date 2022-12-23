@@ -3,6 +3,7 @@ import styles from './CipTask.module.scss';
 import {
     ActionsCell,
     DueDateCell,
+    FooterYesNo,
     hideDialog,
     hideSpinner,
     PriorityCell,
@@ -54,7 +55,10 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
     const taskFinished = React.useMemo(() => Boolean(task.FinishDate), [task]);
     const sourceKey = React.useMemo(() => getSourceKey(task.service.source), [task]);
     // Get the user info on the particular site
-    const currentSourceUser = React.useMemo(() => siteUsers[sourceKey]?.find((u) => u.LoginName === currentUser.LoginName), [currentUser, siteUsers]);
+    const currentSourceUser = React.useMemo(
+        () => siteUsers[sourceKey]?.find((u) => u.LoginName === currentUser.LoginName),
+        [currentUser, siteUsers]
+    );
     let result = null;
 
     const handleNavigateToTask = React.useCallback(() => {
@@ -77,16 +81,49 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
         showSpinner(CIP_SPINNER_ID);
         if (taskFinished) {
             await service.reopenTask(task.Id);
+            // Test
+            if (props.onTaskUpdated) {
+                const newTask = await service.getTask(task.Id);
+                props.onTaskUpdated({ ...newTask, service: task.service });
+            }
+            hideSpinner(CIP_SPINNER_ID);
         } else {
-            await service.finishTask(task.Id);
+            showDialog({
+                id: DIALOG_ID,
+                dialogProps: {
+                    dialogContentProps: {
+                        title: 'Finish task',
+                        subText: 'Task will become finished. Are you sure?',
+                    },
+                },
+                footer: (
+                    <FooterYesNo
+                        onYes={async () => {
+                            await service.finishTask(task.Id);
+                            await task.service.actionService.addAction(
+                                task.Id,
+                                'Finished',
+                                '',
+                                currentSourceUser.Id,
+                                new Date().toISOString()
+                            );
+                            hideDialog(DIALOG_ID);
+                            // Test
+                            if (props.onTaskUpdated) {
+                                const newTask = await service.getTask(task.Id);
+                                props.onTaskUpdated({ ...newTask, service: task.service });
+                            }
+                            hideSpinner(CIP_SPINNER_ID);
+                        }}
+                        onNo={() => {
+                            hideDialog(DIALOG_ID);
+                            hideSpinner(CIP_SPINNER_ID);
+                        }}
+                    />
+                ),
+            });
         }
-        // Test
-        if (props.onTaskUpdated) {
-            const newTask = await service.getTask(task.Id);
-            props.onTaskUpdated({ ...newTask, service: task.service });
-        }
-        hideSpinner(CIP_SPINNER_ID);
-    }, [task, props.open, taskFinished]);
+    }, [task, props.open, taskFinished, currentSourceUser]);
 
     const handleStatusChange = React.useCallback(
         async (status: string) => {
@@ -198,16 +235,19 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
         [task, currentSourceUser]
     );
 
-    const handleActionAdded = React.useCallback(async (action: Partial<IAction>) => {
-        const { actionService } = task.service;
-        await actionService.addAction(
-            task.Id,
-            'Time log',
-            action.Comment,
-            action.UserId,
-            action.Date
-        );
-    }, [task]);
+    const handleActionAdded = React.useCallback(
+        async (action: Partial<IAction>) => {
+            const { actionService } = task.service;
+            await actionService.addAction(
+                task.Id,
+                'Time log',
+                action.Comment,
+                action.UserId,
+                action.Date
+            );
+        },
+        [task]
+    );
 
     // Depending on column, render different cells
     switch (props.column.key) {

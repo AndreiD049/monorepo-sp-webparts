@@ -6,6 +6,7 @@ export default interface ISection {
     name: SectionTypes;
     header?: boolean;
     headerControls?: string[];
+    options: string[];
     conditions?: IConfigCondition[];
     sources: ISource[];
 }

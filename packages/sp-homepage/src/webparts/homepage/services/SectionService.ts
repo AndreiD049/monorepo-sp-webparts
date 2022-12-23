@@ -37,6 +37,8 @@ export const filterSections = (
         .filter((section) => checker.checkConditions(section.conditions))
         .map((section) => filterSectionSources(section, checker))
         .filter((section) => section.sources.length > 0)
-        .map((section) => preProcessor.preProcessFilters(section));
+        .map((section) => preProcessor.preProcessFilters(section))
+        .map((section) => preProcessor.preProcessOptions(section));
+    // !! a section should have at least one source element in order to be shown
     return result.filter((section) => section.sources.length > 0);
 };

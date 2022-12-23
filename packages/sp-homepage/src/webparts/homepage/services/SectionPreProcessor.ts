@@ -15,6 +15,7 @@ export interface IPreProcessorContext {
 const tagMap: { [key: string]: (ctx: IPreProcessorContext) => string } = {
     '@me': (context: IPreProcessorContext) => context.currentUser.Email,
     '@selectedUserId': (context: IPreProcessorContext) => context.selectedUser.Id.toString(),
+    '@selectedTeam': (context: IPreProcessorContext) => context.selectedTeam,
     '@today': (_context: IPreProcessorContext) => DateTime.now().toISODate(),
     '@monday': (_context: IPreProcessorContext) => DateTime.now().set({ weekday: 1 }).toISODate(),
     '@tuesday': (_context: IPreProcessorContext) => DateTime.now().set({ weekday: 2 }).toISODate(),
@@ -50,6 +51,15 @@ export class SectionPreProcessor {
             source.filter = this.preProcessText(source.filter);
             return source;
         });
+        return section;
+    }
+
+    preProcessOptions(section: ISection): ISection {
+        if (!section.options) {
+            section.options = [];
+            return section;
+        }
+        section.options = section.options.map((opt) => opt.toLowerCase());
         return section;
     }
 

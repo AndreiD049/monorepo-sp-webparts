@@ -2,6 +2,7 @@ import { textColor } from 'colored-text';
 import { IconButton, Persona, PersonaSize, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Pill } from 'sp-components';
+import { CalendarContext } from '../../../context/CalendarContext/CalendarContext';
 import {
     ICalendarProcessFlowItem,
     IWrappedCalendarItem,
@@ -14,6 +15,7 @@ export interface ICalendarItemProcessFlowProps {
 }
 
 export const CalendarItemProcessFlow: React.FC<ICalendarItemProcessFlowProps> = (props) => {
+    const { showUser } = React.useContext(CalendarContext);
     const item = props.wrapped.item as ICalendarProcessFlowItem;
     const type = 'PF';
     const typeColor = React.useMemo(() => textColor(type), [item]);
@@ -38,15 +40,24 @@ export const CalendarItemProcessFlow: React.FC<ICalendarItemProcessFlowProps> = 
         );
     }, []);
 
+    const userCell = React.useMemo(() => {
+        if (showUser) {
+            return (
+                <td className={`${tableStyles.cell20} ${tableStyles.paddedl5}`}>
+                    <Persona
+                        size={PersonaSize.size32}
+                        text={item.User.Title}
+                        imageUrl={`/_layouts/15/userphoto.aspx?accountname=${item.User.EMail}&Size=L`}
+                    />
+                </td>
+            );
+        }
+        return null;
+    }, [showUser, item.User]);
+
     return (
         <>
-            <td className={`${tableStyles.cell20} ${tableStyles.paddedl5}`}>
-                <Persona
-                    size={PersonaSize.size32}
-                    text={item.User.Title}
-                    imageUrl={`/_layouts/15/userphoto.aspx?accountname=${item.User.EMail}&Size=L`}
-                />
-            </td>
+            {userCell}
             <td className={`${tableStyles.cell10} ${tableStyles.paddedl5}`}>
                 <Pill
                     title="Process-flow"

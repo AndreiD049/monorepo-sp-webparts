@@ -1,5 +1,6 @@
 import { groupBy } from '@microsoft/sp-lodash-subset';
 import { Dictionary } from 'lodash';
+import { DateTime } from 'luxon';
 import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { IWrappedCalendarItem } from '../../sections/CalendarSection/ICalendarItem';
@@ -28,10 +29,11 @@ interface IRowProps {
 }
 
 const Row: React.FC<IRowProps> = (props) => {
+    const dateDisplay = React.useMemo(() => new Date(props.date).toLocaleDateString(), [props.date]);
     return (
         <>
             <Text block variant="mediumPlus" className={styles.groupText}>
-                {props.date}
+                {dateDisplay}
             </Text>
             {props.groups[props.date].map((item) => (
                 <tr className={styles.row} key={`${item.type}${item.item.Id}`}><CalendarItem key={item.item.Id} wrapped={item} /></tr>
@@ -42,7 +44,7 @@ const Row: React.FC<IRowProps> = (props) => {
 
 export const CalendarItems: React.FC<ICalendarItemsProps> = (props) => {
     const groups = React.useMemo(() => {
-        return groupBy(props.items, (item) => item.date.toLocaleDateString());
+        return groupBy(props.items, (item) => DateTime.fromJSDate(item.date).toISODate());
     }, [props.items]);
     const groupKeys = React.useMemo(() => {
         const keys = Object.keys(groups);

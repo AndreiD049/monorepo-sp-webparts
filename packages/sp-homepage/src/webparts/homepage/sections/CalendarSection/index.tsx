@@ -13,6 +13,7 @@ import { NoData } from '../../components/NoData';
 import { listenSectionEvent } from '../../components/Section/section-events';
 import { LoadingSpinner, showSpinner, hideSpinner } from 'sp-components';
 import { CALENDAR_SPINNER_ID } from '../../constants';
+import { CalendarContext, ICalendarContext } from '../../context/CalendarContext/CalendarContext';
 import styles from './CalendarSection.module.scss';
 
 interface IHeaderProps {
@@ -58,6 +59,17 @@ export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
         if (choice === 'month') return DateTime.fromJSDate(selectedDate).endOf('month');
         return DateTime.fromJSDate(selectedDate).plus({ day: 7 });
     }, [selectedDate, choice]);
+
+    const options = React.useMemo(() => {
+        const optionsSet = new Set(props.section.options);
+        const result: ICalendarContext = {
+            showUser: false
+        };
+        if (optionsSet.has('showuser')) {
+            result.showUser = true;
+        }
+        return result;
+    }, [props.section]);
 
     React.useEffect(() => {
         async function run(): Promise<void> {
@@ -121,26 +133,29 @@ export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
                 isMonthPickerVisible={choice === 'month'}
                 isDayPickerVisible={choice === 'week'}
                 className={styles.monthCalendar}
+                highlightSelectedMonth
             />
         );
     }, [choice, selectedDate]);
 
     return (
-        <div className={styles.container}>
-            <Header startDate={startDate} endDate={endDate} calendarType={choice} />
+        <CalendarContext.Provider value={options}>
+            <div className={styles.container}>
+                <Header startDate={startDate} endDate={endDate} calendarType={choice} />
 
-            <div className={styles.calendarContainer}>
-                <CalendarChoiceGroup
-                    selectedChoice={choice}
-                    onChoiceChange={(choice) => setChoice(choice)}
-                />
-                {calendar}
+                <div className={styles.calendarContainer}>
+                    <CalendarChoiceGroup
+                        selectedChoice={choice}
+                        onChoiceChange={(choice) => setChoice(choice)}
+                    />
+                    {calendar}
+                </div>
+
+                <Separator />
+
+                {filteredItems.length > 0 ? <CalendarItems items={filteredItems} /> : <NoData />}
+                <LoadingSpinner id={CALENDAR_SPINNER_ID} />
             </div>
-
-            <Separator />
-
-            {filteredItems.length > 0 ? <CalendarItems items={filteredItems} /> : <NoData />}
-            <LoadingSpinner id={CALENDAR_SPINNER_ID} />
-        </div>
+        </CalendarContext.Provider>
     );
 };
