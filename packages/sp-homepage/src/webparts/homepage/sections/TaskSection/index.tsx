@@ -11,9 +11,10 @@ import { GlobalContext } from '../../context/GlobalContext';
 import ITaskLog, { TaskStatus } from '@service/sp-tasks/dist/models/ITaskLog';
 import { LoadingSpinner, Task } from 'sp-components';
 import styles from './TaskSection.module.scss';
-import { Text } from 'office-ui-fabric-react';
+import { IDropdownOption, Text } from 'office-ui-fabric-react';
 import { IndexedDbCache } from 'indexeddb-manual-cache';
 import { listenSectionEvent } from '../../components/Section/section-events';
+import { NoData } from '../../components/NoData';
 
 export interface ITaskSectionProps extends ISectionProps {
     // Props go here
@@ -96,53 +97,63 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
         };
     }, [props.section, selectedUser]);
 
+    const handleTaskChange = React.useCallback(
+        (t: ITaskLog) => async (_ev: {}, option: IDropdownOption) => {
+            try {
+                setLoading(true);
+                const status = option.key.toString() as TaskStatus;
+                const payload: Partial<ITaskLog> = {
+                    Status: status,
+                };
+                // Make sure finished and cancelled tasks don't show up next days
+                if (status === 'Finished' || status === 'Cancelled') {
+                    payload.Completed = true;
+                } else {
+                    payload.Completed = false;
+                }
+                const newLog = await logService.updateTaskLog(t.ID, payload);
+                setTaskLogs((prev) => prev.map((t) => (t.ID === newLog.ID ? newLog : t)));
+            } finally {
+                setLoading(false);
+            }
+        },
+        []
+    );
+
+    const tasks = React.useMemo(() => {
+        if (taskLogs.length === 0) return <NoData />;
+        return taskLogs.map((t) => (
+            <Task
+                key={t.ID}
+                info={{
+                    date: new Date().toLocaleDateString(),
+                    description: t.Description,
+                    status: t.Status,
+                    time: new Date(t.Time).toLocaleTimeString(),
+                    title: t.Title,
+                    user: t.User,
+                    remark: t.Remark,
+                    category: t.Task.Category,
+                }}
+                canEditOthers={false}
+                currentUserId={currentUser.Id}
+                expired={false}
+                isHovering={false}
+                onChange={handleTaskChange(t)}
+                theme={HomepageWebPart.theme}
+                style={{
+                    minWidth: '150px',
+                    maxWidth: '90%',
+                }}
+            />
+        ));
+    }, [taskLogs]);
+
     return (
         <>
             <div className={styles.container}>
                 <Text variant="large">{new Date().toLocaleDateString()}</Text>
-                {taskLogs.map((t) => (
-                    <Task
-                        key={t.ID}
-                        info={{
-                            date: new Date().toLocaleDateString(),
-                            description: t.Description,
-                            status: t.Status,
-                            time: new Date(t.Time).toLocaleTimeString(),
-                            title: t.Title,
-                            user: t.User,
-                            remark: t.Remark,
-                            category: t.Task.Category,
-                        }}
-                        canEditOthers={false}
-                        currentUserId={currentUser.Id}
-                        expired={false}
-                        isHovering={false}
-                        onChange={async (_ev, option) => {
-                            try {
-                                setLoading(true);
-                                const status = option.key.toString() as TaskStatus;
-                                const payload: Partial<ITaskLog> = {
-                                    Status: status,
-                                };
-                                // Make sure finished and cancelled tasks don't show up next days
-                                if (status === 'Finished' || status === 'Cancelled') {
-                                    payload.Completed = true;
-                                }
-                                const newLog = await logService.updateTaskLog(t.ID, payload);
-                                setTaskLogs((prev) =>
-                                    prev.map((t) => (t.ID === newLog.ID ? newLog : t))
-                                );
-                            } finally {
-                                setLoading(false);
-                            }
-                        }}
-                        theme={HomepageWebPart.theme}
-                        style={{
-                            minWidth: '250px',
-                            maxWidth: '90%',
-                        }}
-                    />
-                ))}
+                {tasks}
             </div>
             {loading && <LoadingSpinner />}
         </>

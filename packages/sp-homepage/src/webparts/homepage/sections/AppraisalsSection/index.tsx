@@ -99,7 +99,6 @@ export const AppraisalsSection: React.FC<IAppraisalsSectionProps> = (props) => {
     }, [props.section, selectedUser]);
 
     const handleItemUpdate = async (id: number, status: AppraisalItemStatus): Promise<void> => {
-        console.log('update', status);
         const updateBody: Partial<IAppraisalItem> = {
             ItemStatus: status,
         };

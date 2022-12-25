@@ -6,6 +6,7 @@ import {
     FooterYesNo,
     hideDialog,
     hideSpinner,
+    LoadingSpinner,
     PriorityCell,
     showDialog,
     showSpinner,
@@ -95,6 +96,9 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
                         title: 'Finish task',
                         subText: 'Task will become finished. Are you sure?',
                     },
+                    onDismiss: () => {
+                        hideSpinner(CIP_SPINNER_ID);
+                    }
                 },
                 footer: (
                     <FooterYesNo
