@@ -209,3 +209,24 @@ export {
     Search,
     Suggest,
 } from '@pnp/sp/search';
+
+export {
+    SharingRole,
+    SharingLinkKind,
+    SharingOperationStatusCode,
+    SharingDomainRestrictionMode,
+    ISharingResult,
+    ISharingLinkInfo,
+    IShareLinkRequest,
+    ISharingEmailData,
+    ISharingRecipient,
+    IShareLinkResponse,
+    IShareLinkSettings,
+    IUserSharingResult,
+    IShareObjectOptions,
+    ISharingInformation,
+    IObjectSharingSettings,
+    ISharingEntityPermission,
+    IInvitationCreationResult,
+    ISharingInformationRequest
+} from '@pnp/sp/sharing';
