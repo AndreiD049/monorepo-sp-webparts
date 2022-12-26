@@ -2,6 +2,7 @@ import {
     DetailsList,
     DetailsListLayoutMode,
     SelectionMode,
+    Separator,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import CipCommandBar from '../../components/command-bar/CipCommandBar';
@@ -49,11 +50,13 @@ const TasksTable: React.FC<ITasksTableProps> = (props) => {
     const { groups, groupProps } = useGroups(items, showCategories);
 
     /** Resize table to fit to current screen. Avoid showing vertical scrollbar */
+    /**
     React.useEffect(() => {
         const el: HTMLDivElement = tableRef.current.querySelector('.ms-DetailsList');
         const rect = el.getBoundingClientRect();
         el.style.maxHeight = `${window.innerHeight - rect.top - 14}px`;
     }, [tableRef.current, items]);
+     */
 
     return (
         <>
@@ -72,7 +75,26 @@ const TasksTable: React.FC<ITasksTableProps> = (props) => {
                 <DetailsList
                     styles={{
                         root: {
-                            overflow: 'unset',
+                            overflowX: 'scroll',
+                            width: '100%',
+                            selectors: {
+                                '& [role=grid]': {
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'start',
+                                    height: '70vh',
+                                },
+                            },
+                        },
+                        headerWrapper: {
+                            flex: '0 0 auto',
+                        },
+                        contentWrapper: {
+                            flex: '1 1 auto',
+                            overflowY: 'auto',
+                            overflowX: 'hidden',
+                            minWidth: '100%',
+                            paddingBottom: '4em'
                         },
                     }}
                     className={styles.table}
@@ -80,6 +102,7 @@ const TasksTable: React.FC<ITasksTableProps> = (props) => {
                     groupProps={groupProps}
                     layoutMode={DetailsListLayoutMode.fixedColumns}
                     selectionMode={SelectionMode.none}
+                    onRenderDetailsFooter={() => <Separator styles={{ root: { width: '100%' } }} />}
                     columns={columns}
                     items={items}
                     onRenderRow={(props) => (

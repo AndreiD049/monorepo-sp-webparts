@@ -90,7 +90,7 @@ const Cip: React.FC<ICipProps> = (props) => {
                         <Route path="actionlog" element={<ActionLogPanel />} />
                     </Route>
                 </Routes>
-                <Dialog id={DIALOG_ID}/>;
+                <Dialog id={DIALOG_ID}/>
                 <CipTimer />
             </HashRouter>
         </GlobalContext.Provider>
