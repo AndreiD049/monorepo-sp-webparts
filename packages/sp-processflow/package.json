@@ -26,7 +26,7 @@
     "react-dom": "16.13.1",
     "react-router-dom": "^6.4.5",
     "sp-components": "^1.0.0",
-    "sp-preset": "^2.0.18",
+    "sp-preset": "^2.0.19",
     "sp-react-notifications": "^1.0.23",
     "spfx-fast-serve": "^3.0.5",
     "tslib": "2.3.1",

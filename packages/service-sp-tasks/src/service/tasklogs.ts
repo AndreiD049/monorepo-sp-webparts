@@ -198,6 +198,6 @@ export class TaskLogsService {
     }
 
     private getIncompleteUserTasks(userId: number, dt: DateTime) {
-        return `(Completed eq false) and (UserId eq ${userId}) and (Date le '${dt.toISODate()}')`;
+        return `(Completed eq false) and (UserId eq ${userId}) and (Date lt '${dt.toISODate()}')`;
     }
 }

@@ -15,6 +15,7 @@ import { IDropdownOption, Text } from 'office-ui-fabric-react';
 import { IndexedDbCache } from 'indexeddb-manual-cache';
 import { listenSectionEvent } from '../../components/Section/section-events';
 import { NoData } from '../../components/NoData';
+import { uniqBy } from '@microsoft/sp-lodash-subset';
 
 export interface ITaskSectionProps extends ISectionProps {
     // Props go here
@@ -79,7 +80,7 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
                 new Date(),
                 logService
             );
-            setTaskLogs([...logs, ...created]);
+            setTaskLogs(uniqBy([...logs, ...created], (tl) => tl.ID));
             setLoading(false);
         }
         run().catch((e) => console.error(e));

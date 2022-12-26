@@ -1,4 +1,4 @@
-import { IFolder, SPFI } from "sp-preset";
+import { IFolder, SharingLinkKind, SPFI } from "sp-preset";
 import { IAttachments } from "../models/IAttachments";
 import { IServiceProps } from "../models/IServiceProps";
 import { ITaskOverview } from "../models/ITaskOverview";
@@ -126,6 +126,10 @@ export class AttachmentService {
       ProcessPersonalFavorites: false,
       TrimDuplicates: false,
     });
+  }
+
+  async getLink(serverRelativeUrl: string) {
+      return this.sp.web.getFileByServerRelativePath(serverRelativeUrl).getShareLink(SharingLinkKind.OrganizationView, new Date(Date.now() + 1000 * 60 * 5));
   }
 
   async ensureFolder(task: ITaskOverview) {

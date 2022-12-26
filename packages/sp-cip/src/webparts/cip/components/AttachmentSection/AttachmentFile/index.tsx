@@ -14,7 +14,6 @@ import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { loadingStart, loadingStop } from '../../utils/LoadingAnimation';
 import styles from './AttachmentFile.module.scss';
 import { taskUpdated } from '../../../utils/dom-events';
-import { getBasePath } from '../../../utils/path';
 import { hideDialog, showDialog } from 'sp-components';
 import { DIALOG_ID_PANEL } from '../../../utils/constants';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
@@ -87,36 +86,14 @@ const getFileIconName = (name: string): string => {
     }
 };
 
-const getRootSite = (
-    serverRelativeUrl: string,
-    libraryName: string
-): string => {
-    const rootSiteParts = serverRelativeUrl.split('/');
-    const libraryIndex = rootSiteParts.indexOf(libraryName);
-    return rootSiteParts.slice(0, libraryIndex + 1).join('/');
-};
-
 export const AttachmentFile: React.FC<IAttachmentFileProps> = (props) => {
     const { properties } = React.useContext(GlobalContext);
-    const rootSite = React.useMemo(
-        () =>
-            getRootSite(
-                props.file.ServerRelativeUrl,
-                properties.config.attachmentsPath
-            ),
-        [props.file]
-    );
 
-    const handleViewFile = React.useCallback(() => {
-        window.open(
-            rootSite +
-                '/Forms/AllItems.aspx?id=' +
-                props.file.ServerRelativeUrl +
-                '&parent=' +
-                getBasePath(props.file.ServerRelativeUrl),
-            '_blank',
-            'noreferrer'
+    const handleViewFile = React.useCallback(async () => {
+        const link = await MainService.getAttachmentService().getLink(
+            props.file.ServerRelativeUrl
         );
+        window.open(link.sharingLinkInfo.Url, '_blank', 'noreferrer');
     }, [props.file]);
 
     const hadnleDownload = React.useCallback(() => {

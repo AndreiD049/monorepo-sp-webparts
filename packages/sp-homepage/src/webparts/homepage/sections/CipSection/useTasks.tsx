@@ -189,7 +189,8 @@ export function useTasks(sources: ISource[], sectionName: string, selectedUser: 
                 for (const key in services) {
                     if (Object.prototype.hasOwnProperty.call(services, key)) {
                         const service = services[key];
-                        await service.clearOpenTasksCache(selectedUser.Id);
+                        const serviceUser = await service.getUser(selectedUser.LoginName);
+                        await service.clearOpenTasksCache(serviceUser.Id);
                     }
                 }
             } finally {

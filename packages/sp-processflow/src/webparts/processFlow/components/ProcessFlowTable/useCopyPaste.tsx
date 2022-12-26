@@ -92,20 +92,29 @@ export const useCopyPaste = (): void => {
                 if (alreadyCreated.length === 0) {
                     await UserProcessService.addUserProcess(updatePayload);
                 } else {
+                    // If there is more than 1 user-process for this user
                     if (alreadyCreated.length > 1) {
                         // Delete
                         for (const up of alreadyCreated.slice(1)) {
                             await UserProcessService.removeUserProcess(up.Id);
                         }
                     }
-                    askYesNo('Update?', 'Overwrite existing item', async () => {
-                        // Update
+                    if (alreadyCreated[0].Status === 'Completed') {
+                        askYesNo('Update?', 'Overwrite existing item', async () => {
+                            // Update
+                            await UserProcessService.updateUserProcess(
+                                alreadyCreated[0].Id,
+                                updatePayload
+                            );
+                            hideDialog(MAIN_DIALOG);
+                        });
+                    } else {
                         await UserProcessService.updateUserProcess(
                             alreadyCreated[0].Id,
                             updatePayload
                         );
                         hideDialog(MAIN_DIALOG);
-                    });
+                    }
                 }
             }
         });

@@ -91,8 +91,10 @@ export const UserProcessStatusDialog: React.FC<
             if (prevStatus === status) return;
             switch (status) {
                 case 'NA':
+                    setData(() => ({ Status: status, Date: null }));
+                    break;
                 case 'Completed':
-                    setData((prev) => ({ Status: status, Date: new Date().toISOString() }));
+                    setData(() => ({ Status: status, Date: new Date().toISOString() }));
                     break;
                 default:
                     setData((prev) => ({ ...prev, Status: status }));
