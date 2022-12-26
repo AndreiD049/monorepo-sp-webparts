@@ -44,8 +44,8 @@ export const UserSelector: React.FC<IUserSelectorProps> = (props) => {
                 componentRef={dropdownRef}
                 options={options}
                 selectedKey={props.selectedUser?.Id}
-                onChange={(ev, option) => {
-                    if (option.key !== props.selectedUser.Id) {
+                onChange={(_ev, option) => {
+                    if (option.key !== props.selectedUser?.Id) {
                         props.handleUserSelect(option.data)
                     }
                 }}

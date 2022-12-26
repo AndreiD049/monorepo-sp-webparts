@@ -4,6 +4,7 @@ import { Dictionary } from 'lodash';
 import {
     ActionButton,
     IconButton,
+    Panel,
     PanelType,
     Persona,
     PersonaSize,
@@ -13,9 +14,9 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Dialog, hidePanel, showPanel } from 'sp-components';
+import { Dialog } from 'sp-components';
 import { MainService } from '../../services/main-service';
-import { MAIN_PANEL, PANEL_DIALOG } from '../../utils/constants';
+import { PANEL_DIALOG } from '../../utils/constants';
 import {
     listenLocationAdded,
     listenLocationDeleted,
@@ -125,7 +126,14 @@ const StatusTable: React.FC<{
                             <IconButton
                                 className={styles.userEditButton}
                                 iconProps={{ iconName: 'Edit' }}
-                                onClick={() => editUserProcess(props.process, i.User, i, PANEL_DIALOG)}
+                                onClick={() =>
+                                    editUserProcess(
+                                        props.process,
+                                        i.User,
+                                        i,
+                                        PANEL_DIALOG
+                                    )
+                                }
                             />
                         </td>
                     </tr>
@@ -134,7 +142,10 @@ const StatusTable: React.FC<{
     );
 };
 
-const UserProcessOverview: React.FC<{ items: IUserProcess[], process: IProcess }> = (props) => {
+const UserProcessOverview: React.FC<{
+    items: IUserProcess[];
+    process: IProcess;
+}> = (props) => {
     const groupped = React.useMemo(() => {
         return groupBy(props.items, (i) => i.Status);
     }, [props.items]);
@@ -143,9 +154,21 @@ const UserProcessOverview: React.FC<{ items: IUserProcess[], process: IProcess }
         <div>
             <table className={styles.overviewTable}>
                 <tbody>
-                    <StatusTable groupped={groupped} process={props.process} status="Planned" />
-                    <StatusTable groupped={groupped} process={props.process} status="On-going" />
-                    <StatusTable groupped={groupped} process={props.process} status="Completed" />
+                    <StatusTable
+                        groupped={groupped}
+                        process={props.process}
+                        status="Planned"
+                    />
+                    <StatusTable
+                        groupped={groupped}
+                        process={props.process}
+                        status="On-going"
+                    />
+                    <StatusTable
+                        groupped={groupped}
+                        process={props.process}
+                        status="Completed"
+                    />
                 </tbody>
             </table>
         </div>
@@ -214,14 +237,20 @@ const Details: React.FC<{ processId: number }> = (props) => {
         async function locationDeleteHandler(data: number): Promise<void> {
             setLocations((prev) => prev.filter((l) => l.Id !== data));
         }
-        async function userProcessUpdatedHandler(data: IUserProcess): Promise<void> {
-            setUserProcesses((prev) => prev.map((up) => up.Id === data.Id ? data : up));
+        async function userProcessUpdatedHandler(
+            data: IUserProcess
+        ): Promise<void> {
+            setUserProcesses((prev) =>
+                prev.map((up) => (up.Id === data.Id ? data : up))
+            );
         }
         const removeProcessUpdated = listenProcessUpdated(processUpdated);
         const removeLocationAdd = listenLocationAdded(locationAddedHandler);
         const removeLocationUpd = listenLocationUpdated(locationUpdatedHandler);
         const removeLocationDel = listenLocationDeleted(locationDeleteHandler);
-        const removeUserProcessUpdated = listenUserProcessUpdated(userProcessUpdatedHandler)
+        const removeUserProcessUpdated = listenUserProcessUpdated(
+            userProcessUpdatedHandler
+        );
         return () => {
             removeProcessUpdated();
             removeLocationAdd();
@@ -375,7 +404,12 @@ const Details: React.FC<{ processId: number }> = (props) => {
             {userProcesses.length > 0 && (
                 <>
                     <Separator>Overview</Separator>
-                    {<UserProcessOverview items={userProcesses} process={process} />}
+                    {
+                        <UserProcessOverview
+                            items={userProcesses}
+                            process={process}
+                        />
+                    }
                 </>
             )}
             <Dialog id={PANEL_DIALOG} />
@@ -389,20 +423,22 @@ export const ProcessDetails: React.FC<IProcessDetailsProps> = (props) => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    React.useEffect(() => {
-        showPanel(
-            MAIN_PANEL,
-            {
-                headerText: 'Process details',
-                type: PanelType.medium,
-                onDismiss: () => {
-                    navigate(`/team/${selectedTeam}/flow/${selectedFlow.Id}?${searchParams.toString()}`);
-                    hidePanel(MAIN_PANEL);
-                },
-            },
+    return (
+        <Panel
+            headerText="Process details"
+            type={PanelType.medium}
+            isOpen
+            isLightDismiss
+            onDismiss={() => {
+                navigate(
+                    `/team/${selectedTeam}/flow/${
+                        selectedFlow.Id
+                    }?${searchParams.toString()}`
+                );
+            }}
+        >
             <Details processId={+id} />
-        );
-    }, [id, selectedFlow, selectedTeam]);
-
-    return null;
+            <Dialog id={PANEL_DIALOG} />
+        </Panel>
+    );
 };

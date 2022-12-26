@@ -13,15 +13,20 @@ import { SectionFactory } from '../SectionFactory';
 import { ConditionChecker } from '../../services/ConditionChecker';
 import { SectionPreProcessor } from '../../services/SectionPreProcessor';
 import { Callout, Dialog, ErrorBoundary } from 'sp-components';
-import { CALLOUT_ID, DIALOG_ID } from '../../constants';
+import { CALLOUT_ID, DIALOG_ID, LOCALSTORAGE_PREFIX } from '../../constants';
 import { useLayout } from '../../hooks/useLayout';
+import useWebStorage from 'use-web-storage-api';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 export const Homepage: React.FC<IHomepageProps> = (props) => {
     const [locked, setLocked] = React.useState(true);
-    const [team, setTeam] = React.useState(null);
-    const [selectedUser, setSelectedUser] = React.useState<IUser>(null);
+    const [team, setTeam] = useWebStorage('', {
+        key: `${LOCALSTORAGE_PREFIX}/selectedTeam`,
+    });
+    const [selectedUser, setSelectedUser] = useWebStorage<IUser>(null, {
+        key: `${LOCALSTORAGE_PREFIX}/selectedUser`
+    });
     const [context, setContext] = React.useState<IGlobalContext>({
         config: props.properties.config,
         currentUser: null,
@@ -61,8 +66,6 @@ export const Homepage: React.FC<IHomepageProps> = (props) => {
                 ...prev,
                 currentUser: currentUser,
             }));
-            setSelectedUser(currentUser);
-            setTeam(currentUser.teams[0] || null);
         }
         run().catch((err) => console.error(err));
     }, []);

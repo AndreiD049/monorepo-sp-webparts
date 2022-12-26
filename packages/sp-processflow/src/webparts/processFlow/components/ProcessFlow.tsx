@@ -17,6 +17,7 @@ import { Footer } from './Footer';
 import { HashRouter, Routes, Route, Outlet } from 'react-router-dom';
 import styles from './ProcessFlow.module.scss';
 import { ProcessDetails } from './ProcessDetails';
+import { TeamPlannedOverview } from './TeamPlannedOverview';
 
 export interface IProcessFlowProps {
     properties: IProcessFlowWebPartProps;
@@ -105,6 +106,10 @@ export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
                                     <Route
                                         path="/team/:team/flow/:flowId/process/:id"
                                         element={<ProcessDetails />}
+                                    />
+                                    <Route
+                                        path="/team/:team/flow/:flowId/overview"
+                                        element={<TeamPlannedOverview />}
                                     />
                                 </Route>
                             </Route>

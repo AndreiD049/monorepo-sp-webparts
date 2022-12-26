@@ -47,14 +47,17 @@ export const TaskDetails: React.FC = () => {
     React.useEffect(() => {
         async function run(): Promise<void> {
             // if we have a task already, just skip it
-            if (task) return null;
-            loadingStart('details');
-            const id = +params.taskId;
-            if (Number.isInteger(id)) {
-                const task = await taskService.getTask(id);
-                setTask(task);
+            try {
+                if (task) return null;
+                loadingStart('details');
+                const id = +params.taskId;
+                if (Number.isInteger(id)) {
+                    const task = await taskService.getTask(id);
+                    setTask(task);
+                }
+            } finally {
+                loadingStop('details');
             }
-            loadingStop('details');
         }
         run().catch((e) => console.error(e));
     }, [params]);

@@ -1,6 +1,6 @@
 import { IProcess } from "./IProcess";
 import { IFlowLocation } from "./IFlowLocation";
-import { IUserProcess } from "./IUserProcess";
+import { IUserProcess, IUserProcessDetailed } from "./IUserProcess";
 import { ICustomerFlow } from "./ICustomerFlow";
 
-export { IProcess, IFlowLocation, IUserProcess, ICustomerFlow };
+export { IProcess, IFlowLocation, IUserProcess, ICustomerFlow, IUserProcessDetailed };

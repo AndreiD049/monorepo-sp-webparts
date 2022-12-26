@@ -15,7 +15,7 @@ export interface ICalendarItemCipProps {
 }
 
 export const CalendarItemCip: React.FC<ICalendarItemCipProps> = (props) => {
-    const { showUser } = React.useContext(CalendarContext);
+    const { showUser, showStatus } = React.useContext(CalendarContext);
     const item = props.wrapped.item as ICalendarCipItem;
     const type = 'CIP';
     const typeColor = React.useMemo(() => textColor(type), [item]);
@@ -51,8 +51,22 @@ export const CalendarItemCip: React.FC<ICalendarItemCipProps> = (props) => {
         return null;
     }, [showUser, item.Responsible]);
 
+    const statusCell = React.useMemo(() => {
+        if (showStatus) {
+            return (
+                <td className={`${tableStyles.cell10} ${tableStyles.paddedl5}`}>
+                    <Pill style={statusStyles} title={item.Status} value={item.Status} />
+                </td>
+            );
+        }
+        return null;
+    }, [showStatus, item.Status]);
+
     return (
-        <>
+        <tr
+            className={`${tableStyles.row} ${tableStyles.mousePointer}`}
+            onDoubleClick={handleGotoClick}
+        >
             {userCell}
             <td className={`${tableStyles.cell10} ${tableStyles.paddedl5}`}>
                 <Pill
@@ -65,15 +79,13 @@ export const CalendarItemCip: React.FC<ICalendarItemCipProps> = (props) => {
                     }}
                 />
             </td>
-            <td className={`${tableStyles.cell10} ${tableStyles.paddedl5}`}>
-                <Pill style={statusStyles} title={item.Status} value={item.Status} />
-            </td>
-            <td className={tableStyles.paddedl5}>
+            {statusCell}
+            <td className={`${tableStyles.paddedl5} ${tableStyles.cellMin100}`}>
                 <Text variant="medium">{item.Title}</Text>
             </td>
             <td className={tableStyles.cell5}>
                 <IconButton iconProps={{ iconName: 'OpenInNewTab' }} onClick={handleGotoClick} />
             </td>
-        </>
+        </tr>
     );
 };

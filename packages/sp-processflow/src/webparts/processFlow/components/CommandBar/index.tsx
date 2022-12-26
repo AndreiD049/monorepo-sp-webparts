@@ -80,6 +80,8 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                         const foundFlow = result.find((f) => f.Id === +flowId);
                         const selectedFlow = foundFlow || result[0];
                         props.onFlowSelected(selectedFlow)
+                    } else if (result[0].Id) {
+                        navigate(`/team/${selectedTeam}/flow/${result[0].Id}`);
                     }
                 }
             } else {
@@ -90,7 +92,7 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
             }
         }
         run().catch((err) => console.error(err));
-    }, [selectedTeam]);
+    }, [selectedTeam, params.flowId]);
 
     const teamOptions: IComboBoxOption[] = React.useMemo(
         () =>
@@ -164,6 +166,10 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
         setRefreshed(true);
     }, [selectedFlow]);
 
+    const handleGoToOverview = React.useCallback(() => {
+        navigate(`/team/${selectedTeam}/flow/${selectedFlow.Id}/overview`);
+    }, [selectedTeam, selectedFlow]);
+
     const menuProps: IContextualMenuProps = React.useMemo(
         () => ({
             items: [
@@ -217,7 +223,6 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                     styles={comboBoxStyles}
                     useComboBoxAsMenuWidth
                 />
-                {/* {selectedFlow && <ProcessFlowHeader flow={selectedFlow} />} */}
                 <ActionButton
                     disabled={!Boolean(selectedTeam)}
                     iconProps={{ iconName: 'Add' }}
@@ -225,6 +230,14 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                     menuProps={menuProps}
                 >
                     Add
+                </ActionButton>
+                <ActionButton
+                    disabled={!Boolean(selectedTeam)}
+                    iconProps={{ iconName: 'AllApps' }}
+                    styles={{ root: { maxHeight: 32 } }}
+                    onClick={handleGoToOverview}
+                >
+                    Overview
                 </ActionButton>
             </div>
             <div className={styles.farItems}>

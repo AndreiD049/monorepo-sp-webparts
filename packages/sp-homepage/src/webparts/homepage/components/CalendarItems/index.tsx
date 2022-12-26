@@ -36,7 +36,7 @@ const Row: React.FC<IRowProps> = (props) => {
                 {dateDisplay}
             </Text>
             {props.groups[props.date].map((item) => (
-                <tr className={styles.row} key={`${item.type}${item.item.Id}`}><CalendarItem key={item.item.Id} wrapped={item} /></tr>
+                <CalendarItem key={`${item.type}${item.item.Id}`} wrapped={item} />
             ))}
         </>
     );

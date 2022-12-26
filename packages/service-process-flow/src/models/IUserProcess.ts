@@ -25,3 +25,14 @@ export interface IUserProcess {
     Team: string;
     Status: 'NA' | 'On-going' | 'Planned' | 'Completed';
 }
+
+export interface IUserProcessDetailed extends IUserProcess {
+    Process: {
+        Id: number;
+        Title: string;
+    };
+    Flow: {
+        Id: number;
+        Title: string;
+    }
+}

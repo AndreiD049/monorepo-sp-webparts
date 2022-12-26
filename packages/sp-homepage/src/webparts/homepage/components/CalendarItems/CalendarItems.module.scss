@@ -18,6 +18,10 @@
     width: 5%;
 }
 
+.cellMin100 {
+    min-width: 100px;
+}
+
 .paddedl5 {
     padding-left: .5em;
 }
@@ -28,6 +32,10 @@
     &:hover {
         background-color: '[theme: neutralLighter, default: #c86c70]';
     }
+}
+
+.mousePointer {
+    cursor: pointer;
 }
 
 .paddedCell {

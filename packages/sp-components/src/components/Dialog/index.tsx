@@ -87,7 +87,7 @@ export const Dialog: React.FC<ISPDialogProps> = (props) => {
                 )}
             </FluentDialog>
         );
-    }, [visible, dialogProps, content]);
+    }, [visible, dialogProps, content, footer]);
 
     return dialog;
 };

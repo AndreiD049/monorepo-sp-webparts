@@ -6,7 +6,6 @@ import {
     FooterYesNo,
     hideDialog,
     hideSpinner,
-    LoadingSpinner,
     PriorityCell,
     showDialog,
     showSpinner,
@@ -379,6 +378,10 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
         case 'DueDate':
             result = (
                 <DueDateCell
+                    style={{
+                        width: props.column.currentWidth,
+                        padding: '0.5em 8px 0.5em 12px',
+                    }}
                     dueDate={new Date(task.DueDate)}
                     calloutId={CALLOUT_ID}
                     onDateChange={handleDueDateChange}

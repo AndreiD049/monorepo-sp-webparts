@@ -78,7 +78,7 @@ const DueDateCellCallout: React.FC<IDueDateCellCalloutProps> = (props) => {
     );
 };
 
-export interface IDueDateCellProps {
+export interface IDueDateCellProps extends React.HTMLAttributes<HTMLElement> {
     dueDate: Date;
     disabled?: boolean;
     calloutId?: string;
@@ -132,6 +132,7 @@ export const DueDateCell: React.FC<IDueDateCellProps> = (props) => {
                 ref={textRef}
                 disabled={props.disabled}
                 className={styles.button}
+                style={props.style}
             >
                 <Text variant="medium" className={dateClassName}>
                     {new Date(props.dueDate).toLocaleDateString()}

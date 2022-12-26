@@ -3,3 +3,26 @@
 .container {
     min-width: 500px;
 }
+
+.table {
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+        background: '[theme: neutralLighter, default: #f4f4f4]';
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+        background: '[theme: neutralSecondary, default: #212121]';
+        border-radius: 6px;
+    }
+
+    /* Handle on hover */
+    &::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+}

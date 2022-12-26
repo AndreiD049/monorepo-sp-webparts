@@ -100,6 +100,7 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
     const handleTaskChange = React.useCallback(
         (t: ITaskLog) => async (_ev: {}, option: IDropdownOption) => {
             try {
+                if (t.Status === option.key.toString()) return;
                 setLoading(true);
                 const status = option.key.toString() as TaskStatus;
                 const payload: Partial<ITaskLog> = {

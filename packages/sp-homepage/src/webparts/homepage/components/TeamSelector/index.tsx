@@ -14,7 +14,7 @@ export const TeamSelector: React.FC<ITeamSelectorProps> = (props) => {
             key: team,
             text: team,
         }));
-    }, []);
+    }, [props.teams]);
 
     return (
         <span

@@ -19,7 +19,7 @@ import {
 import { GlobalContext } from '../../utils/globalContext';
 
 export const useCopyPaste = (): void => {
-    const { selectedFlow } = React.useContext(GlobalContext);
+    const { selectedFlow, selectedTeam } = React.useContext(GlobalContext);
     const { UserProcessService, FlowLocationService } = MainService;
     const [copiedUserProcess, setCopiedUserProcess] =
         React.useState<IUserProcess>(null);
@@ -82,10 +82,10 @@ export const useCopyPaste = (): void => {
                 const updatePayload: Parameters<
                     UserProcessService['addUserProcess']
                 >['0'] = {
-                    FlowId: copiedUserProcess.FlowId,
+                    FlowId: selectedFlow.Id,
                     Date: copiedUserProcess.Date,
                     Status: copiedUserProcess.Status,
-                    Team: copiedUserProcess.Team,
+                    Team: selectedTeam,
                     UserId: data.userId,
                     ProcessId: data.processId,
                 };
@@ -112,7 +112,7 @@ export const useCopyPaste = (): void => {
         return () => {
             removePaste();
         };
-    }, [copiedUserProcess]);
+    }, [copiedUserProcess, selectedFlow, selectedTeam]);
 
     React.useEffect(() => {
         const removeCopy = listenLocationCopy((location) => {

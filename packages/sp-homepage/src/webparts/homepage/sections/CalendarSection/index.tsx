@@ -62,11 +62,16 @@ export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
 
     const options = React.useMemo(() => {
         const optionsSet = new Set(props.section.options);
+        console.log(optionsSet);
         const result: ICalendarContext = {
-            showUser: false
+            showUser: false,
+            showStatus: false,
         };
         if (optionsSet.has('showuser')) {
             result.showUser = true;
+        }
+        if (optionsSet.has('showstatus')) {
+            result.showStatus = true;
         }
         return result;
     }, [props.section]);

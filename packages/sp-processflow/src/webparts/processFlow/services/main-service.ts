@@ -118,7 +118,7 @@ const userProcessCacheOptions: ICacheProxyOptions<UserProcessService> = {
     storeName: STORE_NAME,
     prefix: 'UserProcessService',
     props: {
-        '(getByFlow|getByProcess)': { isPattern: true, isCached: true, expiresIn: HOUR * 3 },
+        '(getByFlow|getByProcess|getByTeamAndStatus)': { isPattern: true, isCached: true, expiresIn: HOUR * 3 },
         addUserProcess: {
             after: async (db, service, args, returnValue) => {
                 const flowId = args[0].FlowId;
@@ -137,6 +137,7 @@ const userProcessCacheOptions: ICacheProxyOptions<UserProcessService> = {
                         return values;
                     }
                 );
+                await removeCached(db, /UserProcessService\/getByTeamAndStatus.*/);
                 userProcessAdded(addedProcess);
             },
         },
@@ -163,6 +164,7 @@ const userProcessCacheOptions: ICacheProxyOptions<UserProcessService> = {
                         return values;
                     }
                 );
+                await removeCached(db, /UserProcessService\/getByTeamAndStatus.*/);
                 userProcessUpdated(updatedItem);
             },
         },

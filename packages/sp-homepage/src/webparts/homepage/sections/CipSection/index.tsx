@@ -1,5 +1,4 @@
 import * as React from 'react';
-import styles from './CipSection.module.scss';
 import { CipTask } from '../../components/CipTask';
 import { GlobalContext } from '../../context/GlobalContext';
 import { IColumn, DetailsList, SelectionMode, DetailsListLayoutMode } from 'office-ui-fabric-react';
@@ -15,6 +14,7 @@ import { ISiteUserInfo } from 'sp-preset';
 import { getSourceKey } from '../../utils';
 import { CIP_SPINNER_ID } from '../../constants';
 import { LoadingSpinner } from 'sp-components';
+import styles from './CipSection.module.scss';
 
 export interface ICipSectionProps extends ISectionProps {
     // Props go here
@@ -128,6 +128,7 @@ export const CipSection: React.FC<ICipSectionProps> = (props) => {
                 <div className={styles.container}>
                     <LoadingSpinner id={CIP_SPINNER_ID} />
                     <DetailsList
+                        className={styles.table}
                         groups={groups}
                         items={children}
                         getKey={(item) =>

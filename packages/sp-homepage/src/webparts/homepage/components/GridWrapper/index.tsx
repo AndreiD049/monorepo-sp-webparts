@@ -20,12 +20,6 @@ export const GridWrapper: React.FC<IGridWrapperProps> = (props) => {
     const { currentUser: currentUserInfo } = React.useContext(GlobalContext);
     const [users, setUsers] = React.useState([]);
 
-    React.useEffect(() => {
-        if (currentUserInfo) {
-            props.handleTeamSelect(currentUserInfo?.teams[0] || null);
-        }
-    }, [currentUserInfo]);
-
     // every time the team changes. change user options
     React.useEffect(() => {
         async function run(): Promise<void> {
@@ -42,22 +36,18 @@ export const GridWrapper: React.FC<IGridWrapperProps> = (props) => {
             <div className={styles.commandBar}>
                 <div className={styles.commandBarNearItems}>
                     <Text variant="xLarge">Homepage</Text>
-                    {props.team && (
-                        <TeamSelector
-                            teams={currentUserInfo.teams}
-                            selectedTeam={props.team}
-                            onTeamSelect={(team) => props.handleTeamSelect(team)}
-                        />
-                    )}
-                    {props.team && (
-                        <UserSelector
-                            users={users}
-                            selectedUser={props.user}
-                            handleUserSelect={async (user) =>
-                                props.handleUserSelect(await UserService.getUser(user.User.Id))
-                            }
-                        />
-                    )}
+                    <TeamSelector
+                        teams={currentUserInfo?.teams || []}
+                        selectedTeam={props.team}
+                        onTeamSelect={(team) => props.handleTeamSelect(team)}
+                    />
+                    <UserSelector
+                        users={users || []}
+                        selectedUser={props.user}
+                        handleUserSelect={async (user) =>
+                            props.handleUserSelect(await UserService.getUser(user.User.Id))
+                        }
+                    />
                 </div>
                 <IconButton
                     style={{

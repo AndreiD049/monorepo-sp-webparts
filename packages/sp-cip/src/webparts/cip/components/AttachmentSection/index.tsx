@@ -50,25 +50,28 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
     // Fetch Data
     React.useEffect(() => {
         async function run(): Promise<void> {
-            loadingStart('details');
-            const fullPath = path.join('/');
-            const result = await attachmentService.getAttachments(
-                props.task,
-                fullPath
-            );
-            setAttachments(result.Files);
-            setFolders(result.Folders);
-            if (
-                serverRelativeUrl === '' &&
-                (result.Files.length > 0 || result.Folders.length > 0)
-            ) {
-                setServerRelativeUrl(
-                    result.Files.length > 0
-                        ? result.Files[0].ServerRelativeUrl
-                        : result.Folders[0].ServerRelativeUrl
+            try {
+                loadingStart('details');
+                const fullPath = path.join('/');
+                const result = await attachmentService.getAttachments(
+                    props.task,
+                    fullPath
                 );
+                setAttachments(result.Files);
+                setFolders(result.Folders);
+                if (
+                    serverRelativeUrl === '' &&
+                    (result.Files.length > 0 || result.Folders.length > 0)
+                ) {
+                    setServerRelativeUrl(
+                        result.Files.length > 0
+                            ? result.Files[0].ServerRelativeUrl
+                            : result.Folders[0].ServerRelativeUrl
+                    );
+                }
+            } finally {
+                loadingStop('details');
             }
-            loadingStop('details');
         }
         run().catch((err) => console.error(err));
     }, [path]);
@@ -122,9 +125,11 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
         }
     };
 
-    /** Attach by dropping */ 
+    /** Attach by dropping */
     const handleDrop =
-        (currentPath: string[] = path): (data: IDragData<IAttachmentFile>) => void =>
+        (
+            currentPath: string[] = path
+        ): ((data: IDragData<IAttachmentFile>) => void) =>
         async (data: IDragData<IAttachmentFile>) => {
             if (!data.files.length) return;
             try {
@@ -151,7 +156,10 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
 
     // Move file by dragging
     const handleFileMove =
-        (folder: string): (data: IDragData<IAttachmentFile>) => Promise<void> => async (data: IDragData<IAttachmentFile>) => {
+        (
+            folder: string
+        ): ((data: IDragData<IAttachmentFile>) => Promise<void>) =>
+        async (data: IDragData<IAttachmentFile>) => {
             try {
                 loadingStart('details');
                 if (data.files.length) return;

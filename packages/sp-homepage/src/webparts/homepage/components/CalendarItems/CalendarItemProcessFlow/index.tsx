@@ -15,7 +15,7 @@ export interface ICalendarItemProcessFlowProps {
 }
 
 export const CalendarItemProcessFlow: React.FC<ICalendarItemProcessFlowProps> = (props) => {
-    const { showUser } = React.useContext(CalendarContext);
+    const { showUser, showStatus } = React.useContext(CalendarContext);
     const item = props.wrapped.item as ICalendarProcessFlowItem;
     const type = 'PF';
     const typeColor = React.useMemo(() => textColor(type), [item]);
@@ -55,8 +55,22 @@ export const CalendarItemProcessFlow: React.FC<ICalendarItemProcessFlowProps> = 
         return null;
     }, [showUser, item.User]);
 
+    const statusCell = React.useMemo(() => {
+        if (showStatus) {
+            return (
+                <td className={`${tableStyles.cell10} ${tableStyles.paddedl5}`}>
+                    <Pill style={statusStyles} title={item.Status} value={item.Status} />
+                </td>
+            );
+        }
+        return null;
+    }, [showStatus, item.Status]);
+
     return (
-        <>
+        <tr
+            className={`${tableStyles.row} ${tableStyles.mousePointer}`}
+            onDoubleClick={handleGotoClick}
+        >
             {userCell}
             <td className={`${tableStyles.cell10} ${tableStyles.paddedl5}`}>
                 <Pill
@@ -65,15 +79,13 @@ export const CalendarItemProcessFlow: React.FC<ICalendarItemProcessFlowProps> = 
                     style={{ color: typeColor.fg, backgroundColor: typeColor.bg, minWidth: 60 }}
                 />
             </td>
-            <td className={`${tableStyles.cell10} ${tableStyles.paddedl5}`}>
-                <Pill style={statusStyles} title={item.Status} value={item.Status} />
-            </td>
+            {statusCell}
             <td className={`${tableStyles.paddedCell} ${tableStyles.paddedl5}`}>
                 <Text variant="medium">{item.Process.Title}</Text>
             </td>
             <td className={tableStyles.cell5}>
                 <IconButton iconProps={{ iconName: 'OpenInNewTab' }} onClick={handleGotoClick} />
             </td>
-        </>
+        </tr>
     );
 };
