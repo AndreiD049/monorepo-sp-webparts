@@ -10,10 +10,6 @@
     cursor: pointer;  
     min-height: 32px;
 
-    i {
-        font-size: 1.5em;
-    }
-
     &:hover {
         background-color: "[theme: themeLighterAlt, default: #e3afb2]";
     }

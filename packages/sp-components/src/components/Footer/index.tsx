@@ -1,11 +1,10 @@
 import { Icon, Link, Separator, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { IProcessFlowConfig } from '../../IProcessFlowConfig';
 import styles from './Footer.module.scss';
 
 export interface IFooterProps {
     // Props go here
-    config: IProcessFlowConfig;
+    email: string;
 }
 
 export const Footer: React.FC<IFooterProps> = (props) => {
@@ -19,7 +18,7 @@ export const Footer: React.FC<IFooterProps> = (props) => {
                 />
                 <Text variant="medium">
                     Any questions -{' '}
-                    <Link href={`mailto:${props.config.contactEmail}?Subject=Sharepoint ProcessFlow Webpart question`}>
+                    <Link href={`mailto:${props.email}?Subject=Sharepoint ProcessFlow Webpart question`}>
                         Contact us
                     </Link>
                 </Text>

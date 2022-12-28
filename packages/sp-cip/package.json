@@ -10,6 +10,7 @@
     "serve": "gulp bundle --custom-serve --max_old_space_size=4096 && fast-serve"
   },
   "dependencies": {
+    "@fluentui/react-file-type-icons": "^8.8.4",
     "@microsoft/sp-adaptive-card-extension-base": "1.15.2",
     "@microsoft/sp-core-library": "1.15.2",
     "@microsoft/sp-lodash-subset": "1.15.2",

@@ -22,7 +22,7 @@ export const TeamPlannedOverview: React.FC = () => {
                 selectedTeam,
                 'Planned'
             );
-            setUserProcesses(result);
+            setUserProcesses(result.filter((i) => i.Date !== null));
         }
         run().catch((err) => console.error(err));
     }, [selectedTeam]);
@@ -55,8 +55,6 @@ export const TeamPlannedOverview: React.FC = () => {
             },
         ]
     }, [selectedTeam]);
-
-
 
     const [tableItems, tableGroups]: [IUserProcessDetailed[], IGroup[]] = React.useMemo(() => {
         const sortedKeys = Object.keys(groupped);

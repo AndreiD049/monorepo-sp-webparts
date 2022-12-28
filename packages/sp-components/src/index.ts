@@ -22,3 +22,4 @@ export { userToPersonaProps } from './utils';
 export { Panel, hidePanel, showPanel, dispatchButtonClick, handleButtonClick, ICustomPanelProps } from './components/Panel';
 export { LoadingSpinner, showSpinner, hideSpinner } from './components/LoadingSpinner';
 export { ErrorBoundary } from './components/ErrorBoundary';
+export { Footer } from './components/Footer';

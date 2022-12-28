@@ -1,8 +1,13 @@
-import { IProcess, IUserProcess } from '@service/process-flow';
+import {
+    IProcess,
+    IUserProcess,
+} from '@service/process-flow';
 import { IUserProps } from '@service/users';
 import { MessageBarType } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { FooterYesNo, hideDialog, showDialog } from 'sp-components';
 import { SPnotify } from 'sp-react-notifications';
+import { MainService } from '../../../services/main-service';
 import { MAIN_DIALOG } from '../../../utils/constants';
 import { copyUserProcess, pasteUserProcess } from '../../../utils/events';
 import { editUserProcess } from '../../UserProcessStatusDialog';
@@ -15,6 +20,7 @@ export interface IUserCellProps {
 }
 
 export const UserCell: React.FC<IUserCellProps> = (props) => {
+    const { UserProcessService } = MainService;
     const className = React.useMemo(
         () =>
             `${styles.container} sp-processflow-${
@@ -26,7 +32,12 @@ export const UserCell: React.FC<IUserCellProps> = (props) => {
     );
 
     const handleShowDialog = React.useCallback(() => {
-        editUserProcess(props.process, props.user, props.userProcess, MAIN_DIALOG);
+        editUserProcess(
+            props.process,
+            props.user,
+            props.userProcess,
+            MAIN_DIALOG
+        );
     }, [props.process, props.userProcess]);
 
     const content = React.useMemo(() => {
@@ -43,9 +54,34 @@ export const UserCell: React.FC<IUserCellProps> = (props) => {
         if (!props.userProcess) return '';
         let content = `Process: ${props.process.Title}\nUser: ${props.user.Title}\nStatus: ${props.userProcess?.Status}\n`;
         if (props.userProcess.Date) {
-            content += `Date: ${new Date(props.userProcess?.Date).toLocaleDateString()}`;
+            content += `Date: ${new Date(
+                props.userProcess?.Date
+            ).toLocaleDateString()}`;
         }
         return content;
+    }, [props.userProcess]);
+
+    const handleDeleteUserProcess = React.useCallback(() => {
+        showDialog({
+            id: MAIN_DIALOG,
+            dialogProps: {
+                dialogContentProps: {
+                    title: 'Delete user process',
+                    subText: 'Are you sure?',
+                },
+            },
+            footer: (
+                <FooterYesNo
+                    onYes={async () => {
+                        hideDialog(MAIN_DIALOG);
+                        await UserProcessService.removeUserProcess(
+                            props.userProcess.Id
+                        );
+                    }}
+                    onNo={() => hideDialog(MAIN_DIALOG)}
+                />
+            ),
+        });
     }, [props.userProcess]);
 
     return (
@@ -55,7 +91,7 @@ export const UserCell: React.FC<IUserCellProps> = (props) => {
             onContextMenu={(ev) => {
                 ev.preventDefault();
             }}
-            onKeyDown={(ev) => {
+            onKeyDown={async (ev) => {
                 // Copy
                 if (ev.key.toLowerCase() === 'c' && ev.ctrlKey) {
                     if (props.userProcess) {
@@ -79,6 +115,10 @@ export const UserCell: React.FC<IUserCellProps> = (props) => {
                         processId: props.process.Id,
                         userId: props.user.Id,
                     });
+                } else if (ev.key.toLowerCase() === 'delete') {
+                    if (props.userProcess.Id) {
+                        handleDeleteUserProcess();
+                    }
                 }
             }}
             onClick={() => handleShowDialog()}

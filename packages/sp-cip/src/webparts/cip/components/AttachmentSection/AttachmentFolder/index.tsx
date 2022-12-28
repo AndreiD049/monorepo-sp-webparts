@@ -9,6 +9,7 @@ import { IAttachmentFile } from '@service/sp-cip/dist/models/IAttachmentFile';
 import { loadingStart, loadingStop } from '../../utils/LoadingAnimation';
 import { UserHandler } from '@rast999/drag-and-drop/dist/utils';
 import { PATH_BACK } from '../../../utils/path';
+import { FileIconType, getFileTypeIconProps } from '@fluentui/react-file-type-icons';
 
 export interface IAttachmentFolderProps {
     folder: Partial<IAttachmentFolder>;
@@ -71,7 +72,7 @@ export const AttachmentFolder: React.FC<IAttachmentFolderProps> = (props) => {
                 className={`${styles.container}`}
                 onDoubleClick={handleDoubleClick}
             >
-                <Icon iconName="Folder" />
+                <Icon {...getFileTypeIconProps({ type: FileIconType.folder, size: 16 })} />
                 <Text variant="medium">{props.folder.Name}{childItemLabel}</Text>
             </div>
         </Droppable>

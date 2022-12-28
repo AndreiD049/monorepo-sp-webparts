@@ -13,9 +13,12 @@ import { IJsonConfig, PropertyPaneJsonConfiguration } from 'json-configuration';
 import IConfig from './models/IConfig';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { getTheme } from 'office-ui-fabric-react';
+import PropertyPaneAccessControl, { IUserGroupPermissions, setupAccessControl } from 'property-pane-access-control';
+import { SEE_ALL_TEAMS } from './constants';
 
 export interface IHomepageWebPartProps {
     config: IJsonConfig<IConfig>;
+    permissions: IUserGroupPermissions;
 }
 
 export default class HomepageWebPart extends BaseClientSideWebPart<IHomepageWebPartProps> {
@@ -43,6 +46,7 @@ export default class HomepageWebPart extends BaseClientSideWebPart<IHomepageWebP
                     Accept: 'application/json;odata=nometadata',
                 }),
             ]);
+        setupAccessControl(this.context);
         this._environmentMessage = this._getEnvironmentMessage();
         if (this.properties.config?.users) {
             UserService.Init(this.context, this.properties.config);
@@ -102,6 +106,12 @@ export default class HomepageWebPart extends BaseClientSideWebPart<IHomepageWebP
                                 new PropertyPaneJsonConfiguration('config', {
                                     ctx: this.context,
                                     value: this.properties.config,
+                                }),
+                                PropertyPaneAccessControl('permissions', {
+                                    key: 'access',
+                                    context: this.context,
+                                    permissions: [SEE_ALL_TEAMS],
+                                    selectedUserGroups: this.properties.permissions,
                                 }),
                             ],
                         },

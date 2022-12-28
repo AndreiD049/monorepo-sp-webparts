@@ -19,6 +19,7 @@ export default class UserService {
         user: (id: number) => KeyAccessor;
         userByEmail: (email: string) => KeyAccessor;
         userGroups: (id: number) => KeyAccessor;
+        getTeams: KeyAccessor;
     };
 
     public static Init(context: {}, config: IConfig): void {
@@ -39,6 +40,7 @@ export default class UserService {
             user: (id: number) => this.db.key(`getUser${id}`),
             userGroups: (id: number) => this.db.key(`getUserGroups${id}`),
             userByEmail: (email: string) => this.db.key(`getUserByEmail${email}`),
+            getTeams: this.db.key('getTeams'),
         };
         this.sp = this.spBuilder.getSP();
         this.rootSp = this.spBuilder.getSP();
@@ -59,6 +61,12 @@ export default class UserService {
                     .expand('User')()
             );
         return users;
+    }
+
+    public static async getTeams(): Promise<string[]> {
+        const list = this.sp.web.lists.getByTitle(this.config.users?.listName);
+        const teamField = await this.cache.getTeams.get(async () => list.fields.getByTitle('Team')());
+        return teamField.Choices;
     }
 
     public static async getSiteUsers(): Promise<ISiteUserInfo[]> {

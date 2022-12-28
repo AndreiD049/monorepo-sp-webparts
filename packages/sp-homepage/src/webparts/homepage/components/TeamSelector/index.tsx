@@ -39,7 +39,7 @@ export const TeamSelector: React.FC<ITeamSelectorProps> = (props) => {
             <Dropdown
                 componentRef={dropdownRef}
                 id="sp-homepage-team-selector"
-                disabled={props.teams.length <= 1}
+                disabled={props.teams.length < 1}
                 options={options}
                 selectedKey={props.selectedTeam}
                 onChange={(_ev, option) => {

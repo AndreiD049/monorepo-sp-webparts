@@ -3,6 +3,7 @@ import ISection from '../../models/ISection';
 import { AppraisalsSection } from '../../sections/AppraisalsSection';
 import { CalendarSection } from '../../sections/CalendarSection';
 import { CipSection } from '../../sections/CipSection';
+import { DevSection } from '../../sections/DevSection';
 import { TaskSection } from '../../sections/TaskSection';
 import { UserInfo } from '../UserInfo';
 
@@ -22,6 +23,8 @@ export const SectionFactory: React.FC<ISectionFactoryProps> = (props) => {
             return (<UserInfo />);
         case 'Calendar':
             return (<CalendarSection section={props.section} />);
+        case 'Dev':
+            return (<DevSection section={props.section} />);
         default:
             return <div>NA</div>
     }

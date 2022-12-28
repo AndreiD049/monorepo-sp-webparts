@@ -11,6 +11,7 @@ export const LOADING_SPINNER = 'sp-processflow-loadingspinner';
 // Events
 export const USER_PROCESS_UPDATE = 'sp-processflow-userprocess-updated';
 export const USER_PROCESS_ADDED = 'sp-processflow-userprocess-added';
+export const USER_PROCESS_REMOVED = 'sp-processflow-userprocess-removed';
 export const PROCESS_ADDED = 'sp-processflow-process-added';
 export const PROCESS_UPDATED = 'sp-processflow-process-updated';
 export const LOCATIONS_ADDED = 'sp-processflow-locations-added';

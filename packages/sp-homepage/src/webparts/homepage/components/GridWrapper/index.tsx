@@ -1,5 +1,6 @@
 import { IconButton, Separator, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { Footer } from 'sp-components';
 import { GlobalContext } from '../../context/GlobalContext';
 import IUser from '../../models/IUser';
 import UserService from '../../services/UserService';
@@ -17,8 +18,14 @@ export interface IGridWrapperProps extends React.PropsWithChildren<{}> {
 }
 
 export const GridWrapper: React.FC<IGridWrapperProps> = (props) => {
-    const { currentUser: currentUserInfo } = React.useContext(GlobalContext);
+    const { config, teams } = React.useContext(GlobalContext);
     const [users, setUsers] = React.useState([]);
+
+    React.useEffect(() => {
+        if (teams.length === 1) {
+            props.handleTeamSelect(teams[0]);
+        }
+    }, [teams]);
 
     // every time the team changes. change user options
     React.useEffect(() => {
@@ -26,6 +33,9 @@ export const GridWrapper: React.FC<IGridWrapperProps> = (props) => {
             if (props.team) {
                 const users = await UserService.getCustomUsersByTeam(props.team);
                 setUsers(users);
+                if (!props.user || !users.find((u) => u.User.Id === props.user.Id)) {
+                    props.handleUserSelect(await UserService.getUser(users[0].User.Id));
+                }
             }
         }
         run().catch((err) => console.error(err));
@@ -37,7 +47,7 @@ export const GridWrapper: React.FC<IGridWrapperProps> = (props) => {
                 <div className={styles.commandBarNearItems}>
                     <Text variant="xLarge">Homepage</Text>
                     <TeamSelector
-                        teams={currentUserInfo?.teams || []}
+                        teams={teams}
                         selectedTeam={props.team}
                         onTeamSelect={(team) => props.handleTeamSelect(team)}
                     />
@@ -54,11 +64,12 @@ export const GridWrapper: React.FC<IGridWrapperProps> = (props) => {
                         marginRight: '.5em',
                     }}
                     onClick={() => props.handleLock(!props.locked)}
-                    iconProps={{ iconName: !props.locked ? 'Lock' : 'Unlock' }}
+                    iconProps={{ iconName: !props.locked ? 'Unlock' : 'Lock' }}
                 />
             </div>
             <Separator />
             {props.children}
+            <Footer email={config.contactEmail || 'noreply@domain.com'} />
         </div>
     );
 };

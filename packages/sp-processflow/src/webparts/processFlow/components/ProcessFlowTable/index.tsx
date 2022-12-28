@@ -30,6 +30,7 @@ import {
     listenUserProcessUpdated,
     listenLocationAdded,
     listenProcessUpdated,
+    listenUserProcessRemoved,
 } from '../../utils/events';
 import { GlobalContext } from '../../utils/globalContext';
 import styles from './ProcessFlowTable.module.scss';
@@ -247,6 +248,9 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 prev.filter((up) => up.Id !== data.Id).concat(data)
             );
         }
+        async function userProcessRemovedHandler(data: number): Promise<void> {
+            setUserProcesses((prev) => prev.filter((up) => up.Id !== data));
+        }
         async function processAddedHandler(data: number): Promise<void> {
             const newProcess = await ProcessService.getById(data);
             setProcesses((prev) => [...prev, newProcess]);
@@ -276,8 +280,9 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
         async function locationDeleteHandler(data: number): Promise<void> {
             setFlowLocations((prev) => prev.filter((l) => l.Id !== data));
         }
-        const update = listenUserProcessUpdated(userProcessAddedHandler);
-        const add = listenUserProcessAdded(userProcessAddedHandler);
+        const userProcessUpdate = listenUserProcessUpdated(userProcessAddedHandler);
+        const userProcessAdded = listenUserProcessAdded(userProcessAddedHandler);
+        const userProcessRemoved = listenUserProcessRemoved(userProcessRemovedHandler);
         const addProcess = listenProcessAdded(processAddedHandler);
         const updateProcess = listenProcessUpdated(processUpdatedHandler);
         const addLocations = listenLocationsAdded(locationsHandler);
@@ -285,8 +290,9 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
         const updateLocation = listenLocationUpdated(updateLocationHandler);
         const deleteLocation = listenLocationDeleted(locationDeleteHandler);
         return () => {
-            update();
-            add();
+            userProcessUpdate();
+            userProcessAdded();
+            userProcessRemoved();
             addProcess();
             updateProcess();
             addLocation();

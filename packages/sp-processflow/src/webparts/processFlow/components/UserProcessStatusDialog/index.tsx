@@ -58,7 +58,7 @@ export const UserProcessStatusDialog: React.FC<
 
     const handleSave = React.useCallback(async () => {
         // validate first
-        if (data.Status !== 'NA' && !data.Date) {
+        if ((data.Status !== 'NA' && data.Status !== 'Planned' ) && !data.Date) {
             setError('Date is required.');
             return;
         } else {
@@ -134,18 +134,16 @@ export const UserProcessStatusDialog: React.FC<
             />
             <DatePicker
                 label={getDateLabel()}
-                isRequired={data.Status !== 'NA'}
+                isRequired={data.Status !== 'NA' && data.Status !== 'Planned'}
                 disabled={data.Status === 'NA'}
                 value={data.Date ? new Date(data.Date) : null}
                 allowTextInput
                 disableAutoFocus
                 onSelectDate={(date) => {
-                    if (date) {
-                        setData((prev) => ({
-                            ...prev,
-                            Date: date.toISOString(),
-                        }));
-                    }
+                    setData((prev) => ({
+                        ...prev,
+                        Date: date?.toISOString() || null,
+                    }));
                 }}
             />
             {error && (

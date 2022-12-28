@@ -16,3 +16,5 @@ export const HOUR = MINUTE * 60;
 export const SECTION_EVENT = 'SP_HOMEPAGE_SECTION_EVENT';
 
 export const LOCALSTORAGE_PREFIX = `${location.origin}${location.pathname}`;
+
+export const SEE_ALL_TEAMS = 'see-all-teams';

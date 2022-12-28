@@ -20,7 +20,8 @@ build.configureWebpack.mergeConfig({
                 emitError: true,
                 exclude: (instance) => {
                     // Sometimes different dependencies use the same package with different versions, if there is no possibility to avoid it, we can skip
-                    if (instance.name === '@microsoft/load-themed-styles')
+                    const ignoredDuplicates = new Set(['@microsoft/load-themed-styles', '@fluentui/dom-utilities', '@fluentui/theme'])
+                    if (ignoredDuplicates.has(instance.name))
                         return true;
                     return false;
                 },

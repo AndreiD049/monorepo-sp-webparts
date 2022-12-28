@@ -30,7 +30,7 @@ const tagMap: { [key: string]: (ctx: IPreProcessorContext) => string } = {
 };
 
 export class SectionPreProcessor {
-    private static placeholderRe = /@\w+/g;
+    private static placeholderRe = /([!\s'"]@\w+)|^@\w+/g;
 
     constructor(private context: IPreProcessorContext) {}
 
@@ -110,7 +110,7 @@ export class SectionPreProcessor {
     }
 
     private getTags(text: string): string[] {
-        return uniq(text.match(SectionPreProcessor.placeholderRe));
+        return uniq(text.match(SectionPreProcessor.placeholderRe)).map((tag) => tag.replace(/^[!\s'"]/, ''));
     }
 
     private error(message: string): void {

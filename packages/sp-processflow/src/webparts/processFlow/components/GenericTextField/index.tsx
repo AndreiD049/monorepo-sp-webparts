@@ -13,7 +13,8 @@ export const GenericTextField: React.FC<IGenericTextFieldProps> = ({ options = [
     React.useEffect(() => {
         async function run(): Promise<void> {
             if (!props.readOnly && !props.disabled && choices.length === 0) {
-                setChoices(await props.getOptions());
+                const choices = await props.getOptions();
+                setChoices(choices);
             }
         }
         run().catch((err) => console.error(err));
@@ -26,7 +27,8 @@ export const GenericTextField: React.FC<IGenericTextFieldProps> = ({ options = [
                 list={props.listId}
             />
             <datalist id={props.listId}>
-                {
+                {   options.length > 0 ?
+                    options.map((c) => <option key={c}>{c}</option>) :
                     choices.map((c) => <option key={c}>{c}</option>)
                 }
             </datalist>

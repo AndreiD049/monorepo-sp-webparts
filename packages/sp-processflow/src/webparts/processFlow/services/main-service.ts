@@ -23,6 +23,7 @@ import {
     locationUpdated,
     processUpdated,
     userProcessAdded,
+    userProcessRemoved,
     userProcessUpdated,
 } from '../utils/events';
 
@@ -177,6 +178,7 @@ const userProcessCacheOptions: ICacheProxyOptions<UserProcessService> = {
                     (values: IUserProcess[]) =>
                         values.filter((v) => v.Id !== removedId)
                 );
+                userProcessRemoved(removedId);
             },
         },
     },

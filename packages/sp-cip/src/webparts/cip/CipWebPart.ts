@@ -19,6 +19,7 @@ import { MessageBarType } from 'office-ui-fabric-react';
 import MainService from './services/main-service';
 import { IJsonConfig, PropertyPaneJsonConfiguration } from 'json-configuration';
 import { db } from './components/AttachmentSection';
+import { initializeFileTypeIcons } from '@fluentui/react-file-type-icons';
 
 interface IConfiguration {
     rootSite: string;
@@ -45,6 +46,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
     private theme: IReadonlyTheme;
 
     protected async onInit(): Promise<void> {
+        initializeFileTypeIcons();
         initNotifications();
 
         const tennats: { [key: string]: string } = {};

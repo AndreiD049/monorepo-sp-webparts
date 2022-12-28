@@ -5,6 +5,7 @@ import {
     hideCallout,
     showCallout,
 } from 'sp-components';
+import { MainService } from '../../../services/main-service';
 import {
     MAIN_CALLOUT,
     MAIN_DIALOG,
@@ -73,6 +74,7 @@ const LocationCallout: React.FC<ILocationCellProps> = (
 };
 
 export const LocationCell: React.FC<ILocationCellProps> = (props) => {
+    const { FlowLocationService } = MainService;
     const cellRef = React.useRef(null);
     const content = React.useMemo(() => {
         if (!props.location) return 'N/A';
@@ -86,7 +88,7 @@ export const LocationCell: React.FC<ILocationCellProps> = (props) => {
 
     const handleKeyPress: React.KeyboardEventHandler<HTMLElement> =
         React.useCallback(
-            (ev) => {
+            async (ev) => {
                 if (ev.key.toLowerCase() === 'c' && ev.ctrlKey) {
                     copyLocation(props.location || 'empty');
                 } else if (ev.key.toLowerCase() === 'v' && ev.ctrlKey) {
@@ -94,6 +96,8 @@ export const LocationCell: React.FC<ILocationCellProps> = (props) => {
                         processId: props.processId,
                         title: props.title,
                     });
+                } else if (ev.key.toLowerCase() === 'delete') {
+                    await FlowLocationService.removeFlowLocation(props.location.Id);
                 }
             },
             [props.location, props.processId]

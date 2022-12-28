@@ -2,11 +2,13 @@ import { IProcess } from '@service/process-flow';
 import {
     ActionButton,
     IconButton,
+    MessageBarType,
     TextField,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { hidePanel, hideSpinner, showSpinner } from 'sp-components';
 import { IItemAddResult } from 'sp-preset';
+import { SPnotify } from 'sp-react-notifications';
 import { MainService } from '../../services/main-service';
 import { LOADING_SPINNER, MAIN_PANEL, MAIN_PANEL_FORM } from '../../utils/constants';
 import { processAdded } from '../../utils/events';
@@ -41,6 +43,7 @@ interface INewProcessRowProps {
 }
 
 export const NewProcessRow: React.FC<INewProcessRowProps> = (props) => {
+    console.log(props.categories);
     return (
         <div
             style={{
@@ -52,6 +55,7 @@ export const NewProcessRow: React.FC<INewProcessRowProps> = (props) => {
             }}
         >
             <CategoryTextField
+                key="newProcessCategories"
                 required
                 label="Category"
                 styles={{ root: { maxWidth: 150 } }}
@@ -63,6 +67,7 @@ export const NewProcessRow: React.FC<INewProcessRowProps> = (props) => {
                 options={props.categories}
             />
             <SystemTextField
+                key="newSystemCategories"
                 required
                 label="System"
                 autoComplete="off"
@@ -100,6 +105,7 @@ export const NewProcessRow: React.FC<INewProcessRowProps> = (props) => {
                 styles={{ root: { maxWidth: 100 } }}
             />
             <UomTextField
+                key="uomTextField"
                 label="UOM"
                 autoComplete="off"
                 list="newProcessUOM"
@@ -204,6 +210,11 @@ export const NewProcesses: React.FC<INewProcessesProps> = (props) => {
             }));
             const newItems: IItemAddResult[] = await ProcessService.addProcesses(newProcesses);
             newItems.forEach((i) => processAdded(i.data.Id));
+        } catch (err) {
+            SPnotify({
+                message: err,
+                messageType: MessageBarType.error,
+            });
         } finally {
             hideSpinner(LOADING_SPINNER);
         }

@@ -17,6 +17,7 @@ import { taskUpdated } from '../../../utils/dom-events';
 import { hideDialog, showDialog } from 'sp-components';
 import { DIALOG_ID_PANEL } from '../../../utils/constants';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
+import { getFileTypeIconProps } from '@fluentui/react-file-type-icons';
 
 export interface IAttachmentFileProps {
     file: IAttachmentFile;
@@ -26,65 +27,10 @@ export interface IAttachmentFileProps {
     onDelete: (file: IAttachmentFile) => void;
 }
 
-const getFileIconName = (name: string): string => {
+const getExtension = (name: string): string => {
     const tokens = name.split('.');
-    const extension = tokens[tokens.length - 1].toLowerCase();
-    switch (extension) {
-        case 'xls':
-        case 'xlsx':
-        case 'xltx':
-        case 'xltm':
-        case 'xlsb':
-        case 'xlam':
-        case 'xlsm':
-            return 'ExcelDocument';
-        case 'docx':
-        case 'docm':
-        case 'doc':
-        case 'dot':
-        case 'odt':
-        case 'wps':
-        case 'xps':
-        case 'dotm':
-        case 'dotx':
-        case 'rtf':
-            return 'WordDocument';
-        case 'pdf':
-            return 'PDF';
-        case 'jpg':
-        case 'jpeg':
-        case 'png':
-        case 'gif':
-        case 'tiff':
-        case 'psd':
-        case 'bmp':
-        case 'eps':
-            return 'FileImage';
-        case 'html':
-        case 'htm':
-        case 'mht':
-        case 'mhtml':
-        case 'xml':
-        case 'xsl':
-        case 'xslt':
-            return 'FileHTML';
-        case 'pptx':
-        case 'pptm':
-        case 'potx':
-        case 'potm':
-        case 'ppam':
-        case 'ppsx':
-        case 'ppsm':
-        case 'sldx':
-        case 'sldm':
-        case 'thmx':
-            return 'PowerPointLogo';
-        case 'txt':
-            return 'FileCSS';
-        default:
-            return 'FileTemplate';
-    }
-};
+    return tokens[tokens.length - 1].toLowerCase();
+}
 
 export const AttachmentFile: React.FC<IAttachmentFileProps> = (props) => {
     const { properties } = React.useContext(GlobalContext);
@@ -150,7 +96,7 @@ export const AttachmentFile: React.FC<IAttachmentFileProps> = (props) => {
                     type="spfile"
                     data={props.file}
                 >
-                    <Icon iconName={getFileIconName(props.file.Name)} />
+                    <Icon {...getFileTypeIconProps({ extension: getExtension(props.file.Name), size: 16 })} />
                     <Text
                         styles={{
                             root: {

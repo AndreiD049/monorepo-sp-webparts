@@ -13,9 +13,10 @@ import { SectionFactory } from '../SectionFactory';
 import { ConditionChecker } from '../../services/ConditionChecker';
 import { SectionPreProcessor } from '../../services/SectionPreProcessor';
 import { Callout, Dialog, ErrorBoundary } from 'sp-components';
-import { CALLOUT_ID, DIALOG_ID, LOCALSTORAGE_PREFIX } from '../../constants';
+import { CALLOUT_ID, DIALOG_ID, LOCALSTORAGE_PREFIX, SEE_ALL_TEAMS } from '../../constants';
 import { useLayout } from '../../hooks/useLayout';
 import useWebStorage from 'use-web-storage-api';
+import { canCurrentUser } from 'property-pane-access-control';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -32,6 +33,7 @@ export const Homepage: React.FC<IHomepageProps> = (props) => {
         currentUser: null,
         selectedTeam: team,
         selectedUser: selectedUser,
+        teams: [],
     });
     const sections = React.useMemo(() => {
         if (selectedUser && team && context.currentUser) {
@@ -62,9 +64,12 @@ export const Homepage: React.FC<IHomepageProps> = (props) => {
     React.useEffect(() => {
         async function run(): Promise<void> {
             const currentUser = await UserService.getCurrentUser();
+            const canSeeAllTeams = await canCurrentUser(SEE_ALL_TEAMS, props.properties.permissions);
+            const teams = canSeeAllTeams ? await UserService.getTeams() : currentUser.teams;
             setContext((prev) => ({
                 ...prev,
                 currentUser: currentUser,
+                teams,
             }));
         }
         run().catch((err) => console.error(err));

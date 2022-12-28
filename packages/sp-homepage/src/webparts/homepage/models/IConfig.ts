@@ -7,6 +7,7 @@ type Breakpoint = 'lg' | 'md' | 'sm' | 'xs' | 'xxs';
 
 export default interface IConfig {
     users: IListInfo & { teamsColumn: string },
+    contactEmail: string;
     sections: ISection[];
     layoutsLocalStorageKey: string;
     defaultLayouts: {

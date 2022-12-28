@@ -9,11 +9,10 @@ import {
 } from '../utils/globalContext';
 import { MAIN_CALLOUT, LOADING_SPINNER, MAIN_DIALOG, MAIN_PANEL } from '../utils/constants';
 import { CommandBar } from './CommandBar';
-import { Callout, Dialog, LoadingSpinner, Panel } from 'sp-components';
+import { Callout, Dialog, Footer, LoadingSpinner, Panel } from 'sp-components';
 import { Separator } from 'office-ui-fabric-react';
 import { ProcessFlowContent } from './ProcessFlowContent';
 import { ProcessFlowHeader } from './ProcessFlowHeader';
-import { Footer } from './Footer';
 import { HashRouter, Routes, Route, Outlet } from 'react-router-dom';
 import styles from './ProcessFlow.module.scss';
 import { ProcessDetails } from './ProcessDetails';
@@ -115,7 +114,7 @@ export const ProcessFlow: React.FC<IProcessFlowProps> = (props) => {
                             </Route>
                         </Route>
                     </Routes>
-                    <Footer config={props.properties.config} />
+                    <Footer email={props.properties.config.contactEmail} />
                 </HashRouter>
             </GlobalContext.Provider>
         </div>

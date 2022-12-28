@@ -40,6 +40,7 @@ export class ConditionChecker {
             );
             result = results.every((r) => r === true);
         }
+        console.log(`Condidtion - '${JSON.stringify(condition)}' is ${result}`);
         return result;
     }
 
@@ -77,6 +78,8 @@ export class ConditionChecker {
             return this.compareLists(configValue, userValue);
         } else if (typeof configValue === 'string' && typeof userValue === 'string') {
             return this.compareString(configValue, userValue);
+        } else if (userValue === null) {
+            return typeof configValue === 'string' ? this.compareString(configValue, 'null') : this.compareLists(configValue, ['null']);
         } else {
             this.error(
                 `Invalid configuration. Cannot compare different types for values '${configValue}' and '${userValue}'`
@@ -86,9 +89,9 @@ export class ConditionChecker {
 
     private compareString(configValue: string, userValue: string): boolean {
         if (configValue.startsWith("!")) {
-            return configValue.slice(1) !== userValue;
+            return configValue.slice(1).toLowerCase() !== userValue.toLowerCase();
         }
-        return configValue === userValue;
+        return configValue.toLowerCase() === userValue.toLowerCase();
     }
 
     private compareLists(configValues: string[], userValues: string[]): boolean {
