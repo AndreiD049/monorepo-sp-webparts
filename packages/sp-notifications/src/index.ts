@@ -4,6 +4,7 @@ import { CONTAINER_ID, EVENT_NAME } from './constants';
 import SPNotificationContainer from './SPNotificationContainer';
 import styles from './Notification.module.scss';
 import { INotificationOptions } from './INotificationOptions';
+import { MessageBarType } from 'office-ui-fabric-react';
 
 
 export function initNotifications() {
@@ -26,6 +27,41 @@ export function SPnotify(options: INotificationOptions) {
     if (container !== null) {
         container.dispatchEvent(event);
     }
+}
+
+export function SPnotifyError(message: string) {
+    SPnotify({
+        message,
+        messageType: MessageBarType.error,
+    });
+}
+
+export function SPnotifyWarning(message: string) {
+    SPnotify({
+        message,
+        messageType: MessageBarType.warning,
+    });
+}
+
+export function SPnotifySuccess(message: string) {
+    SPnotify({
+        message,
+        messageType: MessageBarType.success,
+    });
+}
+
+export function SPnotifyInfo(message: string) {
+    SPnotify({
+        message,
+        messageType: MessageBarType.info,
+    });
+}
+
+export function SPnotifySevereWarning(message: string) {
+    SPnotify({
+        message,
+        messageType: MessageBarType.severeWarning,
+    });
 }
 
 initNotifications();

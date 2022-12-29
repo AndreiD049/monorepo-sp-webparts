@@ -31,6 +31,7 @@ import {
     listenLocationAdded,
     listenProcessUpdated,
     listenUserProcessRemoved,
+    listenProcessRemoved,
 } from '../../utils/events';
 import { GlobalContext } from '../../utils/globalContext';
 import styles from './ProcessFlowTable.module.scss';
@@ -260,6 +261,9 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 prev.map((p) => (p.Id === data.Id ? data : p))
             );
         }
+        async function processRemovedHandler(id: number): Promise<void> {
+            setProcesses((prev) => prev.filter((p) => p.Id !== id));
+        }
         async function locationsHandler(): Promise<void> {
             setFlowLocations(
                 await FlowLocationService.getByFlow(props.flow.Id)
@@ -285,6 +289,7 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
         const userProcessRemoved = listenUserProcessRemoved(userProcessRemovedHandler);
         const addProcess = listenProcessAdded(processAddedHandler);
         const updateProcess = listenProcessUpdated(processUpdatedHandler);
+        const removeProcess = listenProcessRemoved(processRemovedHandler);
         const addLocations = listenLocationsAdded(locationsHandler);
         const addLocation = listenLocationAdded(locationAddedHandler);
         const updateLocation = listenLocationUpdated(updateLocationHandler);
@@ -295,6 +300,7 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
             userProcessRemoved();
             addProcess();
             updateProcess();
+            removeProcess();
             addLocation();
             addLocations();
             updateLocation();

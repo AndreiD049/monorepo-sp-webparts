@@ -14,9 +14,17 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Dialog } from 'sp-components';
+import {
+    Dialog,
+    FooterYesNo,
+    hideDialog,
+    hideSpinner,
+    showDialog,
+    showSpinner,
+} from 'sp-components';
+import { SPnotifyError } from 'sp-react-notifications';
 import { MainService } from '../../services/main-service';
-import { PANEL_DIALOG } from '../../utils/constants';
+import { LOADING_SPINNER, PANEL_DIALOG } from '../../utils/constants';
 import {
     listenLocationAdded,
     listenLocationDeleted,
@@ -176,6 +184,7 @@ const UserProcessOverview: React.FC<{
 };
 
 const Details: React.FC<{ processId: number }> = (props) => {
+    const { selectedTeam, selectedFlow } = React.useContext(GlobalContext);
     const { ProcessService, FlowLocationService, UserProcessService } =
         MainService;
     const [process, setProcess] = React.useState<IProcess>(null);
@@ -185,6 +194,7 @@ const Details: React.FC<{ processId: number }> = (props) => {
     );
     const [editable, setEditable] = React.useState(false);
     const [data, setData] = React.useState<Partial<IProcess>>({});
+    const navigate = useNavigate();
 
     React.useEffect(() => {
         if (editable) {
@@ -272,6 +282,40 @@ const Details: React.FC<{ processId: number }> = (props) => {
         setEditable(false);
     }, [data, process]);
 
+    const handleDelete = React.useCallback(() => {
+        showDialog({
+            id: PANEL_DIALOG,
+            dialogProps: {
+                dialogContentProps: {
+                    title: 'Delete process',
+                    subText: `The process '${process.Title}' and all training records will be deleted. Are you sure?`,
+                },
+            },
+            footer: (
+                <FooterYesNo
+                    onYes={async () => {
+                        try {
+                            hideDialog(PANEL_DIALOG);
+                            navigate(`/team/${selectedTeam}/flow/${selectedFlow.Id}`);
+                            showSpinner(LOADING_SPINNER);
+                            for (const up of userProcesses) {
+                                await UserProcessService.removeUserProcess(
+                                    up.Id
+                                );
+                            }
+                            await ProcessService.removeProcess(process.Id);
+                        } catch (err) {
+                            SPnotifyError(err);
+                        } finally {
+                            hideSpinner(LOADING_SPINNER);
+                        }
+                    }}
+                    onNo={() => hideDialog(PANEL_DIALOG)}
+                />
+            ),
+        });
+    }, [userProcesses, process, selectedTeam, selectedFlow]);
+
     const editButtons = React.useMemo(() => {
         if (editable) {
             return (
@@ -327,6 +371,12 @@ const Details: React.FC<{ processId: number }> = (props) => {
                     Add location
                 </ActionButton>
                 {editButtons}
+                <ActionButton
+                    iconProps={{ iconName: 'Delete' }}
+                    onClick={handleDelete}
+                >
+                    Delete
+                </ActionButton>
             </div>
             <Separator>General</Separator>
             <SystemTextField

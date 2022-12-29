@@ -14,6 +14,7 @@ export const USER_PROCESS_ADDED = 'sp-processflow-userprocess-added';
 export const USER_PROCESS_REMOVED = 'sp-processflow-userprocess-removed';
 export const PROCESS_ADDED = 'sp-processflow-process-added';
 export const PROCESS_UPDATED = 'sp-processflow-process-updated';
+export const PROCESS_REMOVED = 'sp-processflow-process-removed';
 export const LOCATIONS_ADDED = 'sp-processflow-locations-added';
 export const LOCATION_ADDED = 'sp-processflow-location-added';
 export const LOCATION_UPDATED = 'sp-processflow-location-updated';

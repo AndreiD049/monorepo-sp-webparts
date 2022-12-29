@@ -21,6 +21,7 @@ import {
     locationAdded,
     locationDeleted,
     locationUpdated,
+    processRemoved,
     processUpdated,
     userProcessAdded,
     userProcessRemoved,
@@ -87,7 +88,7 @@ const processCacheOptions: ICacheProxyOptions<ProcessService> = {
             isCached: true,
             expiresIn: HOUR,
         },
-        '(addProcess|addProcesses|removeProcess)': {
+        '(addProcess|addProcesses)': {
             isPattern: true,
             after: async (db) => {
                 await removeCached(
@@ -109,6 +110,17 @@ const processCacheOptions: ICacheProxyOptions<ProcessService> = {
                     return values.map((process: IProcess) => process.Id === id ? newProcess : process);
                 });
                 processUpdated(newProcess);
+            }
+        },
+        'removeProcess': {
+            isPattern: true,
+            after: async (db, _service, args) => {
+                const id: number = args[0];
+                await removeCached(
+                    db,
+                    new RegExp('getByFlow')
+                );
+                processRemoved(+id);
             }
         }
     },

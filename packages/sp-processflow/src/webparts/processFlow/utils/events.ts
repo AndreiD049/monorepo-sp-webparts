@@ -1,5 +1,5 @@
 import { IFlowLocation, IProcess, IUserProcess } from "@service/process-flow";
-import { COPY_LOCATION, COPY_USER_PROCESS, LOCATIONS_ADDED, LOCATION_ADDED, LOCATION_DELETED, LOCATION_UPDATED, PASTE_LOCATION, PASTE_USER_PROCESS, PROCESS_ADDED, PROCESS_UPDATED, USER_PROCESS_ADDED, USER_PROCESS_REMOVED, USER_PROCESS_UPDATE } from "./constants";
+import { COPY_LOCATION, COPY_USER_PROCESS, LOCATIONS_ADDED, LOCATION_ADDED, LOCATION_DELETED, LOCATION_UPDATED, PASTE_LOCATION, PASTE_USER_PROCESS, PROCESS_ADDED, PROCESS_REMOVED, PROCESS_UPDATED, USER_PROCESS_ADDED, USER_PROCESS_REMOVED, USER_PROCESS_UPDATE } from "./constants";
 
 function dispatchEvent<T>(event: string, data: T): void {
     document.dispatchEvent(new CustomEvent<T>(event, {
@@ -25,6 +25,10 @@ export function processAdded(id: number): void {
 
 export function processUpdated(process: IProcess): void {
     dispatchEvent(PROCESS_UPDATED, process);
+}
+
+export function processRemoved(id: number): void {
+    dispatchEvent(PROCESS_REMOVED, id);
 }
 
 export function locationsAdded(): void {
@@ -90,6 +94,10 @@ export function listenProcessAdded(f: (data: number) => void): () => void {
 
 export function listenProcessUpdated(f: (data: IProcess) => void): () => void {
     return listenEvent<IProcess>(PROCESS_UPDATED, f);
+}
+
+export function listenProcessRemoved(f: (data: number) => void): () => void {
+    return listenEvent<number>(PROCESS_REMOVED, f);
 }
 
 export function listenLocationsAdded(f: (data: number) => void): () => void {
