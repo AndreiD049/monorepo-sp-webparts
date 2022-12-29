@@ -303,6 +303,9 @@ const Details: React.FC<{ processId: number }> = (props) => {
                                     up.Id
                                 );
                             }
+                            for (const l of locations) {
+                                await FlowLocationService.removeFlowLocation(l.Id);
+                            }
                             await ProcessService.removeProcess(process.Id);
                         } catch (err) {
                             SPnotifyError(err);
@@ -314,7 +317,7 @@ const Details: React.FC<{ processId: number }> = (props) => {
                 />
             ),
         });
-    }, [userProcesses, process, selectedTeam, selectedFlow]);
+    }, [userProcesses, process, locations, selectedTeam, selectedFlow]);
 
     const editButtons = React.useMemo(() => {
         if (editable) {
