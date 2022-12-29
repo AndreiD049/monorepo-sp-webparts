@@ -129,7 +129,7 @@ const StatusTable: React.FC<{
                                 imageUrl={`/_layouts/15/userphoto.aspx?accountname=${i.User.EMail}&Size=S`}
                             />
                         </td>
-                        <td>{new Date(i.Date).toLocaleDateString()}</td>
+                        <td>{i.Date ? new Date(i.Date).toLocaleDateString() : '-'}</td>
                         <td>
                             <IconButton
                                 className={styles.userEditButton}
@@ -488,7 +488,6 @@ export const ProcessDetails: React.FC<IProcessDetailsProps> = (props) => {
             }}
         >
             <Details processId={+id} />
-            <Dialog id={PANEL_DIALOG} />
         </Panel>
     );
 };
