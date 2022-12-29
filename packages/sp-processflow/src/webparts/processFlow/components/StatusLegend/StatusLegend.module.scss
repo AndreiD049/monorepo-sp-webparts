@@ -1,0 +1,32 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: .5em;
+    width: 350px;
+    padding: .9em;
+    border: 1px solid "[theme: neutralLighter, default: #f4f4f4]";
+    margin-right: 1em;
+}
+
+.cell {
+    max-width: 90px;
+}
+
+.row {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1em;
+}
+
+.rowLegend {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: .5em;
+    font-weight: bold;
+}

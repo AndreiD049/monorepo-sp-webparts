@@ -4,6 +4,7 @@ import * as React from 'react';
 import { MainService } from '../../services/main-service';
 import { CustomerGroupPicker } from '../CustomerGroupPicker';
 import { DBCustomersPicker } from '../DBCustomersPicker';
+import { StatusLegend } from '../StatusLegend';
 import styles from './ProcessFlowHeader.module.scss';
 
 export interface IProcessFlowHeaderProps {
@@ -13,8 +14,12 @@ export interface IProcessFlowHeaderProps {
 export const ProcessFlowHeader: React.FC<IProcessFlowHeaderProps> = (props) => {
     const { CustomerFlowService } = MainService;
     const [editable, setEditable] = React.useState(false);
-    const [selectedCustomerGroup, setSelectedCustomerGroup] = React.useState(props.flow?.CustomerGroup);
-    const [selectedDbCustomers, setSelectedDbCustomers] = React.useState(props.flow?.DBCustomers || []);
+    const [selectedCustomerGroup, setSelectedCustomerGroup] = React.useState(
+        props.flow?.CustomerGroup
+    );
+    const [selectedDbCustomers, setSelectedDbCustomers] = React.useState(
+        props.flow?.DBCustomers || []
+    );
     const [choiceCustomerGroup, setChoiceCustomerGroup] = React.useState([]);
     const [choiceDbCustomers, setChoiceDBCustomers] = React.useState([]);
 
@@ -25,12 +30,16 @@ export const ProcessFlowHeader: React.FC<IProcessFlowHeaderProps> = (props) => {
             setSelectedDbCustomers(props.flow.DBCustomers);
         }
     }, [props.flow]);
-    
+
     React.useEffect(() => {
         async function run(): Promise<void> {
             if (editable && choiceCustomerGroup.length === 0) {
-                setChoiceCustomerGroup(await CustomerFlowService.getCustomerGroupChoices());
-                setChoiceDBCustomers(await CustomerFlowService.getDBCustomerChoices());
+                setChoiceCustomerGroup(
+                    await CustomerFlowService.getCustomerGroupChoices()
+                );
+                setChoiceDBCustomers(
+                    await CustomerFlowService.getDBCustomerChoices()
+                );
             }
         }
         run().catch((err) => console.error(err));
@@ -52,33 +61,49 @@ export const ProcessFlowHeader: React.FC<IProcessFlowHeaderProps> = (props) => {
 
     return (
         <div className={styles.container}>
-            <div className={styles.topRow}>
-                <CustomerGroupPicker
-                    options={editable ? choiceCustomerGroup : [props.flow.CustomerGroup]}
-                    selectedOption={selectedCustomerGroup}
-                    onSelect={(group) => setSelectedCustomerGroup(group)}
+            <div className={styles.customerBox}>
+                <div className={styles.topRow}>
+                    <CustomerGroupPicker
+                        options={
+                            editable
+                                ? choiceCustomerGroup
+                                : [props.flow.CustomerGroup]
+                        }
+                        selectedOption={selectedCustomerGroup}
+                        onSelect={(group) => setSelectedCustomerGroup(group)}
+                        disabled={!editable}
+                        style={{
+                            display: 'inline-block',
+                            minWidth: 180,
+                        }}
+                    />
+                    <IconButton
+                        onClick={handleClickEditSave}
+                        iconProps={{ iconName: editable ? 'Save' : 'Edit' }}
+                    />
+                    {editable && (
+                        <IconButton
+                            onClick={() => setEditable(false)}
+                            iconProps={{ iconName: 'Cancel' }}
+                        />
+                    )}
+                </div>
+                <DBCustomersPicker
+                    options={
+                        editable
+                            ? choiceDbCustomers
+                            : props.flow.DBCustomers || []
+                    }
+                    selectedOptions={selectedDbCustomers}
+                    onSelect={(items) => setSelectedDbCustomers(items)}
                     disabled={!editable}
                     style={{
                         display: 'inline-block',
                         minWidth: 180,
                     }}
                 />
-                <IconButton
-                    onClick={handleClickEditSave}
-                    iconProps={{ iconName: editable ? 'Save' : 'Edit' }}
-                />
-                {editable && <IconButton onClick={() => setEditable(false)} iconProps={{ iconName: 'Cancel' }} />}
             </div>
-            <DBCustomersPicker
-                options={editable ? choiceDbCustomers : props.flow.DBCustomers || []}
-                selectedOptions={selectedDbCustomers}
-                onSelect={(items) => setSelectedDbCustomers(items)}
-                disabled={!editable}
-                style={{
-                    display: 'inline-block',
-                    minWidth: 180,
-                }}
-            />
+            <StatusLegend />
         </div>
     );
 };
