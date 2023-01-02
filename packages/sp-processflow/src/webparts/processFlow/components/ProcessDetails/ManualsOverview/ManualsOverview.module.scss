@@ -1,0 +1,23 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    min-width: 1px;
+}
+
+.manuals {
+    & > * + * {
+        margin-top: .3em;
+    }
+
+    &Row {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: .5em;
+    }
+
+    &RowLink {
+        flex-grow: 2;
+    }
+}

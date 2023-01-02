@@ -76,7 +76,7 @@ export async function setupLists(
       indexed: true,
       type: "Lookup",
     });
-    await procedure.addTextField({
+    await procedure.addTextMultilineField({
       name: "Manual",
       description: "Manual link",
     });

@@ -114,13 +114,6 @@ export const NewProcessRow: React.FC<INewProcessRowProps> = (props) => {
                 value={props.rows[props.idx].UOM?.toString()}
                 styles={{ root: { maxWidth: 100 } }}
             />
-            <TextField
-                label="Manual"
-                onPaste={props.onPaste(props.idx, 'Manual')}
-                onChange={props.onUpdate(props.idx, 'Manual')}
-                value={props.rows[props.idx].Manual?.toString()}
-                styles={{ root: { maxWidth: 200 } }}
-            />
             <IconButton
                 styles={{ root: { alignSelf: 'flex-end' } }}
                 iconProps={{ iconName: 'Delete' }}

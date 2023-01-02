@@ -7,6 +7,7 @@ export const MAIN_CALLOUT = 'sp-processflow-main-callout';
 export const MAIN_PANEL = 'sp-processflow-main-panel';
 export const MAIN_PANEL_FORM = 'sp-processflow-newprocess';
 export const LOADING_SPINNER = 'sp-processflow-loadingspinner';
+export const LOADING_SPINNER_PANEL = 'sp-processflow-loadingspinner-panel';
 
 // Events
 export const USER_PROCESS_UPDATE = 'sp-processflow-userprocess-updated';
@@ -23,6 +24,9 @@ export const COPY_USER_PROCESS = 'sp-processflow-userprocess-copy';
 export const PASTE_USER_PROCESS = 'sp-processflow-userprocess-paste';
 export const COPY_LOCATION = 'sp-processflow-location-copy';
 export const PASTE_LOCATION = 'sp-processflow-location-paste';
+
+// Separators
+export const MANUAL_SEPARATOR = '\t';
 
 // LocalStorage keys
 export const GROUP_SORTING_KEY = 'sp-processflow-group-sorting';

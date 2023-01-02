@@ -19,12 +19,18 @@ import {
     FooterYesNo,
     hideDialog,
     hideSpinner,
+    LoadingSpinner,
     showDialog,
     showSpinner,
 } from 'sp-components';
 import { SPnotifyError } from 'sp-react-notifications';
 import { MainService } from '../../services/main-service';
-import { LOADING_SPINNER, PANEL_DIALOG } from '../../utils/constants';
+import {
+    LOADING_SPINNER,
+    LOADING_SPINNER_PANEL,
+    MANUAL_SEPARATOR,
+    PANEL_DIALOG,
+} from '../../utils/constants';
 import {
     listenLocationAdded,
     listenLocationDeleted,
@@ -40,6 +46,7 @@ import {
     UomTextField,
 } from '../TextFields';
 import { editUserProcess } from '../UserProcessStatusDialog';
+import { ManualsOverview } from './ManualsOverview';
 import styles from './ProcessDetails.module.scss';
 
 export interface IProcessDetailsProps {
@@ -129,7 +136,11 @@ const StatusTable: React.FC<{
                                 imageUrl={`/_layouts/15/userphoto.aspx?accountname=${i.User.EMail}&Size=S`}
                             />
                         </td>
-                        <td>{i.Date ? new Date(i.Date).toLocaleDateString() : '-'}</td>
+                        <td>
+                            {i.Date
+                                ? new Date(i.Date).toLocaleDateString()
+                                : '-'}
+                        </td>
                         <td>
                             <IconButton
                                 className={styles.userEditButton}
@@ -188,6 +199,15 @@ const Details: React.FC<{ processId: number }> = (props) => {
     const { ProcessService, FlowLocationService, UserProcessService } =
         MainService;
     const [process, setProcess] = React.useState<IProcess>(null);
+    const manuals = React.useMemo(() => {
+        if (!process?.Manual) return [];
+        const lines: string[] = process.Manual?.split('\n');
+        return lines
+            .filter((l) => l !== '')
+            .map((line: string) => {
+                return line.split(MANUAL_SEPARATOR);
+            });
+    }, [process]);
     const [locations, setLocations] = React.useState<IFlowLocation[]>([]);
     const [userProcesses, setUserProcesses] = React.useState<IUserProcess[]>(
         []
@@ -202,7 +222,6 @@ const Details: React.FC<{ processId: number }> = (props) => {
                 System: process.System,
                 Title: process.Title,
                 Category: process.Category,
-                Manual: process.Manual,
                 Allocation: process.Allocation,
                 UOM: process.UOM,
             });
@@ -296,7 +315,9 @@ const Details: React.FC<{ processId: number }> = (props) => {
                     onYes={async () => {
                         try {
                             hideDialog(PANEL_DIALOG);
-                            navigate(`/team/${selectedTeam}/flow/${selectedFlow.Id}`);
+                            navigate(
+                                `/team/${selectedTeam}/flow/${selectedFlow.Id}`
+                            );
                             showSpinner(LOADING_SPINNER);
                             for (const up of userProcesses) {
                                 await UserProcessService.removeUserProcess(
@@ -304,7 +325,9 @@ const Details: React.FC<{ processId: number }> = (props) => {
                                 );
                             }
                             for (const l of locations) {
-                                await FlowLocationService.removeFlowLocation(l.Id);
+                                await FlowLocationService.removeFlowLocation(
+                                    l.Id
+                                );
                             }
                             await ProcessService.removeProcess(process.Id);
                         } catch (err) {
@@ -365,14 +388,6 @@ const Details: React.FC<{ processId: number }> = (props) => {
     return (
         <div>
             <div className={styles.topButtonBar}>
-                <ActionButton
-                    iconProps={{ iconName: 'Add' }}
-                    onClick={() => {
-                        addLocation(null, process.Id, PANEL_DIALOG);
-                    }}
-                >
-                    Add location
-                </ActionButton>
                 {editButtons}
                 <ActionButton
                     iconProps={{ iconName: 'Delete' }}
@@ -411,13 +426,6 @@ const Details: React.FC<{ processId: number }> = (props) => {
                 disabled={editable}
             />
             <TextField
-                label="Manual"
-                value={editable ? data.Manual : process.Manual}
-                title={process.Manual}
-                readOnly={!editable}
-                onChange={handleFieldChange('Manual')}
-            />
-            <TextField
                 label="Allocation"
                 value={
                     editable
@@ -436,9 +444,30 @@ const Details: React.FC<{ processId: number }> = (props) => {
                 readOnly={!editable}
                 onChange={handleFieldChange('UOM')}
             />
+
+            <Separator>Manuals</Separator>
+            <ManualsOverview
+                processId={process.Id}
+                manuals={manuals}
+                onManualsChange={(manuals) =>
+                    setProcess((prev) => ({
+                        ...prev,
+                        Manual: manuals,
+                    }))
+                }
+            />
+
             {locations.length > 0 && (
                 <>
                     <Separator>Locations</Separator>
+                    <ActionButton
+                        iconProps={{ iconName: 'Add' }}
+                        onClick={() => {
+                            addLocation(null, process.Id, PANEL_DIALOG);
+                        }}
+                    >
+                        Add location
+                    </ActionButton>
                     <table className={styles.locationsTable}>
                         <tr>
                             <th>Countries</th>
@@ -454,6 +483,7 @@ const Details: React.FC<{ processId: number }> = (props) => {
                     </table>
                 </>
             )}
+
             {userProcesses.length > 0 && (
                 <>
                     <Separator>Overview</Separator>
@@ -491,6 +521,7 @@ export const ProcessDetails: React.FC<IProcessDetailsProps> = (props) => {
             }}
         >
             <Details processId={+id} />
+            <LoadingSpinner id={LOADING_SPINNER_PANEL} />
         </Panel>
     );
 };

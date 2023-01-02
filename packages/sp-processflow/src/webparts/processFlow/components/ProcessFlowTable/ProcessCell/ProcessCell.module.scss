@@ -12,3 +12,10 @@
     right: 0px;
     background-color: "[theme: white, default: #ffffff]";
 }
+
+.links {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
