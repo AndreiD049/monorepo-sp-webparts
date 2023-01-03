@@ -3,7 +3,7 @@
   "solution": {
     "name": "sp-homepage-client-side-solution",
     "id": "fc6d3c6e-60eb-47f2-9bd1-152c1fada30c",
-    "version": "1.0.0.10",
+    "version": "1.0.1.1",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,

@@ -4,24 +4,24 @@ import { MINUTE } from '../utils/constants';
 import GlobalContext from '../utils/GlobalContext';
 
 export default function useSyncTasks(date: Date, userIds: number[]) {
-    const { TaskLogsService, TaskService } = React.useContext(GlobalContext);
+    const { taskSyncService, taskLogSyncService } = React.useContext(GlobalContext);
     const visibility = useVisibility();
     const [update, setUpdate] = React.useState(false);
     const timeout = MINUTE * 2;
 
     React.useEffect(() => {
         // aquire the change token on start
-        TaskLogsService.didTaskLogsChanged(date, userIds);
-        TaskService.didTasksChanged(userIds);
+        taskLogSyncService.didRecordsChangedOnDate(date, userIds);
+        taskSyncService.didRecordsChanged(userIds);
     }, []);
 
     const checkSync = React.useCallback(async () => {
         if (visibility.visible) {
-            const logsChanged = await TaskLogsService.didTaskLogsChanged(
+            const logsChanged = await taskLogSyncService.didRecordsChangedOnDate(
                 date,
                 userIds
             );
-            const tasksChanged = await TaskService.didTasksChanged(userIds);
+            const tasksChanged = await taskSyncService.didRecordsChanged(userIds);
             if (logsChanged || tasksChanged) {
                 setUpdate((prev) => !prev);
             }

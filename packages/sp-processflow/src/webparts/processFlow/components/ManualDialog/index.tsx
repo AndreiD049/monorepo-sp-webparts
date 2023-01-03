@@ -1,5 +1,7 @@
 import {
     DefaultButton,
+    MessageBar,
+    MessageBarType,
     PrimaryButton,
     TextField,
 } from 'office-ui-fabric-react';
@@ -18,6 +20,7 @@ export interface IManualDialogProps {
 }
 
 export const ManualDialog: React.FC<IManualDialogProps> = (props) => {
+    const [error, setError] = React.useState('');
     const [name, setName] = React.useState(props.name || '');
     const [link, setLink] = React.useState(props.link || '');
 
@@ -32,30 +35,38 @@ export const ManualDialog: React.FC<IManualDialogProps> = (props) => {
         }
     }, [props.operation]);
 
-    const handlePressOk = React.useCallback(() => {
+    const handlePressOk: React.FormEventHandler = React.useCallback((ev) => {
+        ev.preventDefault();
+        if (name.trim() === '' || link.trim() === '') {
+            setError('Blank values not allowed');
+            return;
+        }
         props.onDone(name, link);
         hideDialog(props.dialogId);
     }, [name, link]);
 
     return (
-        <div className={styles.container}>
+        <form className={styles.container} onSubmit={handlePressOk}>
+            {error !== '' && <MessageBar messageBarType={MessageBarType.error}>{error}</MessageBar>}
             <TextField
                 label="Name"
+                required
                 value={name}
                 onChange={(_ev, value) => setName(value)}
             />
             <TextField
                 label="Link"
+                required
                 value={link}
                 onChange={(_ev, value) => setLink(value)}
             />
             <div className={styles.footer}>
-                <PrimaryButton onClick={handlePressOk}>{okText}</PrimaryButton>
+                <PrimaryButton type='submit'>{okText}</PrimaryButton>
                 <DefaultButton onClick={() => hideDialog(props.dialogId)}>
                     Cancel
                 </DefaultButton>
             </div>
-        </div>
+        </form>
     );
 };
 

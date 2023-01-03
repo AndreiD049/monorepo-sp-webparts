@@ -5,7 +5,7 @@ import { FC } from 'react';
 import { createPanel } from '../hooks/usePanel';
 import { IUser } from '../models/IUser';
 import GlobalContext from '../utils/GlobalContext';
-import DateSelector from './DateSelector';
+import DateSelector from './DateSelector/DateSelector';
 import { CreateTasks } from './panels/CreateTasks';
 import styles from './Tasks.module.scss';
 import UserTeamSelctor from './user-selector/UserTeamSelector';

@@ -7,8 +7,6 @@ import * as React from 'react';
 import { FC } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import { updateTaskLog } from '../../hooks/useTasks';
-import ITask from '../../models/ITask';
-import ITaskLog, { TaskStatus } from '../../models/ITaskLog';
 import { ITaskInfo } from '../../models/ITaskProperties';
 import { MINUTE } from '../../utils/constants';
 import GlobalContext from '../../utils/GlobalContext';
@@ -18,6 +16,8 @@ import { SPnotify } from 'sp-react-notifications';
 import styles from './Task.module.scss';
 import { Task as InnerTask } from 'sp-components';
 import TasksWebPart from '../../TasksWebPart';
+import ITask from '@service/sp-tasks/dist/models/ITask';
+import ITaskLog, { TaskStatus } from '@service/sp-tasks/dist/models/ITaskLog';
 
 export interface ITaskProps {
     task: ITaskLog | ITask;

@@ -25,7 +25,7 @@ export async function ensureFutureTaskLogs(tasks: ITask[], logs: ITaskLog[], ser
         if (!taskLogs.some((log) => DateTime.fromISO(log.Date) > today)) {
             const nextDate = getNextLogDate(task)?.toJSDate();
             if (nextDate) {
-                await service.createTaskLogFromTask(task, nextDate);
+                await service.createTaskLogFromTaskOnDate(task, nextDate);
             }
         }
     }
@@ -60,11 +60,12 @@ export function getNextLogDate(task: ITask): DateTime | null {
     const activeToDate = DateTime.fromISO(task.ActiveTo);
     switch (task.Type) {
         case 'Monthly':
-            if (task.MonthlyDay && task.MonthlyDay <= today.day) {
-                const date = DateTime.now().plus({ month: 1 }).set({ 'day': task.MonthlyDay})
+            if (!task.MonthlyDay) return null;
+            if (task.MonthlyDay <= today.day) {
+                let date = setDay(DateTime.now().plus({ month: 1 }), task.MonthlyDay);
                 return date <= activeToDate ? date : null;
             }
-            const date = today.set({ 'day': task.MonthlyDay });
+            const date = setDay(today, task.MonthlyDay);
             return date <= activeToDate ? date : null;
         case 'Quarter':
             const nextQuarter = today.startOf('quarter').plus({ quarters: 1 });
@@ -72,4 +73,11 @@ export function getNextLogDate(task: ITask): DateTime | null {
         default:
             throw Error(`Task type '${task.Type}' not supported`);
     }
+}
+
+function setDay(date: DateTime, day: number) {
+    if (date.daysInMonth < day) {
+        return date.endOf('month');
+    }
+    return date.set({ day: day });
 }

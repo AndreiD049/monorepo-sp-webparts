@@ -1,3 +1,4 @@
+import ITaskLog from "@service/sp-tasks/dist/models/ITaskLog";
 import { DefaultButton, PrimaryButton, TextField } from "office-ui-fabric-react";
 import * as React from "react"
 import { closePanel, setPanelProperties } from "../../hooks/usePanel";
@@ -17,7 +18,7 @@ export const AddRemark: React.FC<IAddRemarkProps> = ({ taskId, taskLogId, date }
     /** Set remark initial value */
     React.useEffect(() => {
         if (taskLogId) {
-            TaskLogsService.getTaskLog(taskLogId).then((log) => {
+            TaskLogsService.getTaskLog(taskLogId).then((log: ITaskLog) => {
                 setRemark(log.Remark);
             });
         }

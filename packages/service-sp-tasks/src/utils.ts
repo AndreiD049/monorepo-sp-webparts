@@ -142,26 +142,8 @@ export function isTaskValid(task: ITask, stats: IDateStatistics) {
                 const daySet = getWeekDaySet(task.WeeklyDays);
                 return daySet.has(stats.weekday);
             case TaskType.Monthly:
-                // if day is weekend, not applicable
-                if (stats.dt.weekday > 5) return false;
-                // if current monthly date is before 3rd date, check also previous month
-                if (stats.nthDay <= 3) {
-                    const prevMonth = stats.dt.minus({ month: 1 }).set({ day: task.MonthlyDay });
-                    // check if task in previous month was in weekend
-                    if (prevMonth.weekday > 5) {
-                        // new date when task needs to be performed
-                        const newTaskDate = prevMonth.plus({ days: 8 - prevMonth.weekday });
-                        if (newTaskDate.hasSame(stats.dt, 'day')) return true;
-                    }
-                }
-                // current month
-                const currentMonth = stats.dt.set({ day: task.MonthlyDay });
-                let day = task.MonthlyDay;
-                if (currentMonth.weekday > 5) {
-                    day = currentMonth.plus({ days: 8 - currentMonth.weekday }).day;
-                }
-                if (day === 31 && stats.nthDay === stats.daysInMonth) return true;
-                return day === stats.nthDay;
+            case TaskType.Quarter:
+                return false;
             default:
                 console.error(`Task type '${task.Type}' is not supported yet`);
                 return false;

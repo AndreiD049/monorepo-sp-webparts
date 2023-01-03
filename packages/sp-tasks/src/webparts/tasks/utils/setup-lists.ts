@@ -37,7 +37,7 @@ export const setupLists = async (properties: ITasksWebPartProps) => {
         });
 
         await taskExists.list.fields.addChoice('Type', {
-            Choices: ['Daily', 'Weekly', 'Monthly', 'One time'],
+            Choices: ['Daily', 'Weekly', 'Monthly', 'One time', 'Quarter'],
             Required: true,
             EditFormat: ChoiceFieldFormatType.Dropdown,
             FillInChoice: false,

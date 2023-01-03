@@ -28,6 +28,7 @@
     "@pnp/core": "^3.1.0",
     "@pnp/queryable": "^3.1.0",
     "@pnp/sp": "^3.1.0",
+    "@service/sp-tasks": "^1.0.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",
     "office-ui-fabric-react": "7.185.7",
@@ -36,9 +37,9 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "16.13.1",
     "react-visibility-hook": "^1.0.0",
+    "sp-components": "^1.0.0",
     "sp-preset": "^2.0.19",
     "sp-react-notifications": "^1.0.23",
-    "sp-components": "^1.0.0",
     "tslib": "2.3.1",
     "use-web-storage-api": "^1.0.3"
   },

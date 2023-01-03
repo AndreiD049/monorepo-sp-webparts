@@ -13,8 +13,9 @@ import UserColumn from './UserColumn';
 import { SPnotify } from 'sp-react-notifications';
 import { MessageBarType, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import useWebStorage from 'use-web-storage-api';
-import { HOUR } from '../utils/constants';
+import { HOUR, MAIN_CALLOUT } from '../utils/constants';
 import { usePanel } from '../hooks/usePanel';
+import { Callout } from 'sp-components';
 
 const Tasks: React.FC = () => {
     const { currentUser, TaskLogsService, maxPeople } = useContext(GlobalContext);
@@ -180,6 +181,7 @@ const Tasks: React.FC = () => {
                 </div>
             </DragDropContext>
             {panel}
+            <Callout id={MAIN_CALLOUT} />
         </>
     );
 };

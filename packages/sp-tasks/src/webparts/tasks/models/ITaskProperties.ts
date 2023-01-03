@@ -1,4 +1,4 @@
-import { TaskStatus } from "./ITaskLog";
+import { TaskStatus } from "@service/sp-tasks/dist/models/ITaskLog";
 
 export interface ITaskInfo {
     description: string;

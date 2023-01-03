@@ -1,3 +1,4 @@
+import ITask, { TaskType, WeekDay } from '@service/sp-tasks/dist/models/ITask';
 import { isNumber, cloneDeep } from 'lodash';
 import { DateTime } from 'luxon';
 import {
@@ -18,7 +19,6 @@ import {
 import * as React from 'react';
 import { SPnotify } from 'sp-react-notifications';
 import { closePanel, setPanelProperties } from '../../hooks/usePanel';
-import ITask, { TaskType, WeekDay } from '../../models/ITask';
 import GlobalContext from '../../utils/GlobalContext';
 import { TimePicker } from '../time-picker/TimePicker';
 import { UserPicker } from '../user-selector/UserPicker';
@@ -164,6 +164,10 @@ const TaskTypeStep: React.FC<ICreationStepProps> = ({ wrapper, onUpdate }) => {
                 key: TaskType.Monthly,
                 text: TaskType.Monthly,
             },
+            {
+                key: TaskType.Quarter,
+                text: TaskType.Quarter,
+            },
         ],
         []
     );
@@ -185,6 +189,12 @@ const TaskTypeStep: React.FC<ICreationStepProps> = ({ wrapper, onUpdate }) => {
                     case TaskType.Monthly:
                         w.task.Transferable = true;
                         w.task.WeeklyDays = [];
+                        w.task.MonthlyDay = 1;
+                        break;
+                    case TaskType.Quarter:
+                        w.task.Transferable = true;
+                        w.task.WeeklyDays = [];
+                        w.task.MonthlyDay = null;
                         break;
                 }
                 w.task.Type = opt.key as TaskType;
@@ -314,7 +324,7 @@ const MonthlyDayStep: React.FC<ICreationStepProps> = ({ wrapper, onUpdate }) => 
                     }}
                     value={wrapper.task.MonthlyDay?.toString() || '1'}
                     min={1}
-                    max={22}
+                    max={31}
                     onValidate={(v) => {
                         const num = +v;
                         let result = num;
@@ -322,14 +332,14 @@ const MonthlyDayStep: React.FC<ICreationStepProps> = ({ wrapper, onUpdate }) => 
                             result = 1;
                         } else if (num < 1) {
                             result = 1;
-                        } else if (num > 22) {
-                            result = 22;
+                        } else if (num > 31) {
+                            result = 31;
                         }
                         onUpdate(wrapperSetValue(wrapper, (w) => (w.task.MonthlyDay = result)));
                         return result.toString();
                     }}
                     onIncrement={(v) =>
-                        isNumber(+v) && +v < 22
+                        isNumber(+v) && +v < 31
                             ? onUpdate(
                                   wrapperSetValue(wrapper, (w) => (w.task.MonthlyDay = +v + 1))
                               )
@@ -345,7 +355,7 @@ const MonthlyDayStep: React.FC<ICreationStepProps> = ({ wrapper, onUpdate }) => 
                 />
             </div>
             <div style={{ marginLeft: '4px' }} className={styles.taskWrapperStepText}>
-                working day.
+                day.
             </div>
         </div>
     );

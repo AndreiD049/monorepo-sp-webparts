@@ -1,4 +1,5 @@
 import { cloneDeep } from '@microsoft/sp-lodash-subset';
+import ITask from '@service/sp-tasks/dist/models/ITask';
 import { DateTime } from 'luxon';
 import {
     ComboBox,
@@ -24,7 +25,6 @@ import {
 import * as React from 'react';
 import { SPnotify } from 'sp-react-notifications';
 import { closePanel, setPanelProperties } from '../../hooks/usePanel';
-import ITask from '../../models/ITask';
 import GlobalContext from '../../utils/GlobalContext';
 import { userToPeoplePickerOption } from '../../utils/utils';
 import { UserPicker } from '../user-selector/UserPicker';
@@ -236,7 +236,7 @@ export const EditTasks: React.FC<IEditTasksProps> = (props) => {
             const task = await TaskService.getTask(props.taskId);
             const originalId = task.OriginalTaskId || task.ID;
             const originalTasks = await TaskService.getTasksByOriginalId(originalId);
-            const data: ITaskWrapper[] = originalTasks.map((task) => ({
+            const data: ITaskWrapper[] = originalTasks.map((task: ITask) => ({
                 editable: false,
                 item: task,
                 status: 'original',

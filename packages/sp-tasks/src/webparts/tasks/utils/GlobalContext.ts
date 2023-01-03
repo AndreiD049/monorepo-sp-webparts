@@ -1,7 +1,7 @@
+import { TaskLogsService, TaskService } from '@service/sp-tasks';
 import * as React from 'react';
 import { IUser } from '../models/IUser';
-import TaskLogsService from '../services/tasklogs';
-import TaskService from '../services/tasks';
+import { TaskSync } from '../services/taskSync';
 import TeamService from '../services/teams';
 import UserService from '../services/users';
 import ITeams from './ITeams';
@@ -16,6 +16,8 @@ export interface IGlobalContext {
     canEditOthers: boolean;
     canSeeAll: boolean;
     maxPeople: number;
+    taskSyncService: TaskSync;
+    taskLogSyncService: TaskSync;
 }
 
 const GlobalContext = React.createContext<IGlobalContext>({
@@ -28,6 +30,8 @@ const GlobalContext = React.createContext<IGlobalContext>({
     canEditOthers: false,
     canSeeAll: false,
     maxPeople: 1,
+    taskSyncService: null,
+    taskLogSyncService: null,
 });
 
 export default GlobalContext;

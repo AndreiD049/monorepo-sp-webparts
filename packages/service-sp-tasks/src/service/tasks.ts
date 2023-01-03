@@ -19,7 +19,6 @@ const TASK_SELECT = [
     'ActiveTo',
     'OriginalTaskId',
     'Category',
-    'LastGeneratedDate',
 ];
 
 const TASK_EXPAND = ['AssignedTo'];

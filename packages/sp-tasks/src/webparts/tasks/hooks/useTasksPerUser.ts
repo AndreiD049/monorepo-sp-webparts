@@ -1,7 +1,7 @@
 import { cloneDeep } from '@microsoft/sp-lodash-subset';
+import ITask from '@service/sp-tasks/dist/models/ITask';
+import ITaskLog from '@service/sp-tasks/dist/models/ITaskLog';
 import * as React from 'react';
-import ITask from '../models/ITask';
-import ITaskLog from '../models/ITaskLog';
 import { IUser } from '../models/IUser';
 import GlobalContext from '../utils/GlobalContext';
 import { filterTasks, getSortedTaskList, ICustomSorting } from '../utils/utils';

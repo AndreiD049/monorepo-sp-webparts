@@ -12,9 +12,7 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import * as strings from 'TasksWebPartStrings';
 import Tasks from './components/Tasks';
 import { setupLists } from './utils/setup-lists';
-import TaskService from './services/tasks';
 import GlobalContext from './utils/GlobalContext';
-import TaskLogsService from './services/tasklogs';
 import UserService from './services/users';
 import TeamService from './services/teams';
 import { ACCESS_EDIT_OTHERS, ACCESS_SEE_ALL, USER_WEB_RE } from './utils/constants';
@@ -26,6 +24,8 @@ import PropertyPaneAccessControl, {
 } from 'property-pane-access-control';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import { getTheme } from 'office-ui-fabric-react';
+import { TaskLogsService, TaskService } from '@service/sp-tasks';
+import { TaskSync } from './services/taskSync';
 
 export interface ITasksWebPartProps {
     dataSourceRoot: string;
@@ -56,8 +56,14 @@ export default class TasksWebPart extends BaseClientSideWebPart<ITasksWebPartPro
             GlobalContext.Provider,
             {
                 value: {
-                    TaskService: new TaskService(this.properties),
-                    TaskLogsService: new TaskLogsService(this.properties),
+                    TaskService: new TaskService({
+                        sp: TasksWebPart.SPBuilder.getSP(this.properties.dataSourceRoot),
+                        listName: this.properties.tasksListTitle,
+                    }),
+                    TaskLogsService: new TaskLogsService({
+                        sp: TasksWebPart.SPBuilder.getSP(this.properties.dataSourceRoot),
+                        listName: this.properties.taskLogsListTitle,
+                    }),
                     UserService: userServeice,
                     TeamService: teamService,
                     currentUser: await teamService.getCurrentUser(),
@@ -70,6 +76,14 @@ export default class TasksWebPart extends BaseClientSideWebPart<ITasksWebPartPro
                     ),
                     canSeeAll: canSeeAll,
                     maxPeople: this.properties.maxPeople,
+                    taskSyncService: new TaskSync({
+                        sp: TasksWebPart.SPBuilder.getSP(this.properties.dataSourceRoot),
+                        listName: this.properties.tasksListTitle,
+                    }),
+                    taskLogSyncService: new TaskSync({
+                        sp: TasksWebPart.SPBuilder.getSP(this.properties.dataSourceRoot),
+                        listName: this.properties.taskLogsListTitle,
+                    }),
                 },
             },
             React.createElement(Tasks)
@@ -86,7 +100,7 @@ export default class TasksWebPart extends BaseClientSideWebPart<ITasksWebPartPro
         setupAccessControl(this.context);
 
         TasksWebPart.SPBuilder = new SPBuilder(this.context)
-            .withRPM(600)
+            .withRPM(1000)
             .withTennants({
                 Data: this.properties.dataSourceRoot,
                 Users: userWebUrl,

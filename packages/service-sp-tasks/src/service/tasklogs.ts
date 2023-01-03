@@ -132,6 +132,17 @@ export class TaskLogsService {
         return result.item.select(...LOG_SELECT).expand(...LOG_EXPAND)();
     }
 
+    async createTaskLogFromTaskOnDate(task: ITask, date: Date): Promise<void> {
+        if (date === undefined) {
+            date = new Date();
+        }
+
+        const log = this.castTaskToTaskLog(task, date);
+        const result = await this.list.items.add({
+            ...log,
+        });
+    }
+
     async updateTaskLog(id: number, update: Partial<ITaskLog>): Promise<ITaskLog> {
         return (await this.list.items.getById(id).update(update)).item
             .select(...LOG_SELECT)
