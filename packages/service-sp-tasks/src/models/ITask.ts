@@ -3,6 +3,7 @@ export enum TaskType {
     Weekly = 'Weekly',
     Monthly = 'Monthly',
     OneTime = 'One time',
+    Quarter = 'Quarter',
 }
 
 export enum WeekDay {
@@ -43,4 +44,5 @@ export default interface ITask {
     ActiveFrom: string;
     ActiveTo: string;
     OriginalTaskId?: number;
+    Category: string;
 }

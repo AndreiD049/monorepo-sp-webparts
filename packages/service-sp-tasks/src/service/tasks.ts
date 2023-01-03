@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 import { SPFI, IList, IItems } from 'sp-preset';
-import ITask from '../models/ITask';
+import ITask, { TaskType } from '../models/ITask';
 
 const TASK_SELECT = [
     'ID',
@@ -18,6 +18,8 @@ const TASK_SELECT = [
     'ActiveFrom',
     'ActiveTo',
     'OriginalTaskId',
+    'Category',
+    'LastGeneratedDate',
 ];
 
 const TASK_EXPAND = ['AssignedTo'];
@@ -63,26 +65,13 @@ export class TaskService {
     }
 
     async createTask(createdTask: Partial<ITask>) {
-        return this.list.items.add({
-            Title: createdTask.Title,
-            Description: createdTask.Description,
-            AssignedToId: createdTask.AssignedTo?.ID,
-            Type: createdTask.Type,
-            MonthlyDay: createdTask.MonthlyDay,
-            WeeklyDays: createdTask.WeeklyDays || [],
-            Transferable: createdTask.Transferable,
-            DaysDuration: createdTask.DaysDuration,
-            Time: createdTask.Time,
-            ActiveFrom: createdTask.ActiveFrom,
-            ActiveTo: createdTask.ActiveTo,
-            OriginalTaskId: createdTask.OriginalTaskId
-        });
+        return this.list.items.add(this.partialToTask(createdTask));
     }
 
     async createTasks(tasks: (Partial<ITask & { AssignedToId: number }>)[]) {
         const [batchedSP, execute] = this.sp.batched();
         const batchedList = batchedSP.web.lists.getByTitle(this.listTitle);
-        tasks.forEach((task) => batchedList.items.add(task));
+        tasks.forEach((task) => batchedList.items.add(this.partialToTask(task)));
         await execute();
     }
 
@@ -116,5 +105,22 @@ export class TaskService {
             .orderBy('Time', true)
             .select(...TASK_SELECT)
             .expand(...TASK_EXPAND);
+    }
+
+    private partialToTask(partial: Partial<ITask & { AssignedToId: number }>) {
+        return {
+            Title: partial.Title,
+            Description: partial.Description,
+            AssignedToId: partial.AssignedTo?.ID || partial.AssignedToId,
+            Type: partial.Type,
+            MonthlyDay: partial.MonthlyDay,
+            WeeklyDays: partial.WeeklyDays || [],
+            Transferable: partial.Transferable,
+            DaysDuration: partial.DaysDuration,
+            Time: partial.Time,
+            ActiveFrom: partial.ActiveFrom,
+            ActiveTo: partial.ActiveTo,
+            OriginalTaskId: partial.OriginalTaskId,
+        }
     }
 }

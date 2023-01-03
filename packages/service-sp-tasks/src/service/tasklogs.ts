@@ -185,7 +185,7 @@ export class TaskLogsService {
      * @returns the filter to be applied on the list of task logs
      */
     private getTaskLogFilter(userId: number, dt: DateTime) {
-        return `(Date eq '${dt.toISODate()}') and ((UserId eq ${userId}) or (OriginalUserId eq ${userId}))`;
+        return `(Date ge '${dt.toISODate()}') and ((UserId eq ${userId}) or (OriginalUserId eq ${userId}))`;
     }
 
     /**
