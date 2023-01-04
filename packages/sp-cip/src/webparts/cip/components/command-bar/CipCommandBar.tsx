@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router';
 import { relinkParent, setTimerOptions } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { LinkRemoteDialog } from '../LinkRemoteDialog';
-import { TimeLogGeneral } from '../TimeLogGeneral';
 import { AssigneeSelected, CipAssigneeSelector } from './CipAssigneeSelector';
 import { CipCategoriesToggle } from './CipCategoriesToggle';
 import { CipStatusSelector, StatusSelected } from './StatusSelector';
@@ -17,6 +16,7 @@ import { DIALOG_ID, TIMER_VISIBLE_KEY } from '../../utils/constants';
 import useWebStorage from 'use-web-storage-api';
 import { TeamSelector } from '../TeamSelector';
 import { showDialog } from 'sp-components';
+import { TimeLog } from '../TimeLog';
 
 interface ICipCommandBarProps {
     onSearch: (val: string) => void;
@@ -69,7 +69,7 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                         dialogProps: {
                             title: 'Log time',
                         },
-                        content: <TimeLogGeneral dialogId={DIALOG_ID} />,
+                        content: <TimeLog dialogId={DIALOG_ID} />,
                     }),
             },
             {

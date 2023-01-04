@@ -5,11 +5,10 @@ import {
     PrimaryButton,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { hideDialog } from 'sp-components';
+import { hideDialog, TaskPicker } from 'sp-components';
 import MainService from '../../services/main-service';
 import { TaskNode } from '../../tasks/graph/TaskNode';
 import { taskUpdated } from '../../utils/dom-events';
-import { TaskPicker } from '../TaskPicker';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
 import styles from './MoveForm.module.scss';
 

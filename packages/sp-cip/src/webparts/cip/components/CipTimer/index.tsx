@@ -21,9 +21,9 @@ import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IndexedDbCache } from 'indexeddb-manual-cache';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
 import { DefaultButton, PrimaryButton, Stack } from 'office-ui-fabric-react';
-import { TimeLogGeneral } from '../TimeLogGeneral';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { hideDialog, showDialog } from 'sp-components';
+import { TimeLog } from '../TimeLog';
 
 export interface ICipTimerProps {
     // Props go here
@@ -149,7 +149,7 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
                         title: 'Log time',
                     },
                     content: (
-                        <TimeLogGeneral
+                        <TimeLog
                             task={timer.task}
                             dialogId={DIALOG_ID}
                             time={hoursFromMilliseconds(getDuration(timer))}

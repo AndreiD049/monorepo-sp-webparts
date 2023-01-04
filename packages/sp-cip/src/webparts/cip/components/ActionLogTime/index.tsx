@@ -3,10 +3,10 @@ import * as React from 'react';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IAction } from '@service/sp-cip/dist/services/action-service';
 import { formatHours } from '../../utils/hours-duration';
-import { TimeLogGeneral } from '../TimeLogGeneral';
 import styles from './ActionLogTime.module.scss';
 import { showDialog } from 'sp-components';
 import { DIALOG_ID_PANEL } from '../../utils/constants';
+import { TimeLog } from '../TimeLog';
 
 export interface IActionLogTimeProps {
     action: IAction;
@@ -37,7 +37,7 @@ export const ActionLogTime: React.FC<IActionLogTimeProps> = (props) => {
         showDialog({
                 id: DIALOG_ID_PANEL,
                 dialogProps: { title: 'Log time', },
-                content: (<TimeLogGeneral task={props.task} dialogId={DIALOG_ID_PANEL} action={props.action} />)
+                content: (<TimeLog task={props.task} dialogId={DIALOG_ID_PANEL} action={props.action} />)
             })
     };
 

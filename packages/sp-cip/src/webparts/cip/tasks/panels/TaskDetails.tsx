@@ -14,7 +14,6 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import { ActionLog } from '../../actionlog/ActionLog';
 import { Comments } from '../../comments/Comments';
-import { TimeLogGeneral } from '../../components/TimeLogGeneral';
 import {
     LoadingAnimation,
     loadingStart,
@@ -28,6 +27,7 @@ import { AttachmentSection } from '../../components/AttachmentSection';
 import { RelativeTasks } from '../../components/RelativeTasks';
 import { Dialog, showDialog } from 'sp-components';
 import { DIALOG_ID_PANEL } from '../../utils/constants';
+import { TimeLog } from '../../components/TimeLog';
 
 export const TaskDetails: React.FC = () => {
     const params = useParams();
@@ -177,7 +177,7 @@ export const TaskDetails: React.FC = () => {
                         title: 'Log time',
                     },
                     content: (
-                        <TimeLogGeneral
+                        <TimeLog
                             task={task}
                             dialogId={DIALOG_ID_PANEL}
                         />

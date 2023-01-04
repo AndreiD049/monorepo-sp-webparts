@@ -20,7 +20,7 @@ import {
     MINUTE,
     STORE_NAME,
 } from '../../../utils/constants';
-import { TimeLogGeneral } from '../../TimeLogGeneral';
+import { TimeLog } from '../../TimeLog';
 import { useColumns } from './useColumns';
 
 export interface IActionLogTableProps {
@@ -138,7 +138,7 @@ export const ActionLogTable: React.FC<IActionLogTableProps> = (props) => {
                 title: 'Log time',
             },
             content: (
-                <TimeLogGeneral
+                <TimeLog
                     task={task}
                     dialogId={DIALOG_ID_ACTIONLOG_PANEL}
                     action={action}

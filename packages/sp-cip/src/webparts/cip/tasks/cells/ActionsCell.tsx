@@ -12,11 +12,11 @@ import {
 import { taskDeleted, addTimer } from '../../utils/dom-events';
 import { AddCommentDialog } from '../dialogs/AddCommentDialog';
 import { TaskNode } from '../graph/TaskNode';
-import { TimeLogGeneral } from '../../components/TimeLogGeneral';
 import MainService from '../../services/main-service';
 import { FooterYesNo, hideDialog, showDialog } from 'sp-components';
 import { DIALOG_ID } from '../../utils/constants';
 import { MoveForm } from '../../components/MoveForm';
+import { TimeLog } from '../../components/TimeLog';
 
 const ActionsCell: React.FC<{ node: TaskNode }> = ({ node }) => {
     const { isTaskFinished } = React.useContext(TaskNodeContext);
@@ -88,7 +88,7 @@ const ActionsCell: React.FC<{ node: TaskNode }> = ({ node }) => {
                         id: DIALOG_ID,
                         dialogProps: { title: 'Log time' },
                         content: (
-                            <TimeLogGeneral
+                            <TimeLog
                                 task={node.getTask()}
                                 dialogId={DIALOG_ID}
                             />

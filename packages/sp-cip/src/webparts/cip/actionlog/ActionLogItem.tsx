@@ -117,6 +117,13 @@ const ActionIcon: React.FC<{ type: ActionType }> = (props) => {
 };
 
 const ActionItemContent: React.FC<IActionLogItemProps> = (props) => {
+    let text = props.action.ActivityType + ' update: ';
+    switch (props.action.ActivityType) {
+        case 'Created':
+        case 'Finished':
+            text = props.action.ActivityType;
+            break;
+    }
     const content = React.useMemo(() => {
         switch (props.action.ActivityType) {
             case 'Time log':
@@ -132,7 +139,7 @@ const ActionItemContent: React.FC<IActionLogItemProps> = (props) => {
                             gap: '.5em',
                         }}
                     >
-                        <span>{props.action.ActivityType} update: </span>
+                        <span>{text}</span>
                         <span>{getActionComment(props.action)}</span>
                     </div>
                 );
