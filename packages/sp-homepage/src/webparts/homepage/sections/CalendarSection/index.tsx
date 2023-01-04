@@ -46,20 +46,41 @@ export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
     const [choice, setChoice] = React.useState<ChoiceDisplayType>('week');
     const [items, setItems] = React.useState<IWrappedCalendarItem[]>([]);
     const [reload, setReload] = React.useState(false);
+
+    /**
+     * services are read from sources found in json configuration
+     */
     const services = React.useMemo(() => {
         return props.section.sources.map(
             (source) => new SourceService(source, getSelectString(source), getExpandString(source))
         );
     }, [props.section.sources]);
+
+    /**
+     * if choice = month - period starts at beggining of the month
+     * if choice = week - start at the currently selected day
+     */
     const startDate = React.useMemo(() => {
         if (choice === 'month') return DateTime.fromJSDate(selectedDate).startOf('month');
         return DateTime.fromJSDate(selectedDate).startOf('day');
     }, [selectedDate, choice]);
+
+    /**
+     * if choice = month - period ends at the end of the month
+     * if = week - it ends at the selected date + 7 days
+     */
     const endDate = React.useMemo(() => {
         if (choice === 'month') return DateTime.fromJSDate(selectedDate).endOf('month');
         return DateTime.fromJSDate(selectedDate).plus({ day: 7 });
     }, [selectedDate, choice]);
 
+    /**
+     * Get the options from json configuration.
+     * Depending on presence of an option, the behavior of the section will change.
+     * For now, following options are supported:
+     * - showuser: will show user name and photo in the calendar. Can be used if there are multiple users in the filter
+     * - showstatus: show the status of the item if present
+     */
     const options = React.useMemo(() => {
         const optionsSet = new Set(props.section.options);
         const result: ICalendarContext = {
@@ -75,6 +96,9 @@ export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
         return result;
     }, [props.section]);
 
+    /**
+     * Fetch data from sources provided in json configuration
+     */
     React.useEffect(() => {
         async function run(): Promise<void> {
             try {
@@ -104,6 +128,9 @@ export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
         run().catch((err) => console.error(err));
     }, [services, reload]);
 
+    /**
+     * show only the items between start and end dates. (see above)
+     */
     const filteredItems = React.useMemo(() => {
         const startMillis = startDate.toUnixInteger();
         const endMillis = endDate.toUnixInteger();
@@ -113,6 +140,10 @@ export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
         });
     }, [selectedDate, items, startDate, endDate]);
 
+    /**
+     * handle what happens when user presses 'refresh' icon on the top of the section
+     * this should clea all the cache and reload the data from sources
+     */
     React.useEffect(() => {
         const listenHandlerRemove = listenSectionEvent(props.section.name, 'REFRESH', async () => {
             showSpinner(CALENDAR_SPINNER_ID);
@@ -127,6 +158,12 @@ export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
         };
     }, [props.section]);
 
+    /**
+     * render the calendar.
+     * depending on the @choice (week or month).
+     * user will be presented with different calendars (by day or by month)
+     * ! it's very important that it has a key since without it it does not change for some reason
+     */
     const calendar = React.useMemo(() => {
         return (
             <Calendar
