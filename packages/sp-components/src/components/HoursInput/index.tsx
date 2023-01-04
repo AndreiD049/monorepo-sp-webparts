@@ -40,7 +40,7 @@ export const HoursInput: React.FC<IHoursInputProps> = (props) => {
                 min={0}
                 value={`${formatHours(props.value)} hour(s)`}
                 onIncrement={(val) => props.onChange(Number.parseFloat(val) + 1)}
-                onDecrement={(val) => props.onChange(Number.parseFloat(val) - 1)}
+                onDecrement={(val) => props.onChange(Math.max(Number.parseFloat(val) - 1, 0))}
                 onValidate={handleValidate}
             />
             <div className={styles.inputButtonWrapper}>

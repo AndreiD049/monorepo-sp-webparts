@@ -23,3 +23,4 @@ export { Panel, hidePanel, showPanel, dispatchButtonClick, handleButtonClick, IC
 export { LoadingSpinner, showSpinner, hideSpinner } from './components/LoadingSpinner';
 export { ErrorBoundary } from './components/ErrorBoundary';
 export { Footer } from './components/Footer';
+export { TaskPicker } from './components/CipTask/TaskPicker'

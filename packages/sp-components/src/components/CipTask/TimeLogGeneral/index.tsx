@@ -1,6 +1,16 @@
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IAction } from '@service/sp-cip/dist/services/action-service';
-import { Checkbox, CompactPeoplePicker, DatePicker, IPersonaProps, Label, MessageBar, MessageBarType, PrimaryButton, TextField } from 'office-ui-fabric-react';
+import {
+    Checkbox,
+    CompactPeoplePicker,
+    DatePicker,
+    IPersonaProps,
+    Label,
+    MessageBar,
+    MessageBarType,
+    PrimaryButton,
+    TextField,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
 import { HoursInput } from '../../HoursInput';
 import { TaskPicker } from '../TaskPicker';
@@ -19,7 +29,7 @@ export interface ITimeLogGeneralProps {
     description?: string;
     /* Events */
     beforeActions?: () => void;
-    onActionAdd?: (action: Partial<IAction>) => void;
+    onActionAdd?: (action: Partial<IAction>, taskId?: number) => void;
     onActionEdit?: (actionId: number, update: Partial<IAction>) => void;
     onTaskEffectiveTimeChange?: (taskId: number, time: number) => void;
     afterActions?: () => void;
@@ -36,6 +46,7 @@ const setDateCurrentTime = (dt: Date): Date => {
 export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     const [selected, setSelected] = React.useState<ITaskOverview>(props.task);
     const [time, setTime] = React.useState(props.time || 0);
+    const [taskPickerInput, setTaskPickerInput] = React.useState('');
     const [comment, setComment] = React.useState(props.description || '');
     const [errorMessage, setErrorMessage] = React.useState('');
     const [diffDate, setDiffDate] = React.useState(false);
@@ -47,9 +58,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
         async function checkAction(): Promise<void> {
             if (props.action) {
                 const indexPipe = props.action.Comment.indexOf('|');
-                setTime(
-                    Number.parseFloat(props.action.Comment.substring(0, indexPipe))
-                );
+                setTime(Number.parseFloat(props.action.Comment.substring(0, indexPipe)));
                 setComment(props.action.Comment.substring(indexPipe + 1));
             }
         }
@@ -59,13 +68,12 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     // New action - has selected task
     const handleLogNew = async (): Promise<void> => {
         const selId = selected?.Id || null;
-            await props.onActionAdd({
-                ActivityType: 'Time log',
-                Comment: `${time}|${comment}`,
-                UserId: diffPerson ? +selectedUser[0].id : props.currentUserId,
-                Date: date ? setDateCurrentTime(date).toISOString() : new Date().toISOString(),
-            }
-        );
+        await props.onActionAdd({
+            ActivityType: 'Time log',
+            Comment: `${time}|${taskPickerInput ? taskPickerInput + '\n' : ''}${comment}`,
+            UserId: diffPerson ? +selectedUser[0].id : props.currentUserId,
+            Date: date ? setDateCurrentTime(date).toISOString() : new Date().toISOString(),
+        }, selId);
         if (selId) {
             props.onTaskEffectiveTimeChange(selId, time);
         }
@@ -80,14 +88,12 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
             dt = setDateCurrentTime(date).toISOString();
         }
         await props.onActionEdit(props.action.Id, {
-            Comment: `${time}|${comment}`,
+            Comment: `${time}|${taskPickerInput ? taskPickerInput + '\n' : ''}${comment}`,
             UserId: selectedUser.length > 0 ? +selectedUser[0].id : props.action.User.Id,
             Date: dt,
-        })
+        });
         if (props.task) {
-            const delta =
-                Number.parseFloat(props.action.Comment.substring(0, indexOfPipe)) -
-                time;
+            const delta = Number.parseFloat(props.action.Comment.substring(0, indexOfPipe)) - time;
             props.onTaskEffectiveTimeChange(props.task.Id, -delta);
         }
     };
@@ -129,6 +135,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
                 selectedTask={selected}
                 disabled={Boolean(props.disabled)}
                 onTaskSelected={(task) => setSelected(task)}
+                onInputChange={(value) => setTaskPickerInput(value)}
                 tasks={props.tasks ?? []}
             />
             <HoursInput
@@ -187,31 +194,44 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
                 autoAdjustHeight
             />
             <div className={styles.diffBlock}>
-                <Checkbox label="Different date" checked={diffDate} onChange={(_ev, checked) => setDiffDate(checked)} />
-                {
-                    diffDate && (<DatePicker value={date} onSelectDate={(dt) => setDate(dt)} className={styles.diffBlockInput} />)
-                }
+                <Checkbox
+                    label="Different date"
+                    checked={diffDate}
+                    onChange={(_ev, checked) => setDiffDate(checked)}
+                />
+                {diffDate && (
+                    <DatePicker
+                        value={date}
+                        onSelectDate={(dt) => setDate(dt)}
+                        className={styles.diffBlockInput}
+                    />
+                )}
             </div>
             <div className={styles.diffBlock}>
-                <Checkbox label="Different person" checked={diffPerson} onChange={(_ev, checked) => setDiffPerson(checked)} />
-                {
-                    diffPerson && (
-                        <CompactPeoplePicker
-                            className={styles.diffBlockInput} 
-                            itemLimit={1}
-                            inputProps={{ id: 'ResponsiblePicker' }}
-                            onResolveSuggestions={(filter: string) => props.users.filter((u) => u.text.toLowerCase().includes(filter.toLowerCase()))}
-                            onEmptyResolveSuggestions={() => props.users}
-                            selectedItems={selectedUser}
-                            onChange={(items) => setSelectedUser(items)}
-                        />
-                    )
-                }
+                <Checkbox
+                    label="Different person"
+                    checked={diffPerson}
+                    onChange={(_ev, checked) => setDiffPerson(checked)}
+                />
+                {diffPerson && (
+                    <CompactPeoplePicker
+                        className={styles.diffBlockInput}
+                        itemLimit={1}
+                        inputProps={{ id: 'ResponsiblePicker' }}
+                        onResolveSuggestions={(filter: string) =>
+                            props.users.filter((u) =>
+                                u.text.toLowerCase().includes(filter.toLowerCase())
+                            )
+                        }
+                        onEmptyResolveSuggestions={() => props.users}
+                        selectedItems={selectedUser}
+                        onChange={(items) => setSelectedUser(items)}
+                    />
+                )}
             </div>
             <PrimaryButton className={styles.logButton} onClick={handleLogTime}>
                 Log
             </PrimaryButton>
         </div>
     );
-
 };
