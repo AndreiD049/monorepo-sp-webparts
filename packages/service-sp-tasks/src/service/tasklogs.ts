@@ -84,7 +84,7 @@ export class TaskLogsService {
             this.list.items.filter(this.getIncompleteUserTasks(userId, dt))
         )();
         return this._wrap(
-            this.list.items.filter(this.getTaskLogFilter(userId, dt))
+            this.list.items.filter(this.getTaskLogFilterSingleUser(userId, dt))
         )().then((r) => (res = res.concat(r)));
     }
 
@@ -197,6 +197,10 @@ export class TaskLogsService {
      */
     private getTaskLogFilter(userId: number, dt: DateTime) {
         return `(Date ge '${dt.toISODate()}') and ((UserId eq ${userId}) or (OriginalUserId eq ${userId}))`;
+    }
+
+    private getTaskLogFilterSingleUser(userId: number, dt: DateTime) {
+        return `(Date ge '${dt.toISODate()}') and (UserId eq ${userId})`;
     }
 
     /**
