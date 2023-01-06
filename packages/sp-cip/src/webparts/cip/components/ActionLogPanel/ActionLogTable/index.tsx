@@ -1,7 +1,6 @@
 import { uniq } from '@microsoft/sp-lodash-subset';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IAction } from '@service/sp-cip/dist/services/action-service';
-import { IndexedDbCache } from 'indexeddb-manual-cache';
 import {
     DetailsList,
     DetailsListLayoutMode,
@@ -14,11 +13,7 @@ import { showDialog } from 'sp-components';
 import { ActionDropdownOption } from '..';
 import MainService from '../../../services/main-service';
 import {
-    DAY,
-    DB_NAME,
     DIALOG_ID_ACTIONLOG_PANEL,
-    MINUTE,
-    STORE_NAME,
 } from '../../../utils/constants';
 import { TimeLog } from '../../TimeLog';
 import { useColumns } from './useColumns';
@@ -29,18 +24,6 @@ export interface IActionLogTableProps {
     action: ActionDropdownOption;
     selectedUsersIds: string[];
 }
-
-/** Client Database cache */
-export const db = new IndexedDbCache(DB_NAME, STORE_NAME, {
-    expiresIn: DAY * 5,
-});
-export const cache = {
-    getTask: (taskId: number) => db.key(`actionLogTask/${taskId}`),
-    getActions: (dateFrom: Date, dateTo: Date) =>
-        db.key(
-            `actionLogActions/${dateFrom.toLocaleDateString()}/${dateTo.toLocaleDateString()}`
-        ),
-};
 
 export const ActionLogTable: React.FC<IActionLogTableProps> = (props) => {
     const taskService = React.useMemo(() => MainService.getTaskService(), []);
@@ -55,16 +38,10 @@ export const ActionLogTable: React.FC<IActionLogTableProps> = (props) => {
     React.useEffect(() => {
         async function run(): Promise<void> {
             // Get actions, cached every 5 minutes
-            const actions: IAction[] = await cache
-                .getActions(props.dateFrom, props.dateTo)
-                .get(
-                    async () =>
-                        actionService.getActionsFromTo(
-                            props.dateFrom,
-                            props.dateTo
-                        ),
-                    MINUTE * 5
-                );
+            const actions: IAction[] = await actionService.getActionsFromTo(
+                props.dateFrom,
+                props.dateTo
+            );
             setActions(actions);
         }
         run().catch((err) => console.log(err));
@@ -92,14 +69,12 @@ export const ActionLogTable: React.FC<IActionLogTableProps> = (props) => {
                 .filter((a) => Boolean(a.ItemId))
                 .map((a) => a.ItemId);
             const calls = uniq(taskIds).map(async (taskId) => {
-                return cache.getTask(taskId).get(async () => {
-                    try {
-                        const task = await taskService.getTask(taskId);
-                        return task;
-                    } catch {
-                        return null;
-                    }
-                });
+                try {
+                    const task = await taskService.getTask(taskId);
+                    return task;
+                } catch {
+                    return null;
+                }
             });
             const resolvedTasks = await Promise.all(calls);
             setTasks(resolvedTasks);

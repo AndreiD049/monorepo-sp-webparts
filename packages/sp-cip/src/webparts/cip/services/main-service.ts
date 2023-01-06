@@ -6,7 +6,9 @@ import {
 } from '@service/sp-cip';
 import SPBuilder from 'sp-preset';
 import CipWebPart, { ICipWebPartProps } from '../CipWebPart';
+import { createCacheProxy } from 'idb-proxy';
 import { UserService } from './user-service';
+import { taskServiceProxyOptions, userServiceProxyOptions } from './cache-proxy-options';
 
 export default class MainService {
     private static taskServices: Map<string, TaskService>;
@@ -35,18 +37,18 @@ export default class MainService {
         this.taskServices = new Map();
         this.taskServices.set(
             defaultKey,
-            new TaskService({
+            createCacheProxy(new TaskService({
                 sp: this.builder.getSP(defaultKey),
                 listName: properties.config.listName,
-            })
+            }), taskServiceProxyOptions(defaultKey))
         );
         properties.config.remotes.forEach((remote) =>
             this.taskServices.set(
                 remote.Name,
-                new TaskService({
+                createCacheProxy(new TaskService({
                     sp: this.builder.getSP(remote.Name),
                     listName: remote.ListTitle,
-                })
+                }), taskServiceProxyOptions(remote.Name))
             )
         );
     }
@@ -58,12 +60,12 @@ export default class MainService {
         this.userServices = new Map();
         this.userServices.set(
             defaultKey,
-            new UserService(defaultKey, properties)
+            createCacheProxy(new UserService(defaultKey, properties), userServiceProxyOptions(defaultKey))
         );
         properties.config.remotes.forEach((remote) =>
             this.userServices.set(
                 remote.Name,
-                new UserService(remote.Name, properties)
+                createCacheProxy(new UserService(remote.Name, properties), userServiceProxyOptions(remote.Name))
             )
         );
     }
