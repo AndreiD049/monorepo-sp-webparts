@@ -40,7 +40,7 @@ export function separateTaskLogs(logs: ITaskLog[], date: Date) {
     const onDate: ITaskLog[] = [];
     const inFuture: ITaskLog[] = [];
     logs.map((log) => {
-        if (DateTime.fromISO(log.Date) > dt) {
+        if (DateTime.fromISO(log.Time) > dt) {
             inFuture.push(log);
         } else {
             onDate.push(log);
