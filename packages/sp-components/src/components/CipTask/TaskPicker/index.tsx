@@ -6,7 +6,7 @@ export interface ITaskPickerProps {
     tasks?: ITaskOverview[];
     id?: string;
     placeholder?: string;
-    selectedTask: ITaskOverview | undefined;
+    selectedTask: ITaskOverview | string | undefined;
     onTaskSelected: (task: ITaskOverview) => void;
     onInputChange?: (value: string) => void;
     disabled?: boolean;
@@ -27,6 +27,14 @@ export const TaskPicker: React.FC<ITaskPickerProps> = ({
 
     const selected = React.useMemo(() => {
         if (!props.selectedTask) return [];
+        if (typeof props.selectedTask === 'string') {
+            return [
+                {
+                    key: props.selectedTask,
+                    name: props.selectedTask,
+                },
+            ];
+        }
         return [
             {
                 key: props.selectedTask.Id,

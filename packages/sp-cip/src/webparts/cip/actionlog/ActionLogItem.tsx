@@ -8,6 +8,7 @@ import {
     IAction,
 } from '@service/sp-cip/dist/services/action-service';
 import styles from './ActionLog.module.scss';
+import { getTimeLogTokens } from 'sp-components';
 
 export interface IActionLogItemProps {
     action: IAction;
@@ -64,6 +65,7 @@ export const getActionComment = (action: IAction): JSX.Element => {
         flexFlow: 'row nowrap',
         alignItems: 'center',
     };
+    const timeLogTokens = action.ActivityType === 'Time log' ? getTimeLogTokens(action.Comment) : null;
 
     switch (action.ActivityType) {
         case 'Due date':
@@ -86,14 +88,12 @@ export const getActionComment = (action: IAction): JSX.Element => {
             }
             break;
         case 'Time log':
-            if (tokens.length > 1) {
-                content = (
-                    <div>
-                        <div>{formatToken(tokens[0], action.ActivityType)}</div>
-                        <p>{tokens.slice(1).join('|')}</p>
-                    </div>
-                );
-            }
+            content = (
+                <div>
+                    <div>{formatToken(timeLogTokens.time.toString(), action.ActivityType)}</div>
+                    <p>{timeLogTokens.comment}</p>
+                </div>
+            );
             break;
         default:
             content = <span>{action.Comment}</span>;

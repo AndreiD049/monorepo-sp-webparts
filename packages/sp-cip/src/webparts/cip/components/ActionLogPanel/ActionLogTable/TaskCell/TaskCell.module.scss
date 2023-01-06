@@ -3,3 +3,12 @@
 .container {
     min-width: 1px;
 }
+
+.text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spotIcon {
+    margin-right: .5em;
+}

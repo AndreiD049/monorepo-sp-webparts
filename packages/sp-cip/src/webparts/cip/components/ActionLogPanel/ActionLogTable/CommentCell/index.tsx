@@ -8,6 +8,5 @@ export interface ICommentCellProps {
 }
 
 export const CommentCell: React.FC<ICommentCellProps> = (props) => {
-
     return <div className={styles.container}>{getActionComment(props.action)}</div>;
 };

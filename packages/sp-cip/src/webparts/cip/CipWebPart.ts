@@ -9,12 +9,11 @@ import {
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
-
 import * as strings from 'CipWebPartStrings';
 import Cip from './components/Cip';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { initNotifications, SPnotify } from 'sp-react-notifications';
-import { getListId } from './utils/getListId';
+import { ListUtilsService } from './services/list-utils';
 import { MessageBarType } from 'office-ui-fabric-react';
 import MainService from './services/main-service';
 import { IJsonConfig, PropertyPaneJsonConfiguration } from 'json-configuration';
@@ -70,7 +69,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
             MainService.InitServices('Data', this.properties);
 
             CipWebPart.baseUrl = this.context.pageContext.web.absoluteUrl;
-            this.properties.taskListId = await getListId(
+            this.properties.taskListId = await ListUtilsService.getListId(
                 this.properties.config.listName
             );
 

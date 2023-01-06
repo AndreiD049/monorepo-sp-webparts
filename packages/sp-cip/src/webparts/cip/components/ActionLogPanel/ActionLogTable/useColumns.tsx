@@ -43,7 +43,7 @@ export function useColumns(tasks: ITaskOverview[], handleEdit: (action: IAction,
                 name: 'Task',
                 onRender: (item: IAction) => (<TaskCell action={item} task={tasks.find((t) => t?.Id === item.ItemId)} />),
                 isResizable: true,
-                minWidth: 150,
+                minWidth: 250,
             },
             {
                 key: 'Comment',

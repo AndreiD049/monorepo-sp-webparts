@@ -1,8 +1,10 @@
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IAction } from '@service/sp-cip/dist/services/action-service';
-import { Link } from 'office-ui-fabric-react';
+import { Icon, Link } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getTimeLogTokens } from 'sp-components';
+import styles from './TaskCell.module.scss';
 
 export interface ITaskCellProps {
     // Props go here
@@ -18,6 +20,12 @@ export interface ITaskCellProps {
  */
 export const TaskCell: React.FC<ITaskCellProps> = (props) => {
     const navigate = useNavigate();
+    const tokens = React.useMemo(() => {
+        if (props.action.ActivityType === 'Time log') {
+            return getTimeLogTokens(props.action.Comment);
+        }
+        return null;
+    }, []);
 
     const label = React.useMemo(() => {
         if (!props.task) {
@@ -25,6 +33,10 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
         }
         return props.task.Title;
     }, [props.task]);
+
+    if (tokens && tokens.task) {
+        return <div className={styles.text}><Icon iconName='Info' title='SPOT' className={styles.spotIcon} /><span>{tokens.task}</span></div>;
+    }
 
     // Nothing to render
     if (!Boolean(props.action.ItemId)) {

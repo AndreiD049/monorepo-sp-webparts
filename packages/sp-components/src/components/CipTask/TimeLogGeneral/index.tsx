@@ -35,6 +35,34 @@ export interface ITimeLogGeneralProps {
     afterActions?: () => void;
 }
 
+export const TASK_SEPARATOR = '%SEP%';
+
+/**
+ * Get a string containing the Task comment field that contains:
+ * - The time spent on the task
+ * - (Optional) the task entered
+ * - the comment entered
+ * @param timeLogString a string of a format `4|<Task name>%SEP%<Comment>`
+ */
+export function getTimeLogTokens(timeLogString: string): { time: number, task: string, comment: string } {
+    let timeSplit = timeLogString.split('|');
+    const result: ReturnType<typeof getTimeLogTokens> = { time: 0, task: null, comment: null };
+    const time = Number.parseFloat(timeSplit[0])
+    if (timeSplit.length === 0) return result;
+    if (!Number.isNaN(time)) {
+        result.time = time;
+    }
+    if (timeSplit.length === 1) return result;
+    const taskSplit = timeSplit.slice(1).join('|').split(TASK_SEPARATOR);
+    if (taskSplit.length === 1) {
+        result.comment = taskSplit[0].trim();
+    } else {
+        result.task = taskSplit[0].trim();
+        result.comment = taskSplit[1].trim();
+    }
+    return result;
+}
+
 const setDateCurrentTime = (dt: Date): Date => {
     const now = new Date();
     dt.setHours(now.getHours());
@@ -44,7 +72,7 @@ const setDateCurrentTime = (dt: Date): Date => {
 };
 
 export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
-    const [selected, setSelected] = React.useState<ITaskOverview>(props.task);
+    const [selected, setSelected] = React.useState<ITaskOverview | string>(props.task);
     const [time, setTime] = React.useState(props.time || 0);
     const [taskPickerInput, setTaskPickerInput] = React.useState('');
     const [comment, setComment] = React.useState(props.description || '');
@@ -57,9 +85,13 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     React.useEffect(() => {
         async function checkAction(): Promise<void> {
             if (props.action) {
-                const indexPipe = props.action.Comment.indexOf('|');
-                setTime(Number.parseFloat(props.action.Comment.substring(0, indexPipe)));
-                setComment(props.action.Comment.substring(indexPipe + 1));
+                const tokens = getTimeLogTokens(props.action.Comment);
+                setTime(tokens.time);
+                setComment(tokens.comment);
+                if (tokens.task) {
+                    setTaskPickerInput(tokens.task);
+                    setSelected(tokens.task);
+                }
             }
         }
         checkAction().catch((err) => console.error(err));
@@ -67,10 +99,11 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
 
     // New action - has selected task
     const handleLogNew = async (): Promise<void> => {
+        if (typeof selected === 'string') return;
         const selId = selected?.Id || null;
         await props.onActionAdd({
             ActivityType: 'Time log',
-            Comment: `${time}|${taskPickerInput ? taskPickerInput + '\n' : ''}${comment}`,
+            Comment: `${time}|${taskPickerInput ? taskPickerInput + TASK_SEPARATOR + '\n' : ''}${comment}`,
             UserId: diffPerson ? +selectedUser[0].id : props.currentUserId,
             Date: date ? setDateCurrentTime(date).toISOString() : new Date().toISOString(),
         }, selId);
@@ -88,11 +121,11 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
             dt = setDateCurrentTime(date).toISOString();
         }
         await props.onActionEdit(props.action.Id, {
-            Comment: `${time}|${taskPickerInput ? taskPickerInput + '\n' : ''}${comment}`,
+            Comment: `${time}|${taskPickerInput ? taskPickerInput + TASK_SEPARATOR + '\n' : ''}${comment}`,
             UserId: selectedUser.length > 0 ? +selectedUser[0].id : props.action.User.Id,
             Date: dt,
         });
-        if (props.task) {
+        if (props.task && typeof props.task !== 'string') {
             const delta = Number.parseFloat(props.action.Comment.substring(0, indexOfPipe)) - time;
             props.onTaskEffectiveTimeChange(props.task.Id, -delta);
         }
