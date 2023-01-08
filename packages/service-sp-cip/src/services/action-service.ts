@@ -102,7 +102,7 @@ export class ActionService {
 
     async getActionsFromTo(dateFrom: Date, dateTo: Date): Promise<IAction[]> {
         return getAllPaged(wrap(
-            this.list.items.filter(`ListId eq '${await this.taskListId}' and Date ge '${dateODataFormat(dateFrom)}' and Date lt '${dateODataFormat(dateTo)}'`)
+            this.list.items.filter(`ListId eq '${await this.taskListId}' and Date ge '${dateODataFormat(dateFrom)}T00:00:00' and Date le '${dateODataFormat(dateTo)}T23:59:59'`)
         ));
     }
 
