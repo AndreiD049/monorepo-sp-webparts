@@ -4,12 +4,24 @@ import { ICacheDB, openDatabase } from "./db-operations";
 type PropertyOptions<T> = {
   isCached?: boolean;
   expiresIn?: number;
-  after?: (db: ICacheDB, target: T, args: any[], returnValue: any) => Promise<void>;
+  getKey?: (args: any[]) => string;
+  after?: (
+    db: ICacheDB,
+    target: T,
+    args: any[],
+    returnValue: any
+  ) => Promise<void>;
 };
 
-type ICacheProxyProperties<T> = {
-  [property in keyof T]?: PropertyOptions<T>;
-} | { [property in Exclude<string, keyof T>]: PropertyOptions<T> & { isPattern: boolean } };
+type ICacheProxyProperties<T> =
+  | {
+      [property in keyof T]?: PropertyOptions<T>;
+    }
+  | {
+      [property in Exclude<string, keyof T>]: PropertyOptions<T> & {
+        isPattern: boolean;
+      };
+    };
 
 export interface ICacheProxyOptions<T> {
   dbName: string;
@@ -48,6 +60,24 @@ function findValidPropertyOptions(
   return null;
 }
 
+function getKey(
+  property: string,
+  prefix: string,
+  propertyOption: PropertyOptions<any>,
+  args: any[]
+) {
+  let result = `${prefix}/${property}`;
+  if (propertyOption.getKey) {
+    result += propertyOption.getKey(args);
+  } else {
+    result += args.reduce(
+      (acc, current) => `${acc}/${JSON.stringify(current)}`,
+      ""
+    );
+  }
+  return result;
+}
+
 export function createCacheProxy<T extends { [k: string]: any }>(
   target: T,
   options: ICacheProxyOptions<T>
@@ -78,10 +108,7 @@ function cachedHandler<T extends { [k: string]: any }>(
     const db = await openDatabase(options.dbName, options.storeName);
 
     // Calculate the key
-    const key = `${options.prefix}/${property}${args.reduce(
-      (acc, current) => `${acc}/${JSON.stringify(current)}`,
-      ""
-    )}`;
+    const key = getKey(property, options.prefix, propertyOption, args);
 
     // See if we have any valid cache value, and return it
     const cached = await getCached(db, key);
@@ -93,10 +120,11 @@ function cachedHandler<T extends { [k: string]: any }>(
     // Get a fresh value and store it into cache, then return to the user
     const freshValue = await target[property](...args);
     if (!propertyOption.expiresIn) {
-      throw Error('\'expiresIn\' should be provided for cached properties!');
+      throw Error("'expiresIn' should be provided for cached properties!");
     }
     await setCached(db, key, freshValue, propertyOption.expiresIn);
-    propertyOption.after && propertyOption.after(db, target, args, freshValue);
+    propertyOption.after &&
+      (await propertyOption.after(db, target, args, freshValue));
     return freshValue;
   };
 }

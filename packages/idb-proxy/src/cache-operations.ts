@@ -40,6 +40,16 @@ export async function getCached<T>(db: ICacheDB, key: string): Promise<T | null>
     }
 }
 
+export async function removeExpired(db: ICacheDB): Promise<void> {
+    const keys = await getAllKeys(db);
+    for (const key of keys) {
+        const value = await get<ICachedValue<any>>(db, key);
+        if (value && isValueExpired(value)) {
+            await removeCached(db, key);
+        }
+    }
+}
+
 export async function removeCached(db: ICacheDB, key: string | RegExp): Promise<void> {
     if (typeof key === 'string') {
         // if key is a string, just remove this same key

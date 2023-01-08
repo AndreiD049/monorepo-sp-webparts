@@ -6,5 +6,6 @@ export {
   getCached,
   setCached,
   removeCached,
+  removeExpired,
   updateCached,
 } from "./cache-operations";
