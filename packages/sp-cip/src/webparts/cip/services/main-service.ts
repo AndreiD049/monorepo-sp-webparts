@@ -8,7 +8,11 @@ import SPBuilder from 'sp-preset';
 import CipWebPart, { ICipWebPartProps } from '../CipWebPart';
 import { createCacheProxy } from 'idb-proxy';
 import { UserService } from './user-service';
-import { taskServiceProxyOptions, userServiceProxyOptions } from './cache-proxy-options';
+import {
+    actionServiceProxyOptions,
+    taskServiceProxyOptions,
+    userServiceProxyOptions,
+} from './cache-proxy-options';
 
 export default class MainService {
     private static taskServices: Map<string, TaskService>;
@@ -37,18 +41,24 @@ export default class MainService {
         this.taskServices = new Map();
         this.taskServices.set(
             defaultKey,
-            createCacheProxy(new TaskService({
-                sp: this.builder.getSP(defaultKey),
-                listName: properties.config.listName,
-            }), taskServiceProxyOptions(defaultKey))
+            createCacheProxy(
+                new TaskService({
+                    sp: this.builder.getSP(defaultKey),
+                    listName: properties.config.listName,
+                }),
+                taskServiceProxyOptions(defaultKey)
+            )
         );
         properties.config.remotes.forEach((remote) =>
             this.taskServices.set(
                 remote.Name,
-                createCacheProxy(new TaskService({
-                    sp: this.builder.getSP(remote.Name),
-                    listName: remote.ListTitle,
-                }), taskServiceProxyOptions(remote.Name))
+                createCacheProxy(
+                    new TaskService({
+                        sp: this.builder.getSP(remote.Name),
+                        listName: remote.ListTitle,
+                    }),
+                    taskServiceProxyOptions(remote.Name)
+                )
             )
         );
     }
@@ -60,12 +70,18 @@ export default class MainService {
         this.userServices = new Map();
         this.userServices.set(
             defaultKey,
-            createCacheProxy(new UserService(defaultKey, properties), userServiceProxyOptions(defaultKey))
+            createCacheProxy(
+                new UserService(defaultKey, properties),
+                userServiceProxyOptions(defaultKey)
+            )
         );
         properties.config.remotes.forEach((remote) =>
             this.userServices.set(
                 remote.Name,
-                createCacheProxy(new UserService(remote.Name, properties), userServiceProxyOptions(remote.Name))
+                createCacheProxy(
+                    new UserService(remote.Name, properties),
+                    userServiceProxyOptions(remote.Name)
+                )
             )
         );
     }
@@ -102,20 +118,26 @@ export default class MainService {
         this.actionServices = new Map();
         this.actionServices.set(
             defaultKey,
-            new ActionService({
-                sp: this.builder.getSP(defaultKey),
-                listName: properties.config.commentListName,
-                taskListName: properties.config.listName,
-            })
+            createCacheProxy(
+                new ActionService({
+                    sp: this.builder.getSP(defaultKey),
+                    listName: properties.config.commentListName,
+                    taskListName: properties.config.listName,
+                }),
+                actionServiceProxyOptions(defaultKey)
+            )
         );
         properties.config.remotes.forEach((remote) =>
             this.actionServices.set(
                 remote.Name,
-                new ActionService({
-                    sp: this.builder.getSP(remote.Name),
-                    listName: properties.config.commentListName,
-                    taskListName: properties.config.listName,
-                })
+                createCacheProxy(
+                    new ActionService({
+                        sp: this.builder.getSP(remote.Name),
+                        listName: properties.config.commentListName,
+                        taskListName: properties.config.listName,
+                    }),
+                    actionServiceProxyOptions(remote.Name)
+                )
             )
         );
     }
@@ -151,11 +173,15 @@ export default class MainService {
         return this.userServices.get(tennantKey);
     }
 
-    public static getCommentService(tennantKey: string = 'Data'): CommentService {
+    public static getCommentService(
+        tennantKey: string = 'Data'
+    ): CommentService {
         return this.commentServices.get(tennantKey);
     }
 
-    public static getAttachmentService(tennantKey: string = 'Data'): AttachmentService {
+    public static getAttachmentService(
+        tennantKey: string = 'Data'
+    ): AttachmentService {
         return this.attachmentServices.get(tennantKey);
     }
 

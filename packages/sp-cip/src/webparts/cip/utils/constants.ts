@@ -30,7 +30,6 @@ export const FILTERS_ASSIGNED = 'sp-cip-filter-assigned-to';
 
 export const DB_NAME = 'SPFx_CIP';
 export const STORE_NAME = location.origin + location.pathname + `/${VERSION}`;
-export const ALL_TASKS_KEY = `allTasks/${VERSION}`;
 
 export const SELECTED_TEAM_KEY = `/sp-cip-selected-team/${VERSION}`;
 export const SELECTED_USERS_KEY = `/sp-cip-selected-users/${VERSION}`;

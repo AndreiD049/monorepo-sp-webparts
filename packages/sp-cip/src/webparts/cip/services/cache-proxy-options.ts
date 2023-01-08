@@ -1,7 +1,6 @@
 /* eslint-disable @rushstack/security/no-unsafe-regexp */
-import { TaskService } from "@service/sp-cip";
-import { ITaskOverview } from "@service/sp-cip/dist/models/ITaskOverview";
-import { ICacheProxyOptions, removeCached, updateCached } from "idb-proxy";
+import { ActionService, TaskService } from "@service/sp-cip";
+import { ICacheProxyOptions, removeCached } from "idb-proxy";
 import { DB_NAME, HOUR, MINUTE, STORE_NAME } from "../utils/constants";
 import { UserService } from "./user-service";
 
@@ -42,38 +41,6 @@ export const taskServiceProxyOptions: (remote: string) => ICacheProxyOptions<Tas
             isCached: true,
             expiresIn: 8 * HOUR,
         },
-        getAllMains: {
-            isCached: true,
-            expiresIn: 10 * MINUTE,
-        },
-        getAllOpenByCategory: {
-            isCached: true,
-            expiresIn: 10 * MINUTE,
-        },
-        getCategories: {
-            isCached: true,
-            expiresIn: HOUR,
-        },
-        getFinishedMains: {
-            isCached: true,
-            expiresIn: HOUR,
-        },
-        getNonFinishedMains: {
-            isCached: true,
-            expiresIn: HOUR,
-        },
-        getSubtasks: {
-            isCached: true,
-            expiresIn: HOUR,
-        },
-        getUserTasks: {
-            isCached: true,
-            expiresIn: HOUR,
-        },
-        getTask: {
-            isCached: true,
-            expiresIn: HOUR,
-        },
         addCategory: {
             isCached: false,
             async after(db) {
@@ -82,25 +49,59 @@ export const taskServiceProxyOptions: (remote: string) => ICacheProxyOptions<Tas
         },
         updateTask: {
             isCached: false,
-            async after(db, target, args, returnValue) {
+            async after(db, _, args) {
                 const id = +args[0];
-                const updated = await target.getTask(id);
+                await removeCached(db, /TaskService\/getAll/);
                 await removeCached(db, new RegExp(`TaskService/getTask/${id}`));
-                await removeCached(db, /TaskService.*getCategories/);
-                await updateCached(db, /TaskService\/get/, (value) => {
-                    if (Array.isArray(value)) {
-                        return value.map((v: ITaskOverview) => v.Id === id ? updated : v);
-                    }
-                    return value;
-                })
             },
         },
         'createTask|createSubtask': {
             isPattern: true,
             isCached: false,
             async after(db) {
-                await removeCached(db, /TaskService.*/);
-            },
+                await removeCached(db, /TaskService\/getAll/);
+            }
         }
     }
-})
+});
+
+export const actionLogTaskServiceProxyOptions: (remote: string) => ICacheProxyOptions<TaskService> = (remote) => ({
+    dbName: DB_NAME,
+    storeName: STORE_NAME,
+    prefix: `${remote}/TaskService`,
+    props: {
+        getTask: {
+            isCached: true,
+            expiresIn: 12 * HOUR,
+        },
+    }
+});
+
+export const actionServiceProxyOptions: (remote: string) => ICacheProxyOptions<ActionService> = (remote) => ({
+    dbName: DB_NAME,
+    storeName: STORE_NAME,
+    prefix: `${remote}/ActionService`,
+    props: {
+        getActionsFromTo: {
+            isCached: true,
+            getKey: (args) => {
+                const dateFrom: Date = args[0];
+                const dateTo: Date = args[1];
+                return `/${dateFrom?.toLocaleDateString()}-${dateTo?.toLocaleDateString()}`;
+            },
+            expiresIn: 15 * MINUTE,
+        },
+        addAction: {
+            isCached: false,
+            after: async (db) => {
+                await removeCached(db, /ActionService\/getActionsFromTo/);
+            }
+        },
+        updateAction: {
+            isCached: false,
+            after: async (db) => {
+                await removeCached(db, /ActionService\/getActionsFromTo/);
+            }
+        },
+    }
+});

@@ -24,11 +24,12 @@ export interface IActionLogPanelProps {
 
 export type ActionDropdownOption = ActionType | 'All';
 
-export const ActionLogPanel: React.FC<IActionLogPanelProps> = (props) => {
+export const ActionLogPanel: React.FC<IActionLogPanelProps> = () => {
     const [monday, sunday] = React.useMemo(() => {
         const today = new Date();
-        const mon = new Date(today.getTime() - (today.getDay() - 1) * DAY);
-        const sun = new Date(today.getTime() + (7 - today.getDay()) * DAY);
+        const day = today.getDay() === 0 ? 7 : today.getDay();
+        const mon = new Date(today.getTime() - (day - 1) * DAY);
+        const sun = new Date(today.getTime() + (7 - day) * DAY);
         return [mon, sun];
     }, []);
     const [dateFrom, setDateFrom] = React.useState(monday);

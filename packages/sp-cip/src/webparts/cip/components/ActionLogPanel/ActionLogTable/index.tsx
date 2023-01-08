@@ -1,6 +1,8 @@
 import { uniq } from '@microsoft/sp-lodash-subset';
+import { TaskService } from '@service/sp-cip';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IAction } from '@service/sp-cip/dist/services/action-service';
+import { createCacheProxy } from 'idb-proxy';
 import {
     DetailsList,
     DetailsListLayoutMode,
@@ -11,10 +13,9 @@ import {
 import * as React from 'react';
 import { showDialog } from 'sp-components';
 import { ActionDropdownOption } from '..';
+import { actionLogTaskServiceProxyOptions } from '../../../services/cache-proxy-options';
 import MainService from '../../../services/main-service';
-import {
-    DIALOG_ID_ACTIONLOG_PANEL,
-} from '../../../utils/constants';
+import { DIALOG_ID_ACTIONLOG_PANEL } from '../../../utils/constants';
 import { TimeLog } from '../../TimeLog';
 import { useColumns } from './useColumns';
 
@@ -25,8 +26,14 @@ export interface IActionLogTableProps {
     selectedUsersIds: string[];
 }
 
+const actionLogService = (): TaskService =>
+    createCacheProxy(
+        MainService.getTaskService(),
+        actionLogTaskServiceProxyOptions('Data')
+    );
+
 export const ActionLogTable: React.FC<IActionLogTableProps> = (props) => {
-    const taskService = React.useMemo(() => MainService.getTaskService(), []);
+    const taskService = React.useMemo(() => actionLogService(), []);
     const actionService = React.useMemo(
         () => MainService.getActionService(),
         []

@@ -12,8 +12,6 @@ import {
     hideDialog,
     TimeLogGeneral,
 } from 'sp-components';
-import { db } from '../../utils/db';
-import { ALL_TASKS_KEY, MINUTE } from '../../utils/constants';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
 
 export interface ITimeLogGeneralProps {
@@ -38,11 +36,7 @@ export const TimeLog: React.FC<ITimeLogGeneralProps> = (props) => {
     /** Fetch tasks */
     React.useEffect(() => {
         async function getTasks(): Promise<void> {
-            const result = await db.getCached(
-                ALL_TASKS_KEY,
-                async () => taskService.getAll(),
-                MINUTE * 5
-            );
+            const result = await taskService.getAll();
             setTasks(result);
         }
         getTasks().catch((err) => console.error(err));

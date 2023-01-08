@@ -19,21 +19,11 @@ import { getBasePath, getMovedPath, PATH_SEP } from '../../utils/path';
 import { ISearchResult } from 'sp-preset';
 import { SearchResults } from './SearchResults';
 import { NoData } from './NoData';
-import { IndexedDbCache } from 'indexeddb-manual-cache';
-import { DB_NAME, MINUTE, STORE_NAME } from '../../utils/constants';
 import styles from './AttachmentSection.module.scss';
 
 export interface IAttachmentSectionProps {
     task: ITaskOverview;
 }
-
-/** Client Database cache */
-export const db = new IndexedDbCache(DB_NAME, STORE_NAME, {
-    expiresIn: MINUTE * 10,
-});
-export const cache = {
-    searchAll: (taskId: number) => db.key(`searchAll${taskId}`),
-};
 
 export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
     const [path, setPath] = React.useState<string[]>([]);
@@ -90,14 +80,15 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
             )
         ).TotalRowsIncludingDuplicates;
 
-        const delta = results - props.task.AttachmentsCount;
-        if (delta !== 0) {
+        if (results !== props.task.AttachmentsCount) {
             // update number of attachments
-            const latest = await taskService.attachmentsUpdated(
+            await taskService.updateTask(
                 props.task.Id,
-                delta
+                {
+                    AttachmentsCount: results,
+                }
             );
-            taskUpdated(latest);
+            taskUpdated(await taskService.getTask(props.task.Id));
         }
     }, [serverRelativeUrl]);
 
@@ -115,9 +106,6 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
                 props.task.Id,
                 files.length
             );
-            await cache
-                .searchAll(props.task.Id)
-                .update<number>(() => latest.AttachmentsCount);
             taskUpdated(latest);
         } finally {
             loadingStop('details');
@@ -144,9 +132,6 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
                     props.task.Id,
                     data.files.length
                 );
-                await cache
-                    .searchAll(props.task.Id)
-                    .update<number>(() => latest.AttachmentsCount);
                 taskUpdated(latest);
             } finally {
                 loadingStop('details');
@@ -176,15 +161,6 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
                 loadingStop('details');
             }
         };
-
-    const handleDelete = React.useCallback(
-        async (file: IAttachmentFile) => {
-            await cache
-                .searchAll(props.task.Id)
-                .update<number>((prev) => prev - 1);
-        },
-        [props.task]
-    );
 
     // Create new folder
     const handleSaveNewFolder = React.useCallback(
@@ -231,7 +207,6 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
                 results={searchResults}
                 task={props.task}
                 onDelete={async (file) => {
-                    await handleDelete(file);
                     setSearchResults((prev) =>
                         prev.filter((p) => p.UniqueId !== file.UniqueId)
                     );
@@ -278,7 +253,6 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
                         task={props.task}
                         setAttachments={setAttachments}
                         folder={path.join('/')}
-                        onDelete={async (file) => handleDelete(file)}
                     />
                 ))}
             </>

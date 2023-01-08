@@ -17,8 +17,9 @@ import { ListUtilsService } from './services/list-utils';
 import { MessageBarType } from 'office-ui-fabric-react';
 import MainService from './services/main-service';
 import { IJsonConfig, PropertyPaneJsonConfiguration } from 'json-configuration';
-import { db } from './components/AttachmentSection';
 import { initializeFileTypeIcons } from '@fluentui/react-file-type-icons';
+import { openDatabase, removeExpired } from 'idb-proxy';
+import { DB_NAME, STORE_NAME } from './utils/constants';
 
 interface IConfiguration {
     rootSite: string;
@@ -74,13 +75,8 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
             );
 
             // Cleanup expired actions from past
-            const keys = await db.getAllKeys();
-            keys.forEach(async (k: string) => {
-                const expired = await db.isExpired(k);
-                if (expired) {
-                    await db.invalidateCached(k);
-                }
-            })
+            const db = await openDatabase(DB_NAME, STORE_NAME);
+            await removeExpired(db);
             
         } catch (err) {
             SPnotify({

@@ -24,7 +24,7 @@ export interface IAttachmentFileProps {
     task: ITaskOverview;
     setAttachments: React.Dispatch<React.SetStateAction<IAttachmentFile[]>>;
     folder?: string;
-    onDelete: (file: IAttachmentFile) => void;
+    onDelete?: (file: IAttachmentFile) => void;
 }
 
 const getExtension = (name: string): string => {
@@ -63,7 +63,9 @@ export const AttachmentFile: React.FC<IAttachmentFileProps> = (props) => {
                 props.task.Id,
                 -1
             );
-            props.onDelete(props.file);
+            if (props.onDelete) {
+                props.onDelete(props.file);
+            }
             taskUpdated(latest);
             loadingStop('details');
         };
