@@ -32,27 +32,6 @@ export async function ensureFutureTaskLogs(tasks: ITask[], logs: ITaskLog[], ser
 }
 
 /**
- * Separate task logs into 2 lists.
- * The ones on @Date and the ones in the future
- */
-export function separateTaskLogs(logs: ITaskLog[], date: Date) {
-    const dt = DateTime.fromJSDate(date).endOf('day');
-    const onDate: ITaskLog[] = [];
-    const inFuture: ITaskLog[] = [];
-    logs.map((log) => {
-        if (DateTime.fromISO(log.Time) > dt) {
-            inFuture.push(log);
-        } else {
-            onDate.push(log);
-        }
-    })
-    return {
-        onDate,
-        inFuture,
-    }
-}
-
-/**
  * Return the next date the task should be performed.
  */
 export function getNextLogDate(task: ITask): DateTime | null {

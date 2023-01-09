@@ -88,6 +88,10 @@ export class TaskLogsService {
         )().then((r) => (res = res.concat(r)));
     }
 
+    async getFutureTaskLogsByUserId(date: Date, userId: number): Promise<ITaskLog[]> {
+        return this._wrap(this.list.items.filter(this.getFutureTaskLogFilterSingleUser(userId, DateTime.fromJSDate(date))))();
+    }
+
     /**
      * Get single task log by id
      */
@@ -196,11 +200,15 @@ export class TaskLogsService {
      * @returns the filter to be applied on the list of task logs
      */
     private getTaskLogFilter(userId: number, dt: DateTime) {
-        return `(Date ge '${dt.toISODate()}') and ((UserId eq ${userId}) or (OriginalUserId eq ${userId}))`;
+        return `(Date eq '${dt.toISODate()}') and ((UserId eq ${userId}) or (OriginalUserId eq ${userId}))`;
     }
 
     private getTaskLogFilterSingleUser(userId: number, dt: DateTime) {
-        return `(Date ge '${dt.toISODate()}') and (UserId eq ${userId})`;
+        return `(Date eq '${dt.toISODate()}') and (UserId eq ${userId})`;
+    }
+
+    private getFutureTaskLogFilterSingleUser(userId: number, dt: DateTime) {
+        return `(Date gt '${dt.toISODate()}') and ((UserId eq ${userId}) or (OriginalUserId eq ${userId}))`;
     }
 
     /**

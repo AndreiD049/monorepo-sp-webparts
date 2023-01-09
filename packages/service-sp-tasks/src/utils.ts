@@ -142,8 +142,10 @@ export function isTaskValid(task: ITask, stats: IDateStatistics) {
                 const daySet = getWeekDaySet(task.WeeklyDays);
                 return daySet.has(stats.weekday);
             case TaskType.Monthly:
+                return task.MonthlyDay === stats.nthDay;
             case TaskType.Quarter:
-                return false;
+                const startOfQuarter = stats.dt.startOf('quarter');
+                return stats.dt.hasSame(startOfQuarter, 'day');
             default:
                 console.error(`Task type '${task.Type}' is not supported yet`);
                 return false;
