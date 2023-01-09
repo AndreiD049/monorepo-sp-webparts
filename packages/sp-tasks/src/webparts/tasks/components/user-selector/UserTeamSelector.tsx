@@ -131,7 +131,8 @@ const UserTeamSelctor: React.FC<IUserSelectorProps> = (props) => {
         if (option.selected) {
             props.setUsers([...props.users, option.data]);
         } else {
-            props.setUsers(props.users.filter((u) => u.User.ID !== option.data.User.ID));
+            const teamMembersSet: Set<number> = new Set(options.filter((o) => o.data).map((o) => o.data.ID));
+            props.setUsers(props.users.filter((u) => u.User.ID !== option.data.User.ID && teamMembersSet.has(u.User.ID)));
         }
     };
 

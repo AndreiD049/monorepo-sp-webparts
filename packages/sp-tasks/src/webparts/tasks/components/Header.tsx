@@ -16,8 +16,7 @@ export interface IHeaderProps {
     setLoading: (value: boolean) => void;
     setDate: (value: Date) => void;
     selectedUsers: IUser[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setSelectedUsers: any;
+    setSelectedUsers: React.Dispatch<React.SetStateAction<IUser[]>>;
     search: string;
     setSearch: React.Dispatch<React.SetStateAction<string>>;
 }

@@ -32,6 +32,7 @@ const Tasks: React.FC = () => {
     const [selectedUsers, setSelectedUsers] = useWebStorage<IUser[]>([], {
         key: 'selectedUsers',
     });
+
     const userIds = React.useMemo(
         () => [currentUser.User.ID, ...selectedUsers.map((u) => u.User.ID)].slice(0, maxPeople + 1),
         [selectedUsers]

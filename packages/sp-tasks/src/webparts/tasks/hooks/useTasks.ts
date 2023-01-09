@@ -5,7 +5,7 @@ import GlobalContext from '../utils/GlobalContext';
 import { selectTasks, checkTasksAndCreateTaskLogs, ensureFutureTaskLogs } from '@service/sp-tasks';
 import ITask from '@service/sp-tasks/dist/models/ITask';
 import ITaskLog from '@service/sp-tasks/dist/models/ITaskLog';
-import { separateTaskLogs } from '@service/sp-tasks';
+import { SPnotifyError } from 'sp-react-notifications';
 
 export interface ITasksResult {
     tasks: [tasks: ITask[], setTasks: React.Dispatch<React.SetStateAction<ITask[]>>];
@@ -16,15 +16,19 @@ export const UPDATE_TASK_EVENT = 'SP_TASKS_UPDATE_TASK';
 export const UPDATE_TASKLOG_EVENT = 'SP_TASKS_UPDATE_TASK_LOG';
 
 export function updateTask(task: ITask) {
-    document.dispatchEvent(new CustomEvent<ITask>(UPDATE_TASK_EVENT, {
-        detail: task,
-    }));
+    document.dispatchEvent(
+        new CustomEvent<ITask>(UPDATE_TASK_EVENT, {
+            detail: task,
+        })
+    );
 }
 
 export function updateTaskLog(tasklog: ITaskLog) {
-    document.dispatchEvent(new CustomEvent<ITaskLog>(UPDATE_TASKLOG_EVENT, {
-        detail: tasklog,
-    }));
+    document.dispatchEvent(
+        new CustomEvent<ITaskLog>(UPDATE_TASKLOG_EVENT, {
+            detail: tasklog,
+        })
+    );
 }
 
 export function useTasks(
@@ -34,7 +38,7 @@ export function useTasks(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ...deps: any[]
 ): ITasksResult {
-    const { TaskService, TaskLogsService } = React.useContext(GlobalContext);
+    const { TaskService, TaskLogsService, currentUser } = React.useContext(GlobalContext);
     const [taskLogs, setTaskLogs] = React.useState<ITaskLog[]>([]);
     const [tasks, setTasks] = React.useState<ITask[]>([]);
     const isSameDay = React.useMemo(
@@ -47,32 +51,41 @@ export function useTasks(
      */
     React.useEffect(() => {
         async function run() {
-            // Select only valid tasks on that day
-            const allTasks = await TaskService.getTasksByMultipleUserIds(userIds, date);
-            const selectedTasks = selectTasks(allTasks, date);
-            let logs: ITaskLog[] = [];
-            if (isSameDay) {
-                const allLogs = await TaskLogsService.getTaskLogsByUserIds(date, userIds);
-                const separated = separateTaskLogs(allLogs, date);
-                ensureFutureTaskLogs(allTasks, separated.inFuture, TaskLogsService);
-                logs = separated.onDate;
-                const newTasks = await checkTasksAndCreateTaskLogs(
-                    selectedTasks,
-                    logs,
-                    date,
-                    TaskLogsService
-                );
-                logs = logs.concat(newTasks);
-                setTaskLogs(uniqBy(logs, (l) => l.ID));
-            } else {
-                const allLogs = await TaskLogsService.getTaskLogsByUserIds(date, userIds);
-                const separated = separateTaskLogs(allLogs, date);
-                logs = separated.onDate;
-                setTaskLogs(uniqBy(logs, (l) => l.ID));
+            try {
+                // Select only valid tasks on that day
+                const allTasks = await TaskService.getTasksByMultipleUserIds(userIds, date);
+                const selectedTasks = selectTasks(allTasks, date);
+                let logs: ITaskLog[] = [];
+                if (isSameDay) {
+                    logs = await TaskLogsService.getTaskLogsByUserIds(date, userIds);
+                    // Get the task logs from the future and create monhtly or quarterly tasks that are missing
+                    const futureLogs = await TaskLogsService.getFutureTaskLogsByUserId(
+                        date,
+                        currentUser.User.ID
+                    );
+                    await ensureFutureTaskLogs(
+                        allTasks.filter((t) => t.AssignedTo.ID === currentUser.User.ID),
+                        futureLogs,
+                        TaskLogsService
+                    );
+                    const newTasks = await checkTasksAndCreateTaskLogs(
+                        selectedTasks,
+                        logs,
+                        date,
+                        TaskLogsService
+                    );
+                    logs = logs.concat(newTasks);
+                    setTaskLogs(uniqBy(logs, (l) => l.ID));
+                } else {
+                    logs = await TaskLogsService.getTaskLogsByUserIds(date, userIds);
+                    setTaskLogs(uniqBy(logs, (l) => l.ID));
+                }
+                const logSet = new Set(logs.map((log) => log.Task.ID));
+                setTasks(selectedTasks.filter((task) => !logSet.has(task.ID)));
+                setLoading(false);
+            } catch (err) {
+                SPnotifyError(err);
             }
-            const logSet = new Set(logs.map((log) => log.Task.ID));
-            setTasks(selectedTasks.filter((task) => !logSet.has(task.ID)));
-            setLoading(false);
         }
         run();
     }, [date, userIds, ...deps]);
@@ -88,7 +101,7 @@ export function useTasks(
             setTasks((prev) => {
                 const taskPresent = prev.find((t) => t.ID === task.ID);
                 if (taskPresent) {
-                    return prev.map((t) => t.ID !== task.ID ? t : task);
+                    return prev.map((t) => (t.ID !== task.ID ? t : task));
                 }
                 return prev.concat(task);
             });
@@ -107,7 +120,7 @@ export function useTasks(
             setTaskLogs((prev) => {
                 const logPresent = prev.find((t) => t.ID === tasklog.ID);
                 if (logPresent) {
-                    return prev.map((t) => t.ID !== tasklog.ID ? t : tasklog);
+                    return prev.map((t) => (t.ID !== tasklog.ID ? t : tasklog));
                 }
                 return prev.concat(tasklog);
             });
