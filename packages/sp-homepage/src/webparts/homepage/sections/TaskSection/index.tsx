@@ -5,7 +5,6 @@ import {
     selectTasks,
     checkTasksAndCreateTaskLogs,
     TaskLogsService,
-    separateTaskLogs,
     ensureFutureTaskLogs,
 } from '@service/sp-tasks';
 import HomepageWebPart from '../../HomepageWebPart';
@@ -75,10 +74,9 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
                 .getTasks(selectedUser.Id)
                 .get(() => taskService.getTasksByUserId(selectedUser.Id, new Date()));
             const date = new Date();
-            const allLogs = await logService.getTaskLogsByUserId(date, selectedUser.Id);
-            const separated = separateTaskLogs(allLogs, date);
-            await ensureFutureTaskLogs(tasks, separated.inFuture, logService);
-            const logs = separated.onDate;
+            const logs = await logService.getTaskLogsByUserId(date, selectedUser.Id);
+            const futureLogs = await logService.getFutureTaskLogsByUserId(date, selectedUser.Id);
+            await ensureFutureTaskLogs(tasks, futureLogs, logService);
             const selected = selectTasks(tasks, new Date());
             const created = await checkTasksAndCreateTaskLogs(
                 selected,
