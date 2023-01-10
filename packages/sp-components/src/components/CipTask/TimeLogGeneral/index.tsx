@@ -44,10 +44,14 @@ export const TASK_SEPARATOR = '%SEP%';
  * - the comment entered
  * @param timeLogString a string of a format `4|<Task name>%SEP%<Comment>`
  */
-export function getTimeLogTokens(timeLogString: string): { time: number, task: string, comment: string } {
+export function getTimeLogTokens(timeLogString: string): {
+    time: number;
+    task: string;
+    comment: string;
+} {
     let timeSplit = timeLogString.split('|');
     const result: ReturnType<typeof getTimeLogTokens> = { time: 0, task: null, comment: null };
-    const time = Number.parseFloat(timeSplit[0])
+    const time = Number.parseFloat(timeSplit[0]);
     if (timeSplit.length === 0) return result;
     if (!Number.isNaN(time)) {
         result.time = time;
@@ -80,7 +84,7 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
     const [diffDate, setDiffDate] = React.useState(false);
     const [date, setDate] = React.useState<Date>(null);
     const [diffPerson, setDiffPerson] = React.useState(false);
-    const [selectedUser, setSelectedUser] = React.useState<IPersonaProps[]>([]);
+    const [selectedUsers, setSelectedUsers] = React.useState<IPersonaProps[]>([]);
 
     React.useEffect(() => {
         async function checkAction(): Promise<void> {
@@ -97,18 +101,36 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
         checkAction().catch((err) => console.error(err));
     }, [props.action]);
 
+    const addNewActionToUser = React.useCallback(
+        async (userId: number, selectedTaskId: number | null) => {
+            await props.onActionAdd(
+                {
+                    ActivityType: 'Time log',
+                    Comment: `${time}|${
+                        taskPickerInput ? taskPickerInput + TASK_SEPARATOR + '\n' : ''
+                    }${comment}`,
+                    UserId: userId,
+                    Date: date ? setDateCurrentTime(date).toISOString() : new Date().toISOString(),
+                },
+                selectedTaskId
+            );
+            if (selectedTaskId) {
+                await props.onTaskEffectiveTimeChange(selectedTaskId, time);
+            }
+        },
+        [time, date, selected, taskPickerInput, comment]
+    );
+
     // New action - has selected task
     const handleLogNew = async (): Promise<void> => {
         if (typeof selected === 'string') return;
-        const selId = selected?.Id || null;
-        await props.onActionAdd({
-            ActivityType: 'Time log',
-            Comment: `${time}|${taskPickerInput ? taskPickerInput + TASK_SEPARATOR + '\n' : ''}${comment}`,
-            UserId: diffPerson ? +selectedUser[0].id : props.currentUserId,
-            Date: date ? setDateCurrentTime(date).toISOString() : new Date().toISOString(),
-        }, selId);
-        if (selId) {
-            props.onTaskEffectiveTimeChange(selId, time);
+        const selectedTaskId = selected?.Id || null;
+        if (diffPerson && selectedUsers.length > 0) {
+            for (const user of selectedUsers) {
+                await addNewActionToUser(+user.id, selectedTaskId);
+            }
+        } else {
+            await addNewActionToUser(props.currentUserId, selectedTaskId);
         }
     };
 
@@ -121,8 +143,10 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
             dt = setDateCurrentTime(date).toISOString();
         }
         await props.onActionEdit(props.action.Id, {
-            Comment: `${time}|${taskPickerInput ? taskPickerInput + TASK_SEPARATOR + '\n' : ''}${comment}`,
-            UserId: selectedUser.length > 0 ? +selectedUser[0].id : props.action.User.Id,
+            Comment: `${time}|${
+                taskPickerInput ? taskPickerInput + TASK_SEPARATOR + '\n' : ''
+            }${comment}`,
+            UserId: selectedUsers.length > 0 ? +selectedUsers[0].id : props.action.User.Id,
             Date: dt,
         });
         if (props.task && typeof props.task !== 'string') {
@@ -249,16 +273,22 @@ export const TimeLogGeneral: React.FC<ITimeLogGeneralProps> = (props) => {
                 {diffPerson && (
                     <CompactPeoplePicker
                         className={styles.diffBlockInput}
-                        itemLimit={1}
+                        itemLimit={props.action ? 1 : 20}
                         inputProps={{ id: 'ResponsiblePicker' }}
-                        onResolveSuggestions={(filter: string) =>
-                            props.users.filter((u) =>
-                                u.text.toLowerCase().includes(filter.toLowerCase())
-                            )
-                        }
-                        onEmptyResolveSuggestions={() => props.users}
-                        selectedItems={selectedUser}
-                        onChange={(items) => setSelectedUser(items)}
+                        onResolveSuggestions={(filter: string, selected: IPersonaProps[]) => {
+                            const selectedSet = new Set(selected.map((s) => s.id));
+                            return props.users.filter(
+                                (u) =>
+                                    !selectedSet.has(u.id) &&
+                                    u.text.toLowerCase().includes(filter.toLowerCase())
+                            );
+                        }}
+                        onEmptyResolveSuggestions={(selected) => {
+                            const selectedSet = new Set(selected.map((s) => s.id));
+                            return props.users.filter((u) => !selectedSet.has(u.id));
+                        }}
+                        selectedItems={selectedUsers}
+                        onChange={(items) => setSelectedUsers(items)}
                     />
                 )}
             </div>
