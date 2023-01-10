@@ -1,8 +1,5 @@
 import { DateTime } from 'luxon';
-import {
-    IDropdownOption,
-    MessageBarType,
-} from 'office-ui-fabric-react';
+import { IDropdownOption, MessageBarType } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { FC } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
@@ -28,6 +25,7 @@ export interface ITaskProps {
 const Task: FC<ITaskProps> = (props) => {
     const { TaskLogsService, canEditOthers, currentUser } = React.useContext(GlobalContext);
     const [expired, setExpired] = React.useState<boolean>(false);
+    const [disabled, setDisabled] = React.useState(false);
     const [isHovering, setIsHovering] = React.useState<boolean>(false);
 
     const info: ITaskInfo = React.useMemo(() => {
@@ -83,6 +81,20 @@ const Task: FC<ITaskProps> = (props) => {
         const timer = setInterval(checkExpired, MINUTE);
         return () => clearInterval(timer);
     }, [info, props.task]);
+
+    /**
+     * Check tasks from previous days, if 
+     */
+    React.useEffect(() => {
+        const now = DateTime.now();
+        const dt = DateTime.fromJSDate(props.date).set({ hour: now.hour, minute: now.minute, second: now.second });
+        const duration = dt.diffNow('days');
+        if (duration.days <= -2) {
+            setDisabled(true);
+        } else {
+            setDisabled(false);
+        }
+    }, [props.date]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleChange = async (_: any, option: IDropdownOption) => {
@@ -148,6 +160,7 @@ const Task: FC<ITaskProps> = (props) => {
                         isHovering={isHovering}
                         onChange={handleChange}
                         theme={TasksWebPart.theme}
+                        disabled={disabled}
                         TaskPersona={
                             <TaskPersona
                                 title={info.user.Title}

@@ -77,6 +77,7 @@ export interface ITaskProps {
     className?: string;
     style?: React.CSSProperties;
     theme?: IReadonlyTheme;
+    disabled?: boolean;
 }
 
 export const Task: React.FC<ITaskProps> = ({
@@ -86,6 +87,7 @@ export const Task: React.FC<ITaskProps> = ({
     currentUserId,
     className = '',
     style = {},
+    disabled = false,
     ...props
 }) => {
     const [open, setOpen] = React.useState<boolean>(false);
@@ -99,6 +101,14 @@ export const Task: React.FC<ITaskProps> = ({
         if (!open) return null;
         return <TaskBody remark={info.remark} description={info.description} />;
     }, [open]);
+
+    const isDisabled = React.useMemo(() => {
+        if (disabled) return disabled;
+        if (info.user.ID === currentUserId) {
+            return false;
+        }
+        return !props.canEditOthers;
+    }, [disabled, info, currentUserId]);
 
     return (
         <div
@@ -167,7 +177,7 @@ export const Task: React.FC<ITaskProps> = ({
                             ? props.onChange
                             : () => null
                     }
-                    disabled={info.user.ID === currentUserId ? false : !props.canEditOthers}
+                    disabled={isDisabled}
                 />
             </div>
             {info.description || info.remark ? (
