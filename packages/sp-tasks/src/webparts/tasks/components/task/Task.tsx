@@ -58,16 +58,19 @@ const Task: FC<ITaskProps> = (props) => {
         };
     }, [props.task]);
 
+    const time = React.useMemo(() => {
+        const dt = isTask(props.task)
+            ? DateTime.fromJSDate(props.date)
+            : DateTime.fromISO(props.task.Time);
+        return DateTime.fromISO(info.time).set({
+            day: dt.day,
+            month: dt.month,
+            year: dt.year,
+        });
+    }, [props.task, props.date, info]);
+
     React.useEffect(() => {
         function checkExpired() {
-            const dt = isTask(props.task)
-                ? DateTime.fromJSDate(props.date)
-                : DateTime.fromISO(props.task.Time);
-            const time = DateTime.fromISO(info.time).set({
-                day: dt.day,
-                month: dt.month,
-                year: dt.year,
-            });
             if (info.status !== 'Open') {
                 return setExpired(false);
             }
@@ -80,19 +83,17 @@ const Task: FC<ITaskProps> = (props) => {
         checkExpired();
         const timer = setInterval(checkExpired, MINUTE);
         return () => clearInterval(timer);
-    }, [info, props.task]);
+    }, [info, props.task, time]);
 
     /**
-     * Check tasks from previous days, if 
+     * Check tasks from previous days, if
+     * Number of hours since deadline is more than 15 hours, make it disabled
      */
     React.useEffect(() => {
-        const now = DateTime.now();
-        const dt = DateTime.fromJSDate(props.date).set({ hour: now.hour, minute: now.minute, second: now.second });
-        const duration = dt.diffNow('days');
-        if (duration.days <= -2) {
-            setDisabled(true);
-        } else {
-            setDisabled(false);
+        const dt = DateTime.fromJSDate(props.date);
+        if (dt < DateTime.now().startOf('day')) {
+            const duration = time.diffNow('hours');
+            setDisabled(duration.hours < -15);
         }
     }, [props.date]);
 
