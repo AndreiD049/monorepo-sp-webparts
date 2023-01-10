@@ -2,6 +2,7 @@ import ITaskLog from '../models/ITaskLog';
 import { DateTime } from 'luxon';
 import ITask from '../models/ITask';
 import { SPFI, IList, IItemAddResult, IItems } from 'sp-preset';
+import { changeDateTo } from '../utils';
 
 const LOG_SELECT = [
     'ID',
@@ -166,7 +167,7 @@ export class TaskLogsService {
 
     private castTaskToTaskLog(task: ITask, date: Date): Partial<ITaskLog> {
         const dt = DateTime.fromJSDate(date);
-        const time = DateTime.fromISO(task.Time).toUTC();
+        const time = changeDateTo(task.Time, date).toUTC();
         const dateString = dt.toISODate();
         const dateTime = DateTime.utc(dt.year, dt.month, dt.day, time.hour, time.minute, 0);
         return {
