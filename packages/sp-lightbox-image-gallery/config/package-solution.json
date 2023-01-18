@@ -2,11 +2,40 @@
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
     "name": "sp-image-gallery",
+    "developer": {
+      "name": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "websiteUrl": "",
+      "mpnId": "Undefined-1.15.0"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "spfx-lightbox-image-gallery description"
+      },
+      "longDescription": {
+        "default": "spfx-lightbox-image-gallery description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
     "id": "a7d34cfc-bc45-4910-9ec5-3e2ca97a5d28",
     "version": "1.0.0.7",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
-    "isDomainIsolated": false
+    "isDomainIsolated": false,
+    "features": [
+      {
+        "title": "spfx-lightbox-image-gallery LightboxImageGalleryWebPart Feature",
+        "description": "The feature that activates LightboxImageGalleryWebPart from the spfx-lightbox-image-gallery solution.",
+        "id": "4ed6a8a4-0d88-4c94-b969-70a87fd2abf9",
+        "version": "1.0.0.7",
+        "componentIds": [
+          "4ed6a8a4-0d88-4c94-b969-70a87fd2abf9"
+        ]
+      }
+    ]
   },
   "paths": {
     "zippedPackage": "solution/spfx-image-gallery.sppkg"

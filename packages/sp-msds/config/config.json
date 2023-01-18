@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "msds-form-form-customizer": {
+      "components": [
+        {
+          "entrypoint": "./lib/extensions/msdsForm/MsdsFormFormCustomizer.js",
+          "manifest": "./src/extensions/msdsForm/MsdsFormFormCustomizer.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "MsdsFormFormCustomizerStrings": "lib/extensions/msdsForm/loc/{locale}.js"
+  }
+}

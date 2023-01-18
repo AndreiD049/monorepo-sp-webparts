@@ -32,3 +32,5 @@ obj
 *.scss.ts
 
 release*.scss.d.ts
+
+.heft

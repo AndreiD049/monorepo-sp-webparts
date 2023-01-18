@@ -1,4 +1,3 @@
-import { ITextField } from '@microsoft/office-ui-fabric-react-bundle';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IconButton, TextField } from 'office-ui-fabric-react';
 import * as React from 'react';
@@ -13,7 +12,7 @@ export interface INewFolderProps {
 
 export const NewFolder: React.FC<INewFolderProps> = (props) => {
     const [folderName, setFolderName] = React.useState('');
-    const ref = React.useRef<ITextField>(null);
+    const ref = React.useRef(null);
 
     React.useEffect(() => {
         ref.current.focus();
