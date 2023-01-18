@@ -25,7 +25,7 @@ export const TaskCell: React.FC<ITaskCellProps> = (props) => {
             return getTimeLogTokens(props.action.Comment);
         }
         return null;
-    }, []);
+    }, [props.action]);
 
     const label = React.useMemo(() => {
         if (!props.task) {

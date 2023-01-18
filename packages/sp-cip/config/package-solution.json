@@ -3,7 +3,7 @@
   "solution": {
     "name": "sp-cip-client-side-solution",
     "id": "891d1fa3-3c22-4fce-ae0a-2268c0616094",
-    "version": "1.0.4.7",
+    "version": "1.0.4.8",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
