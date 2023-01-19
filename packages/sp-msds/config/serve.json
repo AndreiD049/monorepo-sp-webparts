@@ -4,13 +4,14 @@
   "https": true,
   "serveConfigurations": {
     "default": {
-      "pageUrl": "https://devadmintools.sharepoint.com/sites/Admin-tools/_layouts/15/SPListForm.aspx",
+      "pageUrl": "https://devadmintools.sharepoint.com/sites/BSG/_layouts/15/SPListForm.aspx",
       "formCustomizer": {
         "componentId": "a7fdea8a-6086-4094-b22e-04981e1cdbd6",
         "PageType": 8,
-        "RootFolder": "/sites/Admin-tools/Lists/Trainings",
+        "RootFolder": "/sites/BSG/Lists/Web application form",
         "properties": {
-          "sampleText": "Value"
+          "rootSite": "https://devadmintools.sharepoint.com/sites/BSG",
+          "customerListName": "Customers"
         }
       }
     },
