@@ -12,19 +12,10 @@
 .msdsRow {
   display: flex;
   flex-flow: row wrap;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: flex-start;
 }
 
 .msdsGap1 {
   gap: 2em;
-}
-
-.msdsFormButtons {
-  padding: 3em 0;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: flex-start;
-  gap: .5em;
 }

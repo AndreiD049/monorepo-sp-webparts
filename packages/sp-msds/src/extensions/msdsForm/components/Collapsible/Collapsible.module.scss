@@ -1,0 +1,29 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    min-width: 1px;
+}
+
+.headerText {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    cursor: pointer;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    user-select: none;
+}
+
+.headerCollapseIcon {
+    margin-left: .5em;
+}
+
+.more {
+    background-color: '[theme: neutralLighter, default: #f4f4f4]';
+    cursor: pointer;
+    font-size: 1.2em;
+    font-weight: bold;
+    display: inline-block;
+    padding: 8px 32px;
+    border-radius: 15%;
+}

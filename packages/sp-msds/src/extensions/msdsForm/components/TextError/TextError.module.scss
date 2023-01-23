@@ -1,0 +1,32 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+@keyframes reveal {
+    0% {
+        opacity: 0;
+    };
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes transform {
+    0% {
+        transform: translate3d(0px, -20px, 0px);
+        pointer-events: none;
+    };
+    100% {
+        transform: translate3d(0px, 0px, 0px);
+        pointer-events: auto;
+    }
+}
+
+.container {
+    animation-name: reveal, transform;
+    animation-duration: 0.367s;
+    animation-timing-function: cubic-bezier(0.1, 0.9, 0.2, 1);
+    animation-fill-mode: both;
+    padding-top: 5px;
+    font-size: 12px;
+    font-weight: 400;
+    color: rgb(164, 38, 44);
+}

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { IDatabase, LookupService, LookupServiceCached } from "../services/lookup-service";
+import { IDatabase, LookupService } from "../services/lookup-service";
 import { ITagWithData, LookupOptions } from "./types";
 
 export function useDatabases(site: string | undefined): LookupOptions<IDatabase> {
@@ -7,16 +7,16 @@ export function useDatabases(site: string | undefined): LookupOptions<IDatabase>
     const dbTags: ITagWithData<IDatabase>[] = React.useMemo(() => {
         return dbs.map((db) => ({
             name: db.Title,
-            key: db.Title,
+            key: db.Id,
             data: db,
         }));
     }, [dbs]);
 
     React.useEffect(() => {
         async function run(): Promise<void> {
-            if (!site) {
-                setDbs(await LookupServiceCached.getAllDatabases());
-            } else {
+            if (!site && dbs.length === 0) {
+                setDbs([]);
+            } else if (site) {
                 setDbs(await LookupService.getDatabases(site));
             }
         }

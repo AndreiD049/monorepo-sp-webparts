@@ -3,7 +3,7 @@
   "solution": {
     "name": "sp-msds-client-side-solution",
     "id": "9c3f7981-3be9-4388-a723-e947b2cf35cd",
-    "version": "1.0.0.0",
+    "version": "1.0.0.2",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,

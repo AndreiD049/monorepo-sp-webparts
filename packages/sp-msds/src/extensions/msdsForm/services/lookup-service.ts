@@ -9,6 +9,7 @@ export interface ICustomer {
 }
 
 export interface IDatabase {
+    Id: number;
     Title: string;
 }
 
@@ -18,7 +19,7 @@ export class LookupService {
     private static customerList: IList;
     private static databaseList: IList;
 
-    public static initService(sp: SPFI): void {
+    public static InitService(sp: SPFI): void {
         this.sp = sp;
         this.applicationList = this.sp.web.lists.getByTitle("Web application form");
         this.customerList = this.sp.web.lists.getByTitle("Customers");
@@ -34,11 +35,11 @@ export class LookupService {
     }
 
     public static async getAllDatabases(): Promise<IDatabase[]> {
-        return this.databaseList.items.select('Title')();
+        return this.databaseList.items.select('Id,Title')();
     }
 
     public static async getDatabases(site: string): Promise<IDatabase[]> {
-        return this.databaseList.items.filter(`Sites eq '${site}'`).select('Title')();
+        return this.databaseList.items.filter(`Sites eq '${site}'`).select('Id,Title')();
     }
 
     public static async getAllSites(): Promise<string[]> {

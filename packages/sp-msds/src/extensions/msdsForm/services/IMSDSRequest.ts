@@ -1,4 +1,5 @@
 export interface IMSDSRequest {
+    Id: number;
     Site: string;
 
     Database: string;
@@ -29,7 +30,7 @@ export interface IMSDSRequest {
     Urgency: string;
     StorageManipApproved: boolean;
     ProductType: string;
-    ForbidenForBulk: boolean;
+    ForbiddenForBulk: boolean;
     BulkDensity: number;
     ManipNotAllowed: boolean;
     ProductRemarks: string;
