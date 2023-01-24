@@ -16,6 +16,7 @@ import '@pnp/sp/views';
 import '@pnp/sp/comments';
 import '@pnp/sp/sputilities';
 import '@pnp/sp/search';
+import '@pnp/sp/attachments';
 import RPMController from './controller';
 import {
     ThrottlingDetector,
@@ -230,3 +231,13 @@ export {
     IInvitationCreationResult,
     ISharingInformationRequest
 } from '@pnp/sp/sharing';
+
+export {
+    Attachment,
+    Attachments,
+    IAttachment,
+    IAttachmentAddResult,
+    IAttachmentFileInfo,
+    IAttachmentInfo,
+    IAttachments
+} from '@pnp/sp/attachments';

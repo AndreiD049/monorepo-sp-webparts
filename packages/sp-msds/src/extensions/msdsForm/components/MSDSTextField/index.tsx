@@ -46,7 +46,9 @@ export const MSDSTextField: React.FC<IMSDSTextFieldProps> = (props) => {
                     <TextField
                         id={props.id}
                         {...props.fieldProps}
-                        {...field}
+                        onChange={(_ev, newValue) => field.onChange(newValue)}
+                        onBlur={field.onBlur}
+                        value={field.value}
                         disabled={props.rules?.disabled}
                         componentRef={field.ref}
                         errorMessage={

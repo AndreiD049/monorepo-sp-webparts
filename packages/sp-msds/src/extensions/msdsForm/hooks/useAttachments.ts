@@ -12,9 +12,11 @@ export function useAttachments(itemId: number): IAttachmentInfo[] {
     const [attachments, setAttachments] = React.useState<IAttachmentInfo[]>([]);
 
     React.useEffect(() => {
-        ItemService.getAttachments(itemId)
-            .then((att) => setAttachments(att))
-            .catch((err) => console.error(err));
+        if (itemId) {
+            ItemService.getAttachments(itemId)
+                .then((att) => setAttachments(att))
+                .catch((err) => console.error(err));
+        }
     }, [itemId, reload]);
 
     React.useEffect(() => {

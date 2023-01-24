@@ -41,10 +41,13 @@ export const MsdsTagPickerField: React.FC<IMsdsTagPickerFieldProps> = (
                 control={props.control}
                 rules={props.rules}
                 render={({ field, fieldState }) => {
-                    let selected: ITag[] = [];
-                    if (field.value) {
-                        selected = props.tags.filter((tag) => tag.key === field.value);
-                    }
+                    const selected = React.useMemo(() => {
+                        if (field.value) {
+                            return props.tags.filter((tag) => tag.key === field.value);
+                        }
+                        return [];
+                    }, [field.value, props.tags]);
+
                     return (
                         <>
                             <TagPicker
