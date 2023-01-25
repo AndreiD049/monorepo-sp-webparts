@@ -1,15 +1,5 @@
 # Login to the site
-Connect-PnPOnline "https://devadmintools.sharepoint.com/sites/BSG/" -Interactive
-
-$whListName = "Warehouse type"
-$warehouseTypeList = Get-PnPList -Identity "Lists/$whListName"
-
-# Create list if not created already
-if ($null -eq $warehouseTypeList) {
-    $warehouseTypeList = New-PnPList -Title $whListName -Template GenericList
-
-    Add-PnPField -List $warehouseTypeList -DisplayName "Description" -InternalName "Description" -Type Text -AddToDefaultView
-}
+Connect-PnPOnline "https://katoennatie.sharepoint.com/teams/MSDS-MaterialSafetyDataSheets" -Interactive
 
 $customerListName = "Customers";
 $customersList = Get-PnPList -Identity "Lists/$customerListName";

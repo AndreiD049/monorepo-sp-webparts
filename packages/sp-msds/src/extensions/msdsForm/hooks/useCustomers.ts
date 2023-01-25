@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ICustomer, LookupServiceCached } from '../services/lookup-service';
 import { ITagWithData, LookupOptions } from './types';
 
-export function useCustomers(): LookupOptions<ICustomer> {
+export function useCustomers(selectedId?: number): LookupOptions<ICustomer> {
     const [customers, setCustomers] = React.useState<ICustomer[]>([]);
     const customerTags: ITagWithData<ICustomer>[] = React.useMemo(() => {
         return customers.map((c) => ({
@@ -14,7 +14,11 @@ export function useCustomers(): LookupOptions<ICustomer> {
 
     React.useEffect(() => {
         async function run(): Promise<void> {
-            setCustomers(await LookupServiceCached.getAllCustomers());
+            const first = await LookupServiceCached.getAllCustomers()
+            if (selectedId) {
+                first.push(await LookupServiceCached.getCustomer(selectedId));
+            }
+            setCustomers(first);
         }
         run().catch((err) => console.error(err));
     }, []);

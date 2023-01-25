@@ -6,7 +6,7 @@ import { MSDSCheckbox } from './MSDSCheckbox';
 import { MSDSDatePicker } from './MSDSDatePicker';
 import { MSDSTextField } from './MSDSTextField';
 import { CustomsCodeField } from './CustomsCodeField';
-import { LookupService } from '../services/lookup-service';
+import { LookupService, LookupServiceCached } from '../services/lookup-service';
 import { MsdsTagPickerField } from './MsdsTagPickerField';
 import { useCustomers } from '../hooks/useCustomers';
 import { useDatabases } from '../hooks/useDatabases';
@@ -65,7 +65,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
 
     const site = watch('Site');
     const field = useFields(site);
-    const customers = useCustomers();
+    const customers = useCustomers(props.item?.CustomerNameId);
     const databases = useDatabases(site);
     const sites = useSites();
     const materialTypes = useMaterialTypes();
@@ -169,12 +169,11 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
                         />
                     </div>
 
-                    <div className="width-15p">
+                    <div className="width-20p">
                         <MSDSCheckbox
                             id="HasMsds"
                             label="3.Do you have an (European) msds? / Not older than 3 years"
                             title="EU format (16 sections - mention of EU norms / guidelines) / Max 3 years old"
-                            style={{ maxWidth: '250px' }}
                             control={control}
                             rules={{ disabled: field.HasMsds === 'Disabled' }}
                         />
@@ -219,14 +218,25 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
                             title="to be updated"
                             tags={customers.tags}
                             handleFilter={async (filter) => {
-                                const customers =
+                                const customerItems =
                                     await LookupService.getCustomerFilter(
                                         filter
                                     );
-                                return customers.map((c) => ({
+                                return customerItems.map((c) => ({
                                     name: c.Title,
                                     key: c.Id,
                                 }));
+                            }}
+                            handleSelect={async (tag) => {
+                                if (tag) {
+                                    const customer = await LookupServiceCached.getCustomer(+tag.key);
+                                    customers.set((prev) => {
+                                        if (!prev.find((c) => c.Id === customer.Id)) {
+                                            return [...prev, customer];
+                                        }
+                                        return prev;
+                                    });
+                                }
                             }}
                             control={control}
                             rules={{
@@ -236,7 +246,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
                         />
                     </div>
 
-                    <div className="width-15p">
+                    <div className="width-20p">
                         <MSDSTextField
                             id="ProductName"
                             label="7.Product name to create in Plato"
@@ -312,7 +322,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
                         />
                     </div>
 
-                    <div className="width-15p">
+                    <div className="width-20p">
                         <MsdsTagPickerField
                             id="Color"
                             label="11.What is the color of the product?"
@@ -375,7 +385,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
                         />
                     </div>
 
-                    <div className="width-15p">
+                    <div className="width-20p">
                         <MSDSCheckbox
                             id="SiloOperations"
                             label="15.SILO OPERATION OPERATION NEEDED?"
@@ -433,7 +443,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
                         />
                     </div>
 
-                    <div className="width-15p">
+                    <div className="width-20p">
                         <MSDSCheckbox
                             id="ForbiddenMixedSites"
                             label="19.Forbidden mixed production site in silo?"
@@ -564,7 +574,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
                         />
                     </div>
 
-                    <div className="width-15p">
+                    <div className="width-20p">
                         <MSDSCheckbox
                             id="ForbiddenForBulk"
                             label="3.Forbidden for bulk?"
@@ -621,7 +631,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
                         />
                     </div>
 
-                    <div className="width-15p">
+                    <div className="width-20p">
                         <MSDSTextField
                             id="SafetyRemarks"
                             label="7.SAFETY REMARKS Printed on each order."
@@ -686,7 +696,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
                         />
                     </div>
 
-                    <div className="width-15p">
+                    <div className="width-20p">
                         <MSDSCheckbox
                             id="NitrogenCoverage"
                             label="11.Nitrogen coverage"

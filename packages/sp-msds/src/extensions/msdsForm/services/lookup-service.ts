@@ -26,6 +26,10 @@ export class LookupService {
         this.databaseList = this.sp.web.lists.getByTitle("Databases");
     }     
 
+    public static async getCustomer(id: number): Promise<ICustomer> {
+        return this.customerList.items.getById(id).select("Id,Title,Name")();
+    }
+
     public static async getAllCustomers(top: number = 300): Promise<ICustomer[]> {
         return this.customerList.items.select("Id,Title,Name").top(top)();
     }
@@ -72,7 +76,7 @@ export const LookupServiceCached = createCacheProxy(LookupService, {
     storeName: STORE_NAME,
     prefix: 'LookupService',
     props: {
-        'getAllCustomers|getAllDatabases|getAllSites|getAllFormShapes|getAllColors|getAllWarehouseTypes|getAllHazardousGoodsCode': {
+        'getAllCustomers|getCustomer|getAllDatabases|getAllSites|getAllFormShapes|getAllColors|getAllWarehouseTypes|getAllHazardousGoodsCode': {
             isCached: true,
             expiresIn: HOUR * 8,
             isPattern: true,
