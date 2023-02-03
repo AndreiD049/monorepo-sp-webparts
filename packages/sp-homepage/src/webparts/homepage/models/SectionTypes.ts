@@ -1,1 +1,1 @@
-export type SectionTypes = "Appraisals" | "Tasks" | "Cip" | "Calendar" | "UserInfo" | "Dev";
+export type SectionTypes = "Appraisals" | "Tasks" | "Cip" | "Calendar" | "UserInfo" | "Dev" | "Manuals";

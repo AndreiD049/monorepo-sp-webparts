@@ -1,8 +1,16 @@
 {
   "@microsoft/generator-sharepoint": {
+    "version": "1.16.1",
+    "nodeVersion": "14.18.3",
+    "sdkVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.4.1"
+    },
+    "engines": {
+      "node": ">=16.13.0 <17.0.0"
+    },
     "plusBeta": false,
     "isCreatingSolution": true,
-    "version": "1.15.2",
     "libraryName": "json-configuration",
     "libraryId": "f1b9f13c-2a71-4dc4-9896-c48bfd87f2a9",
     "environment": "spo",
