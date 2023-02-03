@@ -32,6 +32,7 @@ export interface IMSDSRequest {
     ProductType: string;
     ForbiddenForBulk: boolean;
     BulkDensity: number;
+    MeasuredBulkDensity: boolean;
     ManipNotAllowed: boolean;
     ProductRemarks: string;
     SafetyRemarks: string;
@@ -42,4 +43,5 @@ export interface IMSDSRequest {
     ClientRequirementsFnF: boolean;
     MOC: string;
     ExtraCheckNeeded: boolean;
+    IsApprovalNeeded: boolean;
 }

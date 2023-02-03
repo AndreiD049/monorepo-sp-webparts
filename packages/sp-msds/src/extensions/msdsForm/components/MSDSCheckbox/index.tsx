@@ -10,6 +10,7 @@ export interface IMSDSCheckboxProps extends MSDSFormProps {
     label: string;
     title?: string;
     style?: React.CSSProperties;
+    icon?: JSX.Element;
 }
 
 export const MSDSCheckbox: React.FC<IMSDSCheckboxProps> = (props) => {
@@ -19,8 +20,19 @@ export const MSDSCheckbox: React.FC<IMSDSCheckboxProps> = (props) => {
             title={props.title}
             style={props.style}
         >
-            <Label htmlFor={props.id}>
-                <Icon iconName="TaskManager" style={{ marginRight: '.3em' }} />{' '}
+            <Label
+                className={
+                    props.icon ? 'platoRequiredLabel labelFlex' : 'labelFlex'
+                }
+                required={Boolean(props.rules?.required)}
+                htmlFor={props.id}
+            >
+                {props.icon || (
+                    <Icon
+                        iconName="TaskManager"
+                        style={{ marginRight: '.3em' }}
+                    />
+                )}{' '}
                 <span>{props.label}</span>
             </Label>
             <div className={styles.checkboxRow}>
@@ -34,6 +46,7 @@ export const MSDSCheckbox: React.FC<IMSDSCheckboxProps> = (props) => {
                                 {...field}
                                 checked={field.value}
                                 disabled={props.rules?.disabled}
+                                className={field.value ? styles.checkboxChecked : styles.checkboxUnhecked}
                             />
                             <Text variant="medium">
                                 {field.value ? ' - Yes' : ' - No'}

@@ -15,6 +15,7 @@ export interface IMsdsTagPickerFieldProps extends MSDSFormProps {
     className?: string;
     handleFilter: (filter: string) => Promise<ITag[]>;
     handleSelect?: (tag: ITag) => void;
+    icon?: JSX.Element;
 }
 
 export const MsdsTagPickerField: React.FC<IMsdsTagPickerFieldProps> = (
@@ -33,8 +34,19 @@ export const MsdsTagPickerField: React.FC<IMsdsTagPickerFieldProps> = (
             title={props.title}
             style={props.style}
         >
-            <Label required={Boolean(props.rules?.required)} htmlFor={props.id}>
-                <Icon iconName="MultiSelect" style={{ marginRight: '.3em' }} />{' '}
+            <Label
+                className={
+                    props.icon ? 'platoRequiredLabel labelFlex' : 'labelFlex'
+                }
+                required={Boolean(props.rules?.required)}
+                htmlFor={props.id}
+            >
+                {props.icon || (
+                    <Icon
+                        iconName="MultiSelect"
+                        style={{ marginRight: '.3em' }}
+                    />
+                )}{' '}
                 <span>{props.label}</span>
             </Label>
             <Controller
@@ -44,9 +56,9 @@ export const MsdsTagPickerField: React.FC<IMsdsTagPickerFieldProps> = (
                 render={({ field, fieldState }) => {
                     const selected = React.useMemo(() => {
                         if (field.value) {
-                            return props.tags.filter(
-                                (tag) => tag.key === field.value
-                            );
+                            return props.tags
+                                .filter((tag) => tag.key === field.value)
+                                .slice(0, 1);
                         }
                         return [];
                     }, [field.value, props.tags]);
@@ -58,6 +70,11 @@ export const MsdsTagPickerField: React.FC<IMsdsTagPickerFieldProps> = (
                                 onResolveSuggestions={(filter, selected) =>
                                     handleFilter(filter)
                                 }
+                                styles={{
+                                    text: {
+                                        backgroundColor: '#ffffff',
+                                    },
+                                }}
                                 ref={field.ref}
                                 itemLimit={1}
                                 selectedItems={selected}

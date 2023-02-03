@@ -35,3 +35,21 @@ $breakpoint: 768px;
         width: 25%;
     }
 }
+
+.backgroundPrimaryColor {
+    background-color: "[theme: themePrimary, default: #a4262c]";
+}
+
+.backgroundPrimaryFill {
+    fill: "[theme: themePrimary, default: #a4262c]";
+}
+
+.labelFlex {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+}
+
+.platoRequiredLabel {
+    font-weight: bold;
+}

@@ -16,13 +16,18 @@ export interface ICustomsCodeFieldProps extends MSDSFormProps {
     title?: string;
     fieldProps?: IMaskedTextFieldProps;
     style?: React.CSSProperties;
+    icon?: JSX.Element;
 }
 
 export const CustomsCodeField: React.FC<ICustomsCodeFieldProps> = (props) => {
     return (
         <div title={props.title} className={styles.container} style={props.style}>
-            <Label htmlFor={props.id} required={Boolean(props.rules?.required)}>
-                <Icon iconName="NumberField" style={{ marginRight: '.3em' }} />{' '}
+            <Label className={props.icon ? 'platoRequiredLabel labelFlex' : 'labelFlex'} required={Boolean(props.rules?.required)} htmlFor={props.id}>
+                {
+                    props.icon || (
+                        <Icon iconName="NumberField" style={{ marginRight: '.3em' }} />
+                    )
+                }{' '}
                 <span>{props.label}</span>
             </Label>
             <Controller 

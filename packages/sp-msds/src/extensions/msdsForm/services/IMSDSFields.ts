@@ -29,6 +29,7 @@ export interface IMSDSFields {
     ProductType: FieldChoices;
     ForbiddenForBulk: FieldChoices;
     BulkDensity: FieldChoices;
+    MeasuredBulkDensity: FieldChoices;
     ManipNotAllowed: FieldChoices;
     ProductRemarks: FieldChoices;
     SafetyRemarks: FieldChoices;

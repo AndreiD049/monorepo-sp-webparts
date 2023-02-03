@@ -21,7 +21,7 @@ import { FieldService } from './services/field-service';
 export interface IMsdsFormFormCustomizerProperties {
     // This is an example; replace with your own property
     rootSite: string;
-    customerListName?: string;
+    approverListName: string;
 }
 
 const LOG_SOURCE: string = 'MsdsFormFormCustomizer';
@@ -48,7 +48,7 @@ export default class MsdsFormFormCustomizer extends BaseFormCustomizer<IMsdsForm
                     UserAgent: `NONISV|Katoen Natie|MSDS/1.0`,
                 }),
             ]);
-        LookupService.InitService(MsdsFormFormCustomizer.SPBuilder.getSP());
+        LookupService.InitService(MsdsFormFormCustomizer.SPBuilder.getSP(), this.properties);
         ItemService.InitService(MsdsFormFormCustomizer.SPBuilder.getSP());
         FieldService.InitService(MsdsFormFormCustomizer.SPBuilder.getSP());
 

@@ -25,6 +25,7 @@ export interface IMSDSTextFieldProps extends MSDSFormProps {
     title?: string;
     fieldProps?: ITextFieldProps;
     style?: React.CSSProperties;
+    icon?: JSX.Element;
 }
 
 export const MSDSTextField: React.FC<IMSDSTextFieldProps> = (props) => {
@@ -34,8 +35,12 @@ export const MSDSTextField: React.FC<IMSDSTextFieldProps> = (props) => {
             className={styles.container}
             style={props.style}
         >
-            <Label htmlFor={props.id} required={Boolean(props.rules?.required)}>
-                <Icon iconName="TextField" style={{ marginRight: '.3em' }} />{' '}
+            <Label className={props.icon ? 'platoRequiredLabel labelFlex' : 'labelFlex'} required={Boolean(props.rules?.required)} htmlFor={props.id}>
+                {
+                    props.icon || (
+                        <Icon iconName="TextField" style={{ marginRight: '.3em' }} />
+                    )
+                }{' '}
                 <span>{props.label}</span>
             </Label>
             <Controller

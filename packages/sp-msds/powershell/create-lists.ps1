@@ -1,5 +1,5 @@
 # Login to the site
-Connect-PnPOnline "https://katoennatie.sharepoint.com/teams/MSDS-MaterialSafetyDataSheets" -Interactive
+Connect-PnPOnline "https://devadmintools.sharepoint.com/sites/BSG" -Interactive
 
 $customerListName = "Customers";
 $customersList = Get-PnPList -Identity "Lists/$customerListName";
@@ -89,6 +89,8 @@ if ($created) {
     Add-PnPField -List $newList -DisplayName "Forbidden for bulk" -InternalName "ForbiddenForBulk" -Type Boolean -AddToDefaultView
     # Bulk density
     Add-PnPField -List $newList -DisplayName "Bulk density Plato" -InternalName "BulkDensity" -Type Number -AddToDefaultView
+    # Measured bulk density
+    Add-PnPField -List $newList -DisplayName "Measured bulk density" -InternalName "MeasuredBulkDensity" -Type Boolean -AddToDefaultView
     # Manipulation not allowed
     Add-PnPField -List $newList -DisplayName "Manipulation (change) not allowed" -InternalName "ManipNotAllowed" -Type Boolean -AddToDefaultView
     # Product remarks
@@ -109,6 +111,8 @@ if ($created) {
     Add-PnPField -List $newList -DisplayName "MOC Management of change" -InternalName "MOC" -Type Text -AddToDefaultView
     # Extra check needed
     Add-PnPField -List $newList -DisplayName "Extra check needed by quality in Plato ? Approver product will activate PM in Plato!" -InternalName "ExtraCheckNeeded" -Type Boolean -AddToDefaultView
+    # 
+    Add-PnPField -List $newList -DisplayName "IsApprovalNeeded" -InternalName "IsApprovalNeeded" -Type Boolean
 }
 
 #############################################################
@@ -182,7 +186,9 @@ if ($created) {
     Add-PnPField -List $newList -DisplayName "Forbidden for bulk" -InternalName "ForbiddenForBulk" -Type Choice -AddToDefaultView -Choices "Hidden", "Disabled"
     # Bulk density
     Add-PnPField -List $newList -DisplayName "Bulk density Plato" -InternalName "BulkDensity" -Type Choice -AddToDefaultView -Choices "Hidden", "Disabled"
-    # Manipulation not allowed
+    # Measured bulk density
+    Add-PnPField -List $newList -DisplayName "Measured bulk density" -InternalName "MeasuredBulkDensity" -Type Choice -AddToDefaultView -Choices "Hidden", "Disabled"
+    # Manipulation not allowedBulkDensity
     Add-PnPField -List $newList -DisplayName "Manipulation (change) not allowed" -InternalName "ManipNotAllowed" -Type Choice -AddToDefaultView -Choices "Hidden", "Disabled"
     # Product remarks
     Add-PnPField -List $newList -DisplayName "Product remarks" -InternalName "ProductRemarks" -Type Choice -AddToDefaultView -Choices "Hidden", "Disabled"

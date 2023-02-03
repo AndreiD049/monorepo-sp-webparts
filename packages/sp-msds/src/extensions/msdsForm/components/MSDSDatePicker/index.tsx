@@ -17,13 +17,18 @@ export interface IMSDSDatePickerProps extends MSDSFormProps {
     title?: string;
     pickerProps?: IDatePickerProps;
     style?: React.CSSProperties;
+    icon?: JSX.Element;
 }
 
 export const MSDSDatePicker: React.FC<IMSDSDatePickerProps> = (props) => {
     return (
         <div title={props.title} style={props.style}>
-            <Label htmlFor={props.id} required={Boolean(props.rules?.required)}>
-                <Icon iconName="Calendar" style={{ marginRight: '.3em' }} />{' '}
+            <Label className={props.icon ? 'platoRequiredLabel labelFlex' : 'labelFlex'} required={Boolean(props.rules?.required)} htmlFor={props.id}>
+                {
+                    props.icon || (
+                        <Icon iconName="Calendar" style={{ marginRight: '.3em' }} />
+                    )
+                }{' '}
                 <span>{props.label}</span>
             </Label>
             <Controller

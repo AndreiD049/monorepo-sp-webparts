@@ -16,6 +16,7 @@ export interface IMSDSSpinButtonProps extends MSDSFormProps {
     title?: string;
     fieldProps?: ISpinButtonProps;
     style?: React.CSSProperties;
+    icon?: JSX.Element;
 }
 
 const STEP = 0.001;
@@ -55,8 +56,19 @@ export const MSDSSpinButton: React.FC<IMSDSSpinButtonProps> = (props) => {
             className={styles.container}
             style={props.style}
         >
-            <Label htmlFor={props.id}>
-                <Icon iconName="TextField" style={{ marginRight: '.3em' }} />{' '}
+            <Label
+                className={
+                    props.icon ? 'platoRequiredLabel labelFlex' : 'labelFlex'
+                }
+                required={Boolean(props.rules?.required)}
+                htmlFor={props.id}
+            >
+                {props.icon || (
+                    <Icon
+                        iconName="TextField"
+                        style={{ marginRight: '.3em' }}
+                    />
+                )}{' '}
                 <span>{props.label}</span>
             </Label>
             <Controller
