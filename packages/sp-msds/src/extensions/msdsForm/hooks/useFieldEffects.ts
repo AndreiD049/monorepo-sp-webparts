@@ -35,6 +35,7 @@ export function useFieldEffects(
             'ForbiddenMixedSites',
             'DedicatedFlexiblesValves',
         ];
+        if (oper === undefined) return;
         if (!oper) {
             setDisabled((prev) => [...prev, ...fields]);
             fields.forEach((field) =>
@@ -69,6 +70,7 @@ export function useFieldEffects(
     });
 
     useSingleFieldEffect(forbiddenForBulk, (forbidden) => {
+        if (forbidden === undefined) return;
         if (forbidden) {
             setValue('SiloOperations', false);
             setValue('BulkDensity', 0);
@@ -103,7 +105,8 @@ export function useFieldEffects(
     });
 
     useSingleFieldEffect(packedOperations, (packed) => {
-        if (!packed) {
+        if (packed === undefined) return;
+        if (packed === false) {
             setDisabled((prev) => [...prev, 'WarehouseType']);
             setValue('WarehouseType', '');
         } else {

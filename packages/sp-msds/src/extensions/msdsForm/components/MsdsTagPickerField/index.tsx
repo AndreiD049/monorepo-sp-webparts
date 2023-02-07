@@ -73,6 +73,7 @@ export const MsdsTagPickerField: React.FC<IMsdsTagPickerFieldProps> = (
                                 styles={{
                                     text: {
                                         backgroundColor: '#ffffff',
+                                        minWidth: 'auto',
                                     },
                                 }}
                                 ref={field.ref}

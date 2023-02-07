@@ -1,24 +1,47 @@
+$breakpoint: 768px;
+
 .formContainer {
-  background-color: "[theme:neutralLighterAlt, default:#f8f8f8]";
+    background-color: '[theme:neutralLighterAlt, default:#f8f8f8]';
 }
 
 .msdsForm {
-  padding: 0.5rem;
-  padding-left: 2.5em;
+    padding: 0.5rem;
+    padding-left: 2.5em;
+    min-height: 60vh;
+	& > div:first-child {
+		@media (min-width: $breakpoint) {
+			display: flex;
+			flex-flow: row nowrap;
+			align-items: stretch;
+			justify-content: flex-start;
+		}
+	}
+
+	& > div > div:first-child {
+		flex-basis: 80%;
+	}
+}
+
+.commentSection {
+    flex-basis: 20%;
+
+    @media (max-width: $breakpoint) {
+		margin-top: 1em;
+	}
 }
 
 .headerText {
-  color: #ffffff;
-  text-transform: uppercase;
+    color: #ffffff;
+    text-transform: uppercase;
 }
 
 .msdsRow {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: flex-start;
-  justify-content: flex-start;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
 
 .msdsGap1 {
-  gap: 2em;
+    gap: 2em;
 }

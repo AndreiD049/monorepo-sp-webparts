@@ -1,0 +1,6 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    border-left: 1px solid "[theme: neutralQuaternaryAlt, default: #f4f4f4]";
+    padding-left: 1em;
+}

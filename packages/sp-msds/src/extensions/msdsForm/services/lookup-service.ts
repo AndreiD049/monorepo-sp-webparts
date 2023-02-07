@@ -118,6 +118,10 @@ export class LookupService {
             .select('HSEQresponsable/Id,HSEQresponsable/Title,HSEQresponsable/EMail,Location')
             .expand('HSEQresponsable')();
     }
+
+    public static async getSiteUsers(): Promise<ISiteUserInfo[]> {
+        return this.sp.web.siteUsers();
+    }
 }
 
 export const LookupServiceCached = createCacheProxy(LookupService, {
@@ -125,10 +129,10 @@ export const LookupServiceCached = createCacheProxy(LookupService, {
     storeName: STORE_NAME,
     prefix: 'LookupService',
     props: {
-        'getCurrentUser|getAllCustomers|getCustomer|getAllDatabases|getAllSites|getAllFormShapes|getAllColors|getAllWarehouseTypes|getAllHazardousGoodsCode':
+        'getSiteUsers|getCurrentUser|getAllCustomers|getCustomer|getAllDatabases|getAllSites|getAllFormShapes|getAllColors|getAllWarehouseTypes|getAllHazardousGoodsCode':
             {
                 isCached: true,
-                expiresIn: HOUR * 8,
+                expiresIn: HOUR,
                 isPattern: true,
             },
     },
