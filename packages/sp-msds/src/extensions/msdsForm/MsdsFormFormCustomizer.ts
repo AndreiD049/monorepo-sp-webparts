@@ -22,6 +22,7 @@ export interface IMsdsFormFormCustomizerProperties {
     // This is an example; replace with your own property
     rootSite: string;
     approverListName: string;
+    CommentSection?: React.FC;
 }
 
 const LOG_SOURCE: string = 'MsdsFormFormCustomizer';
@@ -48,14 +49,24 @@ export default class MsdsFormFormCustomizer extends BaseFormCustomizer<IMsdsForm
                     UserAgent: `NONISV|Katoen Natie|MSDS/1.0`,
                 }),
             ]);
-        LookupService.InitService(MsdsFormFormCustomizer.SPBuilder.getSP(), this.properties);
+        LookupService.InitService(
+            MsdsFormFormCustomizer.SPBuilder.getSP(),
+            this.properties
+        );
         ItemService.InitService(MsdsFormFormCustomizer.SPBuilder.getSP());
         FieldService.InitService(MsdsFormFormCustomizer.SPBuilder.getSP());
 
         if (this.displayMode !== FormDisplayMode.New) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          this._etag = JSON.parse((this.context.item as any )["@odata.etag"])
-          this._item = this.context.item as unknown as IMSDSRequest;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            this._etag = JSON.parse((this.context.item as any)['@odata.etag']);
+            this._item = this.context.item as unknown as IMSDSRequest;
+            // Import the comment section chunk only if it's Edit or Display mode
+            await import(
+                /* webpackChunkName: 'CommentSection' */
+                './components/CommentSection'
+            ).then((module) => {
+                this.properties.CommentSection = module.CommentSection;
+            });
         }
         return Promise.resolve();
     }
@@ -69,6 +80,7 @@ export default class MsdsFormFormCustomizer extends BaseFormCustomizer<IMsdsForm
             onClose: this._onClose,
             item: this._item,
             etag: this._etag,
+            CommentSection: this.properties.CommentSection
         } as IMsdsFormProps);
 
         ReactDOM.render(msdsForm, this.domElement);

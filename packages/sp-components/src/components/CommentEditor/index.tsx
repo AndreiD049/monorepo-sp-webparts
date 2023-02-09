@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { Mention } from '@tiptap/extension-mention';
-import { ISiteUserInfo } from 'sp-preset';
+import { ICommentInfo, ISiteUserInfo } from 'sp-preset';
 import Suggestion from './suggestion';
-import { Callout } from 'sp-components';
 import StarterKit from '@tiptap/starter-kit';
 import { IconButton } from 'office-ui-fabric-react';
 import styles from './CommentEditor.module.scss';
+import { Callout } from '../Callout';
 
 interface IComment {
-    mentions: ISiteUserInfo[];
+    mentions: ICommentInfo['mentions'];
     text: string;
 }
 
@@ -20,11 +20,28 @@ export interface ICommendEditorProps {
 
 export const CALLOUT_ID = 'spfx/Suggestion';
 
+export function getMentionsFromHtml(
+    html: string,
+    users: ISiteUserInfo[]
+): ICommentInfo['mentions'] {
+    const d = document.createElement('div');
+    d.innerHTML = html;
+    const mentionStrings = Array.from(
+        d.querySelectorAll(`.${styles.mention}`)
+    ).map((m) => m.textContent.replace('@', ''));
+    const mentions = users.filter((u) => mentionStrings.indexOf(u.Title) > -1);
+    return mentions.map((m) => ({
+        loginName: m.Email,
+        email: m.Email,
+        name: m.Title,
+    })) as ICommentInfo['mentions'];
+}
+
 export const CommentEditor: React.FC<ICommendEditorProps> = (props) => {
     const editorRef = React.useRef(null);
     const [comment, setComment] = React.useState<IComment>({
         text: '',
-        mentions: [],
+        mentions: null,
     });
     const [empty, setEmpty] = React.useState(true);
     const suggestion = React.useRef(Suggestion.setUsers(props.users));
@@ -61,20 +78,14 @@ export const CommentEditor: React.FC<ICommendEditorProps> = (props) => {
             content: '',
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onUpdate: (innerProps) => {
-                const d = document.createElement('div');
-                d.innerHTML = innerProps.editor.getHTML();
-                const mentionStrings = Array.from(
-                    d.querySelectorAll(`.${styles.mention}`)
-                ).map((m) => m.textContent.replace('@', ''));
-                const mentions = props.users.filter(
-                    (u) => mentionStrings.indexOf(u.Title) > -1
-                );
-                console.log(mentions);
                 const text = innerProps.editor.getText();
-                setEmpty(text === '');
-                setComment((prev) => ({
+                setEmpty(text.trim() === '');
+                setComment(() => ({
                     text,
-                    mentions,
+                    mentions: getMentionsFromHtml(
+                        innerProps.editor.getHTML(),
+                        props.users
+                    ),
                 }));
             },
         },
@@ -91,9 +102,11 @@ export const CommentEditor: React.FC<ICommendEditorProps> = (props) => {
                         title="Add comment"
                         iconProps={{ iconName: 'Send' }}
                         onClick={() => {
-                            props.onAddComment(comment);
-                            editor.commands.clearContent();
-                            setEmpty(true);
+                            if (!empty) {
+                                props.onAddComment(comment);
+                                editor.commands.clearContent();
+                                setEmpty(true);
+                            }
                         }}
                     />
                 </div>

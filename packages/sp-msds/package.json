@@ -1,6 +1,6 @@
 {
   "name": "sp-msds",
-  "version": "0.0.28",
+  "version": "0.0.40",
   "private": true,
   "engines": {
     "node": ">=16.13.0 <17.0.0"
@@ -19,18 +19,12 @@
     "@microsoft/sp-lodash-subset": "1.16.1",
     "@microsoft/sp-office-ui-fabric-core": "1.16.1",
     "@service/sp-cip": "^1.0.0",
-    "@tiptap/extension-mention": "^2.0.0-beta.212",
-    "@tiptap/pm": "^2.0.0-beta.212",
-    "@tiptap/react": "^2.0.0-beta.212",
-    "@tiptap/starter-kit": "^2.0.0-beta.212",
-    "@tiptap/suggestion": "^2.0.0-beta.212",
     "idb-proxy": "^1.0.0",
     "office-ui-fabric-react": "^7.199.1",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-hook-form": "^7.42.1",
     "sp-components": "^1.0.0",
-    "tippy.js": "^6.3.7",
     "tslib": "2.3.1"
   },
   "devDependencies": {
@@ -44,10 +38,12 @@
     "@types/react-dom": "17.0.17",
     "@types/webpack-env": "~1.15.2",
     "ajv": "^6.12.5",
+    "duplicate-package-checker-webpack-plugin": "^3.0.0",
     "eslint-plugin-react-hooks": "4.3.0",
     "gulp": "4.0.2",
     "sp-preset": "^2.0.20",
     "spfx-fast-serve-helpers": "~1.16.0",
-    "typescript": "4.5.5"
+    "typescript": "4.5.5",
+    "webpack-bundle-analyzer": "^4.7.0"
   }
 }

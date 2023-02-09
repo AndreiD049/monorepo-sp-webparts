@@ -27,7 +27,7 @@ export function useFieldEffects(
     const siloOperations = watch('SiloOperations');
     const packedOperations = watch('PackedOperations');
 
-    useSingleFieldEffect(siloOperations, (oper) => {
+    useSingleFieldEffect(siloOperations, (siloOperations) => {
         const fields: (keyof IMSDSRequest)[] = [
             'MeltingPoint',
             'Abrasive',
@@ -35,9 +35,9 @@ export function useFieldEffects(
             'ForbiddenMixedSites',
             'DedicatedFlexiblesValves',
         ];
-        if (oper === undefined) return;
-        if (!oper) {
+        if (!siloOperations) {
             setDisabled((prev) => [...prev, ...fields]);
+            if (siloOperations === undefined) return;
             fields.forEach((field) =>
                 setValue(field, typeof watch(field) === 'string' ? '' : false)
             );
@@ -70,7 +70,6 @@ export function useFieldEffects(
     });
 
     useSingleFieldEffect(forbiddenForBulk, (forbidden) => {
-        if (forbidden === undefined) return;
         if (forbidden) {
             setValue('SiloOperations', false);
             setValue('BulkDensity', 0);
@@ -89,6 +88,7 @@ export function useFieldEffects(
             setDisabled((prev) => {
                 return prev.filter((val) => !exclude.has(val));
             });
+            if (forbidden === undefined) return;
             if (productRemarks) {
                 setValue(
                     'ProductRemarks',
@@ -105,9 +105,9 @@ export function useFieldEffects(
     });
 
     useSingleFieldEffect(packedOperations, (packed) => {
-        if (packed === undefined) return;
         if (packed === false) {
             setDisabled((prev) => [...prev, 'WarehouseType']);
+            if (packed === undefined) return;
             setValue('WarehouseType', '');
         } else {
             setDisabled((prev) => {

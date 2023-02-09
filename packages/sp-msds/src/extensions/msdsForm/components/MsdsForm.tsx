@@ -40,7 +40,7 @@ import { useCurrentUser } from '../hooks/useCurrentUser';
 import { Logo } from './Logo';
 import KTNLogo from './KTNLogo';
 import styles from './MsdsForm.module.scss';
-import { CommentSection } from './CommentSection';
+import { ICommentSectionProps } from './CommentSection';
 
 export interface IMsdsFormProps {
     context: FormCustomizerContext;
@@ -49,9 +49,10 @@ export interface IMsdsFormProps {
     onClose: () => void;
     item?: IMSDSRequest;
     etag?: string;
+    CommentSection?: React.FC<ICommentSectionProps>;
 }
 
-export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
+export const MsdsForm: React.FC<IMsdsFormProps> = ({ CommentSection, ...props }) => {
     const [collapsedBlocks, setCollapsedBlocks] = React.useState({
         applicant: true,
         approver: props.displayMode === FormDisplayMode.New ? false : true,
@@ -71,6 +72,8 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
         },
         values: props.item || {},
     });
+
+    console.log(props.item);
 
     const site = watch('Site');
     const field = useFields(site);
@@ -185,7 +188,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
                 onSubmit={handleSubmit(CreateOrSave)}
             >
                 <div>
-                    <div>
+                    <div className={styles.padLeft}>
                         <div
                             style={{
                                 display: 'flex',
@@ -238,7 +241,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
 
                                 <div className="width-25p">
                                     <MsdsTagPickerField
-                                        id="DatabaseId"
+                                        id="Database"
                                         label="2.Database"
                                         title="Application where SITE can be found"
                                         tags={databases.tags}
@@ -394,6 +397,10 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
                                             disabled:
                                                 field.ProductName ===
                                                 'Disabled',
+                                            maxLength: {
+                                                value: 35,
+                                                message: 'PLATO cannot handle product names longer than 35 characters',
+                                            }
                                         }}
                                         icon={
                                             <Logo
@@ -768,6 +775,10 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
                                             disabled:
                                                 field.DescriptionOnLabel ===
                                                 'Disabled',
+                                            maxLength: {
+                                                value: 35,
+                                                message: 'Description on label can be 35 characters max',
+                                            }
                                         }}
                                         icon={
                                             <Logo
@@ -1213,15 +1224,21 @@ export const MsdsForm: React.FC<IMsdsFormProps> = (props: IMsdsFormProps) => {
                                 </div>
                             </div>
                         </Collapsible>
+                        <Buttons
+                            displayMode={props.displayMode}
+                            onClose={props.onClose}
+                            onSave={props.onSave}
+                        />
                     </div>
-                    <CommentSection className={styles.commentSection} />
+                    {
+                        CommentSection &&
+                        <CommentSection
+                            className={styles.commentSection}
+                            item={props.item}
+                            currentUser={currentUser}
+                        />
+                    }
                 </div>
-
-                <Buttons
-                    displayMode={props.displayMode}
-                    onClose={props.onClose}
-                    onSave={props.onSave}
-                />
             </form>
         </div>
     );

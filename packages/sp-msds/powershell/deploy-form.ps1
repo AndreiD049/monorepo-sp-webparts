@@ -1,5 +1,5 @@
 # Login to the site
-Connect-PnPOnline "https://katoennatie.sharepoint.com/teams/MSDS-MaterialSafetyDataSheets" -Interactive
+Connect-PnPOnline "https://devadmintools.sharepoint.com/sites/BSG" -Interactive
 $list = Get-PnPList -Identity "Lists/Web application form"
 $contentType = Get-PnPContentType -List $list -Identity "Item"
 

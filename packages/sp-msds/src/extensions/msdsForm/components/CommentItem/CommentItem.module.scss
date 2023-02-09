@@ -1,0 +1,26 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    position: relative;
+    padding: 14px 16px;
+    width: calc(100% - 32px);
+    background-color: "[theme: white, default: #ffffff]";
+    margin: 8px 0;
+}
+
+.commentText {
+    margin: 6px 0;
+    white-space: pre-line;
+    line-height: 12px;
+}
+
+.deleteIcon {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    color: "[theme: neutralSecondary, default: #666666 ]";
+
+    &:hover {
+        color: "[theme: neutralPrimary, default: #333333 ]";
+    }
+}

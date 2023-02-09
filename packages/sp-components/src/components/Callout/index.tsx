@@ -16,10 +16,24 @@ export const showCallout = (props: Omit<ICalloutEventProps, 'visible'>) => {
             detail: {
                 ...props,
                 visible: true,
-            }
+            },
         })
     );
-}
+};
+
+export const updateCalloutContent = (id: string, content: JSX.Element) => {
+    document.dispatchEvent(
+        new CustomEvent<{ id: string; content: JSX.Element }>(
+            `${EVENT_PREFIX}/${id}/content`,
+            {
+                detail: {
+                    id,
+                    content,
+                },
+            }
+        )
+    );
+};
 
 export const hideCallout = (id: string) => {
     document.dispatchEvent(
@@ -31,10 +45,10 @@ export const hideCallout = (id: string) => {
                 content: null,
                 visible: false,
                 id,
-            }
+            },
         })
     );
-}
+};
 
 export interface ISPCalloutProps {
     id: string;
@@ -46,7 +60,7 @@ export const Callout: React.FC<ISPCalloutProps> = (props) => {
         target: null,
         directionalHint: DirectionalHint.bottomCenter,
     });
-    const [renderComponent, setRenderComponent] = React.useState<JSX.Element>(null);
+    const [renderComponent, setRenderComponent] = React.useState<JSX.Element >(null);
     const [visible, setVisible] = React.useState(false);
 
     React.useEffect(() => {
@@ -57,17 +71,25 @@ export const Callout: React.FC<ISPCalloutProps> = (props) => {
                 setVisible(evt.detail.visible);
             }
         }
+        function contentChangeHandler(
+            evt: CustomEvent<{ id: string; content: JSX.Element }>
+        ) {
+            if (evt.detail.id === props.id) {
+                setRenderComponent(evt.detail.content);
+            }
+        }
         document.addEventListener(eventName, visibilityHandler);
-        return () => document.removeEventListener(eventName, visibilityHandler);
+        document.addEventListener(`${eventName}/content`, contentChangeHandler);
+        return () => {
+            document.removeEventListener(eventName, visibilityHandler);
+            document.removeEventListener(`${eventName}/content`, contentChangeHandler);
+        };
     }, []);
 
     if (!visible) return null;
 
     return (
-        <FluentCallout
-            {...calloutProps}
-            onDismiss={() => hideCallout(props.id)}
-        >
+        <FluentCallout {...calloutProps} onDismiss={() => hideCallout(props.id)}>
             {renderComponent}
         </FluentCallout>
     );

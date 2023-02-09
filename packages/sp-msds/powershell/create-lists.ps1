@@ -10,14 +10,16 @@ if ($null -eq $customersList) {
     Add-PnPField -List $customersList -DisplayName "Name" -InternalName "Name" -Type Text -AddToDefaultView
 }
 
-$databaseListName = "Databases";
-$databasesList = Get-PnPList -Identity "Lists/$databaseListName";
+$contactListName = "Contact person Petrochemicals";
+$contactList = Get-PnPList -Identity "Lists/$contactListName";
 # Create list if not created already
-if ($null -eq $databasesList) {
-    $databasesList = New-PnPList -Title $databaseListName -Template GenericList
+if ($null -eq $contactList) {
+    $contactList = New-PnPList -Title $contactListName -Template GenericList
 
-    Add-PnPField -List $databasesList -DisplayName "Sites" -InternalName "Sites" -Type Choice -AddToDefaultView -Choices "119", "CAR353", "ELC353", "FELUY", "HOUSTON363", "KALLO1548", "KALLO1998", "KNW", "LB1227", "LUITHAGEN", "LXS", "NOORD355", "NOORDSTER", "Q309", "RIGA1218", "SNIK4203", "TRAINING", "WVN136"
-    Add-PnPField -List $databasesList -DisplayName "Region" -InternalName "Region" -Type Choice -AddToDefaultView -Choices "AMER", "APAC", "EMEA"
+    Add-PnPField -List $contactList -DisplayName "HSEQresponsable" -InternalName "HSEQresponsable" -Type User -AddToDefaultView
+    Add-PnPField -List $contactList -DisplayName "Location" -InternalName "Location" -Type MultiChoice -AddToDefaultView -Choices "119", "CAR353", "ELC353", "FELUY", "HOUSTON363", "KALLO1548", "KALLO1998", "KNW", "LB1227", "LUITHAGEN", "LXS", "NOORD355", "NOORDSTER", "Q309", "RIGA1218", "SNIK4203", "TRAINING", "WVN136"
+    Add-PnPField -List $contactList -DisplayName "Region" -InternalName "Region" -Type Choice -AddToDefaultView -Choices "AMER", "APAC", "EMEA"
+    Add-PnPField -List $contactList -InternalName "Database" -DisplayName "Database" -Type Choice -AddToDefaultView -Choices "BE-KI Plato Chemicals", "BE-KI Plato Chemicals Kempen", "BE-KI Plato Chemicals NL", "BE-KI Plato Chemicals PL", "BE-KI Plato Durban", "BE-KI Plato Food", "BE-KI Plato Mexico", "BE-KI Plato Saudi Arabia", "BE-KI Plato Soft Commodities EE", "BE-KI Plato Specialty Chemicals", "BE-KI Plato Specialty Chemicals Dupont", "BE-KI Plato Specialty Chemicals NL", "BE-KI Plato Turkey", "BE-KI Plato US North UTC-5", "BE-KI Plato US North UTC-6", "BR-PAU Plato", "FR-SMC Plato", "FR-SMC Plato ARC", "IT-CRE Plato Cremona", "IT-RIV Plato Soft Commodities", "SG-JLT Plato", "TH-MDC Plato KNS", "TH-MDC Plato SCG-DOW", "US-HPT Plato", "US-HPT Plato WarCo Inbev"
 }
 
 # Application form
@@ -34,7 +36,7 @@ if ($created) {
     # Site
     Add-PnPField -List $newList -DisplayName "Site" -InternalName "Site" -Type Choice -AddToDefaultView -Choices "MEXICO742", "LB1227", "Q309", "RIGA1218", "SNIK4203", "Cremona", "Test1"
     # Database
-    Add-PnPFieldFromXml -List $newList -FieldXml "<Field Description='Database' DisplayName='Database' Format='Dropdown' Indexed='FALSE' IsModern='TRUE' IsRelationship='FALSE' List='$($databasesList.Id)' Name='Database' ShowField='Title' Title='Database' Type='Lookup'></Field>"
+    Add-PnPField -List $newList -InternalName "Database" -DisplayName "Database" -Type Text -AddToDefaultView
     # MSDS
     Add-PnPField -List $newList -DisplayName "Do you have an (European) msds? / Not older than 2 years" -InternalName "HasMsds" -Type Boolean -AddToDefaultView
     # MSDS Date

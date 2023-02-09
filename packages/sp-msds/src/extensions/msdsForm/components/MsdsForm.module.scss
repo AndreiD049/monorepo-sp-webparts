@@ -5,29 +5,25 @@ $breakpoint: 768px;
 }
 
 .msdsForm {
-    padding: 0.5rem;
-    padding-left: 2.5em;
-    min-height: 60vh;
-	& > div:first-child {
-		@media (min-width: $breakpoint) {
-			display: flex;
-			flex-flow: row nowrap;
-			align-items: stretch;
-			justify-content: flex-start;
-		}
-	}
+    & > div:first-child {
+        @media (min-width: $breakpoint) {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: stretch;
+            justify-content: flex-start;
+        }
+    }
 
-	& > div > div:first-child {
-		flex-basis: 80%;
-	}
+    & > div > div:first-child {
+        padding-top: 0.5em;
+        flex-basis: 80%;
+    }
 }
 
 .commentSection {
     flex-basis: 20%;
 
-    @media (max-width: $breakpoint) {
-		margin-top: 1em;
-	}
+    padding-top: 1.5em;
 }
 
 .headerText {
@@ -44,4 +40,8 @@ $breakpoint: 768px;
 
 .msdsGap1 {
     gap: 2em;
+}
+
+.padLeft {
+    padding-left: 2.5em;
 }

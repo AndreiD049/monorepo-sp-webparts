@@ -1,9 +1,9 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
 
 .container {
-    border: 1px solid '[theme: neutralTertiary, default: #a6a6a6]';
+    border: 1px solid #a6a6a6;
     border-radius: 2px;
-    background-color: '[theme: white: #ffffff]';
+    background-color: #ffffff;
     box-sizing: border-box;
     margin-top: 8px;
     transition: border 0.2s ease-in-out;
@@ -16,13 +16,12 @@
     &:focus-within {
         border: 2px;
         border-style: solid;
-        border-color: '[theme: themePrimary, default: #a4262c]';
     }
 
     &.empty :global(.ProseMirror) p:not(:focus-within)::after {
         content: '@mention or/and comment';
         position: absolute;
-        color: '[theme: neutralTertiary, default: #a6a6a6]';
+        color: #a6a6a6;
         top: 4px;
         left: 4px;
     }
@@ -36,7 +35,6 @@
     border: 1px solid grey;
     padding: 1px 2px;
     font-weight: bold;
-    color: "[theme: neutralPrimary, default: #a4262c]";
     border-radius: 6px;
     display: inline-block;
 }

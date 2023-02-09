@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SuggestionOptions } from '@tiptap/suggestion';
-import { hideCallout, showCallout, updateCalloutContent } from 'sp-components';
 import { ISiteUserInfo } from 'sp-preset';
 
 import MentionList from './MentionList';
 import { ReactRenderer } from '@tiptap/react';
 import { CALLOUT_ID } from '.';
+import { hideCallout, showCallout, updateCalloutContent } from '../Callout';
 
 export interface ISuggestion extends Omit<SuggestionOptions, 'editor'> {
   users: ISiteUserInfo[];

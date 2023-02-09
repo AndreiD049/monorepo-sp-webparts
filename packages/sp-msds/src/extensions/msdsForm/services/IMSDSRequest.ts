@@ -3,7 +3,6 @@ export interface IMSDSRequest {
     Site: string;
 
     Database: string;
-    DatabaseId?: number;
 
     HasMsds: boolean;
     MSDSDate: string;

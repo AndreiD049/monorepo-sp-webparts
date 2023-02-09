@@ -2,5 +2,7 @@
 
 .container {
     border-left: 1px solid "[theme: neutralQuaternaryAlt, default: #f4f4f4]";
-    padding-left: 1em;
+    padding: 1em 1em 0 1em;
+    background-color: "[theme: neutralLighter, default: #f4f4f4]";
+    position: relative;
 }

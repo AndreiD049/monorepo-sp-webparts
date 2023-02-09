@@ -1,13 +1,13 @@
 import * as React from "react";
-import { IDatabase, LookupService } from "../services/lookup-service";
+import { LookupService } from "../services/lookup-service";
 import { ITagWithData, LookupOptions } from "./types";
 
-export function useDatabases(site: string | undefined): LookupOptions<IDatabase> {
-    const [dbs, setDbs] = React.useState<IDatabase[]>([]);
-    const dbTags: ITagWithData<IDatabase>[] = React.useMemo(() => {
+export function useDatabases(site: string | undefined): LookupOptions<string> {
+    const [dbs, setDbs] = React.useState<string[]>([]);
+    const dbTags: ITagWithData<string>[] = React.useMemo(() => {
         return dbs.map((db) => ({
-            name: db.Title,
-            key: db.Id,
+            name: db,
+            key: db,
             data: db,
         }));
     }, [dbs]);

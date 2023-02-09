@@ -1,4 +1,4 @@
-import { IAttachmentInfo, IItemAddResult, IList, SPFI } from 'sp-preset';
+import { IAttachmentInfo, ICommentInfo, IComments, IItemAddResult, IList, SPFI } from 'sp-preset';
 import { IMSDSRequest } from './IMSDSRequest';
 
 export class ItemService {
@@ -68,5 +68,18 @@ export class ItemService {
 
     public static async deleteAttachment(relativePath: string): Promise<void> {
         await this.sp.web.getFileByServerRelativePath(relativePath).recycle();
+    }
+
+    public static async addComment(itemId: number, comment: Partial<ICommentInfo>): Promise<ICommentInfo> {
+        const item = this.applicationList.items.getById(itemId);
+        return item.comments.add(comment as ICommentInfo);
+    }
+
+    public static async getComments(itemId: number): Promise<IComments> {
+        return this.applicationList.items.getById(itemId).comments();
+    }
+
+    public static async deleteComment(itemId: number, commentId: number): Promise<void> {
+        await this.applicationList.items.getById(itemId).comments.getById(commentId).delete();
     }
 }

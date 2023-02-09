@@ -3,7 +3,7 @@ import { DefaultButton, PrimaryButton } from 'office-ui-fabric-react';
 import * as React from 'react';
 import styles from './Buttons.module.scss';
 
-export interface IButtonsProps {
+export interface IButtonsProps extends React.HTMLAttributes<HTMLDivElement> {
     displayMode: FormDisplayMode;
     onSave: () => void;
     onClose: () => void;
@@ -21,7 +21,7 @@ export const Buttons: React.FC<IButtonsProps> = (props) => {
         return buttons;
     }, [props.displayMode]);
     return (
-        <div className={styles.msdsFormButtons}>
+        <div className={`${styles.msdsFormButtons} ${props.className}`}>
             {buttons}
         </div>
     );

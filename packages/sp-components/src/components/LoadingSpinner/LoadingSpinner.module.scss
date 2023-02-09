@@ -1,7 +1,6 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
 
 .container {
-    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -10,6 +9,16 @@
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
-    justify-content: center;
     z-index: 999;
+}
+
+.containerFixed {
+    position: fixed;
+    justify-content: center;
+}
+
+.containerAbsolute {
+    position: absolute;
+    justify-content: flex-start;
+    padding-top: 2em;
 }

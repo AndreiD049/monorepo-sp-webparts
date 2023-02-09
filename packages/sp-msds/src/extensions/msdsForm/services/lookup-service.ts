@@ -1,3 +1,4 @@
+import { uniq } from '@microsoft/sp-lodash-subset';
 import { createCacheProxy } from 'idb-proxy';
 import { IList, ISiteUserInfo, SPFI } from 'sp-preset';
 import { DB_NAME, HOUR, STORE_NAME } from '../constants';
@@ -7,11 +8,6 @@ export interface ICustomer {
     Id: number;
     Title: string;
     Name: string;
-}
-
-export interface IDatabase {
-    Id: number;
-    Title: string;
 }
 
 export interface IApprovers {
@@ -27,7 +23,6 @@ export class LookupService {
     private static sp: SPFI;
     private static applicationList: IList;
     private static customerList: IList;
-    private static databaseList: IList;
     private static approversList: IList;
 
     public static InitService(
@@ -39,7 +34,6 @@ export class LookupService {
             'Web application form'
         );
         this.customerList = this.sp.web.lists.getByTitle('Customers');
-        this.databaseList = this.sp.web.lists.getByTitle('Databases');
         this.approversList = this.sp.web.lists.getByTitle(
             properties.approverListName
         );
@@ -67,14 +61,16 @@ export class LookupService {
             .filter(`substringof('${filter}', Title)`)();
     }
 
-    public static async getAllDatabases(): Promise<IDatabase[]> {
-        return this.databaseList.items.select('Id,Title')();
+    public static async getAllDatabases(): Promise<string[]> {
+        const items: { Database: string }[] = await this.approversList.items.select('Database')();
+        return uniq(items.map((i) => i.Database));
     }
 
-    public static async getDatabases(site: string): Promise<IDatabase[]> {
-        return this.databaseList.items
-            .filter(`Sites eq '${site}'`)
-            .select('Id,Title')();
+    public static async getDatabases(site: string): Promise<string[]> {
+        const dbs: { Database: string }[] = await this.approversList.items
+            .filter(`Location eq '${site}'`)
+            .select('Id,Database')();
+        return uniq(dbs.map((i) => i.Database));
     }
 
     public static async getAllSites(): Promise<string[]> {

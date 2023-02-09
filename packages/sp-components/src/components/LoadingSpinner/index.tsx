@@ -7,6 +7,7 @@ const evtName = (id: string): string => `${SPINNER_EVT}/${id}`;
 
 export interface ILoadingSpinnerProps {
     id?: string;
+    type?: "fixed" | "absolute";
 }
 
 export function showSpinner(id: string): void {
@@ -26,6 +27,7 @@ export function hideSpinner(id: string): void {
 }
 
 export const LoadingSpinner: React.FC<ILoadingSpinnerProps> = (props) => {
+    const type = props.type ?? "fixed";
     const [visible, setVisible] = React.useState(props.id ? false : true);
 
     React.useEffect(() => {
@@ -42,7 +44,7 @@ export const LoadingSpinner: React.FC<ILoadingSpinnerProps> = (props) => {
     if (!visible) return null;
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} ${type === "fixed" ? styles.containerFixed : styles.containerAbsolute}`}>
             <Spinner size={SpinnerSize.large} label="Please wait" labelPosition={'bottom'} />
         </div>
     );

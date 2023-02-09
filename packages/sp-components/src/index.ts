@@ -8,6 +8,7 @@ export {
     ISPCalloutProps,
     hideCallout,
     showCallout,
+    updateCalloutContent,
 } from './components/Callout';
 export { Dialog, hideDialog, showDialog, ISPDialogProps, FooterOk, FooterYesNo, FooterOkCancel } from './components/Dialog';
 export { CheckExpandButton, ICheckExpandButtonProps } from './components/CipTask/CheckExpandButton';
