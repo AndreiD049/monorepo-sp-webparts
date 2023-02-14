@@ -241,3 +241,5 @@ export {
     IAttachmentInfo,
     IAttachments
 } from '@pnp/sp/attachments';
+
+export * from '@pnp/sp/sputilities';

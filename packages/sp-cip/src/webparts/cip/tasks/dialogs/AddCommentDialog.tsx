@@ -52,7 +52,7 @@ export const AddCommentDialog: React.FC<IAddCommentDialogProps> = (props) => {
                 },
             ],
             comments: (
-                <div className={styles.comments__content}>
+                <div className={styles.commentsContent}>
                     {comment.Comment}
                 </div>
             ),

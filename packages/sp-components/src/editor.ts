@@ -1,1 +1,1 @@
-export { CommentEditor } from './components/CommentEditor'
+export { CommentEditor, IComment } from './components/CommentEditor'

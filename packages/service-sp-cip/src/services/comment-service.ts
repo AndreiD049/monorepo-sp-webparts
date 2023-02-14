@@ -1,4 +1,4 @@
-import SPBuilder, { IList, SPFI } from 'sp-preset';
+import { ICommentInfo, IEmailProperties, IList, SPFI } from 'sp-preset';
 import { IServiceProps } from '../models/IServiceProps';
 import { ITaskComment } from '../models/ITaskComment';
 import { ITaskOverview } from '../models/ITaskOverview';
@@ -133,4 +133,15 @@ export class CommentService {
     async getComment(id: number): Promise<ITaskComment> {
         return this.getCommentRequest(id)();
     };
+
+    async sendCommentMessage(fromEmail: string, mentions: ICommentInfo['mentions'] = null): Promise<void> {
+        if (!mentions) return;
+        const mailProps: IEmailProperties = {
+            From: fromEmail,
+            To: mentions.map((m) => m.email),
+            Body: 'You were mentioned in a comment',
+            Subject: 'You were mentioned in a comment',
+        };
+        return this.sp.utility.sendEmail(mailProps);
+    }
 }
