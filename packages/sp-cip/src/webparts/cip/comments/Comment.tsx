@@ -1,5 +1,4 @@
 import * as React from 'react';
-import styles from './Comments.module.scss';
 import {
     ActivityItem,
     Icon,
@@ -11,6 +10,7 @@ import {
 import { GlobalContext } from '../utils/GlobalContext';
 import MainService from '../services/main-service';
 import { ITaskComment } from '@service/sp-cip/dist/models/ITaskComment';
+import styles from './Comments.module.scss';
 
 export interface ICommentProps {
     comment: ITaskComment;
@@ -38,7 +38,7 @@ const CommentHeader: React.FC<ICommentHeaderProps> = (props) => {
     };
 
     return (
-        <div className={styles['comments__activity-description']}>
+        <div className={styles.commentsActivityDescription}>
             <div>
                 <Link>{user.Title}</Link>
                 <span key={2}> commented</span>
@@ -46,7 +46,7 @@ const CommentHeader: React.FC<ICommentHeaderProps> = (props) => {
             <div>
                 {isCurrentUserComment && (
                     <IconButton
-                        className={styles['comments__edit-icon']}
+                        className={styles.commentsEditIcon}
                         iconProps={{
                             iconName: props.edit ? 'CheckMark' : 'Edit',
                         }}
@@ -86,7 +86,7 @@ const CommentBody: React.FC<ICommentBodyProps> = (props) => {
         );
     }
 
-    return <div className={styles.comments__content}>{content}</div>;
+    return <div className={styles.commentsContent}>{content}</div>;
 };
 
 export const Comment: React.FC<ICommentProps> = (props) => {

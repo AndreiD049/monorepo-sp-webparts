@@ -8,7 +8,7 @@ import { IconButton } from 'office-ui-fabric-react';
 import styles from './CommentEditor.module.scss';
 import { Callout } from '../Callout';
 
-interface IComment {
+export interface IComment {
     mentions: ICommentInfo['mentions'];
     text: string;
 }

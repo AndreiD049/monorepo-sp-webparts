@@ -24,6 +24,7 @@ interface ICipProps {
 const Cip: React.FC<ICipProps> = (props) => {
     const [info, setInfo] = React.useState({
         teams: [],
+        users: [],
         currentUser: null,
     });
     const [selectedTeam, setSelectedTeam] = useWebStorage('All', {
@@ -36,9 +37,11 @@ const Cip: React.FC<ICipProps> = (props) => {
         async function run(): Promise<void> {
             const teams = await userService.getTeams();
             const currentUser = await userService.getCurrentUser();
+            const users = await userService.getAll();
             setInfo((prev) => ({
                 ...prev,
                 teams,
+                users,
                 currentUser,
             }));
         }
@@ -51,6 +54,7 @@ const Cip: React.FC<ICipProps> = (props) => {
                 properties: props.properties,
                 theme: props.theme,
                 teams: info.teams,
+                users: info.users,
                 selectedTeam: selectedTeam,
                 currentUser: info.currentUser,
             }}

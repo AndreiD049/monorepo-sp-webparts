@@ -5,12 +5,12 @@
     white-space: pre-wrap;
     word-break: break-word;
 
-    &__content {
+    &Content {
         padding: .5em 0;
     }
 }
 
-.comments__activity-description {
+.commentsActivityDescription {
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
@@ -22,11 +22,15 @@
     }
 }
 
-.comments__edit-icon {
+.commentsEditIcon {
     height: 25px;
     width: 25px;
     
     i {
         font-size: 1em;
     }
+}
+
+.commentEditor {
+    margin-bottom: 1em;
 }
