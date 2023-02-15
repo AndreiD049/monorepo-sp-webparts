@@ -1,5 +1,8 @@
 import * as React from 'react';
-import { UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import {
+    UseFormSetValue,
+    UseFormWatch,
+} from 'react-hook-form';
 import { IMSDSRequest } from '../services/IMSDSRequest';
 
 function useSingleFieldEffect(
@@ -18,6 +21,7 @@ const REMARK_SILO_OPERATIONS = 'TAKE SAMPLE\n';
 
 export function useFieldEffects(
     watch: UseFormWatch<FormValues>,
+    isDirty: boolean,
     setValue: UseFormSetValue<FormValues>,
     setDisabled: React.Dispatch<React.SetStateAction<(keyof IMSDSRequest)[]>>
 ): void {
@@ -26,6 +30,11 @@ export function useFieldEffects(
     const forbiddenForBulk = watch('ForbiddenForBulk');
     const siloOperations = watch('SiloOperations');
     const packedOperations = watch('PackedOperations');
+
+    const setValueIfAllowed = React.useMemo(() => {
+        if (!isDirty) return (() => null) as typeof setValue;
+        return setValue;
+    }, [isDirty]);
 
     useSingleFieldEffect(siloOperations, (siloOperations) => {
         const fields: (keyof IMSDSRequest)[] = [
@@ -38,65 +47,77 @@ export function useFieldEffects(
         if (!siloOperations) {
             setDisabled((prev) => [...prev, ...fields]);
             if (siloOperations === undefined) return;
-            fields.forEach((field) =>
-                setValue(field, typeof watch(field) === 'string' ? '' : false)
-            );
-            if (productRemarks) {
-                setValue(
-                    'ProductRemarks',
-                    `${productRemarks.replace(REMARK_SILO_OPERATIONS, '')}`
+                fields.forEach((field) =>
+                    setValueIfAllowed(
+                        field,
+                        typeof watch(field) === 'string' ? '' : false
+                    )
                 );
-            }
-            if (siloRemarks) {
-                setValue(
-                    'SiloRemarks',
-                    `${siloRemarks.replace(REMARK_SILO_OPERATIONS, '')}`
-                );
-            }
+                if (productRemarks) {
+                    setValueIfAllowed(
+                        'ProductRemarks',
+                        `${productRemarks.replace(REMARK_SILO_OPERATIONS, '')}`
+                    );
+                }
+                if (siloRemarks) {
+                    setValueIfAllowed(
+                        'SiloRemarks',
+                        `${siloRemarks.replace(REMARK_SILO_OPERATIONS, '')}`
+                    );
+                }
         } else {
             setDisabled((prev) => {
                 const exclude = new Set(fields);
                 return prev.filter((val) => !exclude.has(val));
             });
-            setValue(
-                'ProductRemarks',
-                `${REMARK_SILO_OPERATIONS}${productRemarks || ''}`
-            );
-            setValue(
-                'SiloRemarks',
-                `${REMARK_SILO_OPERATIONS}${siloRemarks || ''}`
-            );
+                setValueIfAllowed(
+                    'ProductRemarks',
+                    `${REMARK_SILO_OPERATIONS}${productRemarks || ''}`
+                );
+                setValueIfAllowed(
+                    'SiloRemarks',
+                    `${REMARK_SILO_OPERATIONS}${siloRemarks || ''}`
+                );
         }
     });
 
     useSingleFieldEffect(forbiddenForBulk, (forbidden) => {
         if (forbidden) {
-            setValue('SiloOperations', false);
-            setValue('BulkDensity', 0);
-            setValue('MeasuredBulkDensity', false);
-            setValue(
-                'ProductRemarks',
-                `${REMARK_FORBIDDEN_FOR_BULK}${productRemarks || ''}`
-            );
-            setValue(
-                'SiloRemarks',
-                `${REMARK_FORBIDDEN_FOR_BULK}${siloRemarks || ''}`
-            );
-            setDisabled((prev) => [...prev, 'SiloOperations', 'BulkDensity', 'MeasuredBulkDensity']);
+                setValueIfAllowed('SiloOperations', false);
+                setValueIfAllowed('BulkDensity', 0);
+                setValueIfAllowed('MeasuredBulkDensity', false);
+                setValueIfAllowed(
+                    'ProductRemarks',
+                    `${REMARK_FORBIDDEN_FOR_BULK}${productRemarks || ''}`
+                );
+                setValueIfAllowed(
+                    'SiloRemarks',
+                    `${REMARK_FORBIDDEN_FOR_BULK}${siloRemarks || ''}`
+                );
+            setDisabled((prev) => [
+                ...prev,
+                'SiloOperations',
+                'BulkDensity',
+                'MeasuredBulkDensity',
+            ]);
         } else {
-            const exclude = new Set(['SiloOperations', 'BulkDensity', 'MeasuredBulkDensity']);
+            const exclude = new Set([
+                'SiloOperations',
+                'BulkDensity',
+                'MeasuredBulkDensity',
+            ]);
             setDisabled((prev) => {
                 return prev.filter((val) => !exclude.has(val));
             });
             if (forbidden === undefined) return;
             if (productRemarks) {
-                setValue(
+                setValueIfAllowed(
                     'ProductRemarks',
                     `${productRemarks.replace(REMARK_FORBIDDEN_FOR_BULK, '')}`
                 );
             }
             if (siloRemarks) {
-                setValue(
+                setValueIfAllowed(
                     'SiloRemarks',
                     `${siloRemarks.replace(REMARK_FORBIDDEN_FOR_BULK, '')}`
                 );
@@ -108,7 +129,7 @@ export function useFieldEffects(
         if (packed === false) {
             setDisabled((prev) => [...prev, 'WarehouseType']);
             if (packed === undefined) return;
-            setValue('WarehouseType', '');
+            setValueIfAllowed('WarehouseType', '');
         } else {
             setDisabled((prev) => {
                 return prev.filter((val) => val !== 'WarehouseType');

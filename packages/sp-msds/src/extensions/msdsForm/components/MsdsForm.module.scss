@@ -24,6 +24,9 @@ $breakpoint: 768px;
     flex-basis: 20%;
 
     padding-top: 1.5em;
+    @media (max-width: $breakpoint) {
+        display: none;
+    }
 }
 
 .headerText {

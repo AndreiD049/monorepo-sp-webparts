@@ -39,8 +39,8 @@ import { useApprovers } from '../hooks/useApprovers';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { Logo } from './Logo';
 import KTNLogo from './KTNLogo';
-import styles from './MsdsForm.module.scss';
 import { ICommentSectionProps } from './CommentSection';
+import styles from './MsdsForm.module.scss';
 
 export interface IMsdsFormProps {
     context: FormCustomizerContext;
@@ -52,7 +52,10 @@ export interface IMsdsFormProps {
     CommentSection?: React.FC<ICommentSectionProps>;
 }
 
-export const MsdsForm: React.FC<IMsdsFormProps> = ({ CommentSection, ...props }) => {
+export const MsdsForm: React.FC<IMsdsFormProps> = ({
+    CommentSection,
+    ...props
+}) => {
     const [collapsedBlocks, setCollapsedBlocks] = React.useState({
         applicant: true,
         approver: props.displayMode === FormDisplayMode.New ? false : true,
@@ -65,15 +68,13 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({ CommentSection, ...props })
         handleSubmit,
         setValue,
         watch,
-        formState: { dirtyFields },
+        formState: { dirtyFields, isDirty },
     } = useForm<Partial<IMSDSRequest & { Attachments: File[] }>>({
         defaultValues: {
             Urgency: 'Medium',
         },
         values: props.item || {},
     });
-
-    console.log(props.item);
 
     const site = watch('Site');
     const field = useFields(site);
@@ -164,7 +165,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({ CommentSection, ...props })
         ]
     );
 
-    useFieldEffects(watch, setValue, setdisabledFields);
+    useFieldEffects(watch, isDirty, setValue, setdisabledFields);
 
     return (
         <div className={styles.formContainer}>
@@ -399,8 +400,9 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({ CommentSection, ...props })
                                                 'Disabled',
                                             maxLength: {
                                                 value: 35,
-                                                message: 'PLATO cannot handle product names longer than 35 characters',
-                                            }
+                                                message:
+                                                    'PLATO cannot handle product names longer than 35 characters',
+                                            },
                                         }}
                                         icon={
                                             <Logo
@@ -743,7 +745,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({ CommentSection, ...props })
                                         id="DedicatedFlexiblesValves"
                                         label="20.Dedicated Flexible(s)? Rotary Valve(s)?"
                                         title="Operational or customer service knowledge for dedicated equipment if any"
-                                        style={{ width: '200px' }}
                                         fieldProps={{
                                             multiline: true,
                                             autoAdjustHeight: true,
@@ -777,8 +778,9 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({ CommentSection, ...props })
                                                 'Disabled',
                                             maxLength: {
                                                 value: 35,
-                                                message: 'Description on label can be 35 characters max',
-                                            }
+                                                message:
+                                                    'Description on label can be 35 characters max',
+                                            },
                                         }}
                                         icon={
                                             <Logo
@@ -1230,14 +1232,13 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({ CommentSection, ...props })
                             onSave={props.onSave}
                         />
                     </div>
-                    {
-                        CommentSection &&
+                    {CommentSection && (
                         <CommentSection
                             className={styles.commentSection}
                             item={props.item}
                             currentUser={currentUser}
                         />
-                    }
+                    )}
                 </div>
             </form>
         </div>
