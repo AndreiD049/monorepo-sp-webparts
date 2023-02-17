@@ -18,7 +18,7 @@ export class UserService {
     async getAll(): Promise<ISiteUserInfo[]> {
         return this.sp.web.siteUsers();
     }
-
+    
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async getCustomListUsers(): Promise<any[]> {
         return this.usersList.items

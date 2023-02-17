@@ -5,12 +5,13 @@ import {
     IconButton,
     Link,
     Text,
-    TextField,
 } from 'office-ui-fabric-react';
 import { GlobalContext } from '../utils/GlobalContext';
 import MainService from '../services/main-service';
 import { ITaskComment } from '@service/sp-cip/dist/models/ITaskComment';
 import styles from './Comments.module.scss';
+import { IComment } from 'sp-components/dist/editor';
+import { CommentEditor } from '../components/CommentEditor';
 
 export interface ICommentProps {
     comment: ITaskComment;
@@ -21,7 +22,6 @@ interface ICommentHeaderProps {
     comment: ITaskComment;
     edit: boolean;
     setEdit: (val: boolean) => void;
-    onEdit: () => void;
 }
 
 const CommentHeader: React.FC<ICommentHeaderProps> = (props) => {
@@ -29,10 +29,7 @@ const CommentHeader: React.FC<ICommentHeaderProps> = (props) => {
     const user = props.comment.User || props.comment.Author;
     const isCurrentUserComment = user.Id === currentUser?.Id;
     const handleClick = async (): Promise<void> => {
-        if (props.edit && isCurrentUserComment) {
-            await props.onEdit();
-            props.setEdit(false);
-        } else {
+        if (!props.edit && isCurrentUserComment) {
             props.setEdit(true);
         }
     };
@@ -44,13 +41,13 @@ const CommentHeader: React.FC<ICommentHeaderProps> = (props) => {
                 <span key={2}> commented</span>
             </div>
             <div>
-                {isCurrentUserComment && (
+                {isCurrentUserComment && !props.edit && (
                     <IconButton
                         className={styles.commentsEditIcon}
                         iconProps={{
-                            iconName: props.edit ? 'CheckMark' : 'Edit',
+                            iconName: 'Edit',
                         }}
-                        title={props.edit ? 'Save' : 'Edit'}
+                        title={'Edit'}
                         onClick={handleClick}
                     />
                 )}
@@ -63,25 +60,25 @@ interface ICommentBodyProps {
     comment: ITaskComment;
     edit: boolean;
     setEdit: (val: boolean) => void;
-    newValue: string;
-    setNewValue: (val: string) => void;
+    onEdit: (comment: IComment) => void;
 }
 
 const CommentBody: React.FC<ICommentBodyProps> = (props) => {
-    const { currentUser } = React.useContext(GlobalContext);
+    const { currentUser, users } = React.useContext(GlobalContext);
     const user = props.comment.User || props.comment.Author;
-    let content = <Text variant="medium">{props.newValue}</Text>;
+    let content = <Text variant="medium">{props.comment.Comment}</Text>;
 
     if (props.edit && user.Id === currentUser?.Id) {
         content = (
-            <TextField
-                multiline
-                value={props.newValue}
-                onChange={(_e: {}, newValue: string) =>
-                    props.setNewValue(newValue)
-                }
-                autoAdjustHeight
-                resizable={false}
+            <CommentEditor
+                users={users}
+                onAddComment={(comment) => {
+                    props.setEdit(false);
+                    if (comment.text.trim() !== '') {
+                        props.onEdit(comment);
+                    }
+                }}
+                initialContent={props.comment.Comment}
             />
         );
     }
@@ -90,17 +87,27 @@ const CommentBody: React.FC<ICommentBodyProps> = (props) => {
 };
 
 export const Comment: React.FC<ICommentProps> = (props) => {
+    const { currentUser } = React.useContext(GlobalContext);
     const commentService = MainService.getCommentService();
+    const taskService = MainService.getTaskService();
     const user = props.comment.User || props.comment.Author;
     const [edit, setEdit] = React.useState(false);
-    const [newValue, setNewValue] = React.useState(props.comment.Comment);
 
-    const handleEdit = React.useCallback(async () => {
+    const handleEdit = React.useCallback(async (comment: IComment) => {
         await commentService.editComment(props.comment.Id, {
-            Comment: newValue,
+            Comment: comment.text,
+        });
+        const task = await taskService.getTask(props.comment.ItemId);
+        await commentService.sendCommentMessage({
+            fromEmail: currentUser.Email,
+            fromName: currentUser.Title,
+            baseUrl: `${location.origin}${location.pathname}`,
+            comment: comment.text,
+            mentions: comment.mentions,
+            task,
         });
         props.onEdit(props.comment.Id);
-    }, [newValue]);
+    }, []);
 
     const data = React.useMemo(
         () => ({
@@ -111,7 +118,6 @@ export const Comment: React.FC<ICommentProps> = (props) => {
                     comment={props.comment}
                     edit={edit}
                     setEdit={setEdit}
-                    onEdit={handleEdit}
                 />,
             ],
             activityIcon: (
@@ -128,15 +134,16 @@ export const Comment: React.FC<ICommentProps> = (props) => {
             comments: (
                 <CommentBody
                     comment={props.comment}
-                    newValue={newValue}
-                    setNewValue={setNewValue}
                     edit={edit}
                     setEdit={setEdit}
+                    onEdit={handleEdit}
                 />
             ),
-            timeStamp: new Date(props.comment.Date || props.comment.Created).toLocaleString(),
+            timeStamp: new Date(
+                props.comment.Date || props.comment.Created
+            ).toLocaleString(),
         }),
-        [props.comment, edit, newValue]
+        [props.comment, edit]
     );
 
     return (

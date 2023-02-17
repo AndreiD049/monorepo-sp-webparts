@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rollup -c --environment BUILD:production",
-    "dev": "rollup -c --watch --environment BUILD:production"
+    "dev": "rollup -c --watch"
   },
   "author": "Dimitrascu Andrei",
   "license": "MIT",

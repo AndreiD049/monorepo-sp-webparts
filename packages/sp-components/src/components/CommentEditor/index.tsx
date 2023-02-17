@@ -13,12 +13,25 @@ export interface IComment {
     text: string;
 }
 
-export interface ICommendEditorProps {
+export interface ICommentEditorProps {
     users: ISiteUserInfo[];
     onAddComment: (comment: IComment) => void;
+    clearAfterInsert?: boolean;
+    initialContent?: string;
 }
 
 export const CALLOUT_ID = 'spfx/Suggestion';
+
+function reAddNewLines(text: string) {
+    if (text === '') return text;
+    const lines = text.split('\n');
+    if (lines.length === 1) return text;
+    return lines.map((l) => `<p>${l}</p>`).join('\n');
+}
+
+function removeDoubleNewLines(text: string) {
+    return text.replace(/\n{2,3}/g, '\n');
+}
 
 export function getMentionsFromHtml(
     html: string,
@@ -37,13 +50,13 @@ export function getMentionsFromHtml(
     })) as ICommentInfo['mentions'];
 }
 
-export const CommentEditor: React.FC<ICommendEditorProps> = (props) => {
+export const CommentEditor: React.FC<ICommentEditorProps> = ({ initialContent = '', clearAfterInsert = true, ...props }) => {
     const editorRef = React.useRef(null);
     const [comment, setComment] = React.useState<IComment>({
         text: '',
         mentions: null,
     });
-    const [empty, setEmpty] = React.useState(true);
+    const [empty, setEmpty] = React.useState(initialContent === '');
     const suggestion = React.useRef(Suggestion.setUsers(props.users));
 
     const editor = useEditor(
@@ -56,12 +69,12 @@ export const CommentEditor: React.FC<ICommendEditorProps> = (props) => {
                     blockquote: false,
                     dropcursor: false,
                     gapcursor: false,
+                    hardBreak: false,
                     heading: false,
                     horizontalRule: false,
                     italic: false,
                     strike: false,
                     bulletList: false,
-                    hardBreak: false,
                     listItem: false,
                     orderedList: false,
                 }),
@@ -75,10 +88,10 @@ export const CommentEditor: React.FC<ICommendEditorProps> = (props) => {
                     suggestion: suggestion.current,
                 }),
             ],
-            content: '',
+            content: reAddNewLines(initialContent),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onUpdate: (innerProps) => {
-                const text = innerProps.editor.getText();
+                const text = removeDoubleNewLines(innerProps.editor.view.dom.innerText);
                 setEmpty(text.trim() === '');
                 setComment(() => ({
                     text,
@@ -104,8 +117,10 @@ export const CommentEditor: React.FC<ICommendEditorProps> = (props) => {
                         onClick={() => {
                             if (!empty) {
                                 props.onAddComment(comment);
-                                editor.commands.clearContent();
-                                setEmpty(true);
+                                if (clearAfterInsert) {
+                                    editor.commands.clearContent();
+                                    setEmpty(true);
+                                }
                             }
                         }}
                     />

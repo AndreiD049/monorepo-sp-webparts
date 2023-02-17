@@ -1,1 +1,1 @@
-export { CommentEditor, IComment } from './components/CommentEditor'
+export { CommentEditor, ICommentEditorProps, IComment } from './components/CommentEditor'

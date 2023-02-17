@@ -1,19 +1,12 @@
-import {
-    ActivityItem,
-    Icon,
-    IconButton,
-    Link,
-    Stack,
-    StackItem,
-    Text,
-    TextField,
-} from 'office-ui-fabric-react';
+import { ActivityItem, Icon, Link, Stack, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import styles from '../../comments/Comments.module.scss';
 import MainService from '../../services/main-service';
 import { taskUpdated } from '../../utils/dom-events';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { GlobalContext } from '../../utils/GlobalContext';
+import { IComment } from 'sp-components/dist/editor';
+import { CommentEditor } from '../../components/CommentEditor';
 
 export interface IAddCommentDialogProps {
     task: ITaskOverview;
@@ -21,16 +14,18 @@ export interface IAddCommentDialogProps {
 }
 
 export const AddCommentDialog: React.FC<IAddCommentDialogProps> = (props) => {
-    const { currentUser } = React.useContext(GlobalContext);
+    const { currentUser, users } = React.useContext(GlobalContext);
     const commentService = MainService.getCommentService();
     const taskService = MainService.getTaskService();
-    const [newComment, setNewComment] = React.useState('');
     const [comments, setComments] = React.useState([]);
 
     React.useEffect(() => {
-        commentService.getByTask(props.task, 3, 0).then((c) => {
-            setComments(c);
-        }).catch((err) => console.error(err));
+        commentService
+            .getByTask(props.task, 3, 0)
+            .then((c) => {
+                setComments(c);
+            })
+            .catch((err) => console.error(err));
     }, [props.task]);
 
     const data = React.useMemo(() => {
@@ -52,46 +47,39 @@ export const AddCommentDialog: React.FC<IAddCommentDialogProps> = (props) => {
                 },
             ],
             comments: (
-                <div className={styles.commentsContent}>
-                    {comment.Comment}
-                </div>
+                <div className={styles.commentsContent}>{comment.Comment}</div>
             ),
             timeStamp: new Date(comment.Created).toLocaleString(),
         }));
     }, [comments]);
 
-    const handleNewComment = React.useCallback(async () => {
-        if (!newComment.trim()) return;
-        await commentService.addComment(props.task, newComment, currentUser.Id, new Date().toISOString());
+    const handleNewComment = React.useCallback(async (comment: IComment) => {
+        if (!comment.text.trim()) return;
+        await commentService.addComment(
+            props.task,
+            comment.text,
+            currentUser.Id,
+            new Date().toISOString()
+        );
+        await commentService.sendCommentMessage({
+            fromEmail: currentUser.Email,
+            fromName: currentUser.Title,
+            baseUrl: `${location.origin}${location.pathname}`,
+            comment: comment.text,
+            mentions: comment.mentions,
+            task: props.task,
+        });
         taskUpdated(await taskService.getTask(props.task.Id));
-        if (props.onAfterComment) { 
+        if (props.onAfterComment) {
             props.onAfterComment();
         }
-    }, [newComment]);
+    }, []);
 
     return (
         <div style={{ width: 400 }}>
-            <Stack
-                horizontal
-                horizontalAlign="stretch"
-                verticalAlign="center"
-                styles={{ root: { marginBottom: '1em' } }}
-            >
-                <StackItem grow={1}>
-                    <TextField
-                        value={newComment}
-                        multiline
-                        resizable={false}
-                        autoAdjustHeight
-                        onChange={(evt, val) => setNewComment(val)}
-                        placeholder="Add comment"
-                    />
-                </StackItem>
-                <IconButton
-                    iconProps={{ iconName: 'Send' }}
-                    onClick={handleNewComment}
-                />
-            </Stack>
+            <div className={styles.commentEditor}>
+                <CommentEditor users={users} onAddComment={handleNewComment} clearAfterInsert={false} />
+            </div>
             {comments.length > 0 && (
                 <Stack>
                     <Text

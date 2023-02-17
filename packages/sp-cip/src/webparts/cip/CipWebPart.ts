@@ -31,6 +31,7 @@ interface IConfiguration {
         fieldName: string;
     }
     remotes: IRemoteSource[];
+    additionalEmails?: string[];
 }
 
 export interface ICipWebPartProps {

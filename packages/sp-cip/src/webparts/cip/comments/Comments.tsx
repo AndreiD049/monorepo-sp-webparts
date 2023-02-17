@@ -2,7 +2,7 @@ import {
     ActionButton,
     Separator,
 } from 'office-ui-fabric-react';
-import { CommentEditor, IComment } from 'sp-components/dist/editor';
+import { IComment } from 'sp-components/dist/editor';
 import * as React from 'react';
 import { Comment } from './Comment';
 import MainService from '../services/main-service';
@@ -12,10 +12,12 @@ import { IPagedCollection } from '@service/sp-cip/dist/services/comment-service'
 import { GlobalContext } from '../utils/GlobalContext';
 import { ITaskComment } from '@service/sp-cip/dist/models/ITaskComment';
 import styles from './Comments.module.scss';
+import { CommentEditor } from '../components/CommentEditor';
 
 interface ICommentsProps {
     task: ITaskOverview;
 }
+
 
 export const Comments: React.FC<ICommentsProps> = (props) => {
     const { currentUser, users } = React.useContext(GlobalContext);
@@ -35,7 +37,14 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
     const handleNewComment = React.useCallback(async (comment: IComment) => {
         if (!comment.text.trim()) return;
         const added = await commentService.addComment(props.task, comment.text, currentUser.Id, new Date().toISOString());
-        await commentService.sendCommentMessage(currentUser.Email, comment.mentions);
+        await commentService.sendCommentMessage({
+            fromEmail: currentUser.Email,
+            fromName: currentUser.Title,
+            baseUrl: `${location.origin}${location.pathname}`,
+            comment: comment.text,
+            mentions: comment.mentions,
+            task: props.task,
+        });
         taskUpdated(await taskService.getTask(props.task.Id));
         const synced = await commentService.getComment(added.data.Id);
         setTaskComments((prev) => [synced, ...prev]);
