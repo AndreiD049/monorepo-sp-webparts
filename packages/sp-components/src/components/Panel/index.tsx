@@ -5,7 +5,7 @@ const EVENT_PREFIX = 'sp-panel-visibility';
 const CLICK_EVENT_PREFIX = 'sp-panel-button';
 const getEventName = (id: string) => `${EVENT_PREFIX}/${id}`;
 
-import { IPanelProps, Panel as FabrikPanel } from 'office-ui-fabric-react';
+import { IPanelProps, Panel as FabricPanel } from 'office-ui-fabric-react';
 
 export interface ICustomPanelProps {
     id: string;
@@ -85,10 +85,10 @@ export const Panel: React.FC<ICustomPanelProps> = (props) => {
     }, [panelProps]);
 
     return (
-        <FabrikPanel {...props.defaultProps} {...panelProps} onDismiss={handleDismiss}>
+        <FabricPanel {...props.defaultProps} {...panelProps} onDismiss={handleDismiss}>
             <div className={className}>
                 {content}
             </div>
-        </FabrikPanel>
+        </FabricPanel>
     );
 };

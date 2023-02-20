@@ -1,5 +1,5 @@
 import { getAllPaged } from '@service/sp-cip';
-import { IField, IItem, IItemAddResult, IItemUpdateResult, IList } from 'sp-preset';
+import { IField, IItemAddResult, IItemUpdateResult, IList } from 'sp-preset';
 import { IFlowLocation } from '../models';
 import { IServiceProps } from '../models/IServiceProps';
 
