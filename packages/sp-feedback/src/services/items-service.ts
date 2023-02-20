@@ -17,11 +17,18 @@ export class ItemsService {
         return new Item(await this.itemsList.items.getById(id)());
     }
 
-    public async getAllItems(): Promise<Item[]> {
+    public async getAllItems(): Promise<IFeedbackItemRaw[]> {
         const items: IFeedbackItemRaw[] = await getAllPaged(
-            this.itemsList.items.select('Id', 'Title', 'Tags', 'Fields')
+            this.itemsList.items.filter(`IsService eq '0'`).select('Id', 'Title', 'Tags', 'Fields', 'IsService')
         );
-        return items.map((i) => new Item(i));
+        return items;
+    }
+
+    public async getAllSystemItems(): Promise<IFeedbackItemRaw[]> {
+        const items: IFeedbackItemRaw[] = await getAllPaged(
+            this.itemsList.items.filter(`IsService eq '1'`).select('Id', 'Title', 'Tags', 'Fields', 'IsService')
+        );
+        return items;
     }
     
     public async addItem(item: IFeedbackItemRaw): Promise<IItemAddResult> {

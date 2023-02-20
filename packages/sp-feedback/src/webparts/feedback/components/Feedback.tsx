@@ -1,12 +1,15 @@
-import { PanelType, PrimaryButton } from 'office-ui-fabric-react';
+import { openDatabase, removeCached } from 'idb-proxy';
+import { ActionButton, PanelType, PrimaryButton } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Panel, showPanel } from 'sp-components';
 import { IFeedbackItem } from '../../../models/IFeedbackItem';
-import { FEEDBACK, MAIN_PANEL } from '../constants';
+import { DB_NAME, FEEDBACK, MAIN_PANEL, STORE_NAME } from '../constants';
 import { IFeedbackWebPartProps } from '../FeedbackWebPart';
+import { Item } from '../item';
 import { buildIndex, Index } from '../services';
 import { ITEM_ADDED } from '../services/events';
 import { MainService } from '../services/main-service';
+import { DescriptionEditor } from './DescriptionEditor';
 import styles from './Feedback.module.scss';
 import { FeedbackForm } from './FeedbackForm';
 
@@ -30,15 +33,17 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
 
     // Pull information
     React.useEffect(() => {
-        ItemsService.getAllItems()
-            .then((items) => {
-                const index = buildIndex(items);
-                setInfo({
-                    items,
-                    index,
-                });
-            })
-            .catch((err) => console.error(err));
+        async function run(): Promise<void> {
+            const items = await ItemsService.getAllItems();
+            const systemItems = await ItemsService.getAllSystemItems();
+            const allItems = items.concat(systemItems).map((i) => new Item(i));
+            const index = buildIndex(allItems);
+            setInfo({
+                items: allItems,
+                index,
+            });
+        }
+        run().catch((err) => console.error(err));
     }, []);
 
     React.useEffect(() => {
@@ -76,9 +81,15 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
                 >
                     Leave feedback
                 </PrimaryButton>
+                <ActionButton iconProps={{ iconName: 'Refresh' }} onClick={async () => {
+                    const db = await openDatabase(DB_NAME, STORE_NAME);
+                    await removeCached(db, /.*/);
+                    location.reload();
+                }} />
                 {info.index.findByTag(FEEDBACK).map((i) => (
                     <div key={i.Id}>{i.Title}</div>
                 ))}
+                <DescriptionEditor />
                 <Panel id={MAIN_PANEL} />
             </GlobalContext.Provider>
         </div>
