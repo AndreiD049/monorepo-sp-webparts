@@ -20,6 +20,7 @@
     "@microsoft/sp-webpart-base": "1.16.1",
     "@service/sp-cip": "^1.0.0",
     "@tiptap/extension-image": "^2.0.0-beta.218",
+    "@tiptap/extension-link": "^2.0.0-beta.218",
     "@tiptap/pm": "^2.0.0-beta.218",
     "@tiptap/react": "^2.0.0-beta.218",
     "@tiptap/starter-kit": "^2.0.0-beta.218",

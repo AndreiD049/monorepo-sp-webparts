@@ -9,7 +9,6 @@ import { Item } from '../item';
 import { buildIndex, Index } from '../services';
 import { ITEM_ADDED } from '../services/events';
 import { MainService } from '../services/main-service';
-import { DescriptionEditor } from './DescriptionEditor';
 import styles from './Feedback.module.scss';
 import { FeedbackForm } from './FeedbackForm';
 
@@ -87,9 +86,8 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
                     location.reload();
                 }} />
                 {info.index.findByTag(FEEDBACK).map((i) => (
-                    <div key={i.Id}>{i.Title}</div>
+                    <div key={i.Id} dangerouslySetInnerHTML={{  __html: i.Fields.text }} />
                 ))}
-                <DescriptionEditor />
                 <Panel id={MAIN_PANEL} />
             </GlobalContext.Provider>
         </div>

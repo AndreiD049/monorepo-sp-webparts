@@ -6,6 +6,7 @@ import { Item } from '../../item';
 import { itemAdded } from '../../services/events';
 import { MainService } from '../../services/main-service';
 import { optionsFromItems } from '../../utils';
+import { DescriptionEditor } from '../DescriptionEditor';
 import { GlobalContext } from '../Feedback';
 import styles from './FeedbackForm.module.scss';
 
@@ -26,7 +27,8 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = (props) => {
     );
     
     const handleCreate = React.useCallback(async () => {
-        const addResult = await MainService.ItemsService.addItem(item.addTag(FEEDBACK).asRaw());
+        const newItem = await item.addTag(FEEDBACK).replaceImagesIn('text');
+        const addResult = await MainService.ItemsService.addItem(newItem.asRaw());
         itemAdded(await MainService.ItemsService.getItem(addResult.data.Id))
         setItem(new Item());
         hidePanel(MAIN_PANEL);
@@ -53,15 +55,7 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = (props) => {
                 selectedKey={item.getField('environment')}
             />
             <TextField label="Summary" value={item.Title} onChange={(_ev, val) => setItem((prev) => prev.setTitle(val))} />
-            <TextField
-                label="Description"
-                multiline
-                autoAdjustHeight
-                value={item.getFieldOr('text', '')}
-                onChange={(_ev, val) =>
-                    setItem((prev) => prev.setField('text', val))
-                }
-            />
+            <DescriptionEditor onUpdate={(content) => setItem((prev) => prev.setField('text', content))} />
             <PrimaryButton onClick={handleCreate}>Create</PrimaryButton>
             <pre>{JSON.stringify(item, null, 4)}</pre>
         </div>

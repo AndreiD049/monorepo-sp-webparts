@@ -1,4 +1,5 @@
 import { IFeedbackItem, IFeedbackItemRaw, IFields } from "../../models/IFeedbackItem";
+import { replaceImagesInHtml } from "./utils";
 
 export class Item implements IFeedbackItem {
     Id: number;
@@ -52,6 +53,15 @@ export class Item implements IFeedbackItem {
         if (result.Tags.indexOf(tag) === -1) {
             this.Tags.push(tag);
         } 
+        return result;
+    }
+    
+    public async replaceImagesIn(field: string): Promise<Item> {
+        const result = this.clone();
+        const oldContent = result.getField<string>(field);
+        const newContent = await replaceImagesInHtml(oldContent);
+        console.log(newContent);
+        result.setField(field, newContent);
         return result;
     }
     

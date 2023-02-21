@@ -68,3 +68,34 @@
         }
     }
 }
+
+
+.header {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 4px;
+    border-top: 1px solid '[theme: neutralLight, default: #eaeaea]';
+    border-left: 1px solid '[theme: neutralLight, default: #eaeaea]';
+    border-right: 1px solid '[theme: neutralLight, default: #eaeaea]';
+    padding: 4px 2px;
+}
+
+.headerButton {
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid "[theme: themePrimary, default: #a4262c]";
+    margin: 0;
+    padding: 0;
+    border-radius: 3px;
+    
+    &Active, &Active:hover {
+        background-color: "[theme: themePrimary, default: #a4262c]";
+
+        i, i:hover, span:hover {
+            color: "[theme: white, default: #ffffff]" !important;
+        }
+    }
+}
