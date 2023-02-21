@@ -1,7 +1,18 @@
-import { Dropdown, IDropdownOption, PrimaryButton, TextField } from 'office-ui-fabric-react';
+import {
+    Dropdown,
+    IDropdownOption,
+    Label,
+    PrimaryButton,
+    TextField,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
 import { hidePanel } from 'sp-components';
-import { APPLICATION, ENVIRONMENT, FEEDBACK, MAIN_PANEL } from '../../constants';
+import {
+    APPLICATION,
+    ENVIRONMENT,
+    FEEDBACK,
+    MAIN_PANEL,
+} from '../../constants';
 import { Item } from '../../item';
 import { itemAdded } from '../../services/events';
 import { MainService } from '../../services/main-service';
@@ -15,21 +26,23 @@ export interface IFeedbackFormProps {
 }
 
 export const FeedbackForm: React.FC<IFeedbackFormProps> = (props) => {
-    const { index } = React.useContext(GlobalContext);
+    const { indexManager } = React.useContext(GlobalContext);
     const [item, setItem] = React.useState(new Item());
     const apps: IDropdownOption[] = React.useMemo(
-        () => optionsFromItems(index.findByTag(APPLICATION)),
+        () => optionsFromItems(indexManager.getArrayBy('tag', APPLICATION)),
         []
     );
     const envs: IDropdownOption[] = React.useMemo(
-        () => optionsFromItems(index.findByTag(ENVIRONMENT)),
+        () => optionsFromItems(indexManager.getArrayBy('tag', ENVIRONMENT)),
         []
     );
-    
+
     const handleCreate = React.useCallback(async () => {
         const newItem = await item.addTag(FEEDBACK).replaceImagesIn('text');
-        const addResult = await MainService.ItemsService.addItem(newItem.asRaw());
-        itemAdded(await MainService.ItemsService.getItem(addResult.data.Id))
+        const addResult = await MainService.ItemsService.addItem(
+            newItem.asRaw()
+        );
+        itemAdded(await MainService.ItemsService.getItem(addResult.data.Id));
         setItem(new Item());
         hidePanel(MAIN_PANEL);
     }, [item]);
@@ -40,7 +53,9 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = (props) => {
                 options={apps}
                 label="Application"
                 onChange={(_ev, option) => {
-                    setItem((prev) => prev.setField('application', option.text));
+                    setItem((prev) =>
+                        prev.setField('application', option.text)
+                    );
                 }}
                 selectedKey={item.getField('application')}
             />
@@ -54,8 +69,19 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = (props) => {
                 }}
                 selectedKey={item.getField('environment')}
             />
-            <TextField label="Summary" value={item.Title} onChange={(_ev, val) => setItem((prev) => prev.setTitle(val))} />
-            <DescriptionEditor onUpdate={(content) => setItem((prev) => prev.setField('text', content))} />
+            <TextField
+                label="Summary"
+                value={item.Title}
+                onChange={(_ev, val) => setItem((prev) => prev.setTitle(val))}
+            />
+            <Label>
+                Description
+                <DescriptionEditor
+                    onUpdate={(content) =>
+                        setItem((prev) => prev.setField('text', content))
+                    }
+                />
+            </Label>
             <PrimaryButton onClick={handleCreate}>Create</PrimaryButton>
             <pre>{JSON.stringify(item, null, 4)}</pre>
         </div>

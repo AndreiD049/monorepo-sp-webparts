@@ -122,6 +122,7 @@ const HeaderButton: React.FC<{
                     ? styles.headerButtonActive
                     : '')
             }`}
+            tabIndex={-1}
             title={props.title}
             iconProps={{ iconName: props.iconName }}
         />

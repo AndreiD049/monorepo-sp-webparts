@@ -5,8 +5,8 @@ import { Panel, showPanel } from 'sp-components';
 import { IFeedbackItem } from '../../../models/IFeedbackItem';
 import { DB_NAME, FEEDBACK, MAIN_PANEL, STORE_NAME } from '../constants';
 import { IFeedbackWebPartProps } from '../FeedbackWebPart';
+import { IndexManager } from '../indexes/index-manager';
 import { Item } from '../item';
-import { buildIndex, Index } from '../services';
 import { ITEM_ADDED } from '../services/events';
 import { MainService } from '../services/main-service';
 import styles from './Feedback.module.scss';
@@ -14,12 +14,12 @@ import { FeedbackForm } from './FeedbackForm';
 
 interface IGlobalContextProps {
     items: IFeedbackItem[];
-    index: Index;
+    indexManager: IndexManager;
 }
 
 export const GlobalContext = React.createContext<IGlobalContextProps>({
     items: [],
-    index: null,
+    indexManager: null,
 });
 
 export interface IFeedbackProps {
@@ -36,10 +36,10 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
             const items = await ItemsService.getAllItems();
             const systemItems = await ItemsService.getAllSystemItems();
             const allItems = items.concat(systemItems).map((i) => new Item(i));
-            const index = buildIndex(allItems);
+            const indexManager = new IndexManager(allItems);
             setInfo({
                 items: allItems,
-                index,
+                indexManager,
             });
         }
         run().catch((err) => console.error(err));
@@ -48,10 +48,10 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
     React.useEffect(() => {
         function itemAddedHandler(ev: CustomEvent): void {
             setInfo((prev) => {
-                const newIndex = prev.index.addItem(ev.detail);
+                prev.indexManager.itemAdded(ev.detail);
                 return {
-                    items: newIndex.items,
-                    index: newIndex,
+                    items: prev.indexManager.items,
+                    indexManager: prev.indexManager,
                 };
             });
         }
@@ -85,7 +85,7 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
                     await removeCached(db, /.*/);
                     location.reload();
                 }} />
-                {info.index.findByTag(FEEDBACK).map((i) => (
+                {info.indexManager.getArrayBy('tag', FEEDBACK).map((i) => (
                     <div key={i.Id} dangerouslySetInnerHTML={{  __html: i.Fields.text }} />
                 ))}
                 <Panel id={MAIN_PANEL} />

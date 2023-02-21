@@ -25,10 +25,7 @@
     "lib": [
       "es5",
       "dom",
-      "es2015.collection",
-      "es2015.promise",
-      "ES2015.Iterable",
-      "ES2015.Core"
+      "es2015"
     ]
   },
   "include": [

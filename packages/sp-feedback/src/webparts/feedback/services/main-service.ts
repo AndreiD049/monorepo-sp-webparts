@@ -12,7 +12,6 @@ export class MainService {
 
     public static initService(sp: SPFI, config: IFeedbackConfig): void {
         this.config = config;
-        // this.ItemsService = new ItemsService(sp, this.config.listName);
         this.ItemsService = createCacheProxy(
             new ItemsService(sp, this.config.listName),
             {
@@ -27,6 +26,6 @@ export class MainService {
                 },
             }
         );
-        this.AttachmentService = new AttachmentService(sp, "Shared Documents");
+        this.AttachmentService = new AttachmentService(sp, config.attachmentsRoot);
     }
 }
