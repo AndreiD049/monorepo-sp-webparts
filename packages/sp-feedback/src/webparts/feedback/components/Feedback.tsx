@@ -3,7 +3,13 @@ import { ActionButton, PanelType, PrimaryButton } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Panel, showPanel } from 'sp-components';
 import { IFeedbackItem } from '../../../models/IFeedbackItem';
-import { DB_NAME, FEEDBACK, MAIN_PANEL, STORE_NAME } from '../constants';
+import {
+    APPLICATION,
+    DB_NAME,
+    FEEDBACK,
+    MAIN_PANEL,
+    STORE_NAME,
+} from '../constants';
 import { IFeedbackWebPartProps } from '../FeedbackWebPart';
 import { IndexManager } from '../indexes/index-manager';
 import { Item } from '../item';
@@ -11,6 +17,8 @@ import { ITEM_ADDED } from '../services/events';
 import { MainService } from '../services/main-service';
 import styles from './Feedback.module.scss';
 import { FeedbackForm } from './FeedbackForm';
+import { ItemTemplate } from './ItemTemplate';
+import { SelectDropdown } from './SelectDropdown';
 
 interface IGlobalContextProps {
     items: IFeedbackItem[];
@@ -80,14 +88,45 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
                 >
                     Leave feedback
                 </PrimaryButton>
-                <ActionButton iconProps={{ iconName: 'Refresh' }} onClick={async () => {
-                    const db = await openDatabase(DB_NAME, STORE_NAME);
-                    await removeCached(db, /.*/);
-                    location.reload();
-                }} />
+                <ActionButton
+                    iconProps={{ iconName: 'Refresh' }}
+                    onClick={async () => {
+                        const db = await openDatabase(DB_NAME, STORE_NAME);
+                        await removeCached(db, /.*/);
+                        location.reload();
+                    }}
+                />
                 {info.indexManager.getArrayBy('tag', FEEDBACK).map((i) => (
-                    <div key={i.Id} dangerouslySetInnerHTML={{  __html: i.Fields.text }} />
+                    <ItemTemplate
+                        style={{ marginTop: '.5em' }}
+                        item={i}
+                        key={i.Id}
+                    />
                 ))}
+                {info.indexManager.getArrayBy('tag', FEEDBACK).map((i) => {
+                    return (
+                        <SelectDropdown
+                            key={i.Id}
+                            options={info.indexManager.getArrayBy(
+                                'tag',
+                                APPLICATION
+                            )}
+                            target={i}
+                            field="application"
+                            onChange={async (result) => {
+                                await MainService.ItemsService.updateItem(result.Id, result.asRaw());
+                                info.indexManager.itemUpdated(i, result);
+                                setInfo((prev) => ({
+                                    ...prev,
+                                }));
+                                
+                            }}
+                            dropDownProps={{
+                                label: 'Application'
+                            }}
+                        />
+                    );
+                })}
                 <Panel id={MAIN_PANEL} />
             </GlobalContext.Provider>
         </div>

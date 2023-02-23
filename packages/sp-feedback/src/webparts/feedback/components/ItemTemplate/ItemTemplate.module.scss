@@ -1,0 +1,35 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    display: flex;
+    flex-flow: column nowrap;
+    background-color: "[theme: themeLighterAlt, default: #f8f8f8]";
+    border: 1px solid "[theme: neutralLighter, default: #f8f8f8]";
+    padding: 8px 24px;
+}
+
+.itemBodyOuter {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 1em;
+    padding-top: 1em;
+}
+
+.itemBody {
+    background-color: "[theme: primaryBackground, default: #ffffff]";
+}
+
+.itemBodyCollapsible {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .2s ease-out;
+}
+
+.itemDescriptionButton {
+    align-items: center;
+    cursor: pointer;
+    display: inline-flex;
+    flex-flow: row nowrap;
+    gap: 8px;
+    user-select: none;
+}

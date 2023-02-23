@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getAllPaged } from '@service/sp-cip';
-import { IItemAddResult, IList, SPFI } from 'sp-preset';
+import { IItemAddResult, IItemUpdateResult, IList, SPFI } from 'sp-preset';
 import { IFeedbackItemRaw } from '../models/IFeedbackItem';
 import { Item } from '../webparts/feedback/item';
 
@@ -33,5 +33,9 @@ export class ItemsService {
     
     public async addItem(item: IFeedbackItemRaw): Promise<IItemAddResult> {
         return this.itemsList.items.add(item);
+    }
+    
+    public async updateItem(id: number, payload: Partial<IFeedbackItemRaw>): Promise<IItemUpdateResult> {
+        return this.itemsList.items.getById(id).update(payload);
     }
 }

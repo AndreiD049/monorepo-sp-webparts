@@ -60,7 +60,6 @@ export class Item implements IFeedbackItem {
         const result = this.clone();
         const oldContent = result.getField<string>(field);
         const newContent = await replaceImagesInHtml(oldContent);
-        console.log(newContent);
         result.setField(field, newContent);
         return result;
     }

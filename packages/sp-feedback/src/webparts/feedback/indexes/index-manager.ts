@@ -115,6 +115,7 @@ export class IndexManager {
     private titleIndex: Index;
     private _fieldIndexes: IndexMap = {};
     private fieldIndexes: IndexMap;
+    private sortFunc = (a: Item, b: Item): number => a.Id - b.Id;
 
     constructor(public items: Item[]) {
         this.idIndex = new Index(items, (item) => item.Id.toString());
@@ -141,13 +142,13 @@ export class IndexManager {
     public getArrayBy(by: SearchByType, value: ValueType): Item[] {
         switch (by) {
             case 'tag':
-                return this.tagIndex.getArray(value);
+                return this.tagIndex.getArray(value).sort(this.sortFunc);
             case 'title':
-                return this.titleIndex.getArray(value);
+                return this.titleIndex.getArray(value).sort(this.sortFunc);
             case 'id':
-                return this.idIndex.getArray(value);
+                return this.idIndex.getArray(value).sort(this.sortFunc);
             default:
-                return this.fieldIndexes[by.field].getArray(value);
+                return this.fieldIndexes[by.field].getArray(value).sort(this.sortFunc);
         }
     }
     
@@ -176,8 +177,7 @@ export class IndexManager {
     }
 
     public itemUpdated(oldItem: Item, newItem: Item): void {
-        this.items = this.items.filter((i) => i.Id !== oldItem.Id);
-        this.items.push(newItem);
+        this.items = this.items.map((i) => i.Id === oldItem.Id ? newItem : i);
         this.tagIndex.updateItem(oldItem, newItem);
         this.titleIndex.updateItem(oldItem, newItem);
         for (const key in this.fieldIndexes) {

@@ -14,16 +14,18 @@ import { Dialog, FooterOkCancel, hideDialog, showDialog } from 'sp-components';
 
 const DIALOG_ID = 'spfxFeedbackDialog';
 export interface IDescriptionEditorProps {
-    onUpdate: (content: string) => void;
+    onUpdate?: (content: string) => void;
+    content: string;
+    editable?: boolean;
 }
 
 async function getBase64DataFromFile(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
         try {
             const reader = new FileReader();
-            reader.onload = function(e) {
-              resolve(e.target.result as string);
-            }
+            reader.onload = function (e) {
+                resolve(e.target.result as string);
+            };
             reader.readAsDataURL(file);
         } catch (err) {
             reject(err);
@@ -70,16 +72,24 @@ const ImageDialog: React.FC<{ editor: Editor }> = (props) => {
             />
             <div style={{ marginTop: 4 }}>
                 {selected === 'Attach' ? (
-                    <input type="file" accept='image/*' onChange={(ev) => {
-                        const files = ev.target.files;
-                        if (files.length > 0) {
-                            setFile(files[0]);
-                        } else {
-                            setFile(null);
-                        }
-                    }} />
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(ev) => {
+                            const files = ev.target.files;
+                            if (files.length > 0) {
+                                setFile(files[0]);
+                            } else {
+                                setFile(null);
+                            }
+                        }}
+                    />
                 ) : (
-                    <TextField placeholder="Url" value={url} onChange={(_ev, value) => setUrl(value)} />
+                    <TextField
+                        placeholder="Url"
+                        value={url}
+                        onChange={(_ev, value) => setUrl(value)}
+                    />
                 )}
             </div>
             <div style={{ marginTop: 8 }}>
@@ -87,11 +97,11 @@ const ImageDialog: React.FC<{ editor: Editor }> = (props) => {
                     onOk={async () => {
                         if (selected === 'Attach' && file) {
                             props.editor.commands.setImage({
-                                src: await getBase64DataFromFile(file)
+                                src: await getBase64DataFromFile(file),
                             });
                         } else {
                             props.editor.commands.setImage({
-                                src: url
+                                src: url,
                             });
                         }
                         hideDialog(DIALOG_ID);
@@ -163,24 +173,6 @@ const MenuBar: React.FC<{ editor: Editor }> = ({ editor }) => {
             <HeaderButton
                 iconName="Header1"
                 onClick={() =>
-                    editor.chain().focus().toggleHeading({ level: 2 }).run()
-                }
-                disabled={
-                    !editor
-                        .can()
-                        .chain()
-                        .focus()
-                        .toggleHeading({ level: 2 })
-                        .run()
-                }
-                editor={editor}
-                name="heading"
-                attributes={{ level: 2 }}
-                title="Heading level 1"
-            />
-            <HeaderButton
-                iconName="Header2"
-                onClick={() =>
                     editor.chain().focus().toggleHeading({ level: 1 }).run()
                 }
                 disabled={
@@ -194,10 +186,46 @@ const MenuBar: React.FC<{ editor: Editor }> = ({ editor }) => {
                 editor={editor}
                 name="heading"
                 attributes={{ level: 1 }}
+                title="Heading level 1"
+            />
+            <HeaderButton
+                iconName="Header2"
+                onClick={() =>
+                    editor.chain().focus().toggleHeading({ level: 2 }).run()
+                }
+                disabled={
+                    !editor
+                        .can()
+                        .chain()
+                        .focus()
+                        .toggleHeading({ level: 2 })
+                        .run()
+                }
+                editor={editor}
+                name="heading"
+                attributes={{ level: 2 }}
                 title="Heading level 2"
             />
             <HeaderButton
                 iconName="Header3"
+                onClick={() =>
+                    editor.chain().focus().toggleHeading({ level: 3 }).run()
+                }
+                disabled={
+                    !editor
+                        .can()
+                        .chain()
+                        .focus()
+                        .toggleHeading({ level: 3 })
+                        .run()
+                }
+                editor={editor}
+                name="heading"
+                attributes={{ level: 3 }}
+                title="Heading level 3"
+            />
+            <HeaderButton
+                iconName="Header4"
                 onClick={() =>
                     editor.chain().focus().toggleHeading({ level: 4 }).run()
                 }
@@ -212,24 +240,6 @@ const MenuBar: React.FC<{ editor: Editor }> = ({ editor }) => {
                 editor={editor}
                 name="heading"
                 attributes={{ level: 4 }}
-                title="Heading level 3"
-            />
-            <HeaderButton
-                iconName="Header4"
-                onClick={() =>
-                    editor.chain().focus().toggleHeading({ level: 5 }).run()
-                }
-                disabled={
-                    !editor
-                        .can()
-                        .chain()
-                        .focus()
-                        .toggleHeading({ level: 5 })
-                        .run()
-                }
-                editor={editor}
-                name="heading"
-                attributes={{ level: 5 }}
                 title="Heading level 4"
             />
             <HeaderButton
@@ -290,7 +300,10 @@ const MenuBar: React.FC<{ editor: Editor }> = ({ editor }) => {
     );
 };
 
-export const DescriptionEditor: React.FC<IDescriptionEditorProps> = (props) => {
+export const DescriptionEditor: React.FC<IDescriptionEditorProps> = ({
+    editable = true,
+    ...props
+}) => {
     const editor = useEditor({
         extensions: [
             StarterKit,
@@ -302,17 +315,19 @@ export const DescriptionEditor: React.FC<IDescriptionEditorProps> = (props) => {
                 linkOnPaste: true,
                 HTMLAttributes: {
                     rel: 'noopener',
-                    target: '_blank'
-                }
-            })
+                    target: '_blank',
+                },
+            }),
         ],
-        onUpdate: (innerProps) => props.onUpdate(innerProps.editor.getHTML()),
-        content: '',
+        onUpdate: (innerProps) =>
+            props.onUpdate ? props.onUpdate(innerProps.editor.getHTML()) : null,
+        content: props.content,
+        editable,
     });
 
     return (
         <div className={styles.container}>
-            <MenuBar editor={editor} />
+            {editable && <MenuBar editor={editor} />}
             <EditorContent editor={editor} />
             <Dialog id={DIALOG_ID} />
         </div>

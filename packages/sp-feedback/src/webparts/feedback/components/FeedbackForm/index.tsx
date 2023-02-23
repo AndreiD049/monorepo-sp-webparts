@@ -1,6 +1,4 @@
 import {
-    Dropdown,
-    IDropdownOption,
     Label,
     PrimaryButton,
     TextField,
@@ -12,13 +10,14 @@ import {
     ENVIRONMENT,
     FEEDBACK,
     MAIN_PANEL,
+    STATUS,
 } from '../../constants';
 import { Item } from '../../item';
 import { itemAdded } from '../../services/events';
 import { MainService } from '../../services/main-service';
-import { optionsFromItems } from '../../utils';
 import { DescriptionEditor } from '../DescriptionEditor';
 import { GlobalContext } from '../Feedback';
+import { SelectDropdown } from '../SelectDropdown';
 import styles from './FeedbackForm.module.scss';
 
 export interface IFeedbackFormProps {
@@ -27,15 +26,7 @@ export interface IFeedbackFormProps {
 
 export const FeedbackForm: React.FC<IFeedbackFormProps> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
-    const [item, setItem] = React.useState(new Item());
-    const apps: IDropdownOption[] = React.useMemo(
-        () => optionsFromItems(indexManager.getArrayBy('tag', APPLICATION)),
-        []
-    );
-    const envs: IDropdownOption[] = React.useMemo(
-        () => optionsFromItems(indexManager.getArrayBy('tag', ENVIRONMENT)),
-        []
-    );
+    const [item, setItem] = React.useState(new Item().setField('status', 'New'));
 
     const handleCreate = React.useCallback(async () => {
         const newItem = await item.addTag(FEEDBACK).replaceImagesIn('text');
@@ -49,25 +40,32 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = (props) => {
 
     return (
         <div className={styles.container}>
-            <Dropdown
-                options={apps}
-                label="Application"
-                onChange={(_ev, option) => {
-                    setItem((prev) =>
-                        prev.setField('application', option.text)
-                    );
+            <SelectDropdown
+                options={indexManager.getArrayBy('tag', APPLICATION)}
+                target={item}
+                onChange={(result: Item) => {
+                    setItem(result);
                 }}
-                selectedKey={item.getField('application')}
+                dropDownProps={{ label: 'Application' }}
+                field="application"
             />
-            <Dropdown
-                options={envs}
-                label="Environment"
-                onChange={(_ev, option) => {
-                    setItem((prev) =>
-                        prev.setField('environment', option.text)
-                    );
+            <SelectDropdown
+                options={indexManager.getArrayBy('tag', ENVIRONMENT)}
+                target={item}
+                onChange={(result: Item) => {
+                    setItem(result);
                 }}
-                selectedKey={item.getField('environment')}
+                dropDownProps={{ label: 'Environment' }}
+                field="environment"
+            />
+            <SelectDropdown
+                options={indexManager.getArrayBy('tag', STATUS)}
+                target={item}
+                onChange={(result: Item) => {
+                    setItem(result);
+                }}
+                dropDownProps={{ label: 'Status' }}
+                field="status"
             />
             <TextField
                 label="Summary"
@@ -80,6 +78,7 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = (props) => {
                     onUpdate={(content) =>
                         setItem((prev) => prev.setField('text', content))
                     }
+                    content={item.getFieldOr('text', '')}
                 />
             </Label>
             <PrimaryButton onClick={handleCreate}>Create</PrimaryButton>
