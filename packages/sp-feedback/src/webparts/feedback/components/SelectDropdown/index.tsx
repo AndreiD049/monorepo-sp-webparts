@@ -1,8 +1,14 @@
-import { Dropdown, Icon, IDropdownOption, IDropdownProps } from 'office-ui-fabric-react';
+import {
+    Dropdown,
+    Icon,
+    IDropdownOption,
+    IDropdownProps,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Item } from '../../item';
 
-export interface ISelectDropdownProps {
+export interface ISelectDropdownProps
+    extends Omit<React.HTMLAttributes<HTMLElement>, 'onChange'> {
     // options that user can select
     options: Item[];
     // target item. All changes will be done in regards to this item
@@ -12,8 +18,11 @@ export interface ISelectDropdownProps {
     // if set, the given field will be updated with the selected value
     field?: string;
     onChange: (result: Item) => void;
-    
-    dropDownProps?: Omit<IDropdownProps, 'options' | 'selectedKeys' | 'selectedKey' | 'onChange'>;
+
+    dropDownProps?: Omit<
+        IDropdownProps,
+        'options' | 'selectedKeys' | 'selectedKey' | 'onChange'
+    >;
 }
 
 export const SelectDropdown: React.FC<ISelectDropdownProps> = (props) => {
@@ -24,46 +33,57 @@ export const SelectDropdown: React.FC<ISelectDropdownProps> = (props) => {
             data: o,
         }));
     }, [props.options]);
-    
-    const handleSelect = React.useCallback((_ev, option: IDropdownOption) => {
-        let result = props.target.clone();
-        const key = option.key.toString();
-        const optionSet = new Set(options.map((o) => o.key.toString()));
-        if (props.tag) {
-            const strippedTags = result.Tags.filter((t) => !optionSet.has(t));
-            result.Tags = [...strippedTags, key];
-        }
-        if (props.field) {
-            result = result.setField(props.field, key);
-        }
-        props.onChange(result);
-    }, [props]);
 
-    const handleSelectMultiple = React.useCallback((_ev, option: IDropdownOption) => {
-        const result = props.target.clone();
-        const key = option.key.toString();
-        if (props.tag) {
-            if (option.selected) {
-                result.Tags = [...result.Tags, key];
-            } else {
-                result.Tags = result.Tags.filter((t) => t !== key);
+    const handleSelect = React.useCallback(
+        (_ev, option: IDropdownOption) => {
+            let result = props.target.clone();
+            const key = option.key.toString();
+            const optionSet = new Set(options.map((o) => o.key.toString()));
+            if (props.tag) {
+                const strippedTags = result.Tags.filter(
+                    (t) => !optionSet.has(t)
+                );
+                result.Tags = [...strippedTags, key];
             }
-        }
-        if (props.field) {
-            const fieldValue = result.getField(props.field);
-            if (Array.isArray(fieldValue)) {
+            if (props.field) {
+                result = result.setField(props.field, key);
+            }
+            props.onChange(result);
+        },
+        [props]
+    );
+
+    const handleSelectMultiple = React.useCallback(
+        (_ev, option: IDropdownOption) => {
+            const result = props.target.clone();
+            const key = option.key.toString();
+            if (props.tag) {
                 if (option.selected) {
-                    result.setField(props.field, [...fieldValue, key]);
+                    result.Tags = [...result.Tags, key];
                 } else {
-                    result.setField(props.field, fieldValue.filter((v) => v !== key));
+                    result.Tags = result.Tags.filter((t) => t !== key);
                 }
-            } else {
-                result.setField(props.field, [key]);
             }
-        }
-        props.onChange(result);
-    }, [props]);
-    
+            if (props.field) {
+                const fieldValue = result.getField(props.field);
+                if (Array.isArray(fieldValue)) {
+                    if (option.selected) {
+                        result.setField(props.field, [...fieldValue, key]);
+                    } else {
+                        result.setField(
+                            props.field,
+                            fieldValue.filter((v) => v !== key)
+                        );
+                    }
+                } else {
+                    result.setField(props.field, [key]);
+                }
+            }
+            props.onChange(result);
+        },
+        [props]
+    );
+
     const getItemKey = React.useCallback(() => {
         if (props.tag) {
             const tagSet = new Set(props.target.Tags);
@@ -97,7 +117,7 @@ export const SelectDropdown: React.FC<ISelectDropdownProps> = (props) => {
         additionalProps.selectedKey = getItemKey();
         additionalProps.onChange = handleSelect;
     }
-    
+
     const handleRenderOption = React.useCallback((props, defaultRender) => {
         const option: Item = props.data;
         if (option) {
@@ -108,13 +128,21 @@ export const SelectDropdown: React.FC<ISelectDropdownProps> = (props) => {
                         <Icon iconName={icon} style={{ margin: '0 .5em' }} />
                         {defaultRender(props)}
                     </div>
-                )
+                );
             }
         }
         return defaultRender(props);
     }, []);
 
+    if (props.options.length === 0) return null;
+
     return (
-        <Dropdown {...props.dropDownProps} options={options} {...additionalProps} onRenderOption={handleRenderOption} />
+        <Dropdown
+            {...props.dropDownProps}
+            options={options}
+            {...additionalProps}
+            onRenderOption={handleRenderOption}
+            style={props.style}
+        />
     );
 };

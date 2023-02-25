@@ -10,5 +10,6 @@ export const MAIN_PANEL = 'SpfxFedbackPanel';
 // TAGS
 export const APPLICATION = 'FB:/Application';
 export const ENVIRONMENT = 'FB:/Environment';
+export const CATEGORY = 'FB:/Category';
 export const FEEDBACK = 'FB:/Feedback';
 export const STATUS = 'FB:/Status';

@@ -29,6 +29,9 @@ export class Item implements IFeedbackItem {
     }
     
     public getFieldOr<T>(field: string, def: IFields['k']): T {
+        if (field === 'title') return this.Title as unknown as T;
+        if (field === 'id') return this.Id as unknown as T;
+        if (field === 'tags') return this.Tags as unknown as T;
         return (this.Fields[field] ?? def) as T;
     }
     
@@ -39,6 +42,12 @@ export class Item implements IFeedbackItem {
     public setField<T>(field: string, value: T): Item {
         const result = this.clone();
         result.Fields[field] = value;
+        return result;
+    }
+    
+    public unsetField(field: string): Item {
+        const result = this.clone();
+        delete this.Fields[field];
         return result;
     }
     
@@ -53,6 +62,12 @@ export class Item implements IFeedbackItem {
         if (result.Tags.indexOf(tag) === -1) {
             this.Tags.push(tag);
         } 
+        return result;
+    }
+    
+    public setTags(tags: string[]): Item {
+        const result = this.clone();
+        result.Tags = tags;
         return result;
     }
     

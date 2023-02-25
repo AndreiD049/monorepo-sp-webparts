@@ -1,7 +1,8 @@
 import { Item } from '../item';
+import { Filter, getFieldAndValue, getFilterKey } from './filter';
+import { filterSet, setIntersection, setUnion } from './set-operations';
 
 type ValueType = string;
-type SearchByType = { field: string } | 'title' | 'tag' | 'id';
 type HashMap = {
     [key: ValueType]: Set<Item>;
 };
@@ -29,15 +30,25 @@ export class Index implements IIndex {
     }
 
     updateItem(oldItem: Item, newItem: Item): void {
+        function mapReplace(i: Item): Item {
+            return i.Id === oldItem.Id ? newItem : i;
+        }
+        const key = this.getter(oldItem) || null;
         if (this.indexBuilt()) {
-            this.removeItem(oldItem);
-            this.addItem(newItem);
+            if (Array.isArray(key)) {
+                key.forEach((k) => {
+                    const set = this.getArray(k).map(mapReplace);
+                    this.index[k] = new Set(set);
+                });
+            } else {
+                this.index[key] = new Set(this.getArray(key).map(mapReplace));
+            }
         }
     }
 
     removeItem(item: Item): void {
-        const key = this.getter(item);
-        if (this.indexBuilt() && key) {
+        const key = this.getter(item) || null;
+        if (this.indexBuilt()) {
             if (Array.isArray(key)) {
                 key.forEach((k) => {
                     const set = this.get(k);
@@ -71,7 +82,7 @@ export class Index implements IIndex {
     getArray(value: string): Item[] {
         return Array.from(this.get(value));
     }
-    
+
     private checkBuildIndex(): void {
         if (!this.indexBuilt()) {
             this.buildIndex();
@@ -91,8 +102,7 @@ export class Index implements IIndex {
     }
 
     private addValueToIndex(item: Item, index: HashMap): void {
-        const key = this.getter(item);
-        if (!key) return;
+        const key = this.getter(item) || null;
         if (Array.isArray(key)) {
             key.forEach((k) => {
                 if (index[k] === undefined) {
@@ -115,18 +125,16 @@ export class IndexManager {
     private titleIndex: Index;
     private _fieldIndexes: IndexMap = {};
     private fieldIndexes: IndexMap;
-    private sortFunc = (a: Item, b: Item): number => a.Id - b.Id;
-
     constructor(public items: Item[]) {
         this.idIndex = new Index(items, (item) => item.Id.toString());
         this.tagIndex = new Index(items, (item) => item.Tags);
         this.titleIndex = new Index(items, (item) => item.Title);
         this.fieldIndexes = new Proxy(this._fieldIndexes, {
-            get: this.proxyHandlerGet,
+            get: this.proxyHandlerGet.bind(this),
         });
     }
 
-    public getBy(by: SearchByType, value: ValueType): ReadonlySet<Item> {
+    public getBy(by: string, value: ValueType): ReadonlySet<Item> {
         switch (by) {
             case 'tag':
                 return this.tagIndex.get(value);
@@ -135,23 +143,54 @@ export class IndexManager {
             case 'id':
                 return this.idIndex.get(value);
             default:
-                return this.fieldIndexes[by.field].get(value);
+                return this.fieldIndexes[by].get(value);
         }
     }
 
-    public getArrayBy(by: SearchByType, value: ValueType): Item[] {
-        switch (by) {
-            case 'tag':
-                return this.tagIndex.getArray(value).sort(this.sortFunc);
-            case 'title':
-                return this.titleIndex.getArray(value).sort(this.sortFunc);
-            case 'id':
-                return this.idIndex.getArray(value).sort(this.sortFunc);
-            default:
-                return this.fieldIndexes[by.field].getArray(value).sort(this.sortFunc);
+    public filter(f: Filter, contextItems?: Set<Item>): ReadonlySet<Item> {
+        contextItems = contextItems || new Set(this.items);
+        if (f.$or) {
+            let result = new Set<Item>();
+            for (const filter of f.$or) {
+                const intermediate = this.filter(filter, contextItems);
+                result = setUnion(result, intermediate);
+            }
+            return result;
         }
+        if (f.$and) {
+            let result = contextItems;
+            for (const filter of f.$and) {
+                const intermediate = this.filter(
+                    filter,
+                    result
+                );
+                if (intermediate.size === 0) return new Set();
+                if (!result) {
+                    result = intermediate as Set<Item>;
+                } else {
+                    result = setIntersection(result, intermediate);
+                }
+            }
+            return result;
+        }
+        const key = getFilterKey(f);
+        const [field, value] = getFieldAndValue(f);
+        if (key === '$eq') {
+            return this.getBy(field, value);
+        }
+        if (key === '$ne') {
+            return filterSet(contextItems, (item) => {
+                const fieldValue = item.getField(field);
+                return fieldValue !== value;
+            });
+        }
+        throw Error(`Invalid fitler ${JSON.stringify(f)}`);
     }
-    
+
+    public filterArray(f: Filter): Item[] {
+        return Array.from(this.filter(f));
+    }
+
     public itemAdded(item: Item): void {
         this.items.push(item);
         this.tagIndex.addItem(item);
@@ -177,7 +216,7 @@ export class IndexManager {
     }
 
     public itemUpdated(oldItem: Item, newItem: Item): void {
-        this.items = this.items.map((i) => i.Id === oldItem.Id ? newItem : i);
+        this.items = this.items.map((i) => (i.Id === oldItem.Id ? newItem : i));
         this.tagIndex.updateItem(oldItem, newItem);
         this.titleIndex.updateItem(oldItem, newItem);
         for (const key in this.fieldIndexes) {
