@@ -1,5 +1,5 @@
 import { Item } from '../item';
-import { Filter, getFieldAndValue, getFilterKey } from './filter';
+import { Filter, getFieldAndValue, getFilterOp } from './filter';
 import { filterSet, setIntersection, setUnion } from './set-operations';
 
 type ValueType = string;
@@ -173,7 +173,7 @@ export class IndexManager {
             }
             return result;
         }
-        const key = getFilterKey(f);
+        const key = getFilterOp(f);
         const [field, value] = getFieldAndValue(f);
         if (key === '$eq') {
             return this.getBy(field, value);

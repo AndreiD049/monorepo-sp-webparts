@@ -6,6 +6,7 @@ import { DB_NAME, MAIN_PANEL, STORE_NAME } from '../../../constants';
 import { Filter } from '../../../indexes/filter';
 import { Item } from '../../../item';
 import { GlobalContext } from '../../Feedback';
+import { FilterBuilder } from '../../FilterBuilder';
 import { ItemTemplate } from '../../ItemTemplate';
 import styles from './Main.module.scss';
 
@@ -21,6 +22,7 @@ export const Main: React.FC<IMainProps> = (props) => {
     
     const handleFilter = (): void => {
         const filter: Filter = JSON.parse(value);
+        console.log(filter);
         console.time('filter');
         const items = indexManager.filterArray(filter);
         console.timeEnd('filter');
@@ -31,7 +33,11 @@ export const Main: React.FC<IMainProps> = (props) => {
         <div className={styles.container}>
             <div>
                 <textarea value={value} onChange={(ev) => setValue(ev.target.value)} />
+                <br/>
                 <button onClick={handleFilter}>Filter</button>
+            </div>
+            <div>
+                <FilterBuilder />
             </div>
             <PrimaryButton
                 onClick={() => navigate('new?from=/')}
