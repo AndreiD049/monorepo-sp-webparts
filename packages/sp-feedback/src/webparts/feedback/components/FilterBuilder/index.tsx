@@ -36,11 +36,13 @@ const FilterRowContext = React.createContext({
     field: '',
     value: '',
     level: 0,
+    defaultFilter: null,
 });
 
 export interface IFilterBuilderProps {
     filter: Filter;
     setFilter: React.Dispatch<React.SetStateAction<Filter>>;
+    defaultFilter?: Filter;
 }
 
 const OptionsList: React.FC<{
@@ -84,6 +86,7 @@ const CalloutButton: React.FC<{
             ),
         });
     };
+    
     if (typeof props.value !== 'string') {
         return (
             <div
@@ -108,12 +111,12 @@ const CalloutButton: React.FC<{
 };
 
 const FilterField: React.FC = () => {
-    const { filter, path, onChange, field } =
+    const { filter, path, onChange, field, defaultFilter } =
         React.useContext(FilterRowContext);
     const { indexManager } = React.useContext(GlobalContext);
     const options = React.useMemo(() => {
-        return indexManager.getFields();
-    }, [indexManager]);
+        return indexManager.getFields(defaultFilter);
+    }, [indexManager, defaultFilter]);
 
     return (
         <CalloutButton
@@ -134,10 +137,12 @@ const FilterField: React.FC = () => {
 };
 
 const FilterValue: React.FC = () => {
-    const { filter, path, onChange, field, value } =
+    const { filter, path, onChange, field, value, defaultFilter } =
         React.useContext(FilterRowContext);
     const { indexManager } = React.useContext(GlobalContext);
-    const options = React.useMemo(() => indexManager.getValues(field), [field, indexManager]);
+    const options = React.useMemo(() => {
+        return indexManager.getValues(field, defaultFilter);
+    }, [field, indexManager, defaultFilter]);
 
     return (
         <CalloutButton
@@ -202,7 +207,9 @@ const FilterBuilderRow: React.FC<IFilterBuilderRowProps> = (props) => {
             }
             if (isLogicOp(op)) {
                 if (path.length === 0) {
-                    return onChange(insertAtPath(filter, newFilter, [...path, op, 0]));
+                    return onChange(
+                        insertAtPath(filter, newFilter, [...path, op, 0])
+                    );
                 }
                 return onChange(insertAtPath(filter, newFilter, incPath(path)));
             }
@@ -212,7 +219,7 @@ const FilterBuilderRow: React.FC<IFilterBuilderRowProps> = (props) => {
 
     const levelStyles: React.CSSProperties = {
         paddingLeft: 50 * level - 25,
-        marginLeft: level === 0 ? 0 :25,
+        marginLeft: level === 0 ? 0 : 25,
     };
     if (level > 0) {
         levelStyles.borderLeft =
@@ -271,7 +278,8 @@ const FilterElement: React.FC<{
     onChange?: (filter: Filter) => void;
     path: PathTokens[];
     level: number;
-}> = ({ filter, onChange, path, level = 0 }) => {
+    defaultFilter?: Filter;
+}> = ({ filter, onChange, path, defaultFilter, level = 0 }) => {
     const fValue = React.useMemo(
         () => traversePath(filter, path),
         [filter, path]
@@ -290,6 +298,7 @@ const FilterElement: React.FC<{
                     field: '',
                     value: '',
                     level,
+                    defaultFilter,
                 }}
             >
                 <FilterBuilderRow type="empty" />
@@ -307,11 +316,21 @@ const FilterElement: React.FC<{
                 onChange={onChange}
                 path={[...path, op, idx]}
                 level={level + 1}
+                defaultFilter={defaultFilter}
             />
         ));
         return (
             <FilterRowContext.Provider
-                value={{ filter, path, onChange, op, field, value, level }}
+                value={{
+                    filter,
+                    path,
+                    onChange,
+                    op,
+                    field,
+                    value,
+                    level,
+                    defaultFilter,
+                }}
             >
                 <FilterBuilderRow type="logic" />
                 {filters.length === 0 ? (
@@ -324,6 +343,7 @@ const FilterElement: React.FC<{
                             field,
                             value,
                             level: level + 1,
+                            defaultFilter,
                         }}
                     >
                         <FilterBuilderRow type="empty" />
@@ -336,7 +356,16 @@ const FilterElement: React.FC<{
     }
     return (
         <FilterRowContext.Provider
-            value={{ filter, path, onChange, op, field, value, level }}
+            value={{
+                filter,
+                path,
+                onChange,
+                op,
+                field,
+                value,
+                level,
+                defaultFilter,
+            }}
         >
             <FilterBuilderRow type="op" />
         </FilterRowContext.Provider>
@@ -346,6 +375,7 @@ const FilterElement: React.FC<{
 export const FilterBuilder: React.FC<IFilterBuilderProps> = ({
     filter,
     setFilter,
+    defaultFilter,
 }) => {
     return (
         <div className={styles.container}>
@@ -356,6 +386,7 @@ export const FilterBuilder: React.FC<IFilterBuilderProps> = ({
                 }}
                 path={[]}
                 level={0}
+                defaultFilter={defaultFilter}
             />
             <Callout id={FILTER_CALLOUT} />
         </div>

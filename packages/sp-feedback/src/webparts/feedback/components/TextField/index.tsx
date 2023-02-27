@@ -35,7 +35,7 @@ export const TextField: React.FC<ITextFieldProps> = (props) => {
             props.onChange(result);
             return newValue;
         });
-    }, []);
+    }, [props.target, props.tag, props.field]);
 
     return (
         <TF {...props.textFieldProps} value={value} onChange={handleChange} />

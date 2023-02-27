@@ -12,7 +12,7 @@ export interface IItemTemplateProps
 export const ItemTitleTemplate: React.FC<{ item: Item }> = (props) => {
     return (
         <Text block variant="large">
-            {props.item.Id} - {props.item.Title} - {props.item.Tags.join(", ")}
+            {props.item.Id} - {props.item.Title} - {props.item.Tags?.join(", ")}
         </Text>
     );
 };

@@ -1,9 +1,7 @@
-import { openDatabase, removeCached } from 'idb-proxy';
-import { ActionButton, Panel, PrimaryButton } from 'office-ui-fabric-react';
+import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { useNavigate } from 'react-router';
-import { DB_NAME, FEEDBACK, MAIN_PANEL, STORE_NAME } from '../../../constants';
-import { $eq, parseFilter } from '../../../indexes/filter';
+import { FEEDBACK } from '../../../constants';
+import { $and, $eq, parseFilter } from '../../../indexes/filter';
 import { Item } from '../../../item';
 import { GlobalContext } from '../../Feedback';
 import { FilterBuilder } from '../../FilterBuilder';
@@ -15,7 +13,6 @@ export interface IMainProps {
 }
 
 export const Main: React.FC<IMainProps> = (props) => {
-    const navigate = useNavigate();
     const { indexManager } = React.useContext(GlobalContext);
     const initialFilter = React.useMemo(() => {
         const localValue = localStorage.getItem("spfx/feedback/last-filter");
@@ -30,31 +27,19 @@ export const Main: React.FC<IMainProps> = (props) => {
     
     React.useEffect(() => {
         console.time('filter');
-        const items = indexManager.filterArray(filter);
+        const items = indexManager.filterArray($and(filter, $eq('isservice', 'false')));
         console.timeEnd('filter');
         setItems(items);
     }, [filter]);
     
     return (
         <div className={styles.container}>
-            <PrimaryButton
-                onClick={() => navigate('new?from=/')}
-            >
-                Leave feedback
-            </PrimaryButton>
-            <ActionButton
-                iconProps={{ iconName: 'Refresh' }}
-                onClick={async () => {
-                    const db = await openDatabase(DB_NAME, STORE_NAME);
-                    await removeCached(db, /.*/);
-                    location.reload();
-                }}
-            />
-            <div>
+            <div className={styles.filters}>
+                <Text block variant='mediumPlus'>Filters:</Text>
                 <FilterBuilder filter={filter} setFilter={(filter) => {
                     localStorage.setItem("spfx/feedback/last-filter", JSON.stringify(filter));
                     setFilter(filter);
-                }} />
+                }} defaultFilter={$eq('isservice', 'false')} />
             </div>
             {items.map((i) => (
                 <ItemTemplate
@@ -63,7 +48,6 @@ export const Main: React.FC<IMainProps> = (props) => {
                     key={i.Id}
                 />
             ))}
-            <Panel id={MAIN_PANEL} />
         </div>
     );
 };

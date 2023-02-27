@@ -1,0 +1,14 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    min-width: 1px;
+}
+
+.topMenu {
+    border-bottom: 1px solid "[theme: themePrimary, default: #a4262c]";
+    margin-bottom: 1em;
+}
+
+.content {
+    padding: 0 14px 0 24px;
+}

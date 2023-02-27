@@ -8,6 +8,7 @@ export interface IFeedbackItem {
     Title: string;
     Tags: string[];
     Fields: IFields;
+    IsService: boolean;
 }
 
 export interface IFeedbackItemRaw extends Omit<IFeedbackItem, 'Fields'> {

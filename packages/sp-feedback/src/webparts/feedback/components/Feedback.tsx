@@ -9,8 +9,8 @@ import { IndexManager } from '../indexes/index-manager';
 import { Item } from '../item';
 import { ITEM_ADDED } from '../services/events';
 import { MainService } from '../services/main-service';
-import styles from './Feedback.module.scss';
 import { router } from './Router';
+import styles from './Feedback.module.scss';
 
 interface IGlobalContextProps {
     items: IFeedbackItem[];

@@ -78,10 +78,10 @@ export class Index implements IIndex {
         }
         return result;
     }
-    
+
     values(): string[] {
         this.checkBuildIndex();
-        return Object.keys(this.index);
+        return Object.keys(this.index).sort();
     }
 
     getArray(value: string): Item[] {
@@ -98,6 +98,11 @@ export class Index implements IIndex {
         return !!this.index;
     }
 
+    private hasVal(item: Item) {
+        const val = this.getter(item);
+        return val !== undefined && val !== null;
+    }
+
     private buildIndex(): void {
         const index: HashMap = {};
         this.items.forEach((item) => {
@@ -107,7 +112,7 @@ export class Index implements IIndex {
     }
 
     private addValueToIndex(item: Item, index: HashMap): void {
-        const key = this.getter(item) || null;
+        const key = this.hasVal(item) ? this.getter(item) : null;
         if (Array.isArray(key)) {
             key.forEach((k) => {
                 if (index[k] === undefined) {
@@ -128,14 +133,17 @@ export class IndexManager {
     private idIndex: Index;
     private tagIndex: Index;
     private titleIndex: Index;
+    private isServiceIndex: Index;
     private _fieldIndexes: IndexMap = {};
     private fieldIndexes: IndexMap;
-    private fieldNamesIndex: Set<string> = new Set();
 
     constructor(public items: Item[]) {
         this.idIndex = new Index(items, (item) => item.Id.toString());
         this.tagIndex = new Index(items, (item) => item.Tags);
         this.titleIndex = new Index(items, (item) => item.Title);
+        this.isServiceIndex = new Index(items, (item) =>
+            String(item.IsService)
+        );
         this.fieldIndexes = new Proxy(this._fieldIndexes, {
             get: this.proxyHandlerGet.bind(this),
         });
@@ -149,6 +157,8 @@ export class IndexManager {
                 return this.titleIndex.get(value);
             case 'id':
                 return this.idIndex.get(value);
+            case 'isservice':
+                return this.isServiceIndex.get(value);
             default:
                 return this.fieldIndexes[by].get(value);
         }
@@ -168,10 +178,7 @@ export class IndexManager {
         if (f.$and) {
             let result = contextItems;
             for (const filter of f.$and) {
-                const intermediate = this.filter(
-                    filter,
-                    result
-                );
+                const intermediate = this.filter(filter, result);
                 if (intermediate.size === 0) return new Set();
                 if (!result) {
                     result = intermediate as Set<Item>;
@@ -237,25 +244,42 @@ export class IndexManager {
             }
         }
     }
-    
-    public getFields(): string[] {
-        if (this.fieldNamesIndex.size === 0) {
-            this.items.forEach((i) => {
-                const fieldNames = Object.keys(i.Fields);
-                fieldNames.forEach((name) => {
-                    if (!this.fieldNamesIndex.has(name)) {
-                        this.fieldNamesIndex.add(name);
-                    }
-                })
+
+    public getFields(filter?: Filter): string[] {
+        const items = filter ? this.filterArray(filter) : this.items;
+        const result = new Set<string>();
+        items.forEach((i) => {
+            const fieldNames = Object.keys(i.Fields);
+            fieldNames.forEach((name) => {
+                if (!result.has(name)) {
+                    result.add(name);
+                }
             });
-            this.fieldNamesIndex.add('tags');
-            this.fieldNamesIndex.add('title');
-        }
-        return Array.from(this.fieldNamesIndex);
+        });
+        result.add('tags');
+        result.add('title');
+        result.add('isservice');
+        result.delete('text');
+        return Array.from(result).sort();
     }
-    
-    public getValues(field: string): string[] {
-        return this.fieldIndexes[field].values();
+
+    public getValues(field: string, filter?: Filter): string[] {
+        if (!filter) {
+            return this.fieldIndexes[field].values();
+        }
+        const items = this.filterArray(filter);
+        const result = new Set<string>();
+        items.forEach((item) => {
+            const value = item.getFieldOr<string | string[]>(field, null);
+            if (Array.isArray(value)) {
+                value.forEach((val) => {
+                    result.add(val);
+                });
+            } else {
+                result.add(String(value))
+            }
+        });
+        return Array.from(result).sort();
     }
 
     private proxyHandlerGet(target: IndexMap, prop: string): Index {

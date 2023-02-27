@@ -1,9 +1,4 @@
-import {
-    Label,
-    PrimaryButton,
-    Stack,
-    StackItem,
-} from 'office-ui-fabric-react';
+import { Label, PrimaryButton, Stack, StackItem } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
@@ -12,6 +7,7 @@ import {
     ENVIRONMENT,
     FEEDBACK,
     STATUS,
+    TEMPLATE,
 } from '../../constants';
 import { $and, $eq } from '../../indexes/filter';
 import { Item } from '../../item';
@@ -31,10 +27,49 @@ export interface IFeedbackFormProps {
 export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
     const navigate = useNavigate();
     const { indexManager } = React.useContext(GlobalContext);
+    const [textModified, setTextModified] = React.useState(false);
+    const [refreshEditor, setrefreshEditor] = React.useState(false);
     const [item, setItem] = React.useState(
         new Item().setField('status', 'FB:/Status/New')
     );
     const [searchParams] = useSearchParams();
+
+    // This doesn't really work, needs to be re-evalutated
+    React.useEffect(() => {
+        if (!textModified) {
+            const app = item.Fields.application as string;
+            const env = item.Fields['environment'] as string;
+            const cat = item.Fields['category'] as string;
+            let template: Item;
+            if (app) {
+                template = indexManager.filterArray(
+                    $and($eq('tags', TEMPLATE), $eq('tags', app))
+                )[0];
+            }
+            if (env) {
+                const filter = [app, env].filter((i) => Boolean(i)).map((i) => $eq('tags', i));
+                template = indexManager.filterArray(
+                    $and($eq('tags', TEMPLATE), ...filter)
+                )[0] || template;
+            }
+            if (cat) {
+                const filter = [app, env, cat].filter((i) => Boolean(i)).map((i) => $eq('tags', i));
+                template = indexManager.filterArray(
+                    $and($eq('tags', TEMPLATE), ...filter)
+                )[0] || template;
+            }
+            if (template) {
+                setItem((prev) =>
+                    prev.setField('text', template.getFieldOr('text', ''))
+                );
+                setrefreshEditor((prev) => !prev);
+            }
+        }
+    }, [
+        item.Fields.application,
+        item.Fields.environment,
+        item.Fields.category,
+    ]);
 
     const handleCreate = React.useCallback(async () => {
         const newItem = await item.addTag(FEEDBACK).replaceImagesIn('text');
@@ -45,7 +80,22 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
         setItem(new Item());
         navigate(searchParams.get('from') || '/');
     }, [item]);
-    
+
+    const editor = React.useMemo(() => {
+        return (
+            <DescriptionEditor
+                key={item.Fields['text']}
+                onUpdate={(content) =>
+                    setItem((prev) => {
+                        setTextModified(true);
+                        return prev.setField('text', content);
+                    })
+                }
+                content={item.getFieldOr('text', '')}
+            />
+        );
+    }, [refreshEditor]);
+
     return (
         <div className={styles.container}>
             <SelectChoice
@@ -56,12 +106,18 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                 choiceGroupProps={{ label: 'Application' }}
                 onChange={(newItem) => setItem(newItem.unsetField('category'))}
             />
-            <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: '1em' }}>
+            <Stack
+                horizontal
+                horizontalAlign="start"
+                tokens={{ childrenGap: '1em' }}
+            >
                 <StackItem>
                     <SelectChoice
                         target={item}
                         field="environment"
-                        options={indexManager.filterArray($eq('tag', ENVIRONMENT))}
+                        options={indexManager.filterArray(
+                            $eq('tag', ENVIRONMENT)
+                        )}
                         choiceGroupProps={{
                             label: 'Environment',
                         }}
@@ -75,8 +131,12 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                     <SelectChoice
                         target={item}
                         field="category"
-                        options={indexManager
-                            .filterArray($and($eq('tag', CATEGORY), $eq('tag', item.getField('application'))))}
+                        options={indexManager.filterArray(
+                            $and(
+                                $eq('tag', CATEGORY),
+                                $eq('tag', item.getField('application'))
+                            )
+                        )}
                         choiceGroupProps={{
                             label: 'Category',
                         }}
@@ -98,17 +158,11 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                 textFieldProps={{ label: 'Summary' }}
                 target={item}
                 field="caption"
-                onChange={(newItem) => setItem(newItem.setTitle(newItem.getFieldOr('caption', '')))}
+                onChange={(newItem) =>
+                    setItem(newItem.setTitle(newItem.getFieldOr('caption', '')))
+                }
             />
-            <Label>
-                Description
-                <DescriptionEditor
-                    onUpdate={(content) =>
-                        setItem((prev) => prev.setField('text', content))
-                    }
-                    content={item.getFieldOr('text', '')}
-                />
-            </Label>
+            <Label>Description {editor}</Label>
             <PrimaryButton onClick={handleCreate}>Create</PrimaryButton>
             <pre>{JSON.stringify(item, null, 4)}</pre>
         </div>

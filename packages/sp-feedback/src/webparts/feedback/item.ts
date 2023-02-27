@@ -5,6 +5,7 @@ export class Item implements IFeedbackItem {
     Id: number;
     Title: string;
     Tags: string[];
+    IsService: boolean;
     Fields: IFields;
     
     constructor(item?: IFeedbackItemRaw) {
@@ -12,11 +13,13 @@ export class Item implements IFeedbackItem {
             this.Id = item.Id;
             this.Title = item.Title;
             this.Tags = item.Tags;
+            this.IsService = item.IsService;
             this.Fields = this.readFields(item.Fields) || {};
         } else {
             this.Title = '';
             this.Tags = [];
             this.Fields = {};
+            this.IsService = false;
         }
     }
     
@@ -32,6 +35,7 @@ export class Item implements IFeedbackItem {
         if (field === 'title') return this.Title as unknown as T;
         if (field === 'id') return this.Id as unknown as T;
         if (field === 'tags') return this.Tags as unknown as T;
+        if (field === 'isservice') return this.IsService as unknown as T;
         return (this.Fields[field] ?? def) as T;
     }
     
@@ -85,11 +89,7 @@ export class Item implements IFeedbackItem {
     }
 
     public clone(): Item {
-        const result = new Item();
-        result.Id = this.Id;
-        result.Fields = this.Fields;
-        result.Tags = this.Tags;
-        result.Title = this.Title;
+        const result = new Item(this.asRaw());
         return result;
     }
 }

@@ -18,5 +18,6 @@ export const CATEGORY = 'FB:/Category';
 export const FEEDBACK = 'FB:/Feedback';
 // Items tagged with this appear in the choice/dropdown for status field
 export const STATUS = 'FB:/Status';
+export const TEMPLATE = 'FB:/Template';
 
 export const ADMINS = 'FB:/Administrators';
