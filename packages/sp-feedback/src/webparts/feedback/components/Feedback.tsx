@@ -1,7 +1,10 @@
 import * as React from 'react';
 import { RouterProvider } from 'react-router';
+import { ISiteUserInfo } from 'sp-preset';
 import { IFeedbackItem } from '../../../models/IFeedbackItem';
+import { ADMINS } from '../constants';
 import { IFeedbackWebPartProps } from '../FeedbackWebPart';
+import { $eq } from '../indexes/filter';
 import { IndexManager } from '../indexes/index-manager';
 import { Item } from '../item';
 import { ITEM_ADDED } from '../services/events';
@@ -12,11 +15,15 @@ import { router } from './Router';
 interface IGlobalContextProps {
     items: IFeedbackItem[];
     indexManager: IndexManager;
+    currentUser: ISiteUserInfo;
+    isAdmin?: boolean;
 }
 
 export const GlobalContext = React.createContext<IGlobalContextProps>({
     items: [],
     indexManager: null,
+    currentUser: null,
+    isAdmin: false,
 });
 
 export interface IFeedbackProps {
@@ -34,9 +41,22 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
             const systemItems = await ItemsService.getAllSystemItems();
             const allItems = items.concat(systemItems).map((i) => new Item(i));
             const indexManager = new IndexManager(allItems);
+            const admins = indexManager.filterArray($eq('title', ADMINS));
+            const currentUser = await MainService.UsersService.getCurrentUser();
+            let isAdmin = false;
+            if (admins.length > 0) {
+                isAdmin = admins[0]
+                    .getFieldOr<string[]>('users', [])
+                    .find(
+                        (u) =>
+                            u.toLowerCase() === currentUser.Email.toLowerCase()
+                    ) !== undefined;
+            }
             setInfo({
                 items: allItems,
                 indexManager,
+                isAdmin,
+                currentUser,
             });
         }
         run().catch((err) => console.error(err));
@@ -47,6 +67,7 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
             setInfo((prev) => {
                 prev.indexManager.itemAdded(ev.detail);
                 return {
+                    ...prev,
                     items: prev.indexManager.items,
                     indexManager: prev.indexManager,
                 };

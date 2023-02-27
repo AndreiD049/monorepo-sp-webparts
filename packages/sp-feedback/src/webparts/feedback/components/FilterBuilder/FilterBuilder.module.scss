@@ -3,3 +3,31 @@
 .container {
     min-width: 1px;
 }
+
+.filterButton {
+    cursor: pointer;
+    padding: 2px 8px;
+}
+
+.filterFieldContainer {
+    background-color: "[theme: themeLighter, default: #f0d3d4]";
+    border: 1px solid "[theme: neutralTertiary, default: #eaeaea]";
+}
+
+.filterOpContainer {
+    background-color: transparentize($color: #00CC6A, $amount: 0.5);
+    border: 1px solid "[theme: neutralTertiary, default: #eaeaea]";
+}
+
+.filterValueContainer {
+    background-color: "[theme: neutralLight, default: #eeeeee]";
+    border: 1px solid "[theme: neutralTertiary, default: #eaeaea]";
+}
+
+.filterRowContainer {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .5em;
+}

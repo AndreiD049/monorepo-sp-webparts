@@ -78,6 +78,11 @@ export class Index implements IIndex {
         }
         return result;
     }
+    
+    values(): string[] {
+        this.checkBuildIndex();
+        return Object.keys(this.index);
+    }
 
     getArray(value: string): Item[] {
         return Array.from(this.get(value));
@@ -125,6 +130,8 @@ export class IndexManager {
     private titleIndex: Index;
     private _fieldIndexes: IndexMap = {};
     private fieldIndexes: IndexMap;
+    private fieldNamesIndex: Set<string> = new Set();
+
     constructor(public items: Item[]) {
         this.idIndex = new Index(items, (item) => item.Id.toString());
         this.tagIndex = new Index(items, (item) => item.Tags);
@@ -148,6 +155,7 @@ export class IndexManager {
     }
 
     public filter(f: Filter, contextItems?: Set<Item>): ReadonlySet<Item> {
+        if (!f) return new Set();
         contextItems = contextItems || new Set(this.items);
         if (f.$or) {
             let result = new Set<Item>();
@@ -181,6 +189,9 @@ export class IndexManager {
         if (key === '$ne') {
             return filterSet(contextItems, (item) => {
                 const fieldValue = item.getField(field);
+                if (Array.isArray(fieldValue)) {
+                    return fieldValue.every((v) => v !== value);
+                }
                 return fieldValue !== value;
             });
         }
@@ -225,6 +236,26 @@ export class IndexManager {
                 index.updateItem(oldItem, newItem);
             }
         }
+    }
+    
+    public getFields(): string[] {
+        if (this.fieldNamesIndex.size === 0) {
+            this.items.forEach((i) => {
+                const fieldNames = Object.keys(i.Fields);
+                fieldNames.forEach((name) => {
+                    if (!this.fieldNamesIndex.has(name)) {
+                        this.fieldNamesIndex.add(name);
+                    }
+                })
+            });
+            this.fieldNamesIndex.add('tags');
+            this.fieldNamesIndex.add('title');
+        }
+        return Array.from(this.fieldNamesIndex);
+    }
+    
+    public getValues(field: string): string[] {
+        return this.fieldIndexes[field].values();
     }
 
     private proxyHandlerGet(target: IndexMap, prop: string): Index {

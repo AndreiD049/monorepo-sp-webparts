@@ -8,8 +8,15 @@ export const HOUR = MINUTE * 60;
 export const MAIN_PANEL = 'SpfxFedbackPanel';
 
 // TAGS
+// Items tagged with this appear in the dropdowns
 export const APPLICATION = 'FB:/Application';
+// Items tagged with this appear in the dropdowns
 export const ENVIRONMENT = 'FB:/Environment';
+// Items tagged with this appear in the dropdowns
 export const CATEGORY = 'FB:/Category';
+// Items tagged with this are perceived as feedback items
 export const FEEDBACK = 'FB:/Feedback';
+// Items tagged with this appear in the choice/dropdown for status field
 export const STATUS = 'FB:/Status';
+
+export const ADMINS = 'FB:/Administrators';

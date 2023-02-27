@@ -96,7 +96,7 @@ function validateFilter(o: any): boolean {
         throw Error(`Filter may have only 1 property: ${JSON.stringify(o)}`);
     const key = keys[0];
     if (key in FILTER_OPS_OBJ) {
-        return validateFilter(o[key]);
+        return true;
     }
     if (key in LOGIC_OPS_OBJ) {
         const filters: any[] = o[key];
@@ -215,14 +215,75 @@ export function getAllowedBefore(path: PathTokens[]): string[] {
     }
 }
 
-export function getAllowedAfter(path: PathTokens[]): string[] {
-    if (!path || path.length === 0) return null;
+export function getAllowedOps(path: PathTokens[], filter: Filter): string[] {
+    if (!path) return [];
+    if (path.length === 0 && !filter) return ALL_OPS;
+    const op = getFilterOp(filter);
+    if (path.length === 0 && isLogicOp(op)) return LOGIC_OPS;
+    if (path.length === 0 && isFilterOp(op)) return ALL_OPS;
     const lastToken = path[path.length - 1];
     if (typeof lastToken === 'number') {
         // path.length is not 0, so we can insert any operations
         return ALL_OPS;
     } else {
-        return null;
+        return [];
     }
 }
 
+export function changeField(filter: Filter, path: PathTokens[], newField: string): Filter {
+    const result = cloneDeep(traversePath(filter, path));
+    if (Array.isArray(result)) throw Error(`Expected single filter path`);
+    const op = getFilterOp(result);
+    const [oldField, value] = getFieldAndValue(result);
+    if (oldField === newField) return result;
+    if (isFilterOp(op)) {
+        result[op][newField] = value;
+        delete result[op][oldField];
+    }
+    return result;    
+}
+
+export function changeOp(filter: Filter, path: PathTokens[], newOp: string): Filter {
+    const result = cloneDeep(traversePath(filter, path));
+    if (Array.isArray(result)) throw Error(`Expected single filter path`);
+    const op = getFilterOp(result);
+    if (newOp === op) return result;
+    if (isFilterOp(newOp) && isFilterOp(op)) {
+        result[newOp] = result[op];
+        delete result[op];
+    } else if (isLogicOp(newOp) && isLogicOp(op)) {
+        result[newOp] = result[op];
+        delete result[op];
+    }
+    return result;    
+}
+
+export function changeValue(filter: Filter, path: PathTokens[], newValue: string): Filter {
+    const result = cloneDeep(traversePath(filter, path));
+    if (Array.isArray(result)) throw Error(`Expected single filter path`);
+    const op = getFilterOp(result);
+    const [oldField,] = getFieldAndValue(result);
+    if (isFilterOp(op)) {
+        result[op][oldField] = newValue;
+    }
+    return result;    
+}
+
+export function incPath(path: PathTokens[]): PathTokens[] {
+    const newPath = [...path];
+    if (path.length === 0) return newPath;
+    const lastToken = newPath[newPath.length - 1];    
+    if (lastToken === undefined || typeof lastToken !== 'number') {
+        throw Error(`Invalid last token in path ${newPath}. Expected number.`);
+    }
+    newPath[newPath.length - 1] = lastToken + 1;
+    return newPath;
+}
+
+export function getEmptyFilter(op: string): Filter {
+    if (isFilterOp(op)) {
+        return genericFilterOp(op, 'tags', '');
+    } else if (isLogicOp(op)) {
+        return genericLogicOp(op, []);
+    }
+}
