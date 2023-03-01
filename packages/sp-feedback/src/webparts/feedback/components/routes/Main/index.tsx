@@ -30,7 +30,7 @@ export const Main: React.FC<IMainProps> = (props) => {
         const items = indexManager.filterArray($and(filter, $eq('isservice', 'false')));
         console.timeEnd('filter');
         setItems(items);
-    }, [filter]);
+    }, [filter, indexManager]);
     
     return (
         <div className={styles.container}>

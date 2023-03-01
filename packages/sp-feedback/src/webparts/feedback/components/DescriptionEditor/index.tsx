@@ -14,6 +14,7 @@ import { Dialog, FooterOkCancel, hideDialog, showDialog } from 'sp-components';
 
 const DIALOG_ID = 'spfxFeedbackDialog';
 export interface IDescriptionEditorProps {
+    id?: string;
     onUpdate?: (content: string) => void;
     content: string;
     editable?: boolean;
@@ -302,6 +303,7 @@ const MenuBar: React.FC<{ editor: Editor }> = ({ editor }) => {
 
 export const DescriptionEditor: React.FC<IDescriptionEditorProps> = ({
     editable = true,
+    id,
     ...props
 }) => {
     const editor = useEditor({
@@ -326,10 +328,10 @@ export const DescriptionEditor: React.FC<IDescriptionEditorProps> = ({
     });
 
     return (
-        <div className={styles.container}>
-            {editable && <MenuBar editor={editor} />}
-            <EditorContent editor={editor} />
-            <Dialog id={DIALOG_ID} />
-        </div>
+            <div className={styles.container}>
+                {editable && <MenuBar editor={editor} />}
+                <EditorContent id={id} editor={editor} />
+                <Dialog id={DIALOG_ID} />
+            </div>
     );
 };

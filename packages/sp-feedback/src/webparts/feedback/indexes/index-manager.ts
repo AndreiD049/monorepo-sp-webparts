@@ -98,7 +98,7 @@ export class Index implements IIndex {
         return !!this.index;
     }
 
-    private hasVal(item: Item) {
+    private hasVal(item: Item): boolean {
         const val = this.getter(item);
         return val !== undefined && val !== null;
     }
@@ -134,6 +134,7 @@ export class IndexManager {
     private tagIndex: Index;
     private titleIndex: Index;
     private isServiceIndex: Index;
+    private allExtraIndexes: Index[];
     private _fieldIndexes: IndexMap = {};
     private fieldIndexes: IndexMap;
 
@@ -144,6 +145,8 @@ export class IndexManager {
         this.isServiceIndex = new Index(items, (item) =>
             String(item.IsService)
         );
+        // ! If you add a new index, add it also to below list
+        this.allExtraIndexes = [this.idIndex, this.tagIndex, this.titleIndex, this.isServiceIndex];
         this.fieldIndexes = new Proxy(this._fieldIndexes, {
             get: this.proxyHandlerGet.bind(this),
         });
@@ -210,9 +213,8 @@ export class IndexManager {
     }
 
     public itemAdded(item: Item): void {
-        this.items.push(item);
-        this.tagIndex.addItem(item);
-        this.titleIndex.addItem(item);
+        this.items.unshift(item);
+        this.allExtraIndexes.forEach((idx) => idx.addItem(item));
         for (const key in this.fieldIndexes) {
             if (Object.prototype.hasOwnProperty.call(this.fieldIndexes, key)) {
                 const index = this.fieldIndexes[key];
@@ -223,8 +225,7 @@ export class IndexManager {
 
     public itemRemoved(item: Item): void {
         this.items = this.items.filter((i) => i.Id !== item.Id);
-        this.tagIndex.removeItem(item);
-        this.titleIndex.removeItem(item);
+        this.allExtraIndexes.forEach((idx) => idx.removeItem(item));
         for (const key in this.fieldIndexes) {
             if (Object.prototype.hasOwnProperty.call(this.fieldIndexes, key)) {
                 const index = this.fieldIndexes[key];
@@ -235,8 +236,7 @@ export class IndexManager {
 
     public itemUpdated(oldItem: Item, newItem: Item): void {
         this.items = this.items.map((i) => (i.Id === oldItem.Id ? newItem : i));
-        this.tagIndex.updateItem(oldItem, newItem);
-        this.titleIndex.updateItem(oldItem, newItem);
+        this.allExtraIndexes.forEach((idx) => idx.updateItem(oldItem, newItem));
         for (const key in this.fieldIndexes) {
             if (Object.prototype.hasOwnProperty.call(this.fieldIndexes, key)) {
                 const index = this.fieldIndexes[key];

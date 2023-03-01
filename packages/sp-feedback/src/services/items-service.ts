@@ -19,7 +19,7 @@ export class ItemsService {
 
     public async getAllItems(): Promise<IFeedbackItemRaw[]> {
         const items: IFeedbackItemRaw[] = await getAllPaged(
-            this.itemsList.items.filter(`IsService eq '0'`).select('Id', 'Title', 'Tags', 'Fields', 'IsService')
+            this.itemsList.items.filter(`IsService eq '0'`).select('Id', 'Title', 'Tags', 'Fields', 'IsService').orderBy('Created', false)
         );
         return items;
     }

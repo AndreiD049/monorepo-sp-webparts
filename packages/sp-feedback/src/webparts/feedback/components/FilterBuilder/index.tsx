@@ -15,7 +15,6 @@ import {
     getFilterOp,
     incPath,
     insertAtPath,
-    isFilterOp,
     isLogicOp,
     LOGIC_OPS,
     PathTokens,
@@ -183,7 +182,7 @@ interface IFilterBuilderRowProps {
 }
 
 const FilterBuilderRow: React.FC<IFilterBuilderRowProps> = (props) => {
-    const { op, filter, onChange, path, level } =
+    const { filter, onChange, path, level } =
         React.useContext(FilterRowContext);
     const allowedOps = React.useMemo(() => getAllowedOps(path, filter), [path]);
 
@@ -198,21 +197,10 @@ const FilterBuilderRow: React.FC<IFilterBuilderRowProps> = (props) => {
             if (!filter) {
                 return onChange(newFilter);
             }
-            // $eq/$ne
-            if (isFilterOp(op)) {
-                if (path.length === 0) {
-                    return onChange($and(filter, newFilter));
-                }
-                return onChange(insertAtPath(filter, newFilter, incPath(path)));
+            if (path.length === 0) {
+                return onChange($and(filter, newFilter));
             }
-            if (isLogicOp(op)) {
-                if (path.length === 0) {
-                    return onChange(
-                        insertAtPath(filter, newFilter, [...path, op, 0])
-                    );
-                }
-                return onChange(insertAtPath(filter, newFilter, incPath(path)));
-            }
+            return onChange(insertAtPath(filter, newFilter, incPath(path)));
         },
         [filter]
     );

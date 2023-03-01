@@ -6,7 +6,6 @@ import {
     CATEGORY,
     ENVIRONMENT,
     FEEDBACK,
-    STATUS,
     TEMPLATE,
 } from '../../constants';
 import { $and, $eq } from '../../indexes/filter';
@@ -16,7 +15,6 @@ import { MainService } from '../../services/main-service';
 import { DescriptionEditor } from '../DescriptionEditor';
 import { GlobalContext } from '../Feedback';
 import { SelectChoice } from '../SelectChoice';
-import { SelectDropdown } from '../SelectDropdown';
 import { TextField } from '../TextField';
 import styles from './FeedbackForm.module.scss';
 
@@ -27,49 +25,10 @@ export interface IFeedbackFormProps {
 export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
     const navigate = useNavigate();
     const { indexManager } = React.useContext(GlobalContext);
-    const [textModified, setTextModified] = React.useState(false);
-    const [refreshEditor, setrefreshEditor] = React.useState(false);
     const [item, setItem] = React.useState(
         new Item().setField('status', 'FB:/Status/New')
     );
     const [searchParams] = useSearchParams();
-
-    // This doesn't really work, needs to be re-evalutated
-    React.useEffect(() => {
-        if (!textModified) {
-            const app = item.Fields.application as string;
-            const env = item.Fields['environment'] as string;
-            const cat = item.Fields['category'] as string;
-            let template: Item;
-            if (app) {
-                template = indexManager.filterArray(
-                    $and($eq('tags', TEMPLATE), $eq('tags', app))
-                )[0];
-            }
-            if (env) {
-                const filter = [app, env].filter((i) => Boolean(i)).map((i) => $eq('tags', i));
-                template = indexManager.filterArray(
-                    $and($eq('tags', TEMPLATE), ...filter)
-                )[0] || template;
-            }
-            if (cat) {
-                const filter = [app, env, cat].filter((i) => Boolean(i)).map((i) => $eq('tags', i));
-                template = indexManager.filterArray(
-                    $and($eq('tags', TEMPLATE), ...filter)
-                )[0] || template;
-            }
-            if (template) {
-                setItem((prev) =>
-                    prev.setField('text', template.getFieldOr('text', ''))
-                );
-                setrefreshEditor((prev) => !prev);
-            }
-        }
-    }, [
-        item.Fields.application,
-        item.Fields.environment,
-        item.Fields.category,
-    ]);
 
     const handleCreate = React.useCallback(async () => {
         const newItem = await item.addTag(FEEDBACK).replaceImagesIn('text');
@@ -81,20 +40,43 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
         navigate(searchParams.get('from') || '/');
     }, [item]);
 
+    const app = React.useMemo(
+        () => item.getFieldOr<string>('application', ''),
+        [item]
+    );
+
     const editor = React.useMemo(() => {
+        const text = item.getFieldOr('text', '');
+        const template = indexManager.filterArray(
+            $and($eq('tags', TEMPLATE), $eq('tags', app))
+        )[0];
+        const textIsEmpty = text === '' || text === '<p></p>';
+        if (textIsEmpty && template) {
+            return (
+                <DescriptionEditor
+                    id="feedbackform-editor"
+                    key={template.getField('id')}
+                    onUpdate={(content) =>
+                        setItem((prev) => {
+                            return prev.setField('text', content);
+                        })
+                    }
+                    content={template.getFieldOr('text', '')}
+                />
+            );
+        }
         return (
             <DescriptionEditor
-                key={item.Fields['text']}
+                id="feedbackform-editor"
                 onUpdate={(content) =>
                     setItem((prev) => {
-                        setTextModified(true);
                         return prev.setField('text', content);
                     })
                 }
                 content={item.getFieldOr('text', '')}
             />
         );
-    }, [refreshEditor]);
+    }, [app, indexManager]);
 
     return (
         <div className={styles.container}>
@@ -144,16 +126,6 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                     />
                 </StackItem>
             </Stack>
-            <SelectDropdown
-                options={indexManager.filterArray($eq('tag', STATUS))}
-                target={item}
-                onChange={(result: Item) => {
-                    setItem(result);
-                }}
-                dropDownProps={{ label: 'Status' }}
-                field="status"
-                style={{ maxWidth: 150 }}
-            />
             <TextField
                 textFieldProps={{ label: 'Summary' }}
                 target={item}
@@ -162,7 +134,8 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                     setItem(newItem.setTitle(newItem.getFieldOr('caption', '')))
                 }
             />
-            <Label>Description {editor}</Label>
+            <Label>Description</Label>
+            {editor}
             <PrimaryButton onClick={handleCreate}>Create</PrimaryButton>
             <pre>{JSON.stringify(item, null, 4)}</pre>
         </div>
