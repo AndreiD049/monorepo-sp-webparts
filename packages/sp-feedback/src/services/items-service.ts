@@ -17,11 +17,11 @@ export class ItemsService {
         return new Item(await this.itemsList.items.getById(id)());
     }
 
-    public async getAllItems(): Promise<IFeedbackItemRaw[]> {
+    public async getAllItems(): Promise<Item[]> {
         const items: IFeedbackItemRaw[] = await getAllPaged(
             this.itemsList.items.filter(`IsService eq '0'`).select('Id', 'Title', 'Tags', 'Fields', 'IsService').orderBy('Created', false)
         );
-        return items;
+        return items.map((i) => new Item(i));
     }
 
     public async getAllSystemItems(): Promise<IFeedbackItemRaw[]> {

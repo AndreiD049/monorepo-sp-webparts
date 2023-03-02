@@ -3,12 +3,14 @@ import { SPFI } from 'sp-preset';
 import { IFeedbackConfig } from '../../../models/IFeedbackConfig';
 import { AttachmentService } from '../../../services/attachment-service';
 import { ItemsService } from '../../../services/items-service';
+import { TempItemsService } from '../../../services/temp-items-service';
 import { UsersService } from '../../../services/user-service';
 import { DB_NAME, MINUTE, STORE_NAME } from '../constants';
 
 export class MainService {
     private static config: IFeedbackConfig;
     public static ItemsService: ItemsService;
+    public static TempItemService: TempItemsService;
     public static AttachmentService: AttachmentService;
     public static UsersService: UsersService;
 
@@ -28,6 +30,7 @@ export class MainService {
                 },
             }
         );
+        this.TempItemService = new TempItemsService();
         this.AttachmentService = new AttachmentService(sp, config.attachmentsRoot);
         this.UsersService = new UsersService(sp);
     }

@@ -1,4 +1,4 @@
-import { cloneDeep } from "@microsoft/sp-lodash-subset";
+import { cloneDeep } from '@microsoft/sp-lodash-subset';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const FILTER_OPS_OBJ = {
@@ -43,10 +43,7 @@ export function genericFilterOp(
     return result;
 }
 
-export function genericLogicOp(
-    op: LogicOps,
-    filters: Filter[]
-): Filter {
+export function genericLogicOp(op: LogicOps, filters: Filter[]): Filter {
     const isLogic = isLogicOp(op);
     if (!isLogic) {
         throw Error(`Invalid operation '${op}'`);
@@ -139,7 +136,7 @@ export function traversePath(
         }
         return traversePath(filter[key as LogicOps], path.slice(1));
     } else if (Array.isArray(filter) && typeof key === 'number') {
-        if (filter.length < (key - 1)) {
+        if (filter.length < key - 1) {
             throw Error(
                 `There is no filter at index - ${key}. (${JSON.stringify(
                     filter,
@@ -155,54 +152,101 @@ export function traversePath(
     );
 }
 
-export function replaceAtPath(filter: Filter, newFilter: Filter | Filter[], path: PathTokens[]): Filter {
+export function replaceAtPath(
+    filter: Filter,
+    newFilter: Filter | Filter[],
+    path: PathTokens[]
+): Filter {
     if (!path || path.length === 0) {
-        if (Array.isArray(newFilter)) throw Error(`Path is empty. newFilter should be of type Filter`);
+        if (Array.isArray(newFilter))
+            throw Error(`Path is empty. newFilter should be of type Filter`);
         return newFilter;
     }
     const result = cloneDeep(filter);
-    const valueToReplce = traversePath(result, path.slice(0, -1));
-    const lastToken = path[path.length - 1];
+    const [head, lastToken] = splitPath(path);
+    const valueToReplce = traversePath(result, head);
     if (typeof lastToken === 'number') {
-        (valueToReplce as Filter[]).splice(lastToken, 1, (newFilter as Filter));
+        (valueToReplce as Filter[]).splice(lastToken, 1, newFilter as Filter);
     } else {
         (valueToReplce as Filter)[lastToken] = newFilter as Filter[];
     }
     return result;
 }
 
-export function insertAtPath(filter: Filter, value: Filter, path: PathTokens[]): Filter {
+export function insertAtPath(
+    filter: Filter,
+    value: Filter,
+    path: PathTokens[]
+): Filter {
     if (!filter || path.length === 0) {
         return cloneDeep(value);
     }
     const result = cloneDeep(filter);
-    const placeToInsert = traversePath(result, path.slice(0, -1));
-    const index = path[path.length - 1];
-    if (typeof index !== 'number') {
+    const [head, lastToken] = splitPath(path);
+    const placeToInsert = traversePath(result, head);
+    if (typeof lastToken !== 'number') {
         throw Error(`Last token in path expected to be number`);
     }
     if (!Array.isArray(placeToInsert)) {
-        throw Error(`Expected to find array. Found ${JSON.stringify(placeToInsert, null, 4)}`);
+        throw Error(
+            `Expected to find array. Found ${JSON.stringify(
+                placeToInsert,
+                null,
+                4
+            )}`
+        );
     }
-    placeToInsert.splice(index, 0, value);
+    placeToInsert.splice(lastToken, 0, value);
     return result;
+}
+
+/**
+ * Takes an operation, a filter and a path
+ * and returns a new filter that has the new operation inserted
+ * at the given path.
+ * Example: 
+ * let filter = $eq('tags', 'test');
+ * insertOpAfter('$eq', filter, []); // => $and($eq('tags', 'test'), $eq('tahs', ''))
+ * @param newOp the new operation to be inserted
+ * @param oldFilter the old filter
+ * @param path the path to the element after which the operation has to be inserted
+ * @returns the new filter with the operation inserted
+ */
+export function insertOpAfter(
+    newOp: string,
+    oldFilter: Filter,
+    path: PathTokens[]
+): Filter {
+    const newFilter = getEmptyFilter(newOp);
+    if (!oldFilter) {
+        return newFilter;
+    }
+    if (path.length === 0) {
+        return $and(oldFilter, newFilter);
+    }
+    return insertAtPath(oldFilter, newFilter, incPath(path));
 }
 
 export function removeAtPath(filter: Filter, path: PathTokens[]): Filter {
     if (!path || path.length === 0) return null;
     const result = cloneDeep(filter);
-    const placeToRemove = traversePath(result, path.slice(0, -1));
-    const index = path[path.length - 1];
-    if (typeof index !== 'number') {
+    const [head, lastToken] = splitPath(path);
+    const placeToRemove = traversePath(result, head);
+    if (typeof lastToken !== 'number') {
         throw Error(`Last token in path expected to be number`);
     }
     if (!Array.isArray(placeToRemove)) {
-        throw Error(`Expected to find array. Found ${JSON.stringify(placeToRemove, null, 4)}`);
+        throw Error(
+            `Expected to find array. Found ${JSON.stringify(
+                placeToRemove,
+                null,
+                4
+            )}`
+        );
     }
-    placeToRemove.splice(index, 1);
+    placeToRemove.splice(lastToken, 1);
     return result;
 }
-
 
 export function getAllowedBefore(path: PathTokens[]): string[] {
     if (!path || path.length === 0) return ALL_OPS;
@@ -230,7 +274,11 @@ export function getAllowedOps(path: PathTokens[], filter: Filter): string[] {
     }
 }
 
-export function changeField(filter: Filter, path: PathTokens[], newField: string): Filter {
+export function changeField(
+    filter: Filter,
+    path: PathTokens[],
+    newField: string
+): Filter {
     const result = cloneDeep(traversePath(filter, path));
     if (Array.isArray(result)) throw Error(`Expected single filter path`);
     const op = getFilterOp(result);
@@ -240,10 +288,14 @@ export function changeField(filter: Filter, path: PathTokens[], newField: string
         result[op][newField] = value;
         delete result[op][oldField];
     }
-    return result;    
+    return result;
 }
 
-export function changeOp(filter: Filter, path: PathTokens[], newOp: string): Filter {
+export function changeOp(
+    filter: Filter,
+    path: PathTokens[],
+    newOp: string
+): Filter {
     const result = cloneDeep(traversePath(filter, path));
     if (Array.isArray(result)) throw Error(`Expected single filter path`);
     const op = getFilterOp(result);
@@ -255,24 +307,28 @@ export function changeOp(filter: Filter, path: PathTokens[], newOp: string): Fil
         result[newOp] = result[op];
         delete result[op];
     }
-    return result;    
+    return result;
 }
 
-export function changeValue(filter: Filter, path: PathTokens[], newValue: string): Filter {
+export function changeValue(
+    filter: Filter,
+    path: PathTokens[],
+    newValue: string
+): Filter {
     const result = cloneDeep(traversePath(filter, path));
     if (Array.isArray(result)) throw Error(`Expected single filter path`);
     const op = getFilterOp(result);
-    const [oldField,] = getFieldAndValue(result);
+    const [oldField] = getFieldAndValue(result);
     if (isFilterOp(op)) {
         result[op][oldField] = newValue;
     }
-    return result;    
+    return result;
 }
 
 export function incPath(path: PathTokens[]): PathTokens[] {
     const newPath = [...path];
     if (path.length === 0) return newPath;
-    const lastToken = newPath[newPath.length - 1];    
+    const lastToken = newPath[newPath.length - 1];
     if (lastToken === undefined || typeof lastToken !== 'number') {
         throw Error(`Invalid last token in path ${newPath}. Expected number.`);
     }
@@ -286,4 +342,11 @@ export function getEmptyFilter(op: string): Filter {
     } else if (isLogicOp(op)) {
         return genericLogicOp(op, []);
     }
+}
+
+function splitPath(path: PathTokens[]): [PathTokens[], PathTokens] {
+    if (!path) return [[], null];
+    const head = path.slice(0, -1);
+    const tail = path[path.length - 1];
+    return [head, tail];
 }

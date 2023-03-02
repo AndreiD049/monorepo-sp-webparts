@@ -14,3 +14,7 @@ export interface IFeedbackItem {
 export interface IFeedbackItemRaw extends Omit<IFeedbackItem, 'Fields'> {
     Fields: string;
 }
+
+export function isRaw(item: IFeedbackItem | IFeedbackItemRaw): item is IFeedbackItemRaw {
+    return typeof item.Fields === 'string';
+}

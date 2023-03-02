@@ -13,10 +13,6 @@ type IndexMap = {
 export interface IIndex {
     get(value: ValueType): ReadonlySet<Item>;
     getArray(value: ValueType): Item[];
-    // Mutating already built index
-    addItem(item: Item): void;
-    removeItem(item: Item): void;
-    updateItem(oldItem: Item, newItem: Item): void;
 }
 
 // Index is a data structure that allows for efficient items lookup
@@ -27,47 +23,6 @@ export class Index implements IIndex {
         private getter: (item: Item) => ValueType | ValueType[] | undefined
     ) {
         this.index = null;
-    }
-
-    updateItem(oldItem: Item, newItem: Item): void {
-        function mapReplace(i: Item): Item {
-            return i.Id === oldItem.Id ? newItem : i;
-        }
-        const key = this.getter(oldItem) || null;
-        if (this.indexBuilt()) {
-            if (Array.isArray(key)) {
-                key.forEach((k) => {
-                    const set = this.getArray(k).map(mapReplace);
-                    this.index[k] = new Set(set);
-                });
-            } else {
-                this.index[key] = new Set(this.getArray(key).map(mapReplace));
-            }
-        }
-    }
-
-    removeItem(item: Item): void {
-        const key = this.getter(item) || null;
-        if (this.indexBuilt()) {
-            if (Array.isArray(key)) {
-                key.forEach((k) => {
-                    const set = this.get(k);
-                    set.forEach((i) => {
-                        if (i.Id === item.Id) {
-                            (set as Set<Item>).delete(i);
-                        }
-                    });
-                });
-            } else {
-                (this.get(key) as Set<Item>).delete(item);
-            }
-        }
-    }
-
-    addItem(item: Item): void {
-        if (this.indexBuilt()) {
-            this.addValueToIndex(item, this.index);
-        }
     }
 
     get(value: ValueType): ReadonlySet<Item> {
@@ -134,7 +89,6 @@ export class IndexManager {
     private tagIndex: Index;
     private titleIndex: Index;
     private isServiceIndex: Index;
-    private allExtraIndexes: Index[];
     private _fieldIndexes: IndexMap = {};
     private fieldIndexes: IndexMap;
 
@@ -145,8 +99,6 @@ export class IndexManager {
         this.isServiceIndex = new Index(items, (item) =>
             String(item.IsService)
         );
-        // ! If you add a new index, add it also to below list
-        this.allExtraIndexes = [this.idIndex, this.tagIndex, this.titleIndex, this.isServiceIndex];
         this.fieldIndexes = new Proxy(this._fieldIndexes, {
             get: this.proxyHandlerGet.bind(this),
         });
@@ -212,37 +164,19 @@ export class IndexManager {
         return Array.from(this.filter(f));
     }
 
-    public itemAdded(item: Item): void {
+    public itemAdded(item: Item): IndexManager {
         this.items.unshift(item);
-        this.allExtraIndexes.forEach((idx) => idx.addItem(item));
-        for (const key in this.fieldIndexes) {
-            if (Object.prototype.hasOwnProperty.call(this.fieldIndexes, key)) {
-                const index = this.fieldIndexes[key];
-                index.addItem(item);
-            }
-        }
+        return this.clone()
     }
 
-    public itemRemoved(item: Item): void {
+    public itemRemoved(item: Item): IndexManager {
         this.items = this.items.filter((i) => i.Id !== item.Id);
-        this.allExtraIndexes.forEach((idx) => idx.removeItem(item));
-        for (const key in this.fieldIndexes) {
-            if (Object.prototype.hasOwnProperty.call(this.fieldIndexes, key)) {
-                const index = this.fieldIndexes[key];
-                index.removeItem(item);
-            }
-        }
+        return this.clone();
     }
 
-    public itemUpdated(oldItem: Item, newItem: Item): void {
+    public itemUpdated(oldItem: Item, newItem: Item): IndexManager {
         this.items = this.items.map((i) => (i.Id === oldItem.Id ? newItem : i));
-        this.allExtraIndexes.forEach((idx) => idx.updateItem(oldItem, newItem));
-        for (const key in this.fieldIndexes) {
-            if (Object.prototype.hasOwnProperty.call(this.fieldIndexes, key)) {
-                const index = this.fieldIndexes[key];
-                index.updateItem(oldItem, newItem);
-            }
-        }
+        return this.clone();
     }
 
     public getFields(filter?: Filter): string[] {
@@ -280,6 +214,11 @@ export class IndexManager {
             }
         });
         return Array.from(result).sort();
+    }
+
+    public clone(): IndexManager {
+        const result = new IndexManager(this.items);
+        return result;
     }
 
     private proxyHandlerGet(target: IndexMap, prop: string): Index {

@@ -3,18 +3,15 @@ import * as React from 'react';
 import { Callout, hideCallout, showCallout } from 'sp-components';
 import FeedbackWebPart from '../../FeedbackWebPart';
 import {
-    $and,
     changeField,
     changeOp,
     changeValue,
     Filter,
     FILTER_OPS,
     getAllowedOps,
-    getEmptyFilter,
     getFieldAndValue,
     getFilterOp,
-    incPath,
-    insertAtPath,
+    insertOpAfter,
     isLogicOp,
     LOGIC_OPS,
     PathTokens,
@@ -193,14 +190,8 @@ const FilterBuilderRow: React.FC<IFilterBuilderRowProps> = (props) => {
 
     const handleAdd = React.useCallback(
         (newOp: string) => {
-            const newFilter = getEmptyFilter(newOp);
-            if (!filter) {
-                return onChange(newFilter);
-            }
-            if (path.length === 0) {
-                return onChange($and(filter, newFilter));
-            }
-            return onChange(insertAtPath(filter, newFilter, incPath(path)));
+            const newFilter = insertOpAfter(newOp, filter, path);
+            onChange(newFilter);
         },
         [filter]
     );

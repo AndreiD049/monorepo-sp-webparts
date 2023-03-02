@@ -1,8 +1,9 @@
-import { Text } from 'office-ui-fabric-react';
+import { ActionButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { FEEDBACK } from '../../../constants';
-import { $and, $eq, parseFilter } from '../../../indexes/filter';
+import { SELECTED_FILTER } from '../../../constants';
+import { $and, $eq, Filter } from '../../../indexes/filter';
 import { Item } from '../../../item';
+import { MainService } from '../../../services/main-service';
 import { GlobalContext } from '../../Feedback';
 import { FilterBuilder } from '../../FilterBuilder';
 import { ItemTemplate } from '../../ItemTemplate';
@@ -14,32 +15,45 @@ export interface IMainProps {
 
 export const Main: React.FC<IMainProps> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
-    const initialFilter = React.useMemo(() => {
-        const localValue = localStorage.getItem("spfx/feedback/last-filter");
-        if (localValue) {
-            return parseFilter(localValue);
-        } else {
-            return $eq('tags', FEEDBACK);
-        }
-    }, []);
-    const [filter, setFilter] = React.useState(initialFilter);
+    const selectedFilter: Item = React.useMemo(() => {
+        const selectedFilterKey =
+            MainService.TempItemService.getTempItem(SELECTED_FILTER);
+        const selected: string = selectedFilterKey?.getField('selected');
+        const result = indexManager.filterArray($eq('title', selected))[0];
+        return result || new Item();
+    }, [indexManager]);
+    const [filter, setFilter] = React.useState(selectedFilter);
     const [items, setItems] = React.useState<Item[]>([]);
     
     React.useEffect(() => {
+        if (selectedFilter.Title !== filter.Title) {
+            setFilter(selectedFilter);
+        }
+    }, [selectedFilter]);
+
+    React.useEffect(() => {
         console.time('filter');
-        const items = indexManager.filterArray($and(filter, $eq('isservice', 'false')));
+        const items = indexManager.filterArray(
+            $and(filter.getField<Filter>('filter'), $eq('isservice', 'false'))
+        );
         console.timeEnd('filter');
         setItems(items);
-    }, [filter, indexManager]);
-    
+    }, [selectedFilter, filter, indexManager]);
+
     return (
         <div className={styles.container}>
             <div className={styles.filters}>
-                <Text block variant='mediumPlus'>Filters:</Text>
-                <FilterBuilder filter={filter} setFilter={(filter) => {
-                    localStorage.setItem("spfx/feedback/last-filter", JSON.stringify(filter));
-                    setFilter(filter);
-                }} defaultFilter={$eq('isservice', 'false')} />
+                <Text block variant="mediumPlus">
+                    Filters:
+                </Text>
+                <FilterBuilder
+                    filter={filter.getField<Filter>('filter')}
+                    setFilter={(filter) => {
+                        setFilter(selectedFilter.setField('filter', filter));
+                    }}
+                    defaultFilter={$eq('isservice', 'false')}
+                />
+                <ActionButton>Save filter</ActionButton>
             </div>
             {items.map((i) => (
                 <ItemTemplate

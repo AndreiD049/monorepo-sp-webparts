@@ -8,13 +8,17 @@ export class Item implements IFeedbackItem {
     IsService: boolean;
     Fields: IFields;
     
-    constructor(item?: IFeedbackItemRaw) {
+    constructor(item?: IFeedbackItemRaw | IFeedbackItem) {
         if (item) {
             this.Id = item.Id;
             this.Title = item.Title;
             this.Tags = item.Tags;
             this.IsService = item.IsService;
-            this.Fields = this.readFields(item.Fields) || {};
+            if (typeof item.Fields === 'string') {
+                this.Fields = this.readFields(item.Fields) || {};
+            } else {
+                this.Fields = item.Fields;
+            }
         } else {
             this.Title = '';
             this.Tags = [];

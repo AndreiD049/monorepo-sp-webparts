@@ -1,26 +1,23 @@
 import * as React from 'react';
 import { RouterProvider } from 'react-router';
 import { ISiteUserInfo } from 'sp-preset';
-import { IFeedbackItem } from '../../../models/IFeedbackItem';
 import { ADMINS } from '../constants';
 import { IFeedbackWebPartProps } from '../FeedbackWebPart';
 import { $eq } from '../indexes/filter';
 import { IndexManager } from '../indexes/index-manager';
-import { Item } from '../item';
-import { ITEM_ADDED } from '../services/events';
+import { itemAddedEventBuilder } from '../services/events';
 import { MainService } from '../services/main-service';
 import { router } from './Router';
+import { Item } from '../item';
 import styles from './Feedback.module.scss';
 
 interface IGlobalContextProps {
-    items: IFeedbackItem[];
     indexManager: IndexManager;
     currentUser: ISiteUserInfo;
     isAdmin?: boolean;
 }
 
 export const GlobalContext = React.createContext<IGlobalContextProps>({
-    items: [],
     indexManager: null,
     currentUser: null,
     isAdmin: false,
@@ -37,23 +34,34 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
     // Pull information
     React.useEffect(() => {
         async function run(): Promise<void> {
+            // Get normal items
             const items = await ItemsService.getAllItems();
-            const systemItems = await ItemsService.getAllSystemItems();
-            const allItems = items.concat(systemItems).map((i) => new Item(i));
+            // Get system items, those are cached
+            const systemItems = (await ItemsService.getAllSystemItems()).map(
+                (i) => new Item(i)
+            );
+            // Get temp items if any
+            const tempItems =
+                await MainService.TempItemService.getAllTempItems();
+
+            // Build items
+            const allItems = items.concat(systemItems, tempItems);
+
             const indexManager = new IndexManager(allItems);
             const admins = indexManager.filterArray($eq('title', ADMINS));
             const currentUser = await MainService.UsersService.getCurrentUser();
             let isAdmin = false;
             if (admins.length > 0) {
-                isAdmin = admins[0]
-                    .getFieldOr<string[]>('users', [])
-                    .find(
-                        (u) =>
-                            u.toLowerCase() === currentUser.Email.toLowerCase()
-                    ) !== undefined;
+                isAdmin =
+                    admins[0]
+                        .getFieldOr<string[]>('users', [])
+                        .find(
+                            (u) =>
+                                u.toLowerCase() ===
+                                currentUser.Email.toLowerCase()
+                        ) !== undefined;
             }
             setInfo({
-                items: allItems,
                 indexManager,
                 isAdmin,
                 currentUser,
@@ -63,19 +71,23 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
     }, []);
 
     React.useEffect(() => {
-        function itemAddedHandler(ev: CustomEvent): void {
-            setInfo((prev) => {
-                prev.indexManager.itemAdded(ev.detail);
-                return {
+        // Add item
+        const [addEvent, handlerItemAdd, removeItemAdd] = itemAddedEventBuilder(
+            MainService.ItemsService,
+            MainService.TempItemService,
+            (item) =>
+                setInfo((prev) => ({
                     ...prev,
-                    items: prev.indexManager.items,
-                    indexManager: prev.indexManager,
-                };
-            });
-        }
-        document.addEventListener(ITEM_ADDED, itemAddedHandler);
+                    indexManager: prev.indexManager.itemAdded(item),
+                }))
+        );
+
+        // Listen to events
+        document.addEventListener(addEvent, handlerItemAdd);
+
+        // remove event listeners
         return () => {
-            document.removeEventListener(ITEM_ADDED, itemAddedHandler);
+            removeItemAdd();
         };
     }, []);
 

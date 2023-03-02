@@ -10,8 +10,7 @@ import {
 } from '../../constants';
 import { $and, $eq } from '../../indexes/filter';
 import { Item } from '../../item';
-import { itemAdded } from '../../services/events';
-import { MainService } from '../../services/main-service';
+import { dispatchItemAdded } from '../../services/events';
 import { DescriptionEditor } from '../DescriptionEditor';
 import { GlobalContext } from '../Feedback';
 import { SelectChoice } from '../SelectChoice';
@@ -32,11 +31,7 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
 
     const handleCreate = React.useCallback(async () => {
         const newItem = await item.addTag(FEEDBACK).replaceImagesIn('text');
-        const addResult = await MainService.ItemsService.addItem(
-            newItem.asRaw()
-        );
-        itemAdded(await MainService.ItemsService.getItem(addResult.data.Id));
-        setItem(new Item());
+        dispatchItemAdded(newItem.asRaw());
         navigate(searchParams.get('from') || '/');
     }, [item]);
 

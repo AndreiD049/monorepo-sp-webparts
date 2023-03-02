@@ -5,6 +5,7 @@ import { Outlet, useNavigate } from 'react-router';
 import { Panel } from 'sp-components';
 import { DB_NAME, MAIN_PANEL, STORE_NAME } from '../../constants';
 import FeedbackWebPart from '../../FeedbackWebPart';
+import { FilterDropdown } from '../FilterDropdown';
 import styles from './TopMenu.module.scss';
 
 export interface ITopMenuProps {
@@ -13,14 +14,6 @@ export interface ITopMenuProps {
 
 export const TopMenu: React.FC<ITopMenuProps> = (props) => {
     const navigate = useNavigate();
-
-    // const item: ICommandBarItemProps = {
-    //     buttonStyles: {
-    //         root: {
-    //             backgroundColor: FeedbackWebPart.theme.palette.themeLighterAlt,
-    //         }
-    //     }
-    // }
 
     const buttonStyles = {
         backgroundColor: FeedbackWebPart.theme.palette.themeLighterAlt,
@@ -37,12 +30,16 @@ export const TopMenu: React.FC<ITopMenuProps> = (props) => {
                 iconProps: { iconName: 'MegaphoneSolid' },
                 onClick: () => navigate('/new?from=/'),
                 buttonStyles: { root: buttonStyles },
-            },
+            }
         ];
     }, []);
 
     const commandBarFarItems: ICommandBarItemProps[] = React.useMemo(() => {
         return [
+            {
+                key: 'filter',
+                onRender: () => <FilterDropdown />
+            },
             {
                 key: 'refresh',
                 iconOnly: true,
