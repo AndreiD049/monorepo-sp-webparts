@@ -19,12 +19,14 @@ export const Main: React.FC<IMainProps> = (props) => {
         const selectedFilterKey =
             MainService.TempItemService.getTempItem(SELECTED_FILTER);
         const selected: string = selectedFilterKey?.getField('selected');
-        const result = indexManager.filterArray($eq('title', selected))[0];
-        return result || new Item();
+        const result = selected
+            ? indexManager.filterArray($eq('title', selected))[0]
+            : new Item();
+        return result;
     }, [indexManager]);
     const [filter, setFilter] = React.useState(selectedFilter);
     const [items, setItems] = React.useState<Item[]>([]);
-    
+
     React.useEffect(() => {
         if (selectedFilter.Title !== filter.Title) {
             setFilter(selectedFilter);
