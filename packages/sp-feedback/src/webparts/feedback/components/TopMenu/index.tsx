@@ -16,10 +16,9 @@ export const TopMenu: React.FC<ITopMenuProps> = (props) => {
     const navigate = useNavigate();
 
     const buttonStyles = {
-        backgroundColor: FeedbackWebPart.theme.palette.themeLighterAlt,
-        '& :hover': {
-            backgroundColor: FeedbackWebPart.theme.palette.themeLighter,
-        },
+        backgroundColor: FeedbackWebPart.theme.palette.themePrimary,
+        minHeight: 32,
+        color: FeedbackWebPart.theme.palette.white,
     };
 
     const commandBarItems: ICommandBarItemProps[] = React.useMemo(() => {
@@ -27,10 +26,13 @@ export const TopMenu: React.FC<ITopMenuProps> = (props) => {
             {
                 key: 'new',
                 text: 'New feedback',
-                iconProps: { iconName: 'MegaphoneSolid' },
+                iconProps: {
+                    iconName: 'MegaphoneSolid',
+                    style: { color: FeedbackWebPart.theme.palette.white },
+                },
                 onClick: () => navigate('/new?from=/'),
                 buttonStyles: { root: buttonStyles },
-            }
+            },
         ];
     }, []);
 
@@ -38,12 +40,15 @@ export const TopMenu: React.FC<ITopMenuProps> = (props) => {
         return [
             {
                 key: 'filter',
-                onRender: () => <FilterDropdown />
+                onRender: () => <FilterDropdown />,
             },
             {
                 key: 'refresh',
                 iconOnly: true,
-                iconProps: { iconName: 'Refresh' },
+                iconProps: {
+                    iconName: 'Refresh',
+                    style: { color: FeedbackWebPart.theme.palette.white },
+                },
                 onClick: () => {
                     const db = openDatabase(DB_NAME, STORE_NAME);
                     db.then((db) => {
@@ -55,8 +60,8 @@ export const TopMenu: React.FC<ITopMenuProps> = (props) => {
                     return;
                 },
                 buttonStyles: {
-                    root: buttonStyles
-                }
+                    root: buttonStyles,
+                },
             },
         ];
     }, []);
@@ -67,11 +72,18 @@ export const TopMenu: React.FC<ITopMenuProps> = (props) => {
                 styles={{
                     root: {
                         backgroundColor:
-                            FeedbackWebPart.theme.palette.themeLighterAlt,
+                            FeedbackWebPart.theme.palette.themePrimary,
+                        display: 'flex',
+                        flexFlow: 'row nowrap',
+                        alignItems: 'center',
                     },
                     primarySet: {
                         backgroundColor:
-                            FeedbackWebPart.theme.palette.themeLighterAlt,
+                            FeedbackWebPart.theme.palette.themePrimary,
+                        gap: '.3em',
+                    },
+                    secondarySet: {
+                        gap: '.3em',
                     },
                 }}
                 className={styles.topMenu}

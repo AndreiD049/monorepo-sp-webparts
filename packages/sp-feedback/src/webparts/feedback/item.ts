@@ -55,7 +55,7 @@ export class Item implements IFeedbackItem {
     
     public unsetField(field: string): Item {
         const result = this.clone();
-        delete this.Fields[field];
+        result.Fields[field] = undefined;
         return result;
     }
     
@@ -94,6 +94,20 @@ export class Item implements IFeedbackItem {
 
     public clone(): Item {
         const result = new Item(this.asRaw());
+        return result;
+    }
+    
+    public merge(other: Partial<IFeedbackItem>): Item {
+        const result = this.clone();
+        result.Fields = { ...this.Fields, ...other.Fields };
+        for (const key in other) {
+            if (Object.prototype.hasOwnProperty.call(other, key) && key !== 'Fields' && key !== 'IsService') {
+                const element = (other as { [key: string]: string | string[] })[key];
+                if (Boolean(element) && element.length !== 0) {
+                    result.setField(key, element)
+                }
+            }
+        }
         return result;
     }
 }

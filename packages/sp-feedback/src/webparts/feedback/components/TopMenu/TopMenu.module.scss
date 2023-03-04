@@ -5,8 +5,11 @@
 }
 
 .topMenu {
-    border-bottom: 1px solid "[theme: themePrimary, default: #a4262c]";
     margin-bottom: 1em;
+    
+    :global(.ms-OverflowSet-item):hover i {
+        color: inherit !important;
+    }
 }
 
 .content {

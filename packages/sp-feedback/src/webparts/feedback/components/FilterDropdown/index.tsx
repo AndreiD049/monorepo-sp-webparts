@@ -2,8 +2,8 @@ import * as React from 'react';
 import { FILTER, SELECTED_FILTER } from '../../constants';
 import { $eq } from '../../indexes/filter';
 import { Item } from '../../item';
-import { dispatchItemAdded } from '../../services/events';
-import { MainService } from '../../services/main-service';
+import { dispatchItemAdded, dispatchItemUpdated } from '../../services/events';
+import { getNewSelectedFilter, getSelectedFilterInfo } from '../../services/saved-filter';
 import { GlobalContext } from '../Feedback';
 import { SelectDropdown } from '../SelectDropdown';
 
@@ -13,23 +13,30 @@ export interface IFilterDropdownProps {
 
 export const FilterDropdown: React.FC<IFilterDropdownProps> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
-    const selectedFilter = React.useMemo(() => {
-        const selected = MainService.TempItemService.getTempItem(SELECTED_FILTER);
-        return selected || new Item().setTitle(SELECTED_FILTER);
-    }, [indexManager]);
+    const selectedFilter = React.useMemo(
+        () => getSelectedFilterInfo(indexManager),
+        [indexManager]
+    );
     const filters: Item[] = React.useMemo(() => {
         return indexManager.filterArray($eq('tags', FILTER));
     }, [indexManager]);
 
     return (
-        <SelectDropdown 
-            target={selectedFilter}
+        <SelectDropdown
+            target={selectedFilter.item || getNewSelectedFilter('', null)}
             field="selected"
             options={filters}
-            onChange={(newFilter) => dispatchItemAdded(newFilter.asRaw(), {
-                temp: true,
-                persist: true,
-            })}
+            dropDownProps={{
+                placeholder: 'Select filter'
+            }}
+            onChange={(newFilter) => {
+                const options = { temp: true, persist: true };
+                if (!selectedFilter.item) {
+                    dispatchItemAdded(newFilter.setTitle(SELECTED_FILTER).asRaw(), options);
+                } else {
+                    dispatchItemUpdated(SELECTED_FILTER, newFilter.unsetField('filter'), options);
+                }
+            }}
         />
     );
 };

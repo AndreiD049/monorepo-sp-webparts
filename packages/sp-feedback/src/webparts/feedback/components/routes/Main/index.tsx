@@ -3,7 +3,12 @@ import * as React from 'react';
 import { SELECTED_FILTER } from '../../../constants';
 import { $and, $eq, Filter } from '../../../indexes/filter';
 import { Item } from '../../../item';
-import { MainService } from '../../../services/main-service';
+import { dispatchItemAdded, dispatchItemUpdated } from '../../../services/events';
+import {
+    getNewSelectedFilter,
+    getFilterApplied,
+    getSelectedFilterInfo,
+} from '../../../services/saved-filter';
 import { GlobalContext } from '../../Feedback';
 import { FilterBuilder } from '../../FilterBuilder';
 import { ItemTemplate } from '../../ItemTemplate';
@@ -15,32 +20,20 @@ export interface IMainProps {
 
 export const Main: React.FC<IMainProps> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
-    const selectedFilter: Item = React.useMemo(() => {
-        const selectedFilterKey =
-            MainService.TempItemService.getTempItem(SELECTED_FILTER);
-        const selected: string = selectedFilterKey?.getField('selected');
-        const result = selected
-            ? indexManager.filterArray($eq('title', selected))[0]
-            : new Item();
-        return result;
-    }, [indexManager]);
-    const [filter, setFilter] = React.useState(selectedFilter);
+    const selectedFilters = React.useMemo(
+        () => getSelectedFilterInfo(indexManager),
+        [indexManager]
+    );
     const [items, setItems] = React.useState<Item[]>([]);
-
-    React.useEffect(() => {
-        if (selectedFilter.Title !== filter.Title) {
-            setFilter(selectedFilter);
-        }
-    }, [selectedFilter]);
 
     React.useEffect(() => {
         console.time('filter');
         const items = indexManager.filterArray(
-            $and(filter.getField<Filter>('filter'), $eq('isservice', 'false'))
+            $and(getFilterApplied(selectedFilters), $eq('isservice', 'false'))
         );
         console.timeEnd('filter');
         setItems(items);
-    }, [selectedFilter, filter, indexManager]);
+    }, [selectedFilters]);
 
     return (
         <div className={styles.container}>
@@ -49,9 +42,15 @@ export const Main: React.FC<IMainProps> = (props) => {
                     Filters:
                 </Text>
                 <FilterBuilder
-                    filter={filter.getField<Filter>('filter')}
-                    setFilter={(filter) => {
-                        setFilter(selectedFilter.setField('filter', filter));
+                    filter={getFilterApplied(selectedFilters)}
+                    setFilter={(filter: Filter) => {
+                        const newSelected = getNewSelectedFilter(selectedFilters.selectedTitle, filter);
+                        const options = { temp: true, persist: true };
+                        if (!selectedFilters.selectedTitle) {
+                            dispatchItemAdded(newSelected.asRaw(), options);
+                        } else {
+                            dispatchItemUpdated(SELECTED_FILTER, newSelected, options);
+                        }
                     }}
                     defaultFilter={$eq('isservice', 'false')}
                 />

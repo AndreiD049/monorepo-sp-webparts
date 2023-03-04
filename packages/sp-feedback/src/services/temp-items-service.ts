@@ -59,13 +59,11 @@ export class TempItemsService {
     ): void {
         try {
             const item = this.getTempItem(title);
+            const resultPayload = item.merge(payload);
             if (item) {
                 localStorage.setItem(
                     this.getKey(title),
-                    JSON.stringify({
-                        ...item,
-                        ...payload,
-                    })
+                    JSON.stringify(resultPayload)
                 );
             } else {
                 throw new Error(`Temporary item '${title}' does not exist.`);

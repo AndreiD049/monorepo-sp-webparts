@@ -163,6 +163,10 @@ export class IndexManager {
     public filterArray(f: Filter): Item[] {
         return Array.from(this.filter(f));
     }
+    
+    public filterFirst(f: Filter): Item {
+        return this.filterArray(f)[0] || null;
+    }
 
     public itemAdded(item: Item): IndexManager {
         this.items.unshift(item);
@@ -175,7 +179,11 @@ export class IndexManager {
     }
 
     public itemUpdated(oldItem: Item, newItem: Item): IndexManager {
-        this.items = this.items.map((i) => (i.Id === oldItem.Id ? newItem : i));
+        if (oldItem.Id !== undefined && newItem.Id !== undefined) {
+            this.items = this.items.map((i) => (i.Id === oldItem.Id ? newItem : i));
+        } else {
+            this.items = this.items.map((i) => (i.Title === oldItem.Title ? newItem : i));
+        }
         return this.clone();
     }
 

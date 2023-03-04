@@ -5,7 +5,7 @@ import { ADMINS } from '../constants';
 import { IFeedbackWebPartProps } from '../FeedbackWebPart';
 import { $eq } from '../indexes/filter';
 import { IndexManager } from '../indexes/index-manager';
-import { itemAddedEventBuilder } from '../services/events';
+import { itemAddedEventBuilder, itemUpdatedEventBuilder } from '../services/events';
 import { MainService } from '../services/main-service';
 import { router } from './Router';
 import { Item } from '../item';
@@ -81,13 +81,27 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
                     indexManager: prev.indexManager.itemAdded(item),
                 }))
         );
+        
+        // Update item
+        const [updateEvent, handlerUpdate, removeUpdate] = itemUpdatedEventBuilder(
+            MainService.ItemsService,
+            MainService.TempItemService,
+            (oldItem, newItem) => {
+                setInfo((prev) => ({
+                    ...prev,
+                    indexManager: prev.indexManager.itemUpdated(oldItem, newItem),
+                }))
+            }
+        )
 
         // Listen to events
         document.addEventListener(addEvent, handlerItemAdd);
+        document.addEventListener(updateEvent, handlerUpdate);
 
         // remove event listeners
         return () => {
             removeItemAdd();
+            removeUpdate();
         };
     }, []);
 

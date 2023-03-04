@@ -1,25 +1,52 @@
-import { IFeedbackItemRaw } from '../../../models/IFeedbackItem';
+import { IFeedbackItem, IFeedbackItemRaw } from '../../../models/IFeedbackItem';
 import { ItemsService } from '../../../services/items-service';
 import { TempItemsService } from '../../../services/temp-items-service';
 import { Item } from '../item';
 
 export const ITEM_ADDED = 'spfxFeedback/ItemAdded';
+export const ITEM_UPDATED = 'spfxFeedback/ItemUpdated';
+export const ITEM_DELETED = 'spfxFeedback/ItemDeleted';
 
-type AddItemOptions = {
+type ItemOptions = {
     temp: boolean;
     persist?: boolean;
-}
+};
 
 type AddItemPayload = {
     item: IFeedbackItemRaw;
-    options?: AddItemOptions;
-}
+    options?: ItemOptions;
+};
 
-export function dispatchItemAdded(item: IFeedbackItemRaw, options?: AddItemOptions): void {
+type UpdateItemPayload = {
+    id: number | string;
+    payload: Partial<IFeedbackItem>;
+    options?: ItemOptions;
+};
+
+export function dispatchItemAdded(
+    item: IFeedbackItemRaw,
+    options?: ItemOptions
+): void {
     document.dispatchEvent(
         new CustomEvent<AddItemPayload>(ITEM_ADDED, {
             detail: {
                 item,
+                options,
+            },
+        })
+    );
+}
+
+export function dispatchItemUpdated(
+    id: number | string,
+    payload: Partial<IFeedbackItem>,
+    options?: ItemOptions
+): void {
+    document.dispatchEvent(
+        new CustomEvent<UpdateItemPayload>(ITEM_UPDATED, {
+            detail: {
+                id,
+                payload,
                 options,
             },
         })
@@ -44,8 +71,10 @@ export function itemAddedEventBuilder(
             const title = ev.detail.item.Title;
             if (shouldPersist) {
                 await tempItemService.addTempItem(ev.detail.item);
+                resultItem = await tempItemService.getTempItem(title);
+            } else {
+                resultItem = new Item(ev.detail.item);
             }
-            resultItem = await tempItemService.getTempItem(title);
         }
         cb(resultItem);
     };
@@ -54,5 +83,46 @@ export function itemAddedEventBuilder(
         ITEM_ADDED,
         handler,
         () => document.removeEventListener(ITEM_ADDED, handler),
+    ];
+}
+
+export function itemUpdatedEventBuilder(
+    itemService: ItemsService,
+    tempItemService: TempItemsService,
+    cb: (oldItem: Item, newitem: Item) => void
+): [string, (ev: CustomEvent) => void, () => void] {
+    // Handler receives item's raw details
+    const handler = async (
+        ev: CustomEvent<UpdateItemPayload>
+    ): Promise<void> => {
+        const options = ev.detail.options;
+        const isTemp = options.temp;
+        const id = ev.detail.id;
+        const shouldPersist = options?.persist ?? false;
+        let oldItem: Item;
+        let updatedItem: Item;
+        if (!isTemp && typeof id === 'number') {
+            // ! TODO: optimize this, it should not do so many calls
+            oldItem = await itemService.getItem(id);
+            const merged = oldItem.merge(ev.detail.payload);
+            await itemService.updateItem(id, merged.asRaw());
+            updatedItem = await itemService.getItem(id);
+        } else {
+            const title = ev.detail.id as string;
+            oldItem = await tempItemService.getTempItem(title);
+            if (shouldPersist) {
+                await tempItemService.updateItem(title, ev.detail.payload);
+                updatedItem = await tempItemService.getTempItem(title);
+            } else {
+                updatedItem = oldItem.merge(ev.detail.payload);
+            }
+        }
+        cb(oldItem, updatedItem);
+    };
+
+    return [
+        ITEM_UPDATED,
+        handler,
+        () => document.removeEventListener(ITEM_UPDATED, handler),
     ];
 }
