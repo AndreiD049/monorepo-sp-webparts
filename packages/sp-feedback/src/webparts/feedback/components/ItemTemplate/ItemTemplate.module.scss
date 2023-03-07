@@ -5,14 +5,12 @@
     flex-flow: column nowrap;
     background-color: "[theme: themeLighterAlt, default: #f8f8f8]";
     border: 1px solid "[theme: neutralLighter, default: #f8f8f8]";
-    padding: 8px 24px;
 }
 
 .itemBodyOuter {
     display: flex;
     flex-flow: column nowrap;
-    gap: 1em;
-    padding-top: 1em;
+    padding: 8px;
 }
 
 .itemBody {
@@ -32,4 +30,12 @@
     flex-flow: row nowrap;
     gap: 8px;
     user-select: none;
+}
+
+.itemHeader {
+    background-color: "[theme: themePrimary, default: #a4262c]";
+    color:  "[theme: white, default: #ffffff]";
+    padding: 4px 8px;
+    min-height: 30px;
+    line-height: 30px;
 }

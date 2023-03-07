@@ -7,3 +7,9 @@
 .filters {
     padding: 16px 0;
 }
+
+.itemsList {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: .8em;
+}

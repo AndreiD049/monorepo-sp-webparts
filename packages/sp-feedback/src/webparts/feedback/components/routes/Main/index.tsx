@@ -3,7 +3,10 @@ import * as React from 'react';
 import { SELECTED_FILTER } from '../../../constants';
 import { $and, $eq, Filter } from '../../../indexes/filter';
 import { Item } from '../../../item';
-import { dispatchItemAdded, dispatchItemUpdated } from '../../../services/events';
+import {
+    dispatchItemAdded,
+    dispatchItemUpdated,
+} from '../../../services/events';
 import {
     getNewSelectedFilter,
     getFilterApplied,
@@ -44,25 +47,30 @@ export const Main: React.FC<IMainProps> = (props) => {
                 <FilterBuilder
                     filter={getFilterApplied(selectedFilters)}
                     setFilter={(filter: Filter) => {
-                        const newSelected = getNewSelectedFilter(selectedFilters.selectedTitle, filter);
+                        const newSelected = getNewSelectedFilter(
+                            selectedFilters.selectedTitle,
+                            filter
+                        );
                         const options = { temp: true, persist: true };
                         if (!selectedFilters.selectedTitle) {
                             dispatchItemAdded(newSelected.asRaw(), options);
                         } else {
-                            dispatchItemUpdated(SELECTED_FILTER, newSelected, options);
+                            dispatchItemUpdated(
+                                SELECTED_FILTER,
+                                newSelected,
+                                options
+                            );
                         }
                     }}
                     defaultFilter={$eq('isservice', 'false')}
                 />
                 <ActionButton>Save filter</ActionButton>
             </div>
-            {items.map((i) => (
-                <ItemTemplate
-                    style={{ marginTop: '.5em' }}
-                    item={i}
-                    key={i.Id}
-                />
-            ))}
+            <div className={styles.itemsList}>
+                {items.map((i) => (
+                    <ItemTemplate item={i} key={i.Id} />
+                ))}
+            </div>
         </div>
     );
 };

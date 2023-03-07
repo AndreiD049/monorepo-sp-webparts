@@ -9,11 +9,13 @@ export interface IItemTemplateProps
     item: Item;
 }
 
-export const ItemTitleTemplate: React.FC<{ item: Item }> = (props) => {
+export const ItemHeaderTemplate: React.FC<{ item: Item }> = (props) => {
     return (
-        <Text block variant="large">
-            {props.item.Id} - {props.item.Title} - {props.item.Tags?.join(", ")}
-        </Text>
+        <div className={styles.itemHeader}>
+            <Text variant="large">
+                {props.item.Title}
+            </Text>
+        </div>
     );
 };
 
@@ -22,7 +24,7 @@ const COLLAPSE_VISIBLE = 'collapse-visible';
 export const ItemBodyTemplate: React.FC<{ item: Item }> = (props) => {
     const content = React.useRef<HTMLDivElement>(null);
     const [icon, setIcon] = React.useState('DoubleChevronUp');
-    
+
     return (
         <div className={styles.itemBodyOuter}>
             <div
@@ -40,12 +42,13 @@ export const ItemBodyTemplate: React.FC<{ item: Item }> = (props) => {
                     }
                 }}
             >
-                <Icon
-                    iconName={icon}
-                />
+                <Icon iconName={icon} />
                 Description
             </div>
-            <div className={`${styles.itemBodyCollapsible} ${styles.itemBody}`} ref={content}>
+            <div
+                className={`${styles.itemBodyCollapsible} ${styles.itemBody}`}
+                ref={content}
+            >
                 <DescriptionEditor
                     content={props.item.getFieldOr('text', '')}
                     editable={false}
@@ -58,7 +61,7 @@ export const ItemBodyTemplate: React.FC<{ item: Item }> = (props) => {
 export const ItemTemplate: React.FC<IItemTemplateProps> = (props) => {
     return (
         <div className={styles.container} style={props.style}>
-            <ItemTitleTemplate item={props.item} />
+            <ItemHeaderTemplate item={props.item} />
             <ItemBodyTemplate item={props.item} />
         </div>
     );
