@@ -1,6 +1,8 @@
 import { IFeedbackItem, IFeedbackItemRaw } from '../../../models/IFeedbackItem';
 import { ItemsService } from '../../../services/items-service';
 import { TempItemsService } from '../../../services/temp-items-service';
+import { $eq } from '../indexes/filter';
+import { IndexManager } from '../indexes/index-manager';
 import { Item } from '../item';
 
 export const ITEM_ADDED = 'spfxFeedback/ItemAdded';
@@ -70,8 +72,8 @@ export function itemAddedEventBuilder(
         } else {
             const title = ev.detail.item.Title;
             if (shouldPersist) {
-                await tempItemService.addTempItem(ev.detail.item);
-                resultItem = await tempItemService.getTempItem(title);
+                tempItemService.addTempItem(ev.detail.item);
+                resultItem = tempItemService.getTempItem(title);
             } else {
                 resultItem = new Item(ev.detail.item);
             }
@@ -89,6 +91,7 @@ export function itemAddedEventBuilder(
 export function itemUpdatedEventBuilder(
     itemService: ItemsService,
     tempItemService: TempItemsService,
+    indexManager: IndexManager,
     cb: (oldItem: Item, newitem: Item) => void
 ): [string, (ev: CustomEvent) => void, () => void] {
     // Handler receives item's raw details
@@ -109,10 +112,12 @@ export function itemUpdatedEventBuilder(
             updatedItem = await itemService.getItem(id);
         } else {
             const title = ev.detail.id as string;
-            oldItem = await tempItemService.getTempItem(title);
+            // If it's a temporary item, it doesn't have a numerical Id, it uses the title as such
+            oldItem = indexManager.filterFirst($eq('title', id.toString()));
             if (shouldPersist) {
-                await tempItemService.updateItem(title, ev.detail.payload);
-                updatedItem = await tempItemService.getTempItem(title);
+                oldItem = tempItemService.getTempItem(title);
+                tempItemService.updateItem(title, ev.detail.payload);
+                updatedItem = tempItemService.getTempItem(title);
             } else {
                 updatedItem = oldItem.merge(ev.detail.payload);
             }

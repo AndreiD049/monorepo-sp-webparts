@@ -6,6 +6,7 @@ import { Panel } from 'sp-components';
 import { DB_NAME, MAIN_PANEL, STORE_NAME } from '../../constants';
 import FeedbackWebPart from '../../FeedbackWebPart';
 import { FilterDropdown } from '../FilterDropdown';
+import { LayoutSelect } from '../LayoutSelect';
 import styles from './TopMenu.module.scss';
 
 export interface ITopMenuProps {
@@ -38,6 +39,10 @@ export const TopMenu: React.FC<ITopMenuProps> = (props) => {
 
     const commandBarFarItems: ICommandBarItemProps[] = React.useMemo(() => {
         return [
+            {
+                key: 'layout',
+                onRender: () => <LayoutSelect />,
+            },
             {
                 key: 'filter',
                 onRender: () => <FilterDropdown />,

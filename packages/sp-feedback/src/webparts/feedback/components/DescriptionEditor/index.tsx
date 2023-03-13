@@ -313,10 +313,10 @@ export const DescriptionEditor: React.FC<IDescriptionEditorProps> = ({
                 allowBase64: true,
             }),
             Link.configure({
-                openOnClick: true,
+                openOnClick: false,
                 linkOnPaste: true,
                 HTMLAttributes: {
-                    rel: 'noopener',
+                    rel: 'noreferrer,noopener',
                     target: '_blank',
                 },
             }),

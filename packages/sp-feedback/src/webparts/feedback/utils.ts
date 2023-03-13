@@ -48,3 +48,14 @@ export async function replaceImagesInHtml(html: string): Promise<string> {
 
     return div.innerHTML;
 }
+
+export function listToColumnSplitter<T>(items: T[], cols: number): T[][] {
+    const result: T[][] = [];
+    let idx = 0;
+    items.forEach((item) => {
+        if (result[idx] === undefined) result[idx] = [];
+        result[idx].push(item);
+        idx = (idx + 1) % cols;
+    });
+    return result;
+}

@@ -42,7 +42,7 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
             );
             // Get temp items if any
             const tempItems =
-                await MainService.TempItemService.getAllTempItems();
+                MainService.TempItemService.getAllTempItems();
 
             // Build items
             const allItems = items.concat(systemItems, tempItems);
@@ -71,6 +71,7 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
     }, []);
 
     React.useEffect(() => {
+        if (!info?.indexManager) return;
         // Add item
         const [addEvent, handlerItemAdd, removeItemAdd] = itemAddedEventBuilder(
             MainService.ItemsService,
@@ -86,6 +87,7 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
         const [updateEvent, handlerUpdate, removeUpdate] = itemUpdatedEventBuilder(
             MainService.ItemsService,
             MainService.TempItemService,
+            info.indexManager,
             (oldItem, newItem) => {
                 setInfo((prev) => ({
                     ...prev,
@@ -103,7 +105,7 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
             removeItemAdd();
             removeUpdate();
         };
-    }, []);
+    }, [info?.indexManager]);
 
     if (!info) return null;
 

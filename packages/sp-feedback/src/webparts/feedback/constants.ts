@@ -21,5 +21,6 @@ export const STATUS = 'FB:/Status';
 export const TEMPLATE = 'FB:/Template';
 export const FILTER = 'FB:/Filter';
 export const SELECTED_FILTER = 'SELECTED_FILTER';
+export const SELECTED_LAYOUT = 'SELECTED_LAYOUT';
 
 export const ADMINS = 'FB:/Administrators';

@@ -1,6 +1,6 @@
-import { ActionButton, Text } from 'office-ui-fabric-react';
+import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { SELECTED_FILTER } from '../../../constants';
+import { SELECTED_FILTER, SELECTED_LAYOUT } from '../../../constants';
 import { $and, $eq, Filter } from '../../../indexes/filter';
 import { Item } from '../../../item';
 import {
@@ -14,7 +14,9 @@ import {
 } from '../../../services/saved-filter';
 import { GlobalContext } from '../../Feedback';
 import { FilterBuilder } from '../../FilterBuilder';
-import { ItemTemplate } from '../../ItemTemplate';
+import { DOUBLE_COL, SINGLE_COL, TRIPLE_COL } from '../../LayoutSelect';
+import { NColumnLayout } from '../../NColumnLayout';
+import { SingleColumnLayout } from '../../SingleColumnLayout';
 import styles from './Main.module.scss';
 
 export interface IMainProps {
@@ -28,6 +30,10 @@ export const Main: React.FC<IMainProps> = (props) => {
         [indexManager]
     );
     const [items, setItems] = React.useState<Item[]>([]);
+    const layout = React.useMemo(() => {
+        const selected = indexManager.filterFirst($eq('title', SELECTED_LAYOUT)) || new Item();
+        return selected.getFieldOr('layout', SINGLE_COL);
+    }, [indexManager]);
 
     React.useEffect(() => {
         console.time('filter');
@@ -37,6 +43,17 @@ export const Main: React.FC<IMainProps> = (props) => {
         console.timeEnd('filter');
         setItems(items);
     }, [selectedFilters]);
+
+    const list = React.useMemo(() => {
+        switch (layout) {
+            case DOUBLE_COL:
+                return <NColumnLayout items={items} cols={2} />
+            case TRIPLE_COL:
+                return <NColumnLayout items={items} cols={3} />
+            default:
+                return <SingleColumnLayout items={items} />
+        }
+    }, [items, layout]);
 
     return (
         <div className={styles.container}>
@@ -64,13 +81,9 @@ export const Main: React.FC<IMainProps> = (props) => {
                     }}
                     defaultFilter={$eq('isservice', 'false')}
                 />
-                <ActionButton>Save filter</ActionButton>
             </div>
-            <div className={styles.itemsList}>
-                {items.map((i) => (
-                    <ItemTemplate item={i} key={i.Id} />
-                ))}
-            </div>
+
+            {list}
         </div>
     );
 };

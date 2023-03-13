@@ -1,9 +1,7 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
 
 .container {
-    min-width: 1px;
-}
-
-.filters {
-    padding: 16px 0;
+    display: flex;
+    flex-flow: column nowrap;
+    gap: .8em;
 }
