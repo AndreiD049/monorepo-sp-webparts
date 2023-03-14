@@ -22,6 +22,6 @@ export const TEMPLATE = 'FB:/Template';
 export const FILTER = 'FB:/Filter';
 export const SELECTED_FILTER = 'SELECTED_FILTER';
 export const SELECTED_LAYOUT = 'SELECTED_LAYOUT';
-export const ITEM_EDITABLE = 'FB:/State/Editable';
+export const EDITABLE_ITEMS = 'FB:/State/Editable';
 
 export const ADMINS = 'FB:/Administrators';

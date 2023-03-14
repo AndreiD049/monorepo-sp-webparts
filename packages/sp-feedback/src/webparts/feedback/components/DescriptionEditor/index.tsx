@@ -16,6 +16,7 @@ const DIALOG_ID = 'spfxFeedbackDialog';
 export interface IDescriptionEditorProps {
     id?: string;
     onUpdate?: (content: string) => void;
+    onBlur?: (content: string) => void;
     content: string;
     editable?: boolean;
 }
@@ -323,6 +324,8 @@ export const DescriptionEditor: React.FC<IDescriptionEditorProps> = ({
         ],
         onUpdate: (innerProps) =>
             props.onUpdate ? props.onUpdate(innerProps.editor.getHTML()) : null,
+        onBlur: (innerProps) => 
+            props.onBlur ? props.onBlur(innerProps.editor.getHTML()) : null,
         content: props.content,
         editable,
     });

@@ -42,7 +42,7 @@ export function dispatchItemAdded(
 export function dispatchItemUpdated(
     id: number | string,
     payload: Partial<IFeedbackItem>,
-    options?: ItemOptions
+    options: ItemOptions = { temp: false, persist: false }
 ): void {
     document.dispatchEvent(
         new CustomEvent<UpdateItemPayload>(ITEM_UPDATED, {

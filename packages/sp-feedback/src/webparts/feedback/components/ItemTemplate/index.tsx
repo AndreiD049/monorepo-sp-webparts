@@ -1,10 +1,11 @@
 import { Icon, IconButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { ITEM_EDITABLE } from '../../constants';
 import { Item } from '../../item';
 import { dispatchItemUpdated } from '../../services/events';
 import { objectToTable } from '../../utils';
 import { DescriptionEditor } from '../DescriptionEditor';
+import { GlobalContext } from '../Feedback';
+import { isItemEditable, toggleItemEditable } from './editable-item';
 import styles from './ItemTemplate.module.scss';
 
 export interface IItemTemplateProps
@@ -13,21 +14,23 @@ export interface IItemTemplateProps
 }
 
 export const ItemHeaderTemplate: React.FC<{ item: Item }> = (props) => {
+    const { indexManager } = React.useContext(GlobalContext);
+    const handleEdit = () => {
+        toggleItemEditable(props.item.Id, indexManager)
+    };
+
     return (
         <div className={styles.itemHeader}>
-            <Text variant="large">{props.item.Title}</Text>
-            <IconButton
-                iconProps={{ iconName: 'Edit' }}
-                onClick={() => {
-                    dispatchItemUpdated(
-                        props.item.Id,
-                        props.item.getField(ITEM_EDITABLE)
-                            ? props.item.unsetField(ITEM_EDITABLE)
-                            : props.item.setField(ITEM_EDITABLE, true),
-                        { temp: true }
-                    );
-                }}
-            />
+            <div>
+                <Text variant="large">{props.item.Title}</Text>
+            </div>
+            <div>
+                <IconButton
+                    iconProps={{ iconName: 'Edit' }}
+                    onClick={handleEdit}
+                    className={styles.titleButton}
+                />
+            </div>
         </div>
     );
 };
@@ -52,16 +55,15 @@ export const ItemProperties: React.FC<{
 };
 
 export const ItemBodyTemplate: React.FC<{ item: Item }> = (props) => {
+    const { indexManager } = React.useContext(GlobalContext);
     const content = React.useRef<HTMLDivElement>(null);
     const [icon, setIcon] = React.useState('DoubleChevronUp');
     const [collapsed, setCollapsed] = React.useState(true);
-    const editable = React.useMemo(
-        () => props.item.getField<boolean>(ITEM_EDITABLE),
-        [props.item]
-    );
+    const editable = React.useMemo(() => isItemEditable(props.item.Id, indexManager), [props.item, indexManager]);
 
     React.useEffect(() => {
         function updateDom() {
+            if (!content.current) return;
             if (content.current && !collapsed) {
                 content.current.style.maxHeight =
                     content.current.firstElementChild.scrollHeight + 'px';
@@ -85,7 +87,7 @@ export const ItemBodyTemplate: React.FC<{ item: Item }> = (props) => {
             <ItemProperties
                 properties={objectToTable(
                     props.item.Fields,
-                    /FB:\/|text|caption/
+                    /text|caption/
                 )}
             />
             <div
@@ -103,8 +105,13 @@ export const ItemBodyTemplate: React.FC<{ item: Item }> = (props) => {
                 ref={content}
             >
                 <DescriptionEditor
+                    key={`${editable}`}
                     content={props.item.getFieldOr('text', '')}
                     editable={editable}
+                    onBlur={(text) => {
+                        console.log(text);
+                        dispatchItemUpdated(props.item.Id, props.item.setField('text', text))
+                    }}
                 />
             </div>
         </div>

@@ -164,8 +164,10 @@ export class IndexManager {
         return Array.from(this.filter(f));
     }
     
-    public filterFirst(f: Filter): Item {
-        return this.filterArray(f)[0] || null;
+    public filterFirst(f: Filter, fallback?: () => Item): Item {
+        const item = this.filterArray(f)[0] || null;
+        if (!item && fallback) return fallback();
+        return item;
     }
 
     public itemAdded(item: Item): IndexManager {

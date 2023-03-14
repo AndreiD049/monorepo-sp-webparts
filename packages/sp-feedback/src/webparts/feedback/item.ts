@@ -79,7 +79,6 @@ export class Item implements IFeedbackItem {
         if (isSpecialField(field)) {
             return setSpecialFieldValue(this, field, value);
         }
-        console.log(result);
         result.Fields[field] = value;
         return result;
     }
