@@ -93,7 +93,7 @@ export class IndexManager {
     private fieldIndexes: IndexMap;
 
     constructor(public items: Item[]) {
-        this.idIndex = new Index(items, (item) => item.Id.toString());
+        this.idIndex = new Index(items, (item) => item.Id?.toString());
         this.tagIndex = new Index(items, (item) => item.Tags);
         this.titleIndex = new Index(items, (item) => item.Title);
         this.isServiceIndex = new Index(items, (item) =>

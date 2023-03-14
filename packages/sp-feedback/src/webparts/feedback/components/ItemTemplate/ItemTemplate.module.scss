@@ -18,7 +18,6 @@
 }
 
 .itemBodyCollapsible {
-    max-height: 0;
     overflow: hidden;
     transition: max-height .2s ease-out;
 }
@@ -39,3 +38,17 @@
     min-height: 30px;
     line-height: 30px;
 }
+
+.propTable {
+    font-size: .8em;
+    border-collapse: collapse;
+
+    & td {
+        border-bottom: 1px solid "[theme: neutralTertiaryAlt, default: #a4262c]";
+    }
+
+    & td {
+        padding: 0 1em 0 0;
+    }
+}
+

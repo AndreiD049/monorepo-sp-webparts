@@ -44,7 +44,7 @@ export async function replaceImagesInHtml(html: string): Promise<string> {
             img.src = await MainService.AttachmentService.attachFile(blob);
         }
     });
-    
+
     await Promise.all(calls);
 
     return div.innerHTML;
@@ -58,6 +58,20 @@ export function listToColumnSplitter<T>(items: T[], cols: number): T[][] {
         if (result[idx] === undefined) result[idx] = [];
         result[idx].push(item);
         idx = (idx + 1) % cols;
+    });
+    return result;
+}
+
+export type PropTable = [string, string | number][];
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export function objectToTable(obj: any, excludeKeys: RegExp): PropTable {
+    const keys = Object.keys(obj)
+        .filter((key) => excludeKeys.test(key) === false)
+        .sort();
+    const result: PropTable = [];
+    keys.forEach((key) => {
+        result.push([key, obj[key]]);
     });
     return result;
 }
