@@ -4,6 +4,9 @@ import { IItemAddResult, IItemUpdateResult, IList, SPFI } from 'sp-preset';
 import { IFeedbackItemRaw } from '../models/IFeedbackItem';
 import { Item } from '../webparts/feedback/item';
 
+const SELECT = ['Id', 'Title', 'Tags', 'Fields', 'IsService', 'Created', 'Author/Id', 'Author/EMail', 'Author/Title']
+const EXPAND = ['Author']
+
 export class ItemsService {
     private sp: SPFI;
     public itemsList: IList;
@@ -19,14 +22,14 @@ export class ItemsService {
 
     public async getAllItems(): Promise<Item[]> {
         const items: IFeedbackItemRaw[] = await getAllPaged(
-            this.itemsList.items.filter(`IsService eq '0'`).select('Id', 'Title', 'Tags', 'Fields', 'IsService').orderBy('Created', false)
+            this.itemsList.items.filter(`IsService eq '0'`).select(...SELECT).expand(...EXPAND)
         );
         return items.map((i) => new Item(i));
     }
 
     public async getAllSystemItems(): Promise<IFeedbackItemRaw[]> {
         const items: IFeedbackItemRaw[] = await getAllPaged(
-            this.itemsList.items.filter(`IsService eq '1'`).select('Id', 'Title', 'Tags', 'Fields', 'IsService')
+            this.itemsList.items.filter(`IsService eq '1'`).select(...SELECT).expand(...EXPAND)
         );
         return items;
     }

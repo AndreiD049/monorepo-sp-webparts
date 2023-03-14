@@ -31,7 +31,6 @@ const options: IDropdownOption[] = [
         },
     },
     {
-
         key: TRIPLE_COL,
         text: 'Three columns',
         data: {
@@ -42,11 +41,15 @@ const options: IDropdownOption[] = [
 const iconStyles = { marginRight: '8px' };
 
 function createTempItemSelectedLayout(option: IDropdownOption): Item {
-    return new Item().setTitle(SELECTED_LAYOUT).setField('layout', option.key);
+    return new Item()
+        .setTitle(SELECTED_LAYOUT)
+        .setField('layout', option.key)
+        .setField('isservice', true);
 }
 
 export const LayoutSelect: React.FC<ILayoutSelectProps> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
+    const selected = React.useMemo(() => indexManager.filterFirst($eq('title', SELECTED_LAYOUT)), [indexManager]);
 
     const onRenderOption = (option: IDropdownOption): JSX.Element => {
         return (
@@ -86,17 +89,24 @@ export const LayoutSelect: React.FC<ILayoutSelectProps> = (props) => {
         <div className={styles.container}>
             <Dropdown
                 options={options}
-                defaultSelectedKey="single"
                 onRenderOption={onRenderOption}
                 onRenderTitle={onRenderTitle}
                 dropdownWidth="auto"
+                selectedKey={selected?.getFieldOr('layout', 'single')}
                 onChange={(_ev, option) => {
                     const item = createTempItemSelectedLayout(option);
-                    const existingItem = indexManager.filterFirst($eq('title', SELECTED_LAYOUT));
+                    const existingItem = indexManager.filterFirst(
+                        $eq('title', SELECTED_LAYOUT)
+                    );
+                    const options = { temp: true, persist: true };
                     if (!existingItem) {
-                        dispatchItemAdded(item.asRaw(), { temp: true });
+                        dispatchItemAdded(item.asRaw(), options);
                     } else {
-                        dispatchItemUpdated(existingItem.Title, { Fields: item.Fields }, { temp: true })
+                        dispatchItemUpdated(
+                            existingItem.Title,
+                            { Fields: item.Fields },
+                            options
+                        );
                     }
                 }}
             />

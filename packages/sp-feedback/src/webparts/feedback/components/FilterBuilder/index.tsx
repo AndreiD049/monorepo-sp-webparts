@@ -186,14 +186,14 @@ const FilterBuilderRow: React.FC<IFilterBuilderRowProps> = (props) => {
     const handleDeleteRow = React.useCallback(() => {
         const newFilter = removeAtPath(filter, path);
         onChange(newFilter);
-    }, [filter]);
+    }, [filter, onChange]);
 
     const handleAdd = React.useCallback(
         (newOp: string) => {
             const newFilter = insertOpAfter(newOp, filter, path);
             onChange(newFilter);
         },
-        [filter]
+        [filter, onChange]
     );
 
     const levelStyles: React.CSSProperties = {

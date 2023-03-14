@@ -1,3 +1,4 @@
+import { range } from 'lodash';
 import { IDropdownOption } from 'office-ui-fabric-react';
 import { Item } from './item';
 import { MainService } from './services/main-service';
@@ -50,7 +51,8 @@ export async function replaceImagesInHtml(html: string): Promise<string> {
 }
 
 export function listToColumnSplitter<T>(items: T[], cols: number): T[][] {
-    const result: T[][] = [];
+    if (cols === 1) return [items];
+    const result: T[][] = range(0, cols).map(() => []);
     let idx = 0;
     items.forEach((item) => {
         if (result[idx] === undefined) result[idx] = [];

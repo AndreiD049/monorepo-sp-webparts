@@ -117,7 +117,7 @@ export const SelectDropdown: React.FC<ISelectDropdownProps> = (props) => {
         additionalProps.selectedKey = getItemKey();
         additionalProps.onChange = handleSelect;
     }
-
+    
     const handleRenderOption = React.useCallback((props, defaultRender) => {
         const option: Item = props.data;
         if (option) {

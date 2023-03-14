@@ -9,6 +9,12 @@ export interface IFeedbackItem {
     Tags: string[];
     Fields: IFields;
     IsService: boolean;
+    Created: string | Date;
+    Author: {
+        Id: number;
+        EMail: string;
+        Title: string;
+    }
 }
 
 export interface IFeedbackItemRaw extends Omit<IFeedbackItem, 'Fields'> {

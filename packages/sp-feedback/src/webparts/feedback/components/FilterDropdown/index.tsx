@@ -3,7 +3,10 @@ import { FILTER, SELECTED_FILTER } from '../../constants';
 import { $eq } from '../../indexes/filter';
 import { Item } from '../../item';
 import { dispatchItemAdded, dispatchItemUpdated } from '../../services/events';
-import { getNewSelectedFilter, getSelectedFilterInfo } from '../../services/saved-filter';
+import {
+    getNewSelectedFilter,
+    getSelectedFilterInfo,
+} from '../../services/saved-filter';
 import { GlobalContext } from '../Feedback';
 import { SelectDropdown } from '../SelectDropdown';
 
@@ -23,18 +26,28 @@ export const FilterDropdown: React.FC<IFilterDropdownProps> = (props) => {
 
     return (
         <SelectDropdown
-            target={selectedFilter.item || getNewSelectedFilter('', null)}
+            target={selectedFilter.tempItem || getNewSelectedFilter('', null)}
             field="selected"
             options={filters}
             dropDownProps={{
-                placeholder: 'Select filter'
+                placeholder: 'Select filter',
             }}
             onChange={(newFilter) => {
                 const options = { temp: true, persist: true };
-                if (!selectedFilter.item) {
-                    dispatchItemAdded(newFilter.setTitle(SELECTED_FILTER).asRaw(), options);
+                if (!selectedFilter.selectedItem) {
+                    dispatchItemAdded(
+                        newFilter
+                            .setTitle(SELECTED_FILTER)
+                            .unsetField('filter')
+                            .asRaw(),
+                        options
+                    );
                 } else {
-                    dispatchItemUpdated(SELECTED_FILTER, newFilter.unsetField('filter'), options);
+                    dispatchItemUpdated(
+                        SELECTED_FILTER,
+                        newFilter.unsetField('filter'),
+                        options
+                    );
                 }
             }}
         />

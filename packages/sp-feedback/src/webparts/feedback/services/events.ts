@@ -113,7 +113,7 @@ export function itemUpdatedEventBuilder(
         } else {
             const title = ev.detail.id as string;
             // If it's a temporary item, it doesn't have a numerical Id, it uses the title as such
-            oldItem = indexManager.filterFirst($eq('title', id.toString()));
+            oldItem = indexManager.filterFirst($eq('title', title));
             if (shouldPersist) {
                 oldItem = tempItemService.getTempItem(title);
                 tempItemService.updateItem(title, ev.detail.payload);

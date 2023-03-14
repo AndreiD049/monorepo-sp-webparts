@@ -1,4 +1,4 @@
-import { Item } from '../item';
+import { Item, SPECIAL_FIELDS } from '../item';
 import { Filter, getFieldAndValue, getFilterOp } from './filter';
 import { filterSet, setIntersection, setUnion } from './set-operations';
 
@@ -198,9 +198,7 @@ export class IndexManager {
                 }
             });
         });
-        result.add('tags');
-        result.add('title');
-        result.add('isservice');
+        SPECIAL_FIELDS.forEach((f) => result.add(f));
         result.delete('text');
         return Array.from(result).sort();
     }
