@@ -79,6 +79,7 @@ export class Item implements IFeedbackItem {
         if (isSpecialField(field)) {
             return setSpecialFieldValue(this, field, value);
         }
+        console.log(result);
         result.Fields[field] = value;
         return result;
     }
@@ -110,10 +111,10 @@ export class Item implements IFeedbackItem {
     }
 
     public async replaceImagesIn(field: string): Promise<Item> {
-        const result = this.clone();
+        let result = this.clone();
         const oldContent = result.getField<string>(field);
         const newContent = await replaceImagesInHtml(oldContent);
-        result.setField(field, newContent);
+        result = result.setField(field, newContent);
         return result;
     }
 
