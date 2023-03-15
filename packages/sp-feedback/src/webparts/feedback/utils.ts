@@ -71,7 +71,11 @@ export function objectToTable(obj: any, excludeKeys: RegExp): PropTable {
         .sort();
     const result: PropTable = [];
     keys.forEach((key) => {
-        result.push([key, obj[key]]);
+        let value = obj[key];
+        if (typeof value === "object") {
+            value = JSON.stringify(value);
+        }
+        result.push([key, value]);
     });
     return result;
 }

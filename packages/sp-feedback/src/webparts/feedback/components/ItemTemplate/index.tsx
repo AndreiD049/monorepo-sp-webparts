@@ -1,4 +1,3 @@
-import { debounce } from '@microsoft/sp-lodash-subset';
 import { Icon, IconButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Item } from '../../item';
@@ -22,7 +21,7 @@ export const ItemHeaderTemplate: React.FC<{ item: Item, editable: boolean }> = (
     
     const handleSave = async (): Promise<void> => {
         const item = await props.item.replaceImagesIn('text');
-        dispatchItemUpdated(item.Id, item);
+        dispatchItemUpdated(item.Id, item.Fields);
         toggleItemEditable(item.Id, indexManager);
     }
 
@@ -67,27 +66,14 @@ export const ItemBodyTemplate: React.FC<{ item: Item, editable: boolean, setItem
     const [collapsed, setCollapsed] = React.useState(true);
 
     React.useEffect(() => {
-        function updateDom(): void {
-            if (!content.current) return;
-            if (!collapsed) {
-                const scrollHeight = content.current.scrollHeight;
-                if (scrollHeight > 0) {
-                    content.current.style.maxHeight =
-                        content.current.scrollHeight + 'px';
-                }
-                setIcon('DoubleChevronDown');
-            } else {
-                content.current.style.maxHeight = '0';
-                setIcon('DoubleChevronUp');
-            }
+        if (!content.current) return;
+        if (!collapsed) {
+            content.current.style.maxHeight = '400px';
+            setIcon('DoubleChevronDown');
+        } else {
+            content.current.style.maxHeight = '0';
+            setIcon('DoubleChevronUp');
         }
-        updateDom();
-        const observer = new MutationObserver(updateDom);
-        observer.observe(content.current.firstElementChild, {
-            childList: true,
-            subtree: true,
-        });
-        return () => observer.disconnect();
     }, [collapsed, props.editable]);
 
     const handleChange = (text: string): void => {
@@ -111,14 +97,14 @@ export const ItemBodyTemplate: React.FC<{ item: Item, editable: boolean, setItem
                 Description
             </div>
             <div
-                className={`${styles.itemBodyCollapsible} ${styles.itemBody}`}
+                className={`${styles.itemBodyCollapsible} ${styles.itemBody} scroll-bar`}
                 ref={content}
             >
                 <DescriptionEditor
                     key={`${props.editable}`}
                     content={props.item.getFieldOr('text', '')}
                     editable={props.editable}
-                    onUpdate={debounce(handleChange, 1000)}
+                    onUpdate={handleChange}
                 />
             </div>
         </div>
@@ -135,7 +121,7 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = (props) => {
     
     React.useEffect(() => {
         setItem(props.item);
-    }, [indexManager, props.item]);
+    }, [props.item]);
 
     return (
         <div className={styles.container} style={props.style}>

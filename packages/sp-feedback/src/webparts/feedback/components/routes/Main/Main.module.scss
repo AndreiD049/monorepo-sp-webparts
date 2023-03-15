@@ -7,3 +7,10 @@
 .filters {
     padding: 16px 0;
 }
+
+.filterBox {
+    background-color: "[theme: neutralLighter, default: #f4f4f4]";
+    padding: 8px 8px 16px 8px;
+    border-radius: 4px;
+    border: 1px solid "[theme: neutralTertiaryAlt, default: #c8c8c8]"
+}

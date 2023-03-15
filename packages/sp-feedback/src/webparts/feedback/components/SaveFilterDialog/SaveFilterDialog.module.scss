@@ -1,0 +1,22 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    width: 300px;
+    display: flex;
+    flex: 1;
+    gap: 1em;
+    flex-flow: column nowrap;
+}
+
+.footer {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: .3em;
+}
+
+.warning {
+    color: red;
+    font-size: .9em;
+    font-weight: bold;
+    height: 1em;
+}

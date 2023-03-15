@@ -1,4 +1,4 @@
-import { SELECTED_FILTER } from '../constants';
+import { FILTER, SELECTED_FILTER } from '../constants';
 import { $eq, Filter } from '../indexes/filter';
 import { IndexManager } from '../indexes/index-manager';
 import { Item } from '../item';
@@ -11,6 +11,8 @@ export type SelectedFilterInfo = {
     appliedSortField: string;
     appliedSortAsc: boolean;
     appliedGroupField: string;
+    /* modified fields */
+    filterModified: boolean;
 };
 
 const emptyFilterInfo: SelectedFilterInfo = {
@@ -21,11 +23,12 @@ const emptyFilterInfo: SelectedFilterInfo = {
     appliedSortField: null,
     appliedSortAsc: true,
     appliedGroupField: null,
+    filterModified: false,
 };
 
 export function getNewSelectedFilter(
     selected: string,
-    filter: Filter,
+    filter?: Filter,
     sort?: string,
     sortAsc?: boolean,
     group?: string
@@ -34,18 +37,24 @@ export function getNewSelectedFilter(
         .setTitle(SELECTED_FILTER)
         .setField('selected', selected)
         .setField('isservice', true);
-    if (filter) {
-        result = result.setField('filter', filter);
-    }
-    if (sort) {
-        result = result
-            .setField('sort', sort)
-            .setField('sortdir', sortAsc ? 'asc' : 'desc');
-    }
-    if (group) {
-        result = result.setField('group', group);
-    }
+    result = result.setField('filter', filter);
+    result = result
+        .setField('sort', sort)
+        .setField('sortdir', sortAsc ? 'asc' : 'desc');
+    result = result.setField('group', group);
+    console.log(result);
     return result;
+}
+
+export function getNewSavedFilterItem(title: string, filterInfo: SelectedFilterInfo): Item {
+    const item = new Item()
+        .setField('title', title)
+        .setTags([FILTER])
+        .setField('filter', filterInfo.appliedFilter)
+        .setField('sort', filterInfo.appliedSortField)
+        .setField('sortdir', filterInfo.appliedSortAsc ? 'asc' : 'desc')
+        .setField('group', filterInfo.appliedGroupField);
+    return item;
 }
 
 export function getSelectedFilterInfo(
@@ -54,25 +63,38 @@ export function getSelectedFilterInfo(
     const result: SelectedFilterInfo = { ...emptyFilterInfo };
     result.tempItem = indexManager.filterFirst($eq('title', SELECTED_FILTER));
     if (!result.tempItem) return result;
-    result.appliedFilter = result.tempItem.getField('filter');
-    result.appliedSortField = result.tempItem.getField('sort');
+    // Any changes to the filters applied by user?
+    result.appliedFilter = result.tempItem.getFieldOr('filter', undefined);
+
+    result.appliedSortField = result.tempItem.getFieldOr('sort', undefined);
     result.appliedSortAsc = result.tempItem.getField('sortdir') === 'asc';
-    result.appliedGroupField = result.tempItem.getField('group');
+
+    result.appliedGroupField = result.tempItem.getFieldOr('group', undefined);
+    // Was the filter modified?
+    result.filterModified =
+        result.appliedFilter !== undefined ||
+        result.appliedSortField !== undefined ||
+        result.appliedGroupField !== undefined;
 
     result.selectedTitle = result.tempItem.getField('selected');
     if (!result.selectedTitle) return result;
+    // If no changes, get filter/sort/group from selected item
     result.selectedItem = indexManager.filterFirst(
         $eq('title', result.selectedTitle)
     );
-    if (!result.appliedFilter) {
+    if (!result.selectedItem) {
+        result.selectedTitle = null;
+        return result;
+    }
+    if (result.appliedFilter === undefined) {
         result.appliedFilter = result.selectedItem.getField('filter');
     }
-    if (!result.appliedSortField) {
+    if (result.appliedSortField === undefined) {
         result.appliedSortField = result.selectedItem.getField('sort');
         result.appliedSortAsc =
             result.selectedItem.getField('sortdir') === 'asc';
     }
-    if (!result.appliedGroupField) {
+    if (result.appliedGroupField === undefined) {
         result.appliedGroupField = result.selectedItem.getField('group');
     }
 

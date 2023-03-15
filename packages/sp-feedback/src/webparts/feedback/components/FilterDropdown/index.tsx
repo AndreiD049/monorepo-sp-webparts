@@ -45,7 +45,7 @@ export const FilterDropdown: React.FC<IFilterDropdownProps> = (props) => {
                 } else {
                     dispatchItemUpdated(
                         SELECTED_FILTER,
-                        newFilter.unsetField('filter'),
+                        newFilter.unsetField('filter').Fields,
                         options
                     );
                 }

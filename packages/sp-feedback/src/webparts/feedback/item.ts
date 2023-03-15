@@ -26,7 +26,7 @@ export const SPECIAL_FIELDS: SPECIAL_KEYS[] = [
 ];
 
 export class Item implements IFeedbackItem {
-    Id: number;
+    Id: number | string;
     Title: string;
     Tags: string[];
     IsService: boolean;
@@ -63,11 +63,11 @@ export class Item implements IFeedbackItem {
         }
     }
 
-    public getFieldOr<T>(field: string, def: IFields['k']): T {
+    public getFieldOr<T>(field: string, defaultValue: IFields['k']): T {
         if (isSpecialField(field)) {
             return getSpecialFieldValue(this, field);
         }
-        return (this.Fields[field] ?? def) as T;
+        return (this.Fields[field] !== undefined ? this.Fields[field] : defaultValue) as T;
     }
 
     public getField<T>(field: string): T {
@@ -130,23 +130,9 @@ export class Item implements IFeedbackItem {
         return result;
     }
 
-    public merge(other: Partial<IFeedbackItem>): Item {
+    public mergeFields(other: IFields): Item {
         const result = this.clone();
-        result.Fields = { ...this.Fields, ...other.Fields };
-        for (const key in other) {
-            if (
-                Object.prototype.hasOwnProperty.call(other, key) &&
-                key !== 'Fields' &&
-                key !== 'IsService'
-            ) {
-                const element = (other as { [key: string]: string | string[] })[
-                    key
-                ];
-                if (Boolean(element) && element.length !== 0) {
-                    result.setField(key, element);
-                }
-            }
-        }
+        result.Fields = { ...result.Fields, ...other };
         return result;
     }
 }

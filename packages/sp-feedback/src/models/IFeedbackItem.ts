@@ -4,7 +4,7 @@ export interface IFields {
 }
 
 export interface IFeedbackItem {
-    Id: number;
+    Id: number | string;
     Title: string;
     Tags: string[];
     Fields: IFields;

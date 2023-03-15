@@ -5,13 +5,13 @@ import { Item } from '../../item';
 import { dispatchItemAdded } from '../../services/events';
 
 const filterEditable = $eq('title', EDITABLE_ITEMS);
-const defaultEditableItem = () => new Item().setField('title', EDITABLE_ITEMS);
+const defaultEditableItem = (): Item => new Item().setField('title', EDITABLE_ITEMS);
 
 export function isItemEditable(id: number | string, indexManager: IndexManager): boolean {
-    return indexManager.filterFirst(filterEditable, defaultEditableItem).getFieldOr(id.toString(), false);
+    return indexManager.filterFirst(filterEditable, defaultEditableItem).getFieldOr(id?.toString(), false);
 }
 
-export function toggleItemEditable(id: number, indexManager: IndexManager): void {
+export function toggleItemEditable(id: number | string, indexManager: IndexManager): void {
     const isEditable = isItemEditable(id, indexManager);
     const editableItems = indexManager.filterFirst(
         filterEditable,

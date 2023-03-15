@@ -1,5 +1,6 @@
 import {
     Dropdown,
+    IconButton,
     IDropdownOption,
     Label,
     Separator,
@@ -24,6 +25,7 @@ import { GlobalContext } from '../../Feedback';
 import { FilterBuilder } from '../../FilterBuilder';
 import { DOUBLE_COL, SINGLE_COL, TRIPLE_COL } from '../../LayoutSelect';
 import { ListView } from '../../ListView';
+import { showSaveFilterDialog } from '../../SaveFilterDialog';
 import styles from './Main.module.scss';
 
 export interface IMainProps {}
@@ -41,7 +43,10 @@ const SelectField: React.FC<{
     onChange: (opt: string | undefined | number) => void;
 }> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
-    const options = React.useMemo(() => indexManager.getFields(props.filter), [indexManager]);
+    const options = React.useMemo(
+        () => indexManager.getFields(props.filter),
+        [indexManager]
+    );
     const dropdownOptions: IDropdownOption[] = React.useMemo(() => {
         const result = props.additionalOptions || [];
         return [
@@ -60,7 +65,7 @@ const SelectField: React.FC<{
                 options={dropdownOptions}
                 dropdownWidth="auto"
                 label={props.label}
-                selectedKey={props.value}
+                selectedKey={props.value || null}
                 onChange={(_ev, option) => {
                     props.onChange(option.data);
                 }}
@@ -89,7 +94,7 @@ const useFilterBar = (): UseFilterType => {
                 });
             } else {
                 const newItem = selectedFilters.tempItem.setField(field, opt);
-                dispatchItemUpdated(SELECTED_FILTER, newItem, {
+                dispatchItemUpdated(SELECTED_FILTER, newItem.Fields, {
                     temp: true,
                     persist: true,
                 });
@@ -99,7 +104,37 @@ const useFilterBar = (): UseFilterType => {
     const component = (
         <div>
             <Stack horizontal tokens={{ childrenGap: '1em' }}>
-                <StackItem>
+                <Stack className={styles.filterBox}>
+                    <IconButton
+                        iconProps={{ iconName: 'Save' }}
+                        disabled={!selectedFilters.filterModified}
+                        onClick={() => {
+                            showSaveFilterDialog(selectedFilters);
+                        }}
+                    />
+                    <IconButton
+                        iconProps={{ iconName: 'Refresh' }}
+                        disabled={!selectedFilters.filterModified}
+                        title="Reset filters"
+                        onClick={() => {
+                            dispatchItemUpdated(
+                                SELECTED_FILTER,
+                                {
+                                    filter: undefined,
+                                    group: undefined,
+                                    sort: undefined,
+                                },
+                                { temp: true, persist: true }
+                            );
+                        }}
+                    />
+                    <IconButton
+                        iconProps={{ iconName: 'Delete' }}
+                        title="Delete item"
+                        disabled={!selectedFilters.selectedTitle}
+                    />
+                </Stack>
+                <StackItem className={styles.filterBox}>
                     <Label>Filter by</Label>
                     <FilterBuilder
                         filter={selectedFilters.appliedFilter}
@@ -117,7 +152,7 @@ const useFilterBar = (): UseFilterType => {
                             } else {
                                 dispatchItemUpdated(
                                     SELECTED_FILTER,
-                                    newSelected,
+                                    newSelected.Fields,
                                     options
                                 );
                             }
@@ -125,20 +160,22 @@ const useFilterBar = (): UseFilterType => {
                         defaultFilter={$eq('isservice', 'false')}
                     />
                 </StackItem>
-                <SelectField
-                    filter={selectedFilters.appliedFilter}
-                    value={selectedFilters.appliedGroupField || 'null'}
-                    label="Group by"
-                    onChange={handleSetField('group')}
-                    additionalOptions={[
-                        {
-                            key: 'null',
-                            data: null,
-                            text: '---',
-                        },
-                    ]}
-                />
-                <Stack tokens={{ childrenGap: 8 }}>
+                <div className={styles.filterBox}>
+                    <SelectField
+                        filter={selectedFilters.appliedFilter}
+                        value={selectedFilters.appliedGroupField || 'null'}
+                        label="Group by"
+                        onChange={handleSetField('group')}
+                        additionalOptions={[
+                            {
+                                key: 'null',
+                                data: null,
+                                text: '---',
+                            },
+                        ]}
+                    />
+                </div>
+                <Stack tokens={{ childrenGap: 8 }} className={styles.filterBox}>
                     <SelectField
                         filter={selectedFilters.appliedFilter}
                         value={selectedFilters.appliedSortField}
@@ -184,9 +221,11 @@ export const Main: React.FC<IMainProps> = (props) => {
 
     React.useEffect(() => {
         console.time('filter');
-        const items = indexManager.filterArray(
-            $and(selectedFilters.appliedFilter, $eq('isservice', 'false'))
-        );
+        let filter = $eq('isservice', 'false');
+        if (selectedFilters.appliedFilter) {
+            filter = $and(selectedFilters.appliedFilter, filter);
+        }
+        const items = indexManager.filterArray(filter);
         console.timeEnd('filter');
         console.time('sort');
         if (selectedFilters.appliedSortField) {

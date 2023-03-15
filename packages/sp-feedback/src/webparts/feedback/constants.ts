@@ -6,6 +6,7 @@ export const MINUTE = SECOND * 60;
 export const HOUR = MINUTE * 60;
 
 export const MAIN_PANEL = 'SpfxFedbackPanel';
+export const DIALOG_ID = 'spfxFeedbackDialog';
 
 // TAGS
 // Items tagged with this appear in the dropdowns

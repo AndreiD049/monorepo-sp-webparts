@@ -18,8 +18,8 @@
 }
 
 .itemBodyCollapsible {
-    overflow: hidden;
-    transition: max-height .2s ease-out;
+    overflow: hidden auto;
+    transition: max-height .1s linear;
 }
 
 .itemDescriptionButton {

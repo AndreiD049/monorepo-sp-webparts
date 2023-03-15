@@ -104,7 +104,7 @@ export const LayoutSelect: React.FC<ILayoutSelectProps> = (props) => {
                     } else {
                         dispatchItemUpdated(
                             existingItem.Title,
-                            { Fields: item.Fields },
+                            item.Fields,
                             options
                         );
                     }

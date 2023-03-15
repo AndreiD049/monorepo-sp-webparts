@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { RouterProvider } from 'react-router';
 import { ISiteUserInfo } from 'sp-preset';
-import { ADMINS } from '../constants';
+import { ADMINS, DIALOG_ID } from '../constants';
 import { IFeedbackWebPartProps } from '../FeedbackWebPart';
 import { $eq } from '../indexes/filter';
 import { IndexManager } from '../indexes/index-manager';
@@ -10,6 +10,8 @@ import { MainService } from '../services/main-service';
 import { router } from './Router';
 import { Item } from '../item';
 import styles from './Feedback.module.scss';
+import '../styles.scss'
+import { Dialog } from 'sp-components';
 
 interface IGlobalContextProps {
     indexManager: IndexManager;
@@ -114,6 +116,7 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
             <GlobalContext.Provider value={info}>
                 <RouterProvider router={router} />
             </GlobalContext.Provider>
+            <Dialog id={DIALOG_ID} />
         </div>
     );
 };

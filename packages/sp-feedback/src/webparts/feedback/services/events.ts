@@ -1,4 +1,4 @@
-import { IFeedbackItem, IFeedbackItemRaw } from '../../../models/IFeedbackItem';
+import { IFeedbackItemRaw, IFields } from '../../../models/IFeedbackItem';
 import { ItemsService } from '../../../services/items-service';
 import { TempItemsService } from '../../../services/temp-items-service';
 import { $eq } from '../indexes/filter';
@@ -16,24 +16,28 @@ type ItemOptions = {
 
 type AddItemPayload = {
     item: IFeedbackItemRaw;
+    callback?: () => void;
     options?: ItemOptions;
 };
 
 type UpdateItemPayload = {
     id: number | string;
-    payload: Partial<IFeedbackItem>;
+    payload: Partial<IFields>;
+    callback?: () => void;
     options?: ItemOptions;
 };
 
 export function dispatchItemAdded(
     item: IFeedbackItemRaw,
-    options?: ItemOptions
+    options?: ItemOptions,
+    callback?: () => void,
 ): void {
     document.dispatchEvent(
         new CustomEvent<AddItemPayload>(ITEM_ADDED, {
             detail: {
                 item,
-                options,
+                options: options || { temp: false, persist: false },
+                callback,
             },
         })
     );
@@ -41,15 +45,17 @@ export function dispatchItemAdded(
 
 export function dispatchItemUpdated(
     id: number | string,
-    payload: Partial<IFeedbackItem>,
-    options: ItemOptions = { temp: false, persist: false }
+    payload: Partial<IFields>,
+    options?: ItemOptions,
+    callback?: () => void,
 ): void {
     document.dispatchEvent(
         new CustomEvent<UpdateItemPayload>(ITEM_UPDATED, {
             detail: {
                 id,
                 payload,
-                options,
+                options: options || { temp: false, persist: false },
+                callback,
             },
         })
     );
@@ -58,10 +64,11 @@ export function dispatchItemUpdated(
 export function itemAddedEventBuilder(
     itemService: ItemsService,
     tempItemService: TempItemsService,
-    cb: (item: Item) => void
+    cb: (item: Item) => void | Promise<void>
 ): [string, (ev: CustomEvent) => void, () => void] {
     // Handler receives item's raw details
     const handler = async (ev: CustomEvent<AddItemPayload>): Promise<void> => {
+        const doneCb = ev.detail.callback ?? (() => null);
         const options = ev.detail.options;
         const isTemp = options ? options.temp : false;
         const shouldPersist = options ? options.persist : false;
@@ -78,7 +85,8 @@ export function itemAddedEventBuilder(
                 resultItem = new Item(ev.detail.item);
             }
         }
-        cb(resultItem);
+        await cb(resultItem);
+        doneCb();
     };
 
     return [
@@ -92,12 +100,13 @@ export function itemUpdatedEventBuilder(
     itemService: ItemsService,
     tempItemService: TempItemsService,
     indexManager: IndexManager,
-    cb: (oldItem: Item, newitem: Item) => void
+    cb: (oldItem: Item, newitem: Item) => void | Promise<void>
 ): [string, (ev: CustomEvent) => void, () => void] {
     // Handler receives item's raw details
     const handler = async (
         ev: CustomEvent<UpdateItemPayload>
     ): Promise<void> => {
+        const doneCb = ev.detail.callback ?? (() => null);
         const options = ev.detail.options;
         const isTemp = options.temp;
         const id = ev.detail.id;
@@ -107,7 +116,7 @@ export function itemUpdatedEventBuilder(
         if (!isTemp && typeof id === 'number') {
             // ! TODO: optimize this, it should not do so many calls
             oldItem = await itemService.getItem(id);
-            const merged = oldItem.merge(ev.detail.payload);
+            const merged = oldItem.mergeFields(ev.detail.payload);
             await itemService.updateItem(id, merged.asRaw());
             updatedItem = await itemService.getItem(id);
         } else {
@@ -123,10 +132,11 @@ export function itemUpdatedEventBuilder(
                 tempItemService.updateItem(title, ev.detail.payload);
                 updatedItem = tempItemService.getTempItem(title);
             } else {
-                updatedItem = oldItem.merge(ev.detail.payload);
+                updatedItem = oldItem.mergeFields(ev.detail.payload);
             }
         }
-        cb(oldItem, updatedItem);
+        await cb(oldItem, updatedItem);
+        doneCb();
     };
 
     return [

@@ -50,16 +50,19 @@ export class TempItemsService {
         if (isRaw(item)) {
             target = fromRaw(item);
         }
+        if (!target.Id) {
+            target.Id = target.Title;
+        }
         localStorage.setItem(`${PREFIX}/${target.Title}`, JSON.stringify(target));
     }
 
     public updateItem(
         title: string,
-        payload: Partial<IFeedbackItem>
+        payload: Partial<IFields>
     ): void {
         try {
             const item = this.getTempItem(title);
-            const resultPayload = item.merge(payload);
+            const resultPayload = item.mergeFields(payload);
             if (item) {
                 localStorage.setItem(
                     this.getKey(title),

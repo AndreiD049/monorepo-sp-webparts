@@ -10,9 +10,9 @@ import {
     IChoiceGroupOption,
     TextField,
 } from 'office-ui-fabric-react';
-import { Dialog, FooterOkCancel, hideDialog, showDialog } from 'sp-components';
+import { FooterOkCancel, hideDialog, showDialog } from 'sp-components';
+import { DIALOG_ID } from '../../constants';
 
-const DIALOG_ID = 'spfxFeedbackDialog';
 export interface IDescriptionEditorProps {
     id?: string;
     onUpdate?: (content: string) => void;
@@ -334,7 +334,6 @@ export const DescriptionEditor: React.FC<IDescriptionEditorProps> = ({
             <div className={styles.container}>
                 {editable && <MenuBar editor={editor} />}
                 <EditorContent id={id} editor={editor} />
-                <Dialog id={DIALOG_ID} />
             </div>
     );
 };
