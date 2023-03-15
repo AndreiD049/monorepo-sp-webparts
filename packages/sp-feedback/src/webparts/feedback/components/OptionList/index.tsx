@@ -7,6 +7,13 @@ export interface IOptionListProps {
     onSelect?: (op: string) => void;
 }
 
+export interface IListOption {
+    key: string | number;
+    text: string | JSX.Element;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data?: any;
+}
+
 export const OptionsList: React.FC<IOptionListProps> = ({
     options,
     onSelect,
