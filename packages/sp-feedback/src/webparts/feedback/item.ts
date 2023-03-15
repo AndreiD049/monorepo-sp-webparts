@@ -152,7 +152,7 @@ export class Item implements IFeedbackItem {
 }
 
 function isSpecialField(field: string): field is SPECIAL_KEYS {
-    return SPECIAL_FIELDS.indexOf(field.toLowerCase() as SPECIAL_KEYS) > -1;
+    return SPECIAL_FIELDS.indexOf(field?.toLowerCase() as SPECIAL_KEYS) > -1;
 }
 
 function setSpecialFieldValue(

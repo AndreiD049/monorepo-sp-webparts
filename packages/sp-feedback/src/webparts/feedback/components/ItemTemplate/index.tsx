@@ -1,3 +1,4 @@
+import { debounce } from '@microsoft/sp-lodash-subset';
 import { Icon, IconButton, Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Item } from '../../item';
@@ -13,11 +14,17 @@ export interface IItemTemplateProps
     item: Item;
 }
 
-export const ItemHeaderTemplate: React.FC<{ item: Item }> = (props) => {
+export const ItemHeaderTemplate: React.FC<{ item: Item, editable: boolean }> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
-    const handleEdit = () => {
-        toggleItemEditable(props.item.Id, indexManager)
+    const handleEdit = (): void => {
+        toggleItemEditable(props.item.Id, indexManager);
     };
+    
+    const handleSave = async (): Promise<void> => {
+        const item = await props.item.replaceImagesIn('text');
+        dispatchItemUpdated(item.Id, item);
+        toggleItemEditable(item.Id, indexManager);
+    }
 
     return (
         <div className={styles.itemHeader}>
@@ -26,8 +33,8 @@ export const ItemHeaderTemplate: React.FC<{ item: Item }> = (props) => {
             </div>
             <div>
                 <IconButton
-                    iconProps={{ iconName: 'Edit' }}
-                    onClick={handleEdit}
+                    iconProps={{ iconName: props.editable ? 'Save' : 'Edit' }}
+                    onClick={props.editable ? handleSave : handleEdit}
                     className={styles.titleButton}
                 />
             </div>
@@ -54,19 +61,20 @@ export const ItemProperties: React.FC<{
     );
 };
 
-export const ItemBodyTemplate: React.FC<{ item: Item }> = (props) => {
-    const { indexManager } = React.useContext(GlobalContext);
+export const ItemBodyTemplate: React.FC<{ item: Item, editable: boolean, setItem: React.Dispatch<React.SetStateAction<Item>> }> = (props) => {
     const content = React.useRef<HTMLDivElement>(null);
     const [icon, setIcon] = React.useState('DoubleChevronUp');
     const [collapsed, setCollapsed] = React.useState(true);
-    const editable = React.useMemo(() => isItemEditable(props.item.Id, indexManager), [props.item, indexManager]);
 
     React.useEffect(() => {
-        function updateDom() {
+        function updateDom(): void {
             if (!content.current) return;
-            if (content.current && !collapsed) {
-                content.current.style.maxHeight =
-                    content.current.firstElementChild.scrollHeight + 'px';
+            if (!collapsed) {
+                const scrollHeight = content.current.scrollHeight;
+                if (scrollHeight > 0) {
+                    content.current.style.maxHeight =
+                        content.current.scrollHeight + 'px';
+                }
                 setIcon('DoubleChevronDown');
             } else {
                 content.current.style.maxHeight = '0';
@@ -79,16 +87,18 @@ export const ItemBodyTemplate: React.FC<{ item: Item }> = (props) => {
             childList: true,
             subtree: true,
         });
-        () => observer.disconnect();
-    }, [collapsed, editable]);
+        return () => observer.disconnect();
+    }, [collapsed, props.editable]);
+
+    const handleChange = (text: string): void => {
+        const item = props.item.setField('text', text);
+        props.setItem(item);
+    }
 
     return (
         <div className={styles.itemBodyOuter}>
             <ItemProperties
-                properties={objectToTable(
-                    props.item.Fields,
-                    /text|caption/
-                )}
+                properties={objectToTable(props.item.Fields, /text|caption/)}
             />
             <div
                 role="button"
@@ -105,13 +115,10 @@ export const ItemBodyTemplate: React.FC<{ item: Item }> = (props) => {
                 ref={content}
             >
                 <DescriptionEditor
-                    key={`${editable}`}
+                    key={`${props.editable}`}
                     content={props.item.getFieldOr('text', '')}
-                    editable={editable}
-                    onBlur={(text) => {
-                        console.log(text);
-                        dispatchItemUpdated(props.item.Id, props.item.setField('text', text))
-                    }}
+                    editable={props.editable}
+                    onUpdate={debounce(handleChange, 1000)}
                 />
             </div>
         </div>
@@ -119,10 +126,21 @@ export const ItemBodyTemplate: React.FC<{ item: Item }> = (props) => {
 };
 
 export const ItemTemplate: React.FC<IItemTemplateProps> = (props) => {
+    const { indexManager } = React.useContext(GlobalContext);
+    const [item, setItem] = React.useState(props.item);
+    const editable = React.useMemo(
+        () => isItemEditable(props.item.Id, indexManager),
+        [props.item, indexManager]
+    );
+    
+    React.useEffect(() => {
+        setItem(props.item);
+    }, [indexManager, props.item]);
+
     return (
         <div className={styles.container} style={props.style}>
-            <ItemHeaderTemplate item={props.item} />
-            <ItemBodyTemplate item={props.item} />
+            <ItemHeaderTemplate item={item} editable={editable} />
+            <ItemBodyTemplate item={item} editable={editable} setItem={setItem} />
         </div>
     );
 };

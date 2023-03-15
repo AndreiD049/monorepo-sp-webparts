@@ -1,0 +1,45 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+@mixin default-padding {
+    padding: 4px 8px;
+    margin: 0 2px 2px 2px;
+}
+
+.container {
+    min-width: 1px;
+}
+
+.defaultText {
+    @include default-padding;
+    color: "[theme: neutralPrimaryAlt, default: #3c3c3c]";
+}
+
+.optionList {
+    list-style-type: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.optionSearch {
+    margin: 4px;
+}
+
+.optionItem {
+    background-color: "[theme: white, default: #ffffff]";
+    
+    & button {
+        @include default-padding;
+        outline: none;
+        background-color: inherit;
+        color: inherit;
+        border: none;
+        border-radius: 0;
+        text-decoration: underline;
+    }
+    
+    &.selected {
+        background-color: "[theme: themeSecondary, default: #ae383e]";
+        color: "[theme: white, default: #ffffff]"
+    }
+}

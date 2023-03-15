@@ -20,6 +20,7 @@ import {
     traversePath,
 } from '../../indexes/filter';
 import { GlobalContext } from '../Feedback';
+import { OptionsList } from '../OptionList';
 import styles from './FilterBuilder.module.scss';
 
 const FILTER_CALLOUT = 'spfx/Feedback/Filter';
@@ -40,21 +41,6 @@ export interface IFilterBuilderProps {
     setFilter: React.Dispatch<React.SetStateAction<Filter>>;
     defaultFilter?: Filter;
 }
-
-const OptionsList: React.FC<{
-    options: string[];
-    onSelect?: (op: string) => void;
-}> = ({ options, onSelect }) => {
-    return (
-        <ul>
-            {options.map((o) => (
-                <li key={o}>
-                    <button onClick={() => onSelect(o)}>{o}</button>
-                </li>
-            ))}
-        </ul>
-    );
-};
 
 const CalloutButton: React.FC<{
     value: string | JSX.Element;

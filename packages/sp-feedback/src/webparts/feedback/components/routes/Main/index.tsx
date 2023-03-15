@@ -41,7 +41,7 @@ const SelectField: React.FC<{
     onChange: (opt: string | undefined | number) => void;
 }> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
-    const options = indexManager.getFields(props.filter);
+    const options = React.useMemo(() => indexManager.getFields(props.filter), [indexManager]);
     const dropdownOptions: IDropdownOption[] = React.useMemo(() => {
         const result = props.additionalOptions || [];
         return [
@@ -52,7 +52,8 @@ const SelectField: React.FC<{
                 text: o,
             })),
         ];
-    }, []);
+    }, [options]);
+
     return (
         <div>
             <Dropdown
