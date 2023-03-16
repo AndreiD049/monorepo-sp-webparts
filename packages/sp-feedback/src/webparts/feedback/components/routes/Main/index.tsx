@@ -11,8 +11,7 @@ import * as React from 'react';
 import { FooterOkCancel, hideDialog, showDialog } from 'sp-components';
 import {
     DIALOG_ID,
-    SELECTED_FILTER,
-    SELECTED_LAYOUT,
+    SELECTED_VIEW,
 } from '../../../constants';
 import { $and, $eq, Filter } from '../../../indexes/filter';
 import { Item } from '../../../item';
@@ -23,15 +22,16 @@ import {
 } from '../../../services/events';
 import {
     changeFilter,
-    getSelectedFilterInfo,
+    getEmptySelectedViewFields,
+    getViewInfo,
     getSortingFunction,
-    SelectedFilterInfo,
-} from '../../../services/saved-filter';
+    SelectedViewInfo,
+} from '../../../services/saved-view';
 import { GlobalContext } from '../../Feedback';
 import { FilterBuilder } from '../../FilterBuilder';
 import { GroupByField } from '../../FilterBuilder/GroupByField';
 import { SortByField } from '../../FilterBuilder/SortByField';
-import { DOUBLE_COL, SINGLE_COL, TRIPLE_COL } from '../../LayoutSelect';
+import { DOUBLE_COL, TRIPLE_COL } from '../../LayoutSelect';
 import { ListView } from '../../ListView';
 import { showSaveFilterDialog } from '../../SaveFilterDialog';
 import styles from './Main.module.scss';
@@ -40,13 +40,13 @@ export interface IMainProps {}
 
 type UseFilterType = {
     filterComponent: JSX.Element;
-    selectedFilters: SelectedFilterInfo;
+    selectedFilters: SelectedViewInfo;
 };
 
 const useFilterBar = (): UseFilterType => {
     const { indexManager } = React.useContext(GlobalContext);
     const selectedFilters = React.useMemo(
-        () => getSelectedFilterInfo(indexManager),
+        () => getViewInfo(indexManager),
         [indexManager]
     );
 
@@ -88,12 +88,8 @@ const useFilterBar = (): UseFilterType => {
                         title="Reset filters"
                         onClick={() => {
                             dispatchItemUpdated(
-                                SELECTED_FILTER,
-                                {
-                                    filter: undefined,
-                                    group: undefined,
-                                    sort: undefined,
-                                },
+                                SELECTED_VIEW,
+                                getEmptySelectedViewFields(selectedFilters.selectedTitle),
                                 { temp: true, persist: true }
                             );
                         }}
@@ -121,7 +117,7 @@ const useFilterBar = (): UseFilterType => {
                                 dispatchItemAdded(newSelected.asRaw(), options);
                             } else {
                                 dispatchItemUpdated(
-                                    SELECTED_FILTER,
+                                    SELECTED_VIEW,
                                     newSelected.Fields,
                                     options
                                 );
@@ -151,10 +147,8 @@ export const Main: React.FC<IMainProps> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
     const [items, setItems] = React.useState<Item[]>([]);
     const layout = React.useMemo(() => {
-        const selected =
-            indexManager.filterFirst($eq('title', SELECTED_LAYOUT)) ||
-            new Item();
-        return selected.getFieldOr('layout', SINGLE_COL);
+        const viewInfo = getViewInfo(indexManager);
+        return viewInfo.appliedLayout;
     }, [indexManager]);
     const { filterComponent, selectedFilters } = useFilterBar();
 

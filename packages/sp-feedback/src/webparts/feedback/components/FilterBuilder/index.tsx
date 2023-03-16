@@ -51,7 +51,7 @@ const CalloutButton: React.FC<{
         showListOptionsCallout(bref, {
             options: props.options,
             onSelect: (op) => {
-                props.onSelect(op.text);
+                props.onSelect(op.key as string);
                 hideListOptionsCallout();
             } 
         });
@@ -106,7 +106,7 @@ const FilterValue: React.FC = () => {
         <CalloutButton
             className={`${styles.filterButton} ${styles.filterValueContainer}`}
             options={options.map((o) => makeSimpleListOption(o))}
-            value={value !== '' ? value : "''"}
+            value={value !== '' ? String(value) : "''"}
             onSelect={(newVal) =>
                 onChange(
                     replaceAtPath(

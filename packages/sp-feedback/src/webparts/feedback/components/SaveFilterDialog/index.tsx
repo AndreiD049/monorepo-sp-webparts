@@ -5,17 +5,17 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { hideDialog, showDialog } from 'sp-components';
-import { DIALOG_ID, SELECTED_FILTER } from '../../constants';
+import { DIALOG_ID, SELECTED_VIEW } from '../../constants';
 import { dispatchItemAdded, dispatchItemUpdated } from '../../services/events';
 import {
-    getEmptySelectedFilterFields,
-    getNewSavedFilterItem,
-    SelectedFilterInfo,
-} from '../../services/saved-filter';
+    getEmptySelectedViewFields,
+    makeViewItem,
+    SelectedViewInfo,
+} from '../../services/saved-view';
 import styles from './SaveFilterDialog.module.scss';
 
 export interface ISaveFilterDialogProps {
-    filterInfo: SelectedFilterInfo;
+    filterInfo: SelectedViewInfo;
     onHide: () => void;
 }
 
@@ -31,14 +31,14 @@ export const SaveFilterDialog: React.FC<ISaveFilterDialogProps> = (props) => {
     const handleUpdateSelectedFilter = (filterName: string): void => {
         // If not overwriting, we also need to update the currently selected filter
         dispatchItemUpdated(
-            SELECTED_FILTER,
-            getEmptySelectedFilterFields(filterName),
+            SELECTED_VIEW,
+            getEmptySelectedViewFields(filterName),
             { temp: true, persist: true }
         );
     }
 
     const handleSaveFilter = (): void => {
-        const newSavedFilter = getNewSavedFilterItem(
+        const newSavedFilter = makeViewItem(
             newFilterName,
             props.filterInfo
         );
@@ -70,7 +70,7 @@ export const SaveFilterDialog: React.FC<ISaveFilterDialogProps> = (props) => {
     );
 };
 
-export function showSaveFilterDialog(filterInfo: SelectedFilterInfo): void {
+export function showSaveFilterDialog(filterInfo: SelectedViewInfo): void {
     showDialog({
         id: DIALOG_ID,
         dialogProps: {

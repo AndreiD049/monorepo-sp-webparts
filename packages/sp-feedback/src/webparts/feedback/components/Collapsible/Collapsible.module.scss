@@ -7,3 +7,9 @@
 .headerButton {
     cursor: pointer;
 }
+
+.hidden {
+    max-height: 0px;
+    overflow: hidden;
+}
+

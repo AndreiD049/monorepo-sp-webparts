@@ -84,8 +84,7 @@ export const ItemBodyTemplate: React.FC<{
     }, [collapsed, props.editable]);
 
     const handleChange = (text: string): void => {
-        const item = props.item.setField('text', text);
-        props.setItem(item);
+        props.setItem((prev) => prev.setField('text', text));
     };
 
     const properties = React.useMemo(() => {

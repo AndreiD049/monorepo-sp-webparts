@@ -24,9 +24,7 @@ export interface IFeedbackFormProps {
 export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
     const navigate = useNavigate();
     const { indexManager } = React.useContext(GlobalContext);
-    const [item, setItem] = React.useState(
-        new Item().setField('status', 'FB:/Status/New')
-    );
+    const [item, setItem] = React.useState(new Item());
     const [searchParams] = useSearchParams();
 
     const handleCreate = React.useCallback(async () => {

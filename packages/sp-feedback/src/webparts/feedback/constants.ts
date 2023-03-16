@@ -23,9 +23,8 @@ export const FEEDBACK = 'FB:/Feedback';
 // Items tagged with this appear in the choice/dropdown for status field
 export const STATUS = 'FB:/Status';
 export const TEMPLATE = 'FB:/Template';
-export const FILTER = 'FB:/Filter';
-export const SELECTED_FILTER = 'SELECTED_FILTER';
-export const SELECTED_LAYOUT = 'SELECTED_LAYOUT';
+export const SAVED_VIEW = 'FB:/Saved_View';
+export const SELECTED_VIEW = 'SELECTED_VIEW';
 export const EDITABLE_ITEMS = 'FB:/State/Editable';
 
 // An item with the title 'FB:/FIELD_VALUES' can be created with

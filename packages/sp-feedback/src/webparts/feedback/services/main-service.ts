@@ -1,4 +1,4 @@
-import { createCacheProxy } from 'idb-proxy';
+import { createCacheProxy, removeCached } from 'idb-proxy';
 import { SPFI } from 'sp-preset';
 import { IFeedbackConfig } from '../../../models/IFeedbackConfig';
 import { AttachmentService } from '../../../services/attachment-service';
@@ -26,6 +26,13 @@ export class MainService {
                     getAllSystemItems: {
                         isCached: true,
                         expiresIn: MINUTE * 5,
+                    },
+                    'addItem|updateItem|deleteItem': {
+                        isCached: false,
+                        isPattern: true,
+                        after: async (db) => {
+                            await removeCached(db, /ItemsService.*getAllSystemItems.*/g);
+                        }
                     },
                 },
             }

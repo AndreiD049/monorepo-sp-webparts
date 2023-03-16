@@ -1,6 +1,5 @@
 import { ActionButton } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { NULL } from '../../constants';
 import { $eq } from '../../indexes/filter';
 import { Item } from '../../item';
 import { GlobalContext } from '../Feedback';
@@ -56,7 +55,7 @@ export const ItemPropertiesEditable: React.FC<{
                 options: values.map((v) => makeSimpleListOption(v)),
                 allowNewVlaues: true,
                 onSelect: (opt) => {
-                    if (opt.key === NULL) {
+                    if (opt.key === null) {
                         props.setItem((prev) => prev.unsetField(field));
                     } else {
                         props.setItem((prev) => prev.setField(field, opt.key));

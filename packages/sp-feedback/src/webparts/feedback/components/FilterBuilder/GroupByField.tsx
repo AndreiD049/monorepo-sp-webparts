@@ -1,12 +1,12 @@
 import { Icon, Label, Stack } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { SELECTED_FILTER } from '../../constants';
+import { SELECTED_VIEW } from '../../constants';
 import { dispatchItemUpdated } from '../../services/events';
 import {
     changeGroup,
-    getEmptySelectedFilter,
-    SelectedFilterInfo,
-} from '../../services/saved-filter';
+    getEmptySelectedView,
+    SelectedViewInfo,
+} from '../../services/saved-view';
 import { GlobalContext } from '../Feedback';
 import {
     hideListOptionsCallout,
@@ -16,7 +16,7 @@ import {
 import styles from './FilterBuilder.module.scss';
 
 export interface IGroupByField {
-    selectedFilters: SelectedFilterInfo;
+    selectedFilters: SelectedViewInfo;
 }
 
 export const GroupByField: React.FC<IGroupByField> = (props) => {
@@ -34,10 +34,10 @@ export const GroupByField: React.FC<IGroupByField> = (props) => {
             ),
             onSelect: (op) => {
                 dispatchItemUpdated(
-                    SELECTED_FILTER,
+                    SELECTED_VIEW,
                     changeGroup(
                         props.selectedFilters.tempItem ||
-                            getEmptySelectedFilter(),
+                            getEmptySelectedView(),
                         op.key
                     ).Fields
                 );

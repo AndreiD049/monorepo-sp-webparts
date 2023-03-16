@@ -68,7 +68,7 @@ export type PropTable = [string, string | number][];
 export function objectToTable(obj: any, excludeKeys: RegExp): PropTable {
     const keys = Object.keys(obj)
         .filter((key) => excludeKeys.test(key) === false)
-        .sort();
+        .sort((k1, k2) => k1.toLowerCase() < k2.toLowerCase() ? -1 : 1);
     const result: PropTable = [];
     keys.forEach((key) => {
         let value = obj[key];
@@ -78,4 +78,8 @@ export function objectToTable(obj: any, excludeKeys: RegExp): PropTable {
         result.push([key, value]);
     });
     return result;
+}
+
+export function replaceInArray<T, U>(array: T[], search: T, replaceWith: U): (T | U)[] {
+    return array.map((v) => v === search ? replaceWith : v);
 }

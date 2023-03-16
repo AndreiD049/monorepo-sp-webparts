@@ -1,12 +1,12 @@
 import { Icon, Label, Stack } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { SELECTED_FILTER } from '../../constants';
+import { SELECTED_VIEW } from '../../constants';
 import { dispatchItemUpdated } from '../../services/events';
 import {
     changeSort,
-    getEmptySelectedFilter,
-    SelectedFilterInfo,
-} from '../../services/saved-filter';
+    getEmptySelectedView,
+    SelectedViewInfo,
+} from '../../services/saved-view';
 import { GlobalContext } from '../Feedback';
 import {
     hideListOptionsCallout,
@@ -16,7 +16,7 @@ import {
 import styles from './FilterBuilder.module.scss';
 
 export interface IGroupByField {
-    selectedFilters: SelectedFilterInfo;
+    selectedFilters: SelectedViewInfo;
 }
 
 export const SortByField: React.FC<IGroupByField> = (props) => {
@@ -34,10 +34,10 @@ export const SortByField: React.FC<IGroupByField> = (props) => {
             ),
             onSelect: (op) => {
                 dispatchItemUpdated(
-                    SELECTED_FILTER,
+                    SELECTED_VIEW,
                     changeSort(
                         props.selectedFilters.tempItem ||
-                            getEmptySelectedFilter(),
+                            getEmptySelectedView(),
                         op.key,
                         true
                     ).Fields,
@@ -50,9 +50,9 @@ export const SortByField: React.FC<IGroupByField> = (props) => {
 
     const handleChangeSort = (): void => {
         dispatchItemUpdated(
-            SELECTED_FILTER,
+            SELECTED_VIEW,
             changeSort(
-                props.selectedFilters.tempItem || getEmptySelectedFilter(),
+                props.selectedFilters.tempItem || getEmptySelectedView(),
                 props.selectedFilters.appliedSortField,
                 !props.selectedFilters.appliedSortAsc
             ).Fields,
@@ -67,7 +67,7 @@ export const SortByField: React.FC<IGroupByField> = (props) => {
             </Label>
             <Stack tokens={{ childrenGap: '0.3em' }}>
                 <button ref={bref} onClick={handleClick} className={styles.filterSortButton}>
-                    {props.selectedFilters.appliedSortField}
+                    {props.selectedFilters.appliedSortField || '---'}
                 </button>
                 <button onClick={handleChangeSort} className={styles.filterSortButton}>
                     {props.selectedFilters.appliedSortAsc ? (

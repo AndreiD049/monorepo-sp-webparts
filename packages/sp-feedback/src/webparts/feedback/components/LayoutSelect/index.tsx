@@ -1,9 +1,12 @@
 import { Dropdown, Icon, IDropdownOption } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { SELECTED_LAYOUT } from '../../constants';
-import { $eq } from '../../indexes/filter';
-import { Item } from '../../item';
+import { SELECTED_VIEW } from '../../constants';
 import { dispatchItemAdded, dispatchItemUpdated } from '../../services/events';
+import {
+    changeLayout,
+    getEmptySelectedView,
+    getViewInfo,
+} from '../../services/saved-view';
 import { GlobalContext } from '../Feedback';
 import styles from './LayoutSelect.module.scss';
 
@@ -40,16 +43,16 @@ const options: IDropdownOption[] = [
 ];
 const iconStyles = { marginRight: '8px' };
 
-function createTempItemSelectedLayout(option: IDropdownOption): Item {
-    return new Item()
-        .setTitle(SELECTED_LAYOUT)
-        .setField('layout', option.key)
-        .setField('isservice', true);
-}
-
 export const LayoutSelect: React.FC<ILayoutSelectProps> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
-    const selected = React.useMemo(() => indexManager.filterFirst($eq('title', SELECTED_LAYOUT)), [indexManager]);
+    const viewInfo = React.useMemo(
+        () => getViewInfo(indexManager),
+        [indexManager]
+    );
+    const selected = React.useMemo(
+        () => viewInfo.appliedLayout,
+        [indexManager]
+    );
 
     const onRenderOption = (option: IDropdownOption): JSX.Element => {
         return (
@@ -92,19 +95,21 @@ export const LayoutSelect: React.FC<ILayoutSelectProps> = (props) => {
                 onRenderOption={onRenderOption}
                 onRenderTitle={onRenderTitle}
                 dropdownWidth="auto"
-                selectedKey={selected?.getFieldOr('layout', 'single')}
+                selectedKey={selected}
                 onChange={(_ev, option) => {
-                    const item = createTempItemSelectedLayout(option);
-                    const existingItem = indexManager.filterFirst(
-                        $eq('title', SELECTED_LAYOUT)
-                    );
                     const options = { temp: true, persist: true };
-                    if (!existingItem) {
-                        dispatchItemAdded(item.asRaw(), options);
+                    if (!viewInfo.tempItem) {
+                        dispatchItemAdded(
+                            changeLayout(
+                                getEmptySelectedView(),
+                                option.key as string
+                            ).asRaw(),
+                            options
+                        );
                     } else {
                         dispatchItemUpdated(
-                            existingItem.Title,
-                            item.Fields,
+                            SELECTED_VIEW,
+                            changeLayout(viewInfo.tempItem, option.key as string).Fields,
                             options
                         );
                     }

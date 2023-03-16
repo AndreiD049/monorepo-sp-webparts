@@ -1,5 +1,6 @@
-import { FIELD_VALUES } from '../constants';
+import { FIELD_VALUES, NULL } from '../constants';
 import { Item, SPECIAL_FIELDS } from '../item';
+import { replaceInArray } from '../utils';
 import { $eq, Filter, getFieldAndValue, getFilterOp } from './filter';
 import { filterSet, setIntersection, setUnion } from './set-operations';
 
@@ -219,7 +220,7 @@ export class IndexManager {
             this.fieldIndexes[field].values().forEach((v) => {
                 result.add(v);
             });
-            return Array.from(result).sort();
+            return replaceInArray(Array.from(result).sort(), NULL, null);
         }
         const items = this.filterArray(filter);
         items.forEach((item) => {
@@ -232,7 +233,7 @@ export class IndexManager {
                 result.add(String(value))
             }
         });
-        return Array.from(result).sort();
+        return replaceInArray(Array.from(result).sort(), NULL, null);
     }
 
     public clone(): IndexManager {

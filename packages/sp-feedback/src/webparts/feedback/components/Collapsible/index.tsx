@@ -22,8 +22,8 @@ export const Collapsible: React.FC<ICollapsibleProps> = (props) => {
             >
                 {header}
             </div>
-            <div>
-                {collapsed ? null : props.children}
+            <div className={collapsed ? styles.hidden : ''}>
+                {props.children}
             </div>
         </div>
     );

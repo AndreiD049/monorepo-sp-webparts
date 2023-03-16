@@ -15,7 +15,7 @@ export interface IListOption {
 export function makeSimpleListOption(value: string): IListOption {
     return {
         key: value,
-        text: value,
+        text: value || String(value),
     }
 }
 

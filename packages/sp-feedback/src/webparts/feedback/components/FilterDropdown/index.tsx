@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { FILTER, SELECTED_FILTER } from '../../constants';
+import { SAVED_VIEW, SELECTED_VIEW } from '../../constants';
 import { $eq } from '../../indexes/filter';
 import { Item } from '../../item';
 import { dispatchItemAdded, dispatchItemUpdated } from '../../services/events';
 import {
-    getEmptySelectedFilter,
-    getEmptySelectedFilterFields,
-    getSelectedFilterInfo,
-} from '../../services/saved-filter';
+    getEmptySelectedView,
+    getEmptySelectedViewFields,
+    getViewInfo,
+} from '../../services/saved-view';
 import { GlobalContext } from '../Feedback';
 import { SelectDropdown } from '../SelectDropdown';
 
@@ -15,19 +15,26 @@ export interface IFilterDropdownProps {
     // Props go here
 }
 
+function getOptions(items: Item[]): Item[] {
+    if (items.length === 0) {
+        return [new Item().setField('title', 'Default').setField('filter', null)];
+    }
+    return items;
+}
+
 export const FilterDropdown: React.FC<IFilterDropdownProps> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
     const selectedFilter = React.useMemo(
-        () => getSelectedFilterInfo(indexManager),
+        () => getViewInfo(indexManager),
         [indexManager]
     );
     const filters: Item[] = React.useMemo(() => {
-        return indexManager.filterArray($eq('tags', FILTER));
+        return getOptions(indexManager.filterArray($eq('tags', SAVED_VIEW)));
     }, [indexManager]);
 
     return (
         <SelectDropdown
-            target={selectedFilter.tempItem || getEmptySelectedFilter()}
+            target={selectedFilter.tempItem || getEmptySelectedView()}
             field="selected"
             options={filters}
             dropDownProps={{
@@ -38,13 +45,13 @@ export const FilterDropdown: React.FC<IFilterDropdownProps> = (props) => {
                 const options = { temp: true, persist: true };
                 if (!selectedFilter.selectedItem) {
                     dispatchItemAdded(
-                        getEmptySelectedFilter(newFilter.getField('selected')).asRaw(),
+                        getEmptySelectedView(newFilter.getField('selected')).asRaw(),
                         options
                     );
                 } else {
                     dispatchItemUpdated(
-                        SELECTED_FILTER,
-                        getEmptySelectedFilterFields(newFilter.getField('selected')),
+                        SELECTED_VIEW,
+                        getEmptySelectedViewFields(newFilter.getField('selected')),
                         options
                     );
                 }
