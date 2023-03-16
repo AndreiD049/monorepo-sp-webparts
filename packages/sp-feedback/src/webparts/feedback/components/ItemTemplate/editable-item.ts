@@ -5,7 +5,7 @@ import { Item } from '../../item';
 import { dispatchItemAdded } from '../../services/events';
 
 const filterEditable = $eq('title', EDITABLE_ITEMS);
-const defaultEditableItem = (): Item => new Item().setField('title', EDITABLE_ITEMS);
+const defaultEditableItem = (): Item => new Item().setField('title', EDITABLE_ITEMS).setField('isservice', true);
 
 export function isItemEditable(id: number | string, indexManager: IndexManager): boolean {
     return indexManager.filterFirst(filterEditable, defaultEditableItem).getFieldOr(id?.toString(), false);

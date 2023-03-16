@@ -1,3 +1,4 @@
+import { IFields } from '../../../models/IFeedbackItem';
 import { FILTER, SELECTED_FILTER } from '../constants';
 import { $eq, Filter } from '../indexes/filter';
 import { IndexManager } from '../indexes/index-manager';
@@ -26,30 +27,41 @@ const emptyFilterInfo: SelectedFilterInfo = {
     filterModified: false,
 };
 
-export function getNewSelectedFilter(
-    selected: string,
-    filter?: Filter,
-    sort?: string,
-    sortAsc?: boolean,
-    group?: string
-): Item {
-    let result = new Item()
-        .setTitle(SELECTED_FILTER)
-        .setField('selected', selected)
-        .setField('isservice', true);
-    result = result.setField('filter', filter);
-    result = result
-        .setField('sort', sort)
-        .setField('sortdir', sortAsc ? 'asc' : 'desc');
-    result = result.setField('group', group);
-    console.log(result);
+export function getEmptySelectedFilter(selectedName?: string): Item {
+    const result = new Item()
+        .setField('title', SELECTED_FILTER)
+        .setField('isservice', true)
+    result.Fields = getEmptySelectedFilterFields(selectedName);
     return result;
+}
+
+export function changeFilter(selectedFilterItem: Item, filter: Filter): Item {
+    return selectedFilterItem.setField('filter', filter);
+}
+
+export function changeSort(selectedFilterItem: Item, sortField: string | number, ascending: boolean): Item {
+    return selectedFilterItem.setField('sort', sortField)
+        .setField('sortdir', ascending ? 'asc' : 'desc');
+}
+
+export function changeGroup(selectedFilterItem: Item, groupField: string | number): Item {
+    return selectedFilterItem.setField('group', groupField);
+}
+
+export function getEmptySelectedFilterFields(selectedName?: string): IFields {
+    return {
+        selected: selectedName,
+        filter: undefined,
+        sort: undefined,
+        group: undefined,
+    }
 }
 
 export function getNewSavedFilterItem(title: string, filterInfo: SelectedFilterInfo): Item {
     const item = new Item()
         .setField('title', title)
         .setTags([FILTER])
+        .setField('isservice', true)
         .setField('filter', filterInfo.appliedFilter)
         .setField('sort', filterInfo.appliedSortField)
         .setField('sortdir', filterInfo.appliedSortAsc ? 'asc' : 'desc')

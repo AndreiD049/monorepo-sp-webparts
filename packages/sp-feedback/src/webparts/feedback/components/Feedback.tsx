@@ -1,17 +1,17 @@
 import * as React from 'react';
 import { RouterProvider } from 'react-router';
 import { ISiteUserInfo } from 'sp-preset';
-import { ADMINS, DIALOG_ID } from '../constants';
+import { ADMINS, DIALOG_ID, MAIN_CALLOUT } from '../constants';
 import { IFeedbackWebPartProps } from '../FeedbackWebPart';
 import { $eq } from '../indexes/filter';
 import { IndexManager } from '../indexes/index-manager';
-import { itemAddedEventBuilder, itemUpdatedEventBuilder } from '../services/events';
+import { itemAddedEventBuilder, itemDeletedEventBuilder, itemUpdatedEventBuilder } from '../services/events';
 import { MainService } from '../services/main-service';
 import { router } from './Router';
 import { Item } from '../item';
 import styles from './Feedback.module.scss';
 import '../styles.scss'
-import { Dialog } from 'sp-components';
+import { Callout, Dialog, Footer } from 'sp-components';
 
 interface IGlobalContextProps {
     indexManager: IndexManager;
@@ -98,14 +98,28 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
             }
         )
 
+        // Delete item
+        const  [deleteEvent, handleDelete, removeDelete] = itemDeletedEventBuilder(
+            MainService.ItemsService,
+            MainService.TempItemService,
+            (id) => {
+                setInfo((prev) => ({
+                    ...prev,
+                    indexManager: prev.indexManager.itemRemoved(id),
+                }))
+            }
+        )
+
         // Listen to events
         document.addEventListener(addEvent, handlerItemAdd);
         document.addEventListener(updateEvent, handlerUpdate);
+        document.addEventListener(deleteEvent, handleDelete);
 
         // remove event listeners
         return () => {
             removeItemAdd();
             removeUpdate();
+            removeDelete();
         };
     }, [info?.indexManager]);
 
@@ -117,6 +131,8 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
                 <RouterProvider router={router} />
             </GlobalContext.Provider>
             <Dialog id={DIALOG_ID} />
+            <Callout id={MAIN_CALLOUT} />
+            <Footer email={props.properties.config.supportEmail} />
         </div>
     );
 };

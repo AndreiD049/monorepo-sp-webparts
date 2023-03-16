@@ -1,11 +1,14 @@
 export const DB_NAME = 'Spfx_Feedback';
 export const STORE_NAME = `${location.origin}/${location.pathname}`;
 
+export const NULL = 'null';
+
 export const SECOND = 1000;
 export const MINUTE = SECOND * 60;
 export const HOUR = MINUTE * 60;
 
 export const MAIN_PANEL = 'SpfxFedbackPanel';
+export const MAIN_CALLOUT = 'SpfxFedbackCallout';
 export const DIALOG_ID = 'spfxFeedbackDialog';
 
 // TAGS

@@ -8,8 +8,8 @@ import { hideDialog, showDialog } from 'sp-components';
 import { DIALOG_ID, SELECTED_FILTER } from '../../constants';
 import { dispatchItemAdded, dispatchItemUpdated } from '../../services/events';
 import {
+    getEmptySelectedFilterFields,
     getNewSavedFilterItem,
-    getNewSelectedFilter,
     SelectedFilterInfo,
 } from '../../services/saved-filter';
 import styles from './SaveFilterDialog.module.scss';
@@ -28,6 +28,15 @@ export const SaveFilterDialog: React.FC<ISaveFilterDialogProps> = (props) => {
         [newFilterName, props.filterInfo]
     );
 
+    const handleUpdateSelectedFilter = (filterName: string): void => {
+        // If not overwriting, we also need to update the currently selected filter
+        dispatchItemUpdated(
+            SELECTED_FILTER,
+            getEmptySelectedFilterFields(filterName),
+            { temp: true, persist: true }
+        );
+    }
+
     const handleSaveFilter = (): void => {
         const newSavedFilter = getNewSavedFilterItem(
             newFilterName,
@@ -35,18 +44,9 @@ export const SaveFilterDialog: React.FC<ISaveFilterDialogProps> = (props) => {
         );
         // Create a new filter of overwrite the old one
         if (!willOverwrite) {
-            dispatchItemAdded(newSavedFilter.asRaw(), null, () => {
-                // If not overwriting, we also need to update the currently selected filter
-                const newSelectedFilter = getNewSelectedFilter(newFilterName);
-                console.log(newSelectedFilter);
-                dispatchItemUpdated(
-                    SELECTED_FILTER,
-                    newSelectedFilter.Fields,
-                    { temp: true, persist: true }
-                );
-            });
+            dispatchItemAdded(newSavedFilter.asRaw(), null, () => handleUpdateSelectedFilter(newFilterName));
         } else {
-            dispatchItemUpdated(props.filterInfo.selectedItem.Id, newSavedFilter.Fields);
+            dispatchItemUpdated(props.filterInfo.selectedItem.Id, newSavedFilter.Fields, null, () => handleUpdateSelectedFilter(newFilterName));
         }
         props.onHide();
     };

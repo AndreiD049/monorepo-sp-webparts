@@ -1,28 +1,36 @@
 import {
-    Dropdown,
+    Icon,
     IconButton,
-    IDropdownOption,
     Label,
     Separator,
     Stack,
     StackItem,
+    Text,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { SELECTED_FILTER, SELECTED_LAYOUT } from '../../../constants';
+import { FooterOkCancel, hideDialog, showDialog } from 'sp-components';
+import {
+    DIALOG_ID,
+    SELECTED_FILTER,
+    SELECTED_LAYOUT,
+} from '../../../constants';
 import { $and, $eq, Filter } from '../../../indexes/filter';
 import { Item } from '../../../item';
 import {
     dispatchItemAdded,
+    dispatchItemDeleted,
     dispatchItemUpdated,
 } from '../../../services/events';
 import {
-    getNewSelectedFilter,
+    changeFilter,
     getSelectedFilterInfo,
     getSortingFunction,
     SelectedFilterInfo,
 } from '../../../services/saved-filter';
 import { GlobalContext } from '../../Feedback';
 import { FilterBuilder } from '../../FilterBuilder';
+import { GroupByField } from '../../FilterBuilder/GroupByField';
+import { SortByField } from '../../FilterBuilder/SortByField';
 import { DOUBLE_COL, SINGLE_COL, TRIPLE_COL } from '../../LayoutSelect';
 import { ListView } from '../../ListView';
 import { showSaveFilterDialog } from '../../SaveFilterDialog';
@@ -35,45 +43,6 @@ type UseFilterType = {
     selectedFilters: SelectedFilterInfo;
 };
 
-const SelectField: React.FC<{
-    filter: Filter;
-    label: string;
-    value: string;
-    additionalOptions?: IDropdownOption[];
-    onChange: (opt: string | undefined | number) => void;
-}> = (props) => {
-    const { indexManager } = React.useContext(GlobalContext);
-    const options = React.useMemo(
-        () => indexManager.getFields(props.filter),
-        [indexManager]
-    );
-    const dropdownOptions: IDropdownOption[] = React.useMemo(() => {
-        const result = props.additionalOptions || [];
-        return [
-            ...result,
-            ...options.map((o) => ({
-                key: o,
-                data: o,
-                text: o,
-            })),
-        ];
-    }, [options]);
-
-    return (
-        <div>
-            <Dropdown
-                options={dropdownOptions}
-                dropdownWidth="auto"
-                label={props.label}
-                selectedKey={props.value || null}
-                onChange={(_ev, option) => {
-                    props.onChange(option.data);
-                }}
-            />
-        </div>
-    );
-};
-
 const useFilterBar = (): UseFilterType => {
     const { indexManager } = React.useContext(GlobalContext);
     const selectedFilters = React.useMemo(
@@ -81,25 +50,26 @@ const useFilterBar = (): UseFilterType => {
         [indexManager]
     );
 
-    const handleSetField =
-        (field: string): ((opt: string | null) => void) =>
-        (opt: string | null) => {
-            if (!selectedFilters.tempItem) {
-                const newItem = new Item()
-                    .setTitle(SELECTED_FILTER)
-                    .setField(field, opt);
-                dispatchItemAdded(newItem.asRaw(), {
-                    temp: true,
-                    persist: true,
-                });
-            } else {
-                const newItem = selectedFilters.tempItem.setField(field, opt);
-                dispatchItemUpdated(SELECTED_FILTER, newItem.Fields, {
-                    temp: true,
-                    persist: true,
-                });
-            }
-        };
+    const handleDelete = React.useCallback(() => {
+        showDialog({
+            id: DIALOG_ID,
+            dialogProps: {
+                dialogContentProps: {
+                    title: 'Delete saved filter',
+                    subText: `Filter '${selectedFilters.selectedTitle}' will be deleted for all users. Proceed?`,
+                },
+            },
+            footer: (
+                <FooterOkCancel
+                    onOk={() => {
+                        hideDialog(DIALOG_ID);
+                        dispatchItemDeleted(selectedFilters.selectedItem.Id);
+                    }}
+                    onCancel={() => hideDialog(DIALOG_ID)}
+                />
+            ),
+        });
+    }, [selectedFilters]);
 
     const component = (
         <div>
@@ -132,19 +102,19 @@ const useFilterBar = (): UseFilterType => {
                         iconProps={{ iconName: 'Delete' }}
                         title="Delete item"
                         disabled={!selectedFilters.selectedTitle}
+                        onClick={handleDelete}
                     />
                 </Stack>
                 <StackItem className={styles.filterBox}>
-                    <Label>Filter by</Label>
+                    <Label>
+                        <Icon iconName="FilterSolid" /> Filter by
+                    </Label>
                     <FilterBuilder
                         filter={selectedFilters.appliedFilter}
                         setFilter={(filter: Filter) => {
-                            const newSelected = getNewSelectedFilter(
-                                selectedFilters.selectedTitle,
-                                filter,
-                                selectedFilters.appliedSortField,
-                                selectedFilters.appliedSortAsc,
-                                selectedFilters.appliedGroupField
+                            const newSelected = changeFilter(
+                                selectedFilters.tempItem,
+                                filter
                             );
                             const options = { temp: true, persist: true };
                             if (!selectedFilters.selectedTitle) {
@@ -161,41 +131,10 @@ const useFilterBar = (): UseFilterType => {
                     />
                 </StackItem>
                 <div className={styles.filterBox}>
-                    <SelectField
-                        filter={selectedFilters.appliedFilter}
-                        value={selectedFilters.appliedGroupField || 'null'}
-                        label="Group by"
-                        onChange={handleSetField('group')}
-                        additionalOptions={[
-                            {
-                                key: 'null',
-                                data: null,
-                                text: '---',
-                            },
-                        ]}
-                    />
+                    <GroupByField selectedFilters={selectedFilters} />
                 </div>
                 <Stack tokens={{ childrenGap: 8 }} className={styles.filterBox}>
-                    <SelectField
-                        filter={selectedFilters.appliedFilter}
-                        value={selectedFilters.appliedSortField}
-                        label="Sort by"
-                        onChange={handleSetField('sort')}
-                    />
-                    <Dropdown
-                        selectedKey={
-                            selectedFilters.appliedSortAsc === true
-                                ? 'asc'
-                                : 'desc'
-                        }
-                        options={[
-                            { key: 'asc', text: 'asc' },
-                            { key: 'desc', text: 'desc' },
-                        ]}
-                        onChange={(_ev, opt) =>
-                            handleSetField('sortdir')(opt.key.toString())
-                        }
-                    />
+                    <SortByField selectedFilters={selectedFilters} />
                 </Stack>
             </Stack>
             <Separator />
@@ -250,11 +189,17 @@ export const Main: React.FC<IMainProps> = (props) => {
         <div className={styles.container}>
             <div className={styles.filters}>{filterComponent}</div>
 
-            <ListView
-                items={items}
-                groupField={selectedFilters.appliedGroupField}
-                columns={columns}
-            />
+            {items.length > 0 ? (
+                <ListView
+                    items={items}
+                    groupField={selectedFilters.appliedGroupField}
+                    columns={columns}
+                />
+            ) : (
+                <div className={styles.noData}>
+                    <Text variant="xLarge">Nothing found...</Text>
+                </div>
+            )}
         </div>
     );
 };

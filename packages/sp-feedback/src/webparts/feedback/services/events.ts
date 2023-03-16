@@ -9,10 +9,12 @@ export const ITEM_ADDED = 'spfxFeedback/ItemAdded';
 export const ITEM_UPDATED = 'spfxFeedback/ItemUpdated';
 export const ITEM_DELETED = 'spfxFeedback/ItemDeleted';
 
+
 type ItemOptions = {
     temp: boolean;
     persist?: boolean;
 };
+const defaultOptions: ItemOptions = { temp: false, persist: false };
 
 type AddItemPayload = {
     item: IFeedbackItemRaw;
@@ -27,6 +29,12 @@ type UpdateItemPayload = {
     options?: ItemOptions;
 };
 
+type DeletePayload = {
+    id: number | string;
+    options?: ItemOptions;
+    callback?: () => void;
+}
+
 export function dispatchItemAdded(
     item: IFeedbackItemRaw,
     options?: ItemOptions,
@@ -36,7 +44,7 @@ export function dispatchItemAdded(
         new CustomEvent<AddItemPayload>(ITEM_ADDED, {
             detail: {
                 item,
-                options: options || { temp: false, persist: false },
+                options: options || defaultOptions,
                 callback,
             },
         })
@@ -54,11 +62,23 @@ export function dispatchItemUpdated(
             detail: {
                 id,
                 payload,
-                options: options || { temp: false, persist: false },
+                options: options || defaultOptions,
                 callback,
             },
         })
     );
+}
+
+export function dispatchItemDeleted(id: number | string, options?: ItemOptions, callback?: () => void): void {
+    document.dispatchEvent(
+        new CustomEvent<DeletePayload>(ITEM_DELETED, {
+            detail: {
+                id,
+                options: options || defaultOptions,
+                callback
+            }
+        })
+    )
 }
 
 export function itemAddedEventBuilder(
@@ -144,4 +164,32 @@ export function itemUpdatedEventBuilder(
         handler,
         () => document.removeEventListener(ITEM_UPDATED, handler),
     ];
+}
+
+export function itemDeletedEventBuilder(
+    itemService: ItemsService,
+    tempItemService: TempItemsService,
+    callback: (id: number | string) => void | Promise<void>,
+): [string, (ev: CustomEvent) => void, () => void] {
+        const handler = async (ev: CustomEvent<DeletePayload>): Promise<void> => {
+            const done = ev.detail.callback || (() => null);
+            const id = ev.detail.id;
+            const isTemp = ev.detail.options.temp;
+            const shouldPersist = ev.detail.options.persist;
+            if (!isTemp && typeof id === 'number') {
+                await itemService.deleteItem(id);
+            } else {
+                if (shouldPersist) {
+                    tempItemService.deleteItem(id.toString());
+                }
+            }
+            await callback(id);
+            done();
+        };
+
+        return [
+            ITEM_DELETED,
+            handler,
+            () => document.removeEventListener(ITEM_DELETED, handler),
+        ]
 }

@@ -107,12 +107,14 @@ export class IndexManager {
     public getBy(by: string, value: ValueType): ReadonlySet<Item> {
         switch (by) {
             case 'tag':
+            case 'tags':
                 return this.tagIndex.get(value);
             case 'title':
                 return this.titleIndex.get(value);
             case 'id':
                 return this.idIndex.get(value);
             case 'isservice':
+            case 'is service':
                 return this.isServiceIndex.get(value);
             default:
                 return this.fieldIndexes[by].get(value);
@@ -175,8 +177,12 @@ export class IndexManager {
         return this.clone()
     }
 
-    public itemRemoved(item: Item): IndexManager {
-        this.items = this.items.filter((i) => i.Id !== item.Id);
+    public itemRemoved(id: number | string): IndexManager {
+        if (typeof id === 'number') {
+            this.items = this.items.filter((i) => i.Id !== id);
+        } else {
+            this.items = this.items.filter((i) => i.Title !== id);
+        }
         return this.clone();
     }
 

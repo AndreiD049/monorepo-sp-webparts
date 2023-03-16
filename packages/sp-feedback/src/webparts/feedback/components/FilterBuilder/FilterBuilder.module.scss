@@ -31,3 +31,9 @@
     justify-content: flex-start;
     gap: .5em;
 }
+
+.filterSortButton {
+    background-color: "[theme: white, default: #ffffff]";
+    border: 1px solid "[theme: neutralTertiary, default: #eaeaea]";
+    cursor: pointer;
+}

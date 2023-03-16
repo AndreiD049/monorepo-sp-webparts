@@ -1,6 +1,5 @@
-import { DirectionalHint, IconButton } from 'office-ui-fabric-react';
+import { IconButton } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { Callout, hideCallout, showCallout } from 'sp-components';
 import FeedbackWebPart from '../../FeedbackWebPart';
 import {
     changeField,
@@ -20,10 +19,9 @@ import {
     traversePath,
 } from '../../indexes/filter';
 import { GlobalContext } from '../Feedback';
-import { OptionsList } from '../OptionList';
+import { FilterOpDisplay, makeFilterOpListOption } from '../FilterOpDisplay';
+import { hideListOptionsCallout, IListOption, showListOptionsCallout, makeSimpleListOption } from '../OptionList';
 import styles from './FilterBuilder.module.scss';
-
-const FILTER_CALLOUT = 'spfx/Feedback/Filter';
 
 const FilterRowContext = React.createContext({
     filter: null,
@@ -45,42 +43,20 @@ export interface IFilterBuilderProps {
 const CalloutButton: React.FC<{
     value: string | JSX.Element;
     onSelect: (newVlaue: string) => void;
-    options: string[];
+    options: IListOption[];
     className?: string;
 }> = (props) => {
     const bref = React.useRef<HTMLElement>(null);
     const handleClick = (): void => {
-        showCallout({
-            id: FILTER_CALLOUT,
-            calloutProps: {
-                target: bref,
-                directionalHint: DirectionalHint.bottomCenter,
-                isBeakVisible: false,
-            },
-            content: (
-                <OptionsList
-                    options={props.options}
-                    onSelect={(op) => {
-                        props.onSelect(op);
-                        hideCallout(FILTER_CALLOUT);
-                    }}
-                />
-            ),
+        showListOptionsCallout(bref, {
+            options: props.options,
+            onSelect: (op) => {
+                props.onSelect(op.text);
+                hideListOptionsCallout();
+            } 
         });
     };
     
-    if (typeof props.value !== 'string') {
-        return (
-            <div
-                role="button"
-                style={{ display: 'inline' }}
-                ref={bref as React.MutableRefObject<HTMLDivElement>}
-                onClick={handleClick}
-            >
-                {props.value}
-            </div>
-        );
-    }
     return (
         <button
             className={props.className}
@@ -103,7 +79,7 @@ const FilterField: React.FC = () => {
     return (
         <CalloutButton
             className={`${styles.filterFieldContainer} ${styles.filterButton}`}
-            options={options}
+            options={options.map((o) => makeFilterOpListOption(o))}
             value={field}
             onSelect={(newVal) =>
                 onChange(
@@ -129,7 +105,7 @@ const FilterValue: React.FC = () => {
     return (
         <CalloutButton
             className={`${styles.filterButton} ${styles.filterValueContainer}`}
-            options={options}
+            options={options.map((o) => makeSimpleListOption(o))}
             value={value !== '' ? value : "''"}
             onSelect={(newVal) =>
                 onChange(
@@ -149,8 +125,8 @@ const FilterOp: React.FC<{ allowedOps: string[] }> = (props) => {
     return (
         <CalloutButton
             className={`${styles.filterButton} ${styles.filterOpContainer}`}
-            value={op}
-            options={props.allowedOps}
+            value={<FilterOpDisplay key={op} operator={op} />}
+            options={props.allowedOps.map((op) => makeFilterOpListOption(op))}
             onSelect={(newVal) =>
                 onChange(
                     replaceAtPath(filter, changeOp(filter, path, newVal), path)
@@ -202,7 +178,8 @@ const FilterBuilderRow: React.FC<IFilterBuilderRowProps> = (props) => {
                 <CalloutButton
                     value={<IconButton iconProps={{ iconName: 'Add' }} />}
                     onSelect={handleAdd}
-                    options={allowedOps}
+                    options={allowedOps.map((o) => makeFilterOpListOption(o))}
+                    className="blank-button"
                 />
             </div>
         );
@@ -214,7 +191,8 @@ const FilterBuilderRow: React.FC<IFilterBuilderRowProps> = (props) => {
                 <CalloutButton
                     value={<IconButton iconProps={{ iconName: 'Add' }} />}
                     onSelect={handleAdd}
-                    options={allowedOps}
+                    options={allowedOps.map((o) => makeFilterOpListOption(o))}
+                    className="blank-button"
                 />
             </div>
         );
@@ -232,7 +210,8 @@ const FilterBuilderRow: React.FC<IFilterBuilderRowProps> = (props) => {
             <CalloutButton
                 value={<IconButton iconProps={{ iconName: 'Add' }} />}
                 onSelect={handleAdd}
-                options={allowedOps}
+                options={allowedOps.map((o) => makeFilterOpListOption(o))}
+                className="blank-button"
             />
         </div>
     );
@@ -353,7 +332,6 @@ export const FilterBuilder: React.FC<IFilterBuilderProps> = ({
                 level={0}
                 defaultFilter={defaultFilter}
             />
-            <Callout id={FILTER_CALLOUT} />
         </div>
     );
 };

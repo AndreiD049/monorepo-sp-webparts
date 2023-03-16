@@ -1,17 +1,28 @@
+import { DirectionalHint, Target } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { hideCallout, showCallout } from 'sp-components';
+import { MAIN_CALLOUT } from '../../constants';
 import styles from './OptionList.module.scss';
-
-export interface IOptionListProps {
-    options: string[];
-    allowNewVlaues?: boolean;
-    onSelect?: (op: string) => void;
-}
 
 export interface IListOption {
     key: string | number;
-    text: string | JSX.Element;
+    text: string;
+    display?: JSX.Element;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data?: any;
+}
+
+export function makeSimpleListOption(value: string): IListOption {
+    return {
+        key: value,
+        text: value,
+    }
+}
+
+export interface IOptionListProps {
+    options: IListOption[];
+    allowNewVlaues?: boolean;
+    onSelect?: (op: IListOption) => void;
 }
 
 export const OptionsList: React.FC<IOptionListProps> = ({
@@ -26,7 +37,7 @@ export const OptionsList: React.FC<IOptionListProps> = ({
     const filteredOptions = React.useMemo(() => {
         if (search === '') return options;
         const searchL = search.toLowerCase();
-        return options.filter((o) => o.toLowerCase().includes(searchL));
+        return options.filter((o) => o.text.toLowerCase().includes(searchL));
     }, [search]);
 
     const canCreateNew = React.useMemo(
@@ -80,7 +91,7 @@ export const OptionsList: React.FC<IOptionListProps> = ({
                 if (!canCreateNew) {
                     selectAtIndex();
                 } else {
-                    onSelect(search);
+                    onSelect(makeSimpleListOption(search));
                 }
             }
         }
@@ -102,12 +113,13 @@ export const OptionsList: React.FC<IOptionListProps> = ({
         }
         return filteredOptions.map((o, idx) => (
             <li
-                key={`${o}-${selectedIdx}`}
+                key={`${o.text}-${selectedIdx}`}
                 className={`${styles.optionItem} ${
                     selectedIdx === idx ? styles.selected : ''
                 }`}
+                onClick={() => onSelect(o)}
             >
-                <button onClick={() => onSelect(o)}>{o}</button>
+                <button>{o.display || o.text}</button>
             </li>
         ));
     }, [filteredOptions, selectedIdx, canCreateNew, search]);
@@ -126,3 +138,20 @@ export const OptionsList: React.FC<IOptionListProps> = ({
         </div>
     );
 };
+
+// User can call this function in order to shol the option list as a callout
+export function showListOptionsCallout(target: Target, props: IOptionListProps): void {
+    showCallout({
+        id: MAIN_CALLOUT,
+        content: <OptionsList {...props} />,
+        calloutProps: {
+            target,
+            directionalHint: DirectionalHint.bottomCenter
+        }
+    })
+}
+
+export function hideListOptionsCallout(): void {
+    hideCallout(MAIN_CALLOUT);
+}
+

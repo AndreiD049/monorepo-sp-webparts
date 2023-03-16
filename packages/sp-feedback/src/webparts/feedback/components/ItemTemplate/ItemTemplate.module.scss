@@ -48,7 +48,7 @@
 }
 
 .propTable {
-    font-size: .8em;
+    font-size: .9em;
     border-collapse: collapse;
 
     & td {
@@ -57,6 +57,24 @@
 
     & td {
         padding: 0 1em 0 0;
+    }
+
+    & td button {
+        font-size: .9em;
+    }
+
+    & td.deleted {
+        text-decoration: line-through;
+    }
+
+    & td.deleted:nth-child(2) {
+        visibility: hidden;
+    }
+}
+
+.propTableNewFieldButton {
+    &, & i {
+        font-size: 0.9em;
     }
 }
 

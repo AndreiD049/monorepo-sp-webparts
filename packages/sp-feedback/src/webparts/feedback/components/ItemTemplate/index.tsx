@@ -1,4 +1,4 @@
-import { Icon, IconButton, Text } from 'office-ui-fabric-react';
+import { Icon, IconButton, Text, TextField } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Item } from '../../item';
 import { dispatchItemUpdated } from '../../services/events';
@@ -6,6 +6,7 @@ import { objectToTable } from '../../utils';
 import { DescriptionEditor } from '../DescriptionEditor';
 import { GlobalContext } from '../Feedback';
 import { isItemEditable, toggleItemEditable } from './editable-item';
+import { ItemProperties, ItemPropertiesEditable } from './ItemProperties';
 import styles from './ItemTemplate.module.scss';
 
 export interface IItemTemplateProps
@@ -13,23 +14,44 @@ export interface IItemTemplateProps
     item: Item;
 }
 
-export const ItemHeaderTemplate: React.FC<{ item: Item, editable: boolean }> = (props) => {
+export const ItemHeaderTemplate: React.FC<{
+    item: Item;
+    editable: boolean;
+    setItem: React.Dispatch<React.SetStateAction<Item>>;
+}> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
     const handleEdit = (): void => {
         toggleItemEditable(props.item.Id, indexManager);
     };
-    
+
     const handleSave = async (): Promise<void> => {
         const item = await props.item.replaceImagesIn('text');
         dispatchItemUpdated(item.Id, item.Fields);
         toggleItemEditable(item.Id, indexManager);
-    }
+    };
+
+    const title = React.useMemo(() => {
+        if (props.editable) {
+            return (
+                <TextField
+                    value={props.item.getFieldOr('caption', props.item.Title)}
+                    onChange={(_ev, value) =>
+                        props.setItem((prev) => prev.setField('caption', value))
+                    }
+                    width="100%"
+                />
+            );
+        }
+        return (
+            <Text variant="large">
+                {props.item.getFieldOr('caption', props.item.Title)}
+            </Text>
+        );
+    }, [props.editable, props.item]);
 
     return (
         <div className={styles.itemHeader}>
-            <div>
-                <Text variant="large">{props.item.Title}</Text>
-            </div>
+            <div style={{ flexGrow: props.editable ? 1 : 0 }}>{title}</div>
             <div>
                 <IconButton
                     iconProps={{ iconName: props.editable ? 'Save' : 'Edit' }}
@@ -41,26 +63,11 @@ export const ItemHeaderTemplate: React.FC<{ item: Item, editable: boolean }> = (
     );
 };
 
-export const ItemProperties: React.FC<{
-    properties: [string, string | number][];
+export const ItemBodyTemplate: React.FC<{
+    item: Item;
+    editable: boolean;
+    setItem: React.Dispatch<React.SetStateAction<Item>>;
 }> = (props) => {
-    return (
-        <div style={{ marginBottom: '.5em' }}>
-            <table className={styles.propTable}>
-                <tbody>
-                    {props.properties.map(([key, value]) => (
-                        <tr key={key}>
-                            <td>{key}</td>
-                            <td>{value}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
-};
-
-export const ItemBodyTemplate: React.FC<{ item: Item, editable: boolean, setItem: React.Dispatch<React.SetStateAction<Item>> }> = (props) => {
     const content = React.useRef<HTMLDivElement>(null);
     const [icon, setIcon] = React.useState('DoubleChevronUp');
     const [collapsed, setCollapsed] = React.useState(true);
@@ -79,13 +86,29 @@ export const ItemBodyTemplate: React.FC<{ item: Item, editable: boolean, setItem
     const handleChange = (text: string): void => {
         const item = props.item.setField('text', text);
         props.setItem(item);
-    }
+    };
 
-    return (
-        <div className={styles.itemBodyOuter}>
+    const properties = React.useMemo(() => {
+        const properties = objectToTable(props.item.Fields, /text|caption/);
+        if (props.editable) {
+            return (
+                <ItemPropertiesEditable
+                    properties={properties}
+                    item={props.item}
+                    setItem={props.setItem}
+                />
+            );
+        }
+        return (
             <ItemProperties
                 properties={objectToTable(props.item.Fields, /text|caption/)}
             />
+        );
+    }, [props.editable, props.item]);
+
+    return (
+        <div className={styles.itemBodyOuter}>
+            {properties}
             <div
                 role="button"
                 className={styles.itemDescriptionButton}
@@ -118,15 +141,23 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = (props) => {
         () => isItemEditable(props.item.Id, indexManager),
         [props.item, indexManager]
     );
-    
+
     React.useEffect(() => {
         setItem(props.item);
     }, [props.item]);
 
     return (
         <div className={styles.container} style={props.style}>
-            <ItemHeaderTemplate item={item} editable={editable} />
-            <ItemBodyTemplate item={item} editable={editable} setItem={setItem} />
+            <ItemHeaderTemplate
+                item={item}
+                setItem={setItem}
+                editable={editable}
+            />
+            <ItemBodyTemplate
+                item={item}
+                editable={editable}
+                setItem={setItem}
+            />
         </div>
     );
 };

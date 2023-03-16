@@ -76,6 +76,10 @@ export class TempItemsService {
         }
     }
 
+    public deleteItem(title: string): void {
+        localStorage.removeItem(title);
+    }
+
     private getKey(title: string): string {
         return `${PREFIX}/${title}`;
     }

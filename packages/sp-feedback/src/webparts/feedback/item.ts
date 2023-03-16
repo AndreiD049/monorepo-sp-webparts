@@ -10,6 +10,7 @@ type SPECIAL_KEYS =
     | 'id'
     | 'tags'
     | 'is service'
+    | 'isservice'
     | 'author id'
     | 'author email'
     | 'author title'
@@ -19,6 +20,7 @@ export const SPECIAL_FIELDS: SPECIAL_KEYS[] = [
     'id',
     'tags',
     'is service',
+    'isservice',
     'created',
     'author id',
     'author email',
@@ -45,7 +47,7 @@ export class Item implements IFeedbackItem {
             if (typeof item.Fields === 'string') {
                 this.Fields = this.readFields(item.Fields) || {};
             } else {
-                this.Fields = item.Fields;
+                this.Fields = { ...item.Fields }; 
             }
         } else {
             this.Title = '';
@@ -126,13 +128,16 @@ export class Item implements IFeedbackItem {
     }
 
     public clone(): Item {
-        const result = new Item(this.asRaw());
+        const result = new Item(this);
         return result;
     }
 
     public mergeFields(other: IFields): Item {
-        const result = this.clone();
-        result.Fields = { ...result.Fields, ...other };
+        let result = this.clone();
+        const keys = Object.keys(other);
+        keys.forEach((k) => {
+            result = result.setField(k, other[k]);
+        });
         return result;
     }
 }
@@ -152,6 +157,7 @@ function setSpecialFieldValue(
             result.Id = value as number;
             break;
         case 'is service':
+        case 'isservice':
             result.IsService = value as boolean;
             break;
         case 'tags':
@@ -194,6 +200,7 @@ function getSpecialFieldValue<T>(item: Item, field: SPECIAL_KEYS): T {
             result = item.Id as unknown as T;
             break;
         case 'is service':
+        case 'isservice':
             result = item.IsService as unknown as T;
             break;
         case 'tags':

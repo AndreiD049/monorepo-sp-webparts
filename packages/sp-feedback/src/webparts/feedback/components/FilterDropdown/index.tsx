@@ -4,7 +4,8 @@ import { $eq } from '../../indexes/filter';
 import { Item } from '../../item';
 import { dispatchItemAdded, dispatchItemUpdated } from '../../services/events';
 import {
-    getNewSelectedFilter,
+    getEmptySelectedFilter,
+    getEmptySelectedFilterFields,
     getSelectedFilterInfo,
 } from '../../services/saved-filter';
 import { GlobalContext } from '../Feedback';
@@ -26,26 +27,24 @@ export const FilterDropdown: React.FC<IFilterDropdownProps> = (props) => {
 
     return (
         <SelectDropdown
-            target={selectedFilter.tempItem || getNewSelectedFilter('', null)}
+            target={selectedFilter.tempItem || getEmptySelectedFilter()}
             field="selected"
             options={filters}
             dropDownProps={{
                 placeholder: 'Select filter',
+                dropdownWidth: 'auto'
             }}
             onChange={(newFilter) => {
                 const options = { temp: true, persist: true };
                 if (!selectedFilter.selectedItem) {
                     dispatchItemAdded(
-                        newFilter
-                            .setTitle(SELECTED_FILTER)
-                            .unsetField('filter')
-                            .asRaw(),
+                        getEmptySelectedFilter(newFilter.getField('selected')).asRaw(),
                         options
                     );
                 } else {
                     dispatchItemUpdated(
                         SELECTED_FILTER,
-                        newFilter.unsetField('filter').Fields,
+                        getEmptySelectedFilterFields(newFilter.getField('selected')),
                         options
                     );
                 }
