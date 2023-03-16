@@ -28,4 +28,11 @@ export const SELECTED_FILTER = 'SELECTED_FILTER';
 export const SELECTED_LAYOUT = 'SELECTED_LAYOUT';
 export const EDITABLE_ITEMS = 'FB:/State/Editable';
 
+// An item with the title 'FB:/FIELD_VALUES' can be created with
+// fields and their corresponding values as an array
+// For ex: {
+//  "status": ["New", "In-Progress", "Cancelled", "Finished", "Abandoned"],
+// }
+export const FIELD_VALUES = 'FB:/FIELD_VALUES';
+
 export const ADMINS = 'FB:/Administrators';

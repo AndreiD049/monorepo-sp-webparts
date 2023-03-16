@@ -1,5 +1,6 @@
+import { FIELD_VALUES } from '../constants';
 import { Item, SPECIAL_FIELDS } from '../item';
-import { Filter, getFieldAndValue, getFilterOp } from './filter';
+import { $eq, Filter, getFieldAndValue, getFilterOp } from './filter';
 import { filterSet, setIntersection, setUnion } from './set-operations';
 
 type ValueType = string;
@@ -212,11 +213,15 @@ export class IndexManager {
     }
 
     public getValues(field: string, filter?: Filter): string[] {
+        const defaultValues = this.filterFirst($eq('title', FIELD_VALUES), () => new Item());
+        const result = new Set<string>(defaultValues.getFieldOr(field, []));
         if (!filter) {
-            return this.fieldIndexes[field].values();
+            this.fieldIndexes[field].values().forEach((v) => {
+                result.add(v);
+            });
+            return Array.from(result).sort();
         }
         const items = this.filterArray(filter);
-        const result = new Set<string>();
         items.forEach((item) => {
             const value = item.getFieldOr<string | string[]>(field, null);
             if (Array.isArray(value)) {
