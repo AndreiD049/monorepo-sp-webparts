@@ -109,7 +109,7 @@ export const MsdsAttachmentsDetails: React.FC<IMsdsAttachmentsDetailsProps> = (
 
     return (
         <div className={styles.container}>
-            <Label htmlFor={props.id} required={props.required}>
+            <Label htmlFor={props.id} required={props.required} title={props.title}>
                 <Icon iconName="TextField" style={{ marginRight: '.3em' }} />{' '}
                 <span>{props.label}</span>
             </Label>

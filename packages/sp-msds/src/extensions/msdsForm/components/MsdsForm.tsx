@@ -278,7 +278,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MSDSDatePicker
                                         id="MSDSDate"
                                         label="4.MSDS issued date"
-                                        title="to be updated"
                                         pickerProps={{
                                             maxDate: new Date(),
                                             allowTextInput: true,
@@ -332,7 +331,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MsdsTagPickerField
                                         id="CustomerNameId"
                                         label="6.Customer name in Plato"
-                                        title="to be updated"
                                         tags={customers.tags}
                                         handleFilter={async (filter) => {
                                             const customerItems =
@@ -420,7 +418,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MsdsTagPickerField
                                         id="MaterialType"
                                         label="8.Material type"
-                                        title="to be updated"
                                         tags={materialTypes.tags}
                                         handleFilter={async (filter) => {
                                             return handleFilter(
@@ -495,7 +492,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MsdsTagPickerField
                                         id="FormShape"
                                         label="10.Form / Shape"
-                                        title="to be updated"
                                         tags={formShapes.tags}
                                         handleFilter={async (filter) =>
                                             handleFilter(
@@ -553,7 +549,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MSDSCheckbox
                                         id="PackedOperations"
                                         label="12.PACKED OPERATIONS NEEDED?"
-                                        title="to be updated"
                                         control={control}
                                         rules={{
                                             disabled:
@@ -602,7 +597,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MSDSCheckbox
                                         id="DebaggingOperations"
                                         label="14.DEBAGGING OPERATIONS NEEDED?"
-                                        title="to be updated"
                                         control={control}
                                         rules={{
                                             disabled:
@@ -616,7 +610,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MSDSCheckbox
                                         id="SiloOperations"
                                         label="15.SILO OPERATION OPERATION NEEDED?"
-                                        title="to be updated"
                                         control={control}
                                         rules={{
                                             disabled:
@@ -633,7 +626,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MSDSTextField
                                         id="MeltingPoint"
                                         label="16.Melting point? °C"
-                                        title="to be updated"
                                         fieldProps={{
                                             suffix: '°C',
                                             type: 'number',
@@ -798,7 +790,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MsdsTagPickerField
                                         id="Urgency"
                                         label="22.Urgency"
-                                        title="to be updated"
                                         tags={urgencyTags}
                                         handleFilter={async (filter) =>
                                             handleFilter(urgencyTags, filter)
@@ -821,8 +812,8 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                         <MSDSAttachmentsNew
                                             id="Attachments"
                                             label="23.Attachments"
-                                            title="to be updated"
                                             control={control}
+                                            title="Add MSDS PDF and customer confirmation mail"
                                             rules={{
                                                 required:
                                                     'Attachments are required',
@@ -832,7 +823,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                         <MsdsAttachmentsDetails
                                             id="Attachments"
                                             label="23.Attachments"
-                                            title="to be updated"
+                                            title="Add MSDS PDF and customer confirmation mail"
                                             displayMode={props.displayMode}
                                             attachments={attachments}
                                             required
@@ -873,7 +864,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MsdsTagPickerField
                                         id="ProductType"
                                         label="2.Product type"
-                                        title="to be updated"
                                         tags={productTypes.tags}
                                         handleFilter={async (filter) =>
                                             handleFilter(
@@ -929,7 +919,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MSDSSpinButton
                                         id="BulkDensity"
                                         label="4.Bulk density Plato"
-                                        title="to be updated"
                                         control={control}
                                         rules={{
                                             disabled:
@@ -960,7 +949,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MSDSCheckbox
                                         id="MeasuredBulkDensity"
                                         label="5. Measured bulk density"
-                                        title="to be updated"
                                         control={control}
                                         rules={{
                                             disabled:
@@ -986,7 +974,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MSDSCheckbox
                                         id="ManipNotAllowed"
                                         label="6.Manipulation (change) not allowed?"
-                                        title="to be updated"
                                         control={control}
                                         rules={{
                                             disabled:
@@ -1148,7 +1135,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MSDSCheckbox
                                         id="NitrogenCoverage"
                                         label="12.Nitrogen coverage"
-                                        title="to be updated"
                                         control={control}
                                         rules={{
                                             disabled:
@@ -1176,7 +1162,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MSDSCheckbox
                                         id="ClientRequirementsFnF"
                                         label="13.Client requirements on food & feed (GMP) regulations?"
-                                        title="to be updated"
                                         control={control}
                                         rules={{
                                             disabled:
@@ -1206,7 +1191,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MSDSCheckbox
                                         id="ExtraCheckNeeded"
                                         label="15.Extra check needed by quality in Plato ? Approver product will activate PM in Plato!"
-                                        title="to be updated"
                                         control={control}
                                         rules={{
                                             disabled:
