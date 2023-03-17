@@ -1,7 +1,7 @@
-import { FIELD_VALUES, NULL } from '../constants';
+import { canHaveNewValues, getFieldsSetup, getFieldValues, isNullAllowed } from '../../../services/field-setup';
+import { NULL } from '../constants';
 import { Item, SPECIAL_FIELDS } from '../item';
-import { replaceInArray } from '../utils';
-import { $eq, Filter, getFieldAndValue, getFilterOp } from './filter';
+import { Filter, getFieldAndValue, getFilterOp } from './filter';
 import { filterSet, setIntersection, setUnion } from './set-operations';
 
 type ValueType = string;
@@ -38,7 +38,7 @@ export class Index implements IIndex {
 
     values(): string[] {
         this.checkBuildIndex();
-        return Object.keys(this.index).sort();
+        return Object.keys(this.index).filter((k) => k !== NULL);
     }
 
     getArray(value: string): Item[] {
@@ -214,13 +214,19 @@ export class IndexManager {
     }
 
     public getValues(field: string, filter?: Filter): string[] {
-        const defaultValues = this.filterFirst($eq('title', FIELD_VALUES), () => new Item());
-        const result = new Set<string>(defaultValues.getFieldOr(field, []));
+        const fieldSetup = getFieldsSetup(this);
+        const result = new Set<string>(getFieldValues(fieldSetup, field));
+        if (isNullAllowed(fieldSetup, field)) {
+            result.add(null);
+        }
+        if (!canHaveNewValues(fieldSetup, field)) {
+            return Array.from(result).sort();
+        }
         if (!filter) {
             this.fieldIndexes[field].values().forEach((v) => {
                 result.add(v);
             });
-            return replaceInArray(Array.from(result).sort(), NULL, null);
+            return Array.from(result).sort();
         }
         const items = this.filterArray(filter);
         items.forEach((item) => {
@@ -233,7 +239,7 @@ export class IndexManager {
                 result.add(String(value))
             }
         });
-        return replaceInArray(Array.from(result).sort(), NULL, null);
+        return Array.from(result).sort();
     }
 
     public clone(): IndexManager {
