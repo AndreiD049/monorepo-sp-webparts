@@ -36,7 +36,8 @@ export function getFieldsSetup(indexManager: IndexManager): FieldsSetup {
 export function saveFieldsSetup(indexManager: IndexManager, newSetup: FieldsSetup): void {
     const setupId = getFieldsSetupId(indexManager);
     if (setupId === null) {
-        const newItem = new Item();
+        const newItem = new Item()
+            .setTitle(FIELD_VALUES);
         newItem.Fields = { ...newSetup };
         dispatchItemAdded(newItem.asRaw());
     } else {

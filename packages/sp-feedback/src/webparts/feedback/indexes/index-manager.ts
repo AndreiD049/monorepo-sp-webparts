@@ -1,4 +1,4 @@
-import { canHaveNewValues, getFieldsSetup, getFieldValues, isNullAllowed } from '../../../services/field-setup';
+import { getFieldSetup } from '../../../features/field-setup';
 import { NULL } from '../constants';
 import { Item, SPECIAL_FIELDS } from '../item';
 import { Filter, getFieldAndValue, getFilterOp } from './filter';
@@ -214,12 +214,12 @@ export class IndexManager {
     }
 
     public getValues(field: string, filter?: Filter): string[] {
-        const fieldSetup = getFieldsSetup(this);
-        const result = new Set<string>(getFieldValues(fieldSetup, field));
-        if (isNullAllowed(fieldSetup, field)) {
+        const fieldSetup = getFieldSetup(this, field);
+        const result = new Set<string>(fieldSetup.values);
+        if (fieldSetup.allowNull) {
             result.add(null);
         }
-        if (!canHaveNewValues(fieldSetup, field)) {
+        if (!fieldSetup.allowNewValues) {
             return Array.from(result).sort();
         }
         if (!filter) {
@@ -231,6 +231,7 @@ export class IndexManager {
         const items = this.filterArray(filter);
         items.forEach((item) => {
             const value = item.getFieldOr<string | string[]>(field, null);
+            if (value === null) return;
             if (Array.isArray(value)) {
                 value.forEach((val) => {
                     result.add(val);
