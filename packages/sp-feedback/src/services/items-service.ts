@@ -39,7 +39,12 @@ export class ItemsService {
     }
     
     public async updateItem(id: number, payload: Partial<IFeedbackItemRaw>): Promise<IItemUpdateResult> {
-        return this.itemsList.items.getById(id).update(payload);
+        const cleanedPayload: Partial<IFeedbackItemRaw> = {
+            ...payload,
+            Author: undefined,
+            Id: undefined,
+        };
+        return this.itemsList.items.getById(id).update(cleanedPayload);
     }
 
     public async deleteItem(id: number): Promise<void> {
