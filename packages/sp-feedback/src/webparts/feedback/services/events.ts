@@ -127,15 +127,17 @@ export function itemUpdatedEventBuilder(
         ev: CustomEvent<UpdateItemPayload>
     ): Promise<void> => {
         const doneCb = ev.detail.callback ?? (() => null);
+
         const options = ev.detail.options;
         const isTemp = options.temp;
         const id = ev.detail.id;
         const shouldPersist = options?.persist ?? false;
+
         let oldItem: Item;
         let updatedItem: Item;
         if (!isTemp && typeof id === 'number') {
             // ! TODO: optimize this, it should not do so many calls
-            oldItem = await itemService.getItem(id);
+            oldItem = indexManager.filterFirst($eq('id', id.toString()));
             const merged = oldItem.mergeFields(ev.detail.payload);
             await itemService.updateItem(id, merged.asRaw());
             updatedItem = await itemService.getItem(id);
