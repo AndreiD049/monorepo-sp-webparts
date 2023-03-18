@@ -27,11 +27,12 @@ import {
     getSortingFunction,
     SelectedViewInfo,
 } from '../../../services/saved-view';
+import { BoardView } from '../../BoardView';
 import { GlobalContext } from '../../Feedback';
 import { FilterBuilder } from '../../FilterBuilder';
 import { GroupByField } from '../../FilterBuilder/GroupByField';
 import { SortByField } from '../../FilterBuilder/SortByField';
-import { DOUBLE_COL, TRIPLE_COL } from '../../LayoutSelect';
+import { BOARD, DOUBLE_COL, TRIPLE_COL } from '../../LayoutSelect';
 import { ListView } from '../../ListView';
 import { showSaveFilterDialog } from '../../SaveFilterDialog';
 import styles from './Main.module.scss';
@@ -179,21 +180,29 @@ export const Main: React.FC<IMainProps> = (props) => {
         }
     }, [items, layout]);
 
+    const body = React.useMemo(() => {
+        if (items.length === 0) return (
+            <div className={styles.noData}>
+                <Text variant="xLarge">Nothing found...</Text>
+            </div>
+        );
+        if (layout === BOARD) {
+            return <BoardView />
+        }
+        return (
+            <ListView
+                items={items}
+                groupField={selectedFilters.appliedGroupField}
+                columns={columns}
+            />
+        );
+    }, [layout, items]);
+
     return (
         <div className={styles.container}>
             <div className={styles.filters}>{filterComponent}</div>
 
-            {items.length > 0 ? (
-                <ListView
-                    items={items}
-                    groupField={selectedFilters.appliedGroupField}
-                    columns={columns}
-                />
-            ) : (
-                <div className={styles.noData}>
-                    <Text variant="xLarge">Nothing found...</Text>
-                </div>
-            )}
+            {body}
         </div>
     );
 };
