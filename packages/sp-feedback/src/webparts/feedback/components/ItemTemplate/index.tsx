@@ -18,16 +18,11 @@ export const ItemHeaderTemplate: React.FC<{
     item: Item;
     editable: boolean;
     setItem: React.Dispatch<React.SetStateAction<Item>>;
+    onSave: () => void;
 }> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
     const handleEdit = (): void => {
         toggleItemEditable(props.item.Id, indexManager);
-    };
-
-    const handleSave = async (): Promise<void> => {
-        const item = await props.item.replaceImagesIn('text');
-        dispatchItemUpdated(item.Id, item.Fields);
-        toggleItemEditable(item.Id, indexManager);
     };
 
     const title = React.useMemo(() => {
@@ -55,7 +50,7 @@ export const ItemHeaderTemplate: React.FC<{
             <div>
                 <IconButton
                     iconProps={{ iconName: props.editable ? 'Save' : 'Edit' }}
-                    onClick={props.editable ? handleSave : handleEdit}
+                    onClick={props.editable ? props.onSave : handleEdit}
                     className={styles.titleButton}
                 />
             </div>
@@ -133,6 +128,16 @@ export const ItemBodyTemplate: React.FC<{
     );
 };
 
+// Save handler
+function saveHandler(saveFunc: () => void): ((ev: KeyboardEvent) => void) {
+    return function(ev: KeyboardEvent) {
+        if (ev.key === 's' && ev.ctrlKey === true) {
+            ev.preventDefault();
+            saveFunc();
+        }
+    }
+}
+
 export const ItemTemplate: React.FC<IItemTemplateProps> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
     const [item, setItem] = React.useState(props.item);
@@ -145,12 +150,29 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = (props) => {
         setItem(props.item);
     }, [props.item]);
 
+    const handleSave = React.useCallback(async () => {
+        const newItem = await item.replaceImagesIn('text');
+        dispatchItemUpdated(newItem.Id, newItem.Fields);
+        toggleItemEditable(newItem.Id, indexManager);
+    }, [item, indexManager]);
+
+    // Save on ctrl-s
+    React.useEffect(() => {
+        if (editable) {
+            const handler = saveHandler(() => handleSave())
+            document.addEventListener('keydown', handler);
+
+            return () => document.removeEventListener('keydown', handler);
+        }
+    }, [editable, handleSave]);
+
     return (
         <div className={styles.container} style={props.style}>
             <ItemHeaderTemplate
                 item={item}
                 setItem={setItem}
                 editable={editable}
+                onSave={handleSave}
             />
             <ItemBodyTemplate
                 item={item}
