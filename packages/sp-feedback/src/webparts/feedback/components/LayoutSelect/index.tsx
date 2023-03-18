@@ -17,6 +17,7 @@ export interface ILayoutSelectProps {
 export const SINGLE_COL = 'single';
 export const DOUBLE_COL = 'double';
 export const TRIPLE_COL = 'triple';
+export const BOARD = 'board';
 
 const options: IDropdownOption[] = [
     {
@@ -38,6 +39,13 @@ const options: IDropdownOption[] = [
         text: 'Three columns',
         data: {
             icon: 'TripleColumn',
+        },
+    },
+    {
+        key: BOARD,
+        text: 'Board',
+        data: {
+            icon: 'BacklogBoard',
         },
     },
 ];
