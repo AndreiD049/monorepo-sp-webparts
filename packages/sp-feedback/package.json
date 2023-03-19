@@ -28,6 +28,8 @@
     "json-configuration": "^0.0.1",
     "office-ui-fabric-react": "^7.199.1",
     "react": "17.0.1",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "17.0.1",
     "react-router": "^6.8.1",
     "react-router-dom": "^6.8.1",
