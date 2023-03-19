@@ -187,7 +187,7 @@ export const Main: React.FC<IMainProps> = (props) => {
             </div>
         );
         if (layout === BOARD) {
-            return <BoardView />
+            return <BoardView items={items} groupField={selectedFilters.appliedGroupField} />
         }
         return (
             <ListView

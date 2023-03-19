@@ -39,7 +39,8 @@ export const GroupByField: React.FC<IGroupByField> = (props) => {
                         props.selectedFilters.tempItem ||
                             getEmptySelectedView(),
                         op.key
-                    ).Fields
+                    ).Fields,
+                    { temp: true, persist: true }
                 );
                 hideListOptionsCallout();
             },

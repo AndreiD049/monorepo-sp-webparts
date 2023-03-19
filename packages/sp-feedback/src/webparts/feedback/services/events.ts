@@ -9,7 +9,6 @@ export const ITEM_ADDED = 'spfxFeedback/ItemAdded';
 export const ITEM_UPDATED = 'spfxFeedback/ItemUpdated';
 export const ITEM_DELETED = 'spfxFeedback/ItemDeleted';
 
-
 type ItemOptions = {
     temp: boolean;
     persist?: boolean;
@@ -33,12 +32,12 @@ type DeletePayload = {
     id: number | string;
     options?: ItemOptions;
     callback?: () => void;
-}
+};
 
 export function dispatchItemAdded(
     item: IFeedbackItemRaw,
     options?: ItemOptions,
-    callback?: () => void,
+    callback?: () => void
 ): void {
     document.dispatchEvent(
         new CustomEvent<AddItemPayload>(ITEM_ADDED, {
@@ -55,7 +54,7 @@ export function dispatchItemUpdated(
     id: number | string,
     payload: Partial<IFields>,
     options?: ItemOptions,
-    callback?: () => void,
+    callback?: () => void
 ): void {
     document.dispatchEvent(
         new CustomEvent<UpdateItemPayload>(ITEM_UPDATED, {
@@ -69,16 +68,20 @@ export function dispatchItemUpdated(
     );
 }
 
-export function dispatchItemDeleted(id: number | string, options?: ItemOptions, callback?: () => void): void {
+export function dispatchItemDeleted(
+    id: number | string,
+    options?: ItemOptions,
+    callback?: () => void
+): void {
     document.dispatchEvent(
         new CustomEvent<DeletePayload>(ITEM_DELETED, {
             detail: {
                 id,
                 options: options || defaultOptions,
-                callback
-            }
+                callback,
+            },
         })
-    )
+    );
 }
 
 export function itemAddedEventBuilder(
@@ -89,24 +92,27 @@ export function itemAddedEventBuilder(
     // Handler receives item's raw details
     const handler = async (ev: CustomEvent<AddItemPayload>): Promise<void> => {
         const doneCb = ev.detail.callback ?? (() => null);
-        const options = ev.detail.options;
-        const isTemp = options ? options.temp : false;
-        const shouldPersist = options ? options.persist : false;
-        let resultItem: Item;
-        if (!isTemp) {
-            const addResults = await itemService.addItem(ev.detail.item);
-            resultItem = await itemService.getItem(addResults.data.Id);
-        } else {
-            const title = ev.detail.item.Title;
-            if (shouldPersist) {
-                tempItemService.addTempItem(ev.detail.item);
-                resultItem = tempItemService.getTempItem(title);
+        try {
+            const options = ev.detail.options;
+            const isTemp = options ? options.temp : false;
+            const shouldPersist = options ? options.persist : false;
+            let resultItem: Item;
+            if (!isTemp) {
+                const addResults = await itemService.addItem(ev.detail.item);
+                resultItem = await itemService.getItem(addResults.data.Id);
             } else {
-                resultItem = new Item(ev.detail.item);
+                const title = ev.detail.item.Title;
+                if (shouldPersist) {
+                    tempItemService.addTempItem(ev.detail.item);
+                    resultItem = tempItemService.getTempItem(title);
+                } else {
+                    resultItem = new Item(ev.detail.item);
+                }
             }
+            await cb(resultItem);
+        } finally {
+            doneCb();
         }
-        await cb(resultItem);
-        doneCb();
     };
 
     return [
@@ -128,36 +134,39 @@ export function itemUpdatedEventBuilder(
     ): Promise<void> => {
         const doneCb = ev.detail.callback ?? (() => null);
 
-        const options = ev.detail.options;
-        const isTemp = options.temp;
-        const id = ev.detail.id;
-        const shouldPersist = options?.persist ?? false;
+        try {
+            const options = ev.detail.options;
+            const isTemp = options.temp;
+            const id = ev.detail.id;
+            const shouldPersist = options?.persist ?? false;
 
-        let oldItem: Item;
-        let updatedItem: Item;
-        if (!isTemp && typeof id === 'number') {
-            oldItem = indexManager.filterFirst($eq('id', id.toString()));
-            const merged = oldItem.mergeFields(ev.detail.payload);
-            await itemService.updateItem(id, merged.asRaw());
-            updatedItem = await itemService.getItem(id);
-        } else {
-            const title = ev.detail.id as string;
-            if (typeof id === 'number') {
+            let oldItem: Item;
+            let updatedItem: Item;
+            if (!isTemp && typeof id === 'number') {
                 oldItem = indexManager.filterFirst($eq('id', id.toString()));
+                const merged = oldItem.mergeFields(ev.detail.payload);
+                await itemService.updateItem(id, merged.asRaw());
+                updatedItem = await itemService.getItem(id);
             } else {
-                // If it's a temporary item, it doesn't have a numerical Id, it uses the title as such
-                oldItem = indexManager.filterFirst($eq('title', title));
+                const title = ev.detail.id as string;
+                if (typeof id === 'number') {
+                    oldItem = indexManager.filterFirst($eq('id', id.toString()));
+                } else {
+                    // If it's a temporary item, it doesn't have a numerical Id, it uses the title as such
+                    oldItem = indexManager.filterFirst($eq('title', title));
+                }
+                if (shouldPersist) {
+                    oldItem = tempItemService.getTempItem(title);
+                    tempItemService.updateItem(title, ev.detail.payload);
+                    updatedItem = tempItemService.getTempItem(title);
+                } else {
+                    updatedItem = oldItem.mergeFields(ev.detail.payload);
+                }
             }
-            if (shouldPersist) {
-                oldItem = tempItemService.getTempItem(title);
-                tempItemService.updateItem(title, ev.detail.payload);
-                updatedItem = tempItemService.getTempItem(title);
-            } else {
-                updatedItem = oldItem.mergeFields(ev.detail.payload);
-            }
+            await cb(oldItem, updatedItem);
+        } finally {
+            doneCb();
         }
-        await cb(oldItem, updatedItem);
-        doneCb();
     };
 
     return [
@@ -170,27 +179,27 @@ export function itemUpdatedEventBuilder(
 export function itemDeletedEventBuilder(
     itemService: ItemsService,
     tempItemService: TempItemsService,
-    callback: (id: number | string) => void | Promise<void>,
+    callback: (id: number | string) => void | Promise<void>
 ): [string, (ev: CustomEvent) => void, () => void] {
-        const handler = async (ev: CustomEvent<DeletePayload>): Promise<void> => {
-            const done = ev.detail.callback || (() => null);
-            const id = ev.detail.id;
-            const isTemp = ev.detail.options.temp;
-            const shouldPersist = ev.detail.options.persist;
-            if (!isTemp && typeof id === 'number') {
-                await itemService.deleteItem(id);
-            } else {
-                if (shouldPersist) {
-                    tempItemService.deleteItem(id.toString());
-                }
+    const handler = async (ev: CustomEvent<DeletePayload>): Promise<void> => {
+        const done = ev.detail.callback || (() => null);
+        const id = ev.detail.id;
+        const isTemp = ev.detail.options.temp;
+        const shouldPersist = ev.detail.options.persist;
+        if (!isTemp && typeof id === 'number') {
+            await itemService.deleteItem(id);
+        } else {
+            if (shouldPersist) {
+                tempItemService.deleteItem(id.toString());
             }
-            await callback(id);
-            done();
-        };
+        }
+        await callback(id);
+        done();
+    };
 
-        return [
-            ITEM_DELETED,
-            handler,
-            () => document.removeEventListener(ITEM_DELETED, handler),
-        ]
+    return [
+        ITEM_DELETED,
+        handler,
+        () => document.removeEventListener(ITEM_DELETED, handler),
+    ];
 }

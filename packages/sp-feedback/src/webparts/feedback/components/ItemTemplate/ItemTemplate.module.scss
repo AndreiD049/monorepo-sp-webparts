@@ -4,7 +4,8 @@
     display: flex;
     flex-flow: column nowrap;
     background-color: "[theme: themeLighterAlt, default: #f8f8f8]";
-    border: 1px solid "[theme: neutralLighter, default: #f8f8f8]";
+    border: 1px solid "[theme: neutralLight, default: #f8f8f8]";
+    box-shadow: $ms-depth-shadow-4;
 }
 
 .itemBodyOuter {

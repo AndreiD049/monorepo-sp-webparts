@@ -1,6 +1,6 @@
-import { groupBy } from '@microsoft/sp-lodash-subset';
 import { Icon } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { getGroupedItems, getGroupKeys } from '../../../../features/grouped-items';
 import { Item } from '../../item';
 import { Collapsible } from '../Collapsible';
 import { NColumnLayout } from '../NColumnLayout';
@@ -23,10 +23,7 @@ const GroupHeader: React.FC<{ group: string; itemsCount: number, collapsed?: boo
 };
 
 export const ListView: React.FC<IListViewProps> = (props) => {
-    const groupedItems = React.useMemo(() => {
-        if (!props.groupField) return null;
-        return groupBy(props.items, (i) => i.getField(props.groupField));
-    }, [props.items, props.groupField]);
+    const groupedItems = React.useMemo(() => getGroupedItems(props.items, props.groupField), [props.items, props.groupField]);
 
     const body = React.useMemo(() => {
         if (!groupedItems) {
@@ -38,7 +35,7 @@ export const ListView: React.FC<IListViewProps> = (props) => {
                 />
             );
         }
-        const groupKeys = Object.keys(groupedItems).sort();
+        const groupKeys = getGroupKeys(groupedItems).sort();
         return (
             <>
                 {groupKeys.map((k) => (

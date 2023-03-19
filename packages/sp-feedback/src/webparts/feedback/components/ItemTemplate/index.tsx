@@ -7,12 +7,14 @@ import { DescriptionEditor } from '../DescriptionEditor';
 import { GlobalContext } from '../Feedback';
 import { isItemEditable, toggleItemEditable } from './editable-item';
 import { ItemProperties, ItemPropertiesEditable } from './ItemProperties';
-import styles from './ItemTemplate.module.scss';
 import { TagsTemplate } from './TagsTemplate';
+import styles from './ItemTemplate.module.scss';
+import { ConnectDragSource } from 'react-dnd';
 
 export interface IItemTemplateProps
     extends React.HTMLAttributes<HTMLDivElement> {
     item: Item;
+    source?: ConnectDragSource;
 }
 
 export const ItemHeaderTemplate: React.FC<{
@@ -20,6 +22,7 @@ export const ItemHeaderTemplate: React.FC<{
     editable: boolean;
     setItem: React.Dispatch<React.SetStateAction<Item>>;
     onSave: () => void;
+    source?: ConnectDragSource;
 }> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
     const handleEdit = (): void => {
@@ -29,24 +32,29 @@ export const ItemHeaderTemplate: React.FC<{
     const title = React.useMemo(() => {
         if (props.editable) {
             return (
-                <TextField
-                    value={props.item.getFieldOr('caption', props.item.Title)}
-                    onChange={(_ev, value) =>
-                        props.setItem((prev) => prev.setField('caption', value))
-                    }
-                    width="100%"
-                />
+                    <TextField
+                        value={props.item.getFieldOr(
+                            'caption',
+                            props.item.Title
+                        )}
+                        onChange={(_ev, value) =>
+                            props.setItem((prev) =>
+                                prev.setField('caption', value)
+                            )
+                        }
+                        width="100%"
+                    />
             );
         }
         return (
-            <Text variant="large">
-                {props.item.getFieldOr('caption', props.item.Title)}
-            </Text>
+                <Text variant="large">
+                    {props.item.getFieldOr('caption', props.item.Title)}
+                </Text>
         );
     }, [props.editable, props.item]);
 
     return (
-        <div className={styles.itemHeader}>
+        <div className={styles.itemHeader} ref={props.source}>
             <div style={{ flexGrow: props.editable ? 1 : 0 }}>{title}</div>
             <div>
                 <IconButton
@@ -103,7 +111,11 @@ export const ItemBodyTemplate: React.FC<{
 
     return (
         <div className={styles.itemBodyOuter}>
-            <TagsTemplate tags={props.item.getFieldOr('tags', [])} editable={props.editable} setItem={props.setItem} />
+            <TagsTemplate
+                tags={props.item.getFieldOr('tags', [])}
+                editable={props.editable}
+                setItem={props.setItem}
+            />
             {properties}
             <div
                 role="button"
@@ -131,13 +143,13 @@ export const ItemBodyTemplate: React.FC<{
 };
 
 // Save handler
-function saveHandler(saveFunc: () => void): ((ev: KeyboardEvent) => void) {
-    return function(ev: KeyboardEvent) {
+function saveHandler(saveFunc: () => void): (ev: KeyboardEvent) => void {
+    return function (ev: KeyboardEvent) {
         if (ev.key === 's' && ev.ctrlKey === true) {
             ev.preventDefault();
             saveFunc();
         }
-    }
+    };
 }
 
 export const ItemTemplate: React.FC<IItemTemplateProps> = (props) => {
@@ -154,14 +166,17 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = (props) => {
 
     const handleSave = React.useCallback(async () => {
         const newItem = await item.replaceImagesIn('text');
-        dispatchItemUpdated(newItem.Id, { ...newItem.Fields, tags: newItem.Tags });
+        dispatchItemUpdated(newItem.Id, {
+            ...newItem.Fields,
+            tags: newItem.Tags,
+        });
         toggleItemEditable(newItem.Id, indexManager);
     }, [item, indexManager]);
 
     // Save on ctrl-s
     React.useEffect(() => {
         if (editable) {
-            const handler = saveHandler(() => handleSave())
+            const handler = saveHandler(() => handleSave());
             document.addEventListener('keydown', handler);
 
             return () => document.removeEventListener('keydown', handler);
@@ -175,6 +190,7 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = (props) => {
                 setItem={setItem}
                 editable={editable}
                 onSave={handleSave}
+                source={props.source}
             />
             <ItemBodyTemplate
                 item={item}

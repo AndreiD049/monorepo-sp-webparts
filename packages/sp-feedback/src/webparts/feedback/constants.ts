@@ -35,3 +35,8 @@ export const EDITABLE_ITEMS = 'FB:/State/Editable';
 export const FIELD_VALUES = 'FB:/FIELD_VALUES';
 
 export const ADMINS = 'FB:/Administrators';
+
+// Drag & Drop item types
+export const ITEM_TYPES = {
+    Item: 'Item',
+}
