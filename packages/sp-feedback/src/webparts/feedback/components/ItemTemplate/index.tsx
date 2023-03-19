@@ -8,6 +8,7 @@ import { GlobalContext } from '../Feedback';
 import { isItemEditable, toggleItemEditable } from './editable-item';
 import { ItemProperties, ItemPropertiesEditable } from './ItemProperties';
 import styles from './ItemTemplate.module.scss';
+import { TagsTemplate } from './TagsTemplate';
 
 export interface IItemTemplateProps
     extends React.HTMLAttributes<HTMLDivElement> {
@@ -102,6 +103,7 @@ export const ItemBodyTemplate: React.FC<{
 
     return (
         <div className={styles.itemBodyOuter}>
+            <TagsTemplate tags={props.item.getFieldOr('tags', [])} editable={props.editable} setItem={props.setItem} />
             {properties}
             <div
                 role="button"
@@ -152,7 +154,7 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = (props) => {
 
     const handleSave = React.useCallback(async () => {
         const newItem = await item.replaceImagesIn('text');
-        dispatchItemUpdated(newItem.Id, newItem.Fields);
+        dispatchItemUpdated(newItem.Id, { ...newItem.Fields, tags: newItem.Tags });
         toggleItemEditable(newItem.Id, indexManager);
     }, [item, indexManager]);
 

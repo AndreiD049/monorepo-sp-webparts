@@ -136,7 +136,6 @@ export function itemUpdatedEventBuilder(
         let oldItem: Item;
         let updatedItem: Item;
         if (!isTemp && typeof id === 'number') {
-            // ! TODO: optimize this, it should not do so many calls
             oldItem = indexManager.filterFirst($eq('id', id.toString()));
             const merged = oldItem.mergeFields(ev.detail.payload);
             await itemService.updateItem(id, merged.asRaw());
