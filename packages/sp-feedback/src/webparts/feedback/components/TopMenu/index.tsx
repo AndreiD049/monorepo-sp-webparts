@@ -3,7 +3,13 @@ import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Outlet, useNavigate } from 'react-router';
 import { Panel } from 'sp-components';
-import { DB_NAME, MAIN_PANEL, STORE_NAME } from '../../constants';
+import { removeLocalCache } from '../../../../features/incremental-sync';
+import {
+    DB_NAME,
+    INCREMENTAL_SYNC_CONFIG,
+    MAIN_PANEL,
+    STORE_NAME,
+} from '../../constants';
 import FeedbackWebPart from '../../FeedbackWebPart';
 import { FilterDropdown } from '../FilterDropdown';
 import { LayoutSelect } from '../LayoutSelect';
@@ -55,13 +61,13 @@ export const TopMenu: React.FC<ITopMenuProps> = (props) => {
                     style: { color: FeedbackWebPart.theme.palette.white },
                 },
                 onClick: () => {
-                    const db = openDatabase(DB_NAME, STORE_NAME);
-                    db.then((db) => {
-                        const removed = removeCached(db, /.*/);
-                        removed
-                            .then(() => location.reload())
-                            .catch((err) => console.error(err));
-                    }).catch((err) => console.error(err));
+                    async function run() {
+                        await removeLocalCache(INCREMENTAL_SYNC_CONFIG.dbName)
+                        const db = await openDatabase(DB_NAME, STORE_NAME);
+                        await removeCached(db, /.*/);
+                        location.reload();
+                    }
+                    run().catch((err) => console.error(err));
                     return;
                 },
                 buttonStyles: {

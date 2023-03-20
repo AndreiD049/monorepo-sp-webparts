@@ -16,6 +16,7 @@ import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { IFeedbackConfig } from '../../models/IFeedbackConfig';
 import { syncList } from '../../features/incremental-sync';
 import { IFeedbackItemRaw } from '../../models/IFeedbackItem';
+import { INCREMENTAL_SYNC_CONFIG } from './constants';
 
 export interface IFeedbackWebPartProps {
     description: string;
@@ -53,42 +54,7 @@ export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebP
             sp,
             this.properties.config
         );
-        this.properties.getItems = await syncList(sp, this.properties.config?.listName, {
-            dbName: 'SPFX-FeedbackItems',
-            tokenStoreName: 'SpfxToken',
-            dataStoreName: 'SpfxItems',
-            fields: [ 
-                {
-                    field: 'ID',
-                    type: 'Number',
-                    key: 'Id',
-                },
-                {
-                    field: 'Title',
-                    type: 'String',
-                },
-                {
-                    field: 'Fields',
-                    type: 'String',
-                },
-                {
-                    field: 'Author',
-                    type: 'Person',
-                },
-                {
-                    field: 'Created',
-                    type: 'String',
-                },
-                {
-                    field: 'Tags',
-                    type: 'List',
-                },
-                {
-                    field: 'IsService',
-                    type: 'Boolean',
-                }
-            ],
-        })
+        this.properties.getItems = await syncList(sp, this.properties.config?.listName, INCREMENTAL_SYNC_CONFIG)
     }
 
     protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {

@@ -6,7 +6,7 @@ type Person = { Id: number; Title: string; EMail: string };
 type FieldType = 'Number' | 'String' | 'Person' | 'List' | 'Boolean';
 type FieldValue = number | string | string[] | Person | boolean;
 type Field = { field: string; type: FieldType, key?: string };
-type IncSyncConfig = {
+export type IncSyncConfig = {
     dbName: string;
     tokenStoreName: string;
     dataStoreName: string;
@@ -46,6 +46,10 @@ async function openSyncDb(
         return openDB(dbName, undefined, {
             upgrade: (db) =>
                 createSyncObjectStores(dataStoreName, tokenStoreName, db, dataKeyPath),
+            blocking: (_v1, _v2, event) => {
+                const db = event.target as IDBDatabase;
+                db.close();
+            },
         });
     } catch (err) {
         await deleteDB(dbName);
@@ -215,6 +219,10 @@ async function getChangesSinceToken(
     });
 }
 
+export async function removeLocalCache(dbName: string): Promise<void> {
+    return deleteDB(dbName);
+}
+
 export async function syncList<T>(
     sp: SPFI,
     listName: string,
@@ -247,7 +255,6 @@ export async function syncList<T>(
             );
             const doc = getDocument(changes);
             if (hasChanges(doc)) {
-                console.log(doc);
                 // Process deletes
                 const deletes = getDeletes(doc);
                 await deleteLocalItems(db, config.dataStoreName, deletes);

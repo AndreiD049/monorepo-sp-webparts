@@ -1,3 +1,5 @@
+import { IncSyncConfig } from "../../features/incremental-sync";
+
 export const DB_NAME = 'Spfx_Feedback';
 export const STORE_NAME = `${location.origin}/${location.pathname}`;
 
@@ -39,4 +41,41 @@ export const ADMINS = 'FB:/Administrators';
 // Drag & Drop item types
 export const ITEM_TYPES = {
     Item: 'Item',
-}
+};
+
+export const INCREMENTAL_SYNC_CONFIG: IncSyncConfig = {
+    dbName: 'SPFX-FeedbackItems',
+    tokenStoreName: 'SpfxToken',
+    dataStoreName: 'SpfxItems',
+    fields: [
+        {
+            field: 'ID',
+            type: 'Number',
+            key: 'Id',
+        },
+        {
+            field: 'Title',
+            type: 'String',
+        },
+        {
+            field: 'Fields',
+            type: 'String',
+        },
+        {
+            field: 'Author',
+            type: 'Person',
+        },
+        {
+            field: 'Created',
+            type: 'String',
+        },
+        {
+            field: 'Tags',
+            type: 'List',
+        },
+        {
+            field: 'IsService',
+            type: 'Boolean',
+        },
+    ],
+};
