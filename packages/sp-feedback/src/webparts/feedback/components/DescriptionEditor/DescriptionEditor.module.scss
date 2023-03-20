@@ -4,6 +4,7 @@
     background-color: "[theme: white, default: #ffffff]";
     :global(.ProseMirror) {
         border: 1px solid '[theme: neutralLight, default: #eaeaea]';
+        min-height: 200px;
         padding: 1em;
         
         img {
