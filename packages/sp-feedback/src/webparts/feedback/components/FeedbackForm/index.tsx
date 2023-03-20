@@ -1,4 +1,10 @@
-import { Label, PrimaryButton, Stack, StackItem } from 'office-ui-fabric-react';
+import {
+    ActionButton,
+    Label,
+    PrimaryButton,
+    Stack,
+    StackItem,
+} from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
@@ -24,7 +30,9 @@ export interface IFeedbackFormProps {
 export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
     const navigate = useNavigate();
     const { indexManager } = React.useContext(GlobalContext);
-    const [item, setItem] = React.useState(new Item());
+    const [item, setItem] = React.useState(
+        new Item().setField('status', 'New')
+    );
     const [searchParams] = useSearchParams();
 
     const handleCreate = React.useCallback(async () => {
@@ -73,6 +81,12 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
 
     return (
         <div className={styles.container}>
+            <ActionButton
+                iconProps={{ iconName: 'Back' }}
+                onClick={() => navigate('/')}
+            >
+                Back
+            </ActionButton>
             <SelectChoice
                 target={item}
                 field="application"
@@ -130,7 +144,6 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
             <Label>Description</Label>
             {editor}
             <PrimaryButton onClick={handleCreate}>Create</PrimaryButton>
-            <pre>{JSON.stringify(item, null, 4)}</pre>
         </div>
     );
 };

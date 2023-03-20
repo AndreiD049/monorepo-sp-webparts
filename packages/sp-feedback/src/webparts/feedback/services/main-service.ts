@@ -15,6 +15,7 @@ export class MainService {
     public static UsersService: UsersService;
 
     public static initService(sp: SPFI, config: IFeedbackConfig): void {
+        if (!config) return null;
         this.config = config;
         this.ItemsService = createCacheProxy(
             new ItemsService(sp, this.config.listName),

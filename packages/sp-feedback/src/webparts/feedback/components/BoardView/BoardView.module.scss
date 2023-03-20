@@ -11,7 +11,8 @@
 }
 
 .column {
-    min-width: 32%;
+    max-width: 24%;
+    min-width: 24%;
     flex: 1;
     background-color: "[theme: neutralLighter, default: #eeeeee]";
     border: 1px solid "[theme: neutralLight, default: #eeeeee]";
@@ -20,7 +21,7 @@
     overflow: auto;
 
     & .columnLabel {
-        padding-top: .5em;
+        padding: .5em 0 1em 0;
         text-align: center;
         font-weight: bold;
     }

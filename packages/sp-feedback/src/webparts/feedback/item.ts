@@ -60,8 +60,9 @@ export class Item implements IFeedbackItem {
     private readFields(fieldsRaw: string): IFields {
         try {
             return JSON.parse(fieldsRaw);
-        } catch {
-            return null;
+        } catch (err) {
+            console.error(err, fieldsRaw);
+            return {};
         }
     }
 

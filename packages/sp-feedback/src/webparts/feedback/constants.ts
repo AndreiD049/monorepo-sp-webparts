@@ -21,11 +21,11 @@ export const CATEGORY = 'FB:/Category';
 // Items tagged with this are perceived as feedback items
 export const FEEDBACK = 'FB:/Feedback';
 // Items tagged with this appear in the choice/dropdown for status field
-export const STATUS = 'FB:/Status';
 export const TEMPLATE = 'FB:/Template';
 export const SAVED_VIEW = 'FB:/Saved_View';
 export const SELECTED_VIEW = 'SELECTED_VIEW';
 export const EDITABLE_ITEMS = 'FB:/State/Editable';
+export const FORM_FIELD_SETUP = 'FB:/FORM_FIELD_SETUP';
 
 // An item with the title 'FB:/FIELD_VALUES' can be created with
 // fields and their corresponding values as an array

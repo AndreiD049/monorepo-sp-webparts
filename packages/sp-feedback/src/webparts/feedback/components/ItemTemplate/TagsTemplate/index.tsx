@@ -1,5 +1,6 @@
 import { IconButton } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { $eq } from '../../../indexes/filter';
 import { Item } from '../../../item';
 import { GlobalContext } from '../../Feedback';
 import {
@@ -20,14 +21,13 @@ const removeTag = (item: Item, tag: string): Item => {
     const oldTags: string[] = item.getFieldOr('tags', []);
     const newTags = oldTags.filter((t) => t !== tag);
     return item.setTags(newTags);
-}
+};
 
 const Tag: React.FC<{
     tag: string;
     editable: boolean;
     setItem?: ITagsTemplateProps['setItem'];
 }> = (props) => {
-
     const handleRemove = (): void => {
         if (!props.editable) return;
         props.setItem((prev) => removeTag(prev, props.tag));
@@ -63,8 +63,9 @@ export const TagsTemplate: React.FC<ITagsTemplateProps> = (props) => {
         }
 
         const options = indexManager
-            .getValues('tags')
-            .map((s) => makeSimpleListOption(s));
+            .getValues('tags', $eq('is service', 'false'))
+            .map((s) => makeSimpleListOption(s))
+            .filter((v) => v.key !== null);
 
         showListOptionsCallout(addTagsButtonRef.current, {
             options,

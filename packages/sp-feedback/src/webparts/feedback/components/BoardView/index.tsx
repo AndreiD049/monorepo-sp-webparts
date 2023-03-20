@@ -1,6 +1,7 @@
 import { Text } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import { getFieldSetup } from '../../../../features/field-setup';
 import {
     getGroupedItems,
     getGroupKeys,
@@ -9,6 +10,7 @@ import { ITEM_TYPES } from '../../constants';
 import FeedbackWebPart from '../../FeedbackWebPart';
 import { Item } from '../../item';
 import { dispatchItemUpdated } from '../../services/events';
+import { GlobalContext } from '../Feedback';
 import { IItemTemplateProps, ItemTemplate } from '../ItemTemplate';
 import styles from './BoardView.module.scss';
 
@@ -78,7 +80,7 @@ const BoardColumn: React.FC<IBoardColumnProps> = (props) => {
     return (
         <div className={`${styles.column} scroll-bar`} style={dndStyles} ref={drop}>
             <Text className={styles.columnLabel} variant="large" block>
-                {props.label}
+                {props.label} ({props.items.length})
             </Text>
             <div className={styles.columnBody}>
                 {props.items.map((item) => (
@@ -94,7 +96,18 @@ const BoardColumn: React.FC<IBoardColumnProps> = (props) => {
 };
 
 export const BoardView: React.FC<IBoardViewProps> = (props) => {
+    const { indexManager } = React.useContext(GlobalContext);
     const [movedItems, setMovedItems] = React.useState<(string | number)[]>([]);
+
+    const groupedItems = React.useMemo(
+        () => getGroupedItems(props.items, props.groupField, getFieldSetup(indexManager, props.groupField)),
+        [props.items]
+    );
+    const groupKeys = React.useMemo(
+        () => getGroupKeys(groupedItems, getFieldSetup(indexManager, props.groupField)),
+        [groupedItems]
+    );
+
     if (!props.groupField) {
         return (
             <div className={styles.container}>
@@ -102,15 +115,6 @@ export const BoardView: React.FC<IBoardViewProps> = (props) => {
             </div>
         );
     }
-
-    const groupedItems = React.useMemo(
-        () => getGroupedItems(props.items, props.groupField),
-        [props.items]
-    );
-    const groupKeys = React.useMemo(
-        () => getGroupKeys(groupedItems).sort(),
-        [groupedItems]
-    );
 
     return (
         <div className={`${styles.container} scroll-bar`}>
