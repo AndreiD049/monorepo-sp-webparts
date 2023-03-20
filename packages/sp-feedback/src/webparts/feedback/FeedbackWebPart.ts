@@ -25,6 +25,7 @@ export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebP
   public static theme: IReadonlyTheme = null;
 
   public render(): void {
+    if (!this.properties.config) return null;
     const element: React.ReactElement<IFeedbackProps> = React.createElement(
       Feedback,
       {
@@ -44,7 +45,7 @@ export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebP
         }),
       ]);
 
-    MainService.initService(FeedbackWebPart.SPBuilder.getSP(), this.properties.config);
+    MainService.initService(FeedbackWebPart.SPBuilder.getSP(this.properties.config?.rootUrl), this.properties.config);
   }
 
   protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {
