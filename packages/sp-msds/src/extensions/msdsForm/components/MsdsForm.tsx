@@ -277,14 +277,14 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                 <div className="width-20p">
                                     <MSDSDatePicker
                                         id="MSDSDate"
-                                        label="4.MSDS issued date"
+                                        label="4.SDS issued date"
                                         pickerProps={{
                                             maxDate: new Date(),
                                             allowTextInput: true,
                                         }}
                                         control={control}
                                         rules={{
-                                            required: 'MSDS Date is required',
+                                            required: 'SDS Date is required',
                                             disabled:
                                                 field.MSDSDate === 'Disabled',
                                         }}
@@ -308,7 +308,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                 <div className="width-20p">
                                     <MSDSTextField
                                         id="CasNo"
-                                        label="5.MSDS Cas No."
+                                        label="5.SDS Cas No."
                                         title="CAS Registry Number is a unique numerical identifier assigned by Chemical Abstracts Service CAS"
                                         control={control}
                                         rules={{
@@ -388,7 +388,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MSDSTextField
                                         id="ProductName"
                                         label="7.Product name to create in Plato"
-                                        title="if created product name ≠ name on MSDS, confirmation of customer to be attached"
+                                        title="if created product name ≠ name on SDS, confirmation of customer to be attached"
                                         control={control}
                                         rules={{
                                             required:
@@ -454,7 +454,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <CustomsCodeField
                                         id="CustomsCode"
                                         label="9.Customs code"
-                                        title="Important for Customs formalities - NOT on MSDS  - to be confirmed by mail  - MUST ALWAYS be mentioned also in case of no customs : 0000000001"
+                                        title="Important for Customs formalities - not on SDS - to be confirmed with customer by mail - MUST ALWAYS be mentioned also in case of no customs: 0000000000"
                                         fieldProps={{
                                             mask: '9999999999',
                                         }}
@@ -684,7 +684,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                     <MSDSCheckbox
                                         id="Hygroscopic"
                                         label="18.Hygroscopic? Tending to absorb moisture, water from air."
-                                        title="Not always clear on MSDS, to be confirmed by customer!  Aluminium bags or liner is an indication.  Section 7"
+                                        title="Not always clear on SDS, to be confirmed by customer!  Aluminium bags or liner is an indication.  Section 7"
                                         control={control}
                                         rules={{
                                             disabled:
@@ -813,7 +813,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                             id="Attachments"
                                             label="23.Attachments"
                                             control={control}
-                                            title="Add MSDS PDF and customer confirmation mail"
+                                            title="Add SDS PDF and customer confirmation mail"
                                             rules={{
                                                 required:
                                                     'Attachments are required',
@@ -823,7 +823,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                         <MsdsAttachmentsDetails
                                             id="Attachments"
                                             label="23.Attachments"
-                                            title="Add MSDS PDF and customer confirmation mail"
+                                            title="Add SDS PDF and customer confirmation mail"
                                             displayMode={props.displayMode}
                                             attachments={attachments}
                                             required
@@ -920,6 +920,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                         id="BulkDensity"
                                         label="4.Bulk density Plato"
                                         control={control}
+                                        title="Density must be measured and tapped for Granulates + only measured for Powder, flakes and fluff."
                                         rules={{
                                             disabled:
                                                 disabledFields.indexOf(

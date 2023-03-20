@@ -1,17 +1,17 @@
 import * as React from 'react';
-import {
-    UseFormSetValue,
-    UseFormWatch,
-} from 'react-hook-form';
+import { UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { IMSDSRequest } from '../services/IMSDSRequest';
 
 function useSingleFieldEffect(
-    fieldValue: string | boolean,
-    effect: (value: string | boolean) => void
+    fieldValue: string | boolean | (string | boolean)[],
+    effect: (value: string | boolean | (string | boolean)[]) => void
 ): void {
-    React.useEffect(() => {
-        effect(fieldValue);
-    }, [fieldValue]);
+    React.useEffect(
+        () => {
+            effect(fieldValue);
+        },
+        Array.isArray(fieldValue) ? [...fieldValue] : [fieldValue]
+    );
 }
 
 type FormValues = Partial<IMSDSRequest & { Attachments: File[] }>;
@@ -29,6 +29,7 @@ export function useFieldEffects(
     const siloRemarks = watch('SiloRemarks');
     const forbiddenForBulk = watch('ForbiddenForBulk');
     const siloOperations = watch('SiloOperations');
+    const debagOperations = watch('DebaggingOperations');
     const packedOperations = watch('PackedOperations');
 
     const setValueIfAllowed = React.useMemo(() => {
@@ -36,23 +37,48 @@ export function useFieldEffects(
         return setValue;
     }, [isDirty]);
 
-    useSingleFieldEffect(siloOperations, (siloOperations) => {
-        const fields: (keyof IMSDSRequest)[] = [
-            'MeltingPoint',
-            'Abrasive',
-            'Hygroscopic',
-            'ForbiddenMixedSites',
-            'DedicatedFlexiblesValves',
-        ];
-        if (!siloOperations) {
-            setDisabled((prev) => [...prev, ...fields]);
-            if (siloOperations === undefined) return;
+    useSingleFieldEffect(
+        [siloOperations, debagOperations],
+        (operations: boolean[]) => {
+            const [siloOperations, debagOperations] = operations;
+            const fields: (keyof IMSDSRequest)[] = [
+                'MeltingPoint',
+                'Abrasive',
+                'Hygroscopic',
+                'ForbiddenMixedSites',
+                'DedicatedFlexiblesValves',
+            ];
+            if (siloOperations === undefined && debagOperations === undefined) {
+                return setDisabled((prev) => [...prev, ...fields]);
+            }
+            if (operations.every((o) => !o)) {
+                setDisabled((prev) => [...prev, ...fields]);
                 fields.forEach((field) =>
                     setValueIfAllowed(
                         field,
                         typeof watch(field) === 'string' ? '' : false
                     )
                 );
+            } else {
+                setDisabled((prev) => {
+                    const exclude = new Set(fields);
+                    return prev.filter((val) => !exclude.has(val));
+                });
+            }
+            if (siloOperations === true) {
+                if (!productRemarks?.includes(REMARK_SILO_OPERATIONS)) {
+                    setValueIfAllowed(
+                        'ProductRemarks',
+                        `${REMARK_SILO_OPERATIONS}${productRemarks || ''}`
+                    );
+                }
+                if (!siloRemarks?.includes(REMARK_SILO_OPERATIONS)) {
+                    setValueIfAllowed(
+                        'SiloRemarks',
+                        `${REMARK_SILO_OPERATIONS}${siloRemarks || ''}`
+                    );
+                }
+            } else {
                 if (productRemarks) {
                     setValueIfAllowed(
                         'ProductRemarks',
@@ -65,35 +91,23 @@ export function useFieldEffects(
                         `${siloRemarks.replace(REMARK_SILO_OPERATIONS, '')}`
                     );
                 }
-        } else {
-            setDisabled((prev) => {
-                const exclude = new Set(fields);
-                return prev.filter((val) => !exclude.has(val));
-            });
-                setValueIfAllowed(
-                    'ProductRemarks',
-                    `${REMARK_SILO_OPERATIONS}${productRemarks || ''}`
-                );
-                setValueIfAllowed(
-                    'SiloRemarks',
-                    `${REMARK_SILO_OPERATIONS}${siloRemarks || ''}`
-                );
+            }
         }
-    });
+    );
 
     useSingleFieldEffect(forbiddenForBulk, (forbidden) => {
         if (forbidden) {
-                setValueIfAllowed('SiloOperations', false);
-                setValueIfAllowed('BulkDensity', 0);
-                setValueIfAllowed('MeasuredBulkDensity', false);
-                setValueIfAllowed(
-                    'ProductRemarks',
-                    `${REMARK_FORBIDDEN_FOR_BULK}${productRemarks || ''}`
-                );
-                setValueIfAllowed(
-                    'SiloRemarks',
-                    `${REMARK_FORBIDDEN_FOR_BULK}${siloRemarks || ''}`
-                );
+            setValueIfAllowed('SiloOperations', false);
+            setValueIfAllowed('BulkDensity', 0);
+            setValueIfAllowed('MeasuredBulkDensity', false);
+            setValueIfAllowed(
+                'ProductRemarks',
+                `${REMARK_FORBIDDEN_FOR_BULK}${productRemarks || ''}`
+            );
+            setValueIfAllowed(
+                'SiloRemarks',
+                `${REMARK_FORBIDDEN_FOR_BULK}${siloRemarks || ''}`
+            );
             setDisabled((prev) => [
                 ...prev,
                 'SiloOperations',

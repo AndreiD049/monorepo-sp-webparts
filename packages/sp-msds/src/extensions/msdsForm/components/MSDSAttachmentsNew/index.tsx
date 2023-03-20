@@ -1,9 +1,10 @@
+import { uniqBy } from '@microsoft/sp-lodash-subset';
 import {
     Icon,
+    IconButton,
     Label,
     PrimaryButton,
     Stack,
-    Text,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Controller } from 'react-hook-form';
@@ -19,12 +20,27 @@ export interface IMSDSAttachmentsProps extends MSDSFormProps {
     style?: React.CSSProperties;
 }
 
+export function mergeFiles(files1: File[], files2: File[]): File[] {
+    if (!files1) return files2;
+    if (!files2) return files1;
+    return uniqBy([...files1, ...files2], (f) => f.name);
+}
+
+export function removeFile(files: File[], fileToRemove: string): File[] {
+    if (!files) return [];
+    return files.filter((f) => f.name !== fileToRemove);
+}
+
 export const MSDSAttachmentsNew: React.FC<IMSDSAttachmentsProps> = (props) => {
     const input = React.useRef(null);
 
     return (
         <div className={styles.container}>
-            <Label htmlFor={props.id} required={Boolean(props.rules?.required)} title={props.title}>
+            <Label
+                htmlFor={props.id}
+                required={Boolean(props.rules?.required)}
+                title={props.title}
+            >
                 <Icon iconName="TextField" style={{ marginRight: '.3em' }} />{' '}
                 <span>{props.label}</span>
             </Label>
@@ -40,9 +56,10 @@ export const MSDSAttachmentsNew: React.FC<IMSDSAttachmentsProps> = (props) => {
                                 type="file"
                                 multiple
                                 ref={input}
+                                value={''}
                                 onChange={async (ev) => {
                                     const files = Array.from(ev.target.files);
-                                    field.onChange(files);
+                                    field.onChange(mergeFiles(field.value, files));
                                 }}
                             />
                             <Stack
@@ -57,9 +74,22 @@ export const MSDSAttachmentsNew: React.FC<IMSDSAttachmentsProps> = (props) => {
                                     Add attachments
                                 </PrimaryButton>
                                 {field.value?.length && (
-                                    <Text variant="smallPlus">
-                                        {field.value?.length} file(s) selected
-                                    </Text>
+                                    <div className={styles.fileList}>
+                                        {field.value?.map((file: File) => (
+                                            <span key={file.name}>
+                                                {file.name}{' '}
+                                                <IconButton
+                                                    className={styles.fileDeleteButton}
+                                                    iconProps={{
+                                                        iconName: 'Delete',
+                                                    }}
+                                                    onClick={() => {
+                                                        field.onChange((prev: File[]) => removeFile(prev, file.name));
+                                                    }}
+                                                />
+                                            </span>
+                                        ))}
+                                    </div>
                                 )}
                             </Stack>
                             <TextError
