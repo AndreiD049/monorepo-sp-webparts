@@ -36,23 +36,22 @@ export interface IFeedbackProps {
 }
 
 export const Feedback: React.FC<IFeedbackProps> = (props) => {
-    const ItemsService = MainService.ItemsService;
     const [info, setInfo] = React.useState<IGlobalContextProps>();
 
     // Pull information
     React.useEffect(() => {
         async function run(): Promise<void> {
             // Get normal items
-            const items = await ItemsService.getAllItems();
+            const items = (await props.properties.getItems()).map((i) => new Item(i));
             // Get system items, those are cached
-            const systemItems = (await ItemsService.getAllSystemItems()).map(
-                (i) => new Item(i)
-            );
+            // const systemItems = (await ItemsService.getAllSystemItems()).map(
+                // (i) => new Item(i)
+            // );
             // Get temp items if any
             const tempItems = MainService.TempItemService.getAllTempItems();
 
             // Build items
-            const allItems = items.concat(systemItems, tempItems);
+            const allItems = items.concat(tempItems);
 
             const indexManager = new IndexManager(allItems);
             const admins = indexManager.filterArray($eq('title', ADMINS));

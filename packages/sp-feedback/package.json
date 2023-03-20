@@ -24,6 +24,7 @@
     "@tiptap/pm": "^2.0.0-beta.218",
     "@tiptap/react": "^2.0.0-beta.218",
     "@tiptap/starter-kit": "^2.0.0-beta.218",
+    "idb": "^7.1.1",
     "idb-proxy": "^1.0.0",
     "json-configuration": "^0.0.1",
     "office-ui-fabric-react": "^7.199.1",
