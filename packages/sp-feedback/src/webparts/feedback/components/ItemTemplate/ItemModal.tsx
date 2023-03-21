@@ -22,7 +22,6 @@ export const ItemModal: React.FC = () => {
     const { indexManager } = React.useContext(GlobalContext);
     const [search, setSearchParams] = useSearchParams();
     const itemId = search.get('display');
-    const [shown, setShown] = React.useState(itemId !== null);
     const item = React.useMemo(() => {
         if (itemId === null) return null;
         return indexManager.filterFirst($eq('id', itemId));
@@ -32,7 +31,6 @@ export const ItemModal: React.FC = () => {
         const hideHandler = (): void => {
             setSearchParams((prev) => {
                 prev.delete('display');
-                setShown(false);
                 return prev;
             });
         };
@@ -41,7 +39,6 @@ export const ItemModal: React.FC = () => {
             if (!isNumber(ev.detail)) return null;
             setSearchParams((prev) => {
                 prev.set('display', ev.detail.toString());
-                setShown(true);
                 return prev;
             });
         };
@@ -56,7 +53,7 @@ export const ItemModal: React.FC = () => {
 
     return (
         <Modal
-            isOpen={shown}
+            isOpen={Boolean(item)}
             onDismiss={hideModal}
             forceFocusInsideTrap={false}
             isClickableOutsideFocusTrap
@@ -68,7 +65,7 @@ export const ItemModal: React.FC = () => {
                     onClick={hideModal}
                 />
                 <div className={`${styles.modalContent} scroll-bar`}>
-                    {item && <ItemTemplate item={item} collapsible={false} />}
+                    <ItemTemplate item={item} collapsible={false} />
                 </div>
             </div>
         </Modal>

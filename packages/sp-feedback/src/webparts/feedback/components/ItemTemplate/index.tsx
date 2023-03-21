@@ -159,12 +159,14 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = ({
     const { indexManager } = React.useContext(GlobalContext);
     const [item, setItem] = React.useState(props.item);
     const editable = React.useMemo(
-        () => isItemEditable(props.item.Id, indexManager),
+        () => props.item ? isItemEditable(props.item.Id, indexManager) : false,
         [props.item, indexManager]
     );
 
     React.useEffect(() => {
-        setItem(props.item);
+        if (props.item) {
+            setItem(props.item);
+        }
     }, [props.item]);
 
     const handleSave = React.useCallback(async () => {
@@ -189,14 +191,14 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = ({
     return (
         <div className={styles.container} style={props.style} ref={rootEventListener} tabIndex={1}>
             <ItemHeaderTemplate
-                item={item}
+                item={item || new Item()}
                 setItem={setItem}
                 editable={editable}
                 onSave={handleSave}
                 source={props.source}
             />
             <ItemBodyTemplate
-                item={item}
+                item={item || new Item()}
                 editable={editable}
                 setItem={setItem}
                 collapsible={collapsible}

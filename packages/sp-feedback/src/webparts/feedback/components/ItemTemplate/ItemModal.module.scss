@@ -2,7 +2,7 @@
 
 .modal {
     min-width: 90vw;
-    height: 80vh;
+    max-height: 80vh;
     padding: 4px;
     display: flex;
     flex-flow: column nowrap;
