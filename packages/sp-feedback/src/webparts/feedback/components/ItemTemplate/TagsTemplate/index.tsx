@@ -1,6 +1,7 @@
 import { IconButton } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { $eq } from '../../../indexes/filter';
+import { IndexManager } from '../../../indexes/index-manager';
 import { Item } from '../../../item';
 import { GlobalContext } from '../../Feedback';
 import {
@@ -9,6 +10,7 @@ import {
     makeSimpleListOption,
     showListOptionsCallout,
 } from '../../OptionList';
+import { showModal } from '../ItemModal';
 import styles from './TagsTemplate.module.scss';
 
 export interface ITagsTemplateProps {
@@ -23,12 +25,19 @@ const removeTag = (item: Item, tag: string): Item => {
     return item.setTags(newTags);
 };
 
+const getItemsTaggedWith = (indexManager: IndexManager, tag: string): Item[] => {
+    return indexManager.filterArray($eq('tag', tag));
+}
+
 const Tag: React.FC<{
     tag: string;
     editable: boolean;
     setItem?: ITagsTemplateProps['setItem'];
 }> = (props) => {
-    const handleRemove = (): void => {
+    const { indexManager } = React.useContext(GlobalContext);
+    const target = React.useRef(null);
+    const handleRemove = (ev: React.MouseEvent<HTMLButtonElement>): void => {
+        ev.stopPropagation();
         if (!props.editable) return;
         props.setItem((prev) => removeTag(prev, props.tag));
     };
@@ -44,8 +53,24 @@ const Tag: React.FC<{
         );
     }
 
+    const handleClick = React.useCallback(() => {
+        const items = getItemsTaggedWith(indexManager, props.tag);
+        showListOptionsCallout(target.current, {
+            options: items.map((i) => ({
+                key: i.Id,
+                text: i.getFieldOr('caption', i.Title),
+                data: i,
+            })),
+            allowNewVlaues: false,
+            onSelect: (i) => {
+                showModal(+i.key);
+                hideListOptionsCallout();
+            }
+        })
+    }, [indexManager, target, props.tag])
+    
     return (
-        <div className={styles.tag}>
+        <div className={styles.tag} role="button" onClick={handleClick} ref={target}>
             <span>{props.tag}</span>
             {removeButton}
         </div>
