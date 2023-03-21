@@ -35,11 +35,13 @@ const Tag: React.FC<{
     setItem?: ITagsTemplateProps['setItem'];
 }> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
-    const target = React.useRef(null);
+    const target = React.useRef<HTMLDivElement>(null);
     const handleRemove = (ev: React.MouseEvent<HTMLButtonElement>): void => {
         ev.stopPropagation();
         if (!props.editable) return;
         props.setItem((prev) => removeTag(prev, props.tag));
+        console.log(target.current.parentElement);
+        target.current.parentElement.focus();
     };
 
     let removeButton = null;
@@ -70,7 +72,7 @@ const Tag: React.FC<{
     }, [indexManager, target, props.tag])
     
     return (
-        <div className={styles.tag} role="button" onClick={handleClick} ref={target} tabIndex={-1}>
+        <div className={styles.tag} role="button" onClick={handleClick} ref={target}>
             <span>{props.tag}</span>
             {removeButton}
         </div>
@@ -114,7 +116,7 @@ export const TagsTemplate: React.FC<ITagsTemplateProps> = (props) => {
     }, [props.editable]);
 
     return (
-        <div className={`${styles.container} ${styles.tagsFont}`}>
+        <div className={`${styles.container} ${styles.tagsFont}`} tabIndex={1}>
             {props.tags.map((tag) => (
                 <Tag
                     key={tag}
