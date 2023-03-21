@@ -78,4 +78,5 @@ export const INCREMENTAL_SYNC_CONFIG: IncSyncConfig = {
             type: 'Boolean',
         },
     ],
+    dataKeyField: 'Id',
 };

@@ -18,6 +18,8 @@ import '../styles.scss';
 import { Callout, Dialog, Footer } from 'sp-components';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { SyncService } from '../../../features/incremental-sync';
+import { IFeedbackItemRaw } from '../../../models/IFeedbackItem';
 
 interface IGlobalContextProps {
     indexManager: IndexManager;
@@ -42,7 +44,7 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
     React.useEffect(() => {
         async function run(): Promise<void> {
             // Get normal items
-            const items = (await props.properties.getItems()).map((i) => new Item(i));
+            const items = (await SyncService.getItems<IFeedbackItemRaw>()).map((i) => new Item(i));
             // Get system items, those are cached
             // const systemItems = (await ItemsService.getAllSystemItems()).map(
                 // (i) => new Item(i)

@@ -14,14 +14,12 @@ import { Feedback, IFeedbackProps } from './components/Feedback';
 import { MainService } from './services/main-service';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { IFeedbackConfig } from '../../models/IFeedbackConfig';
-import { syncList } from '../../features/incremental-sync';
-import { IFeedbackItemRaw } from '../../models/IFeedbackItem';
+import { SyncService } from '../../features/incremental-sync';
 import { INCREMENTAL_SYNC_CONFIG } from './constants';
 
 export interface IFeedbackWebPartProps {
     description: string;
     config: IJsonConfig<IFeedbackConfig>;
-    getItems: () => Promise<IFeedbackItemRaw[]>;
 }
 
 export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebPartProps> {
@@ -54,7 +52,7 @@ export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebP
             sp,
             this.properties.config
         );
-        this.properties.getItems = await syncList(sp, this.properties.config?.listName, INCREMENTAL_SYNC_CONFIG)
+        await SyncService.initService(sp, this.properties.config?.listName, INCREMENTAL_SYNC_CONFIG);
     }
 
     protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {

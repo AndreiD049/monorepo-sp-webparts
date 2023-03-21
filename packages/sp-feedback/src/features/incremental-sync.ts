@@ -5,12 +5,13 @@ import { SPFI } from 'sp-preset';
 type Person = { Id: number; Title: string; EMail: string };
 type FieldType = 'Number' | 'String' | 'Person' | 'List' | 'Boolean';
 type FieldValue = number | string | string[] | Person | boolean;
-type Field = { field: string; type: FieldType, key?: string };
+type Field = { field: string; type: FieldType; key?: string };
 export type IncSyncConfig = {
     dbName: string;
     tokenStoreName: string;
     dataStoreName: string;
-    fields?: Field[];
+    dataKeyField: string;
+    fields: Field[];
 };
 
 // IndexedDb Operations
@@ -18,13 +19,13 @@ function createSyncObjectStores(
     dataStoreName: string,
     tokenStoreName: string,
     db: IDBPDatabase,
-    dataKeyField: string,
+    dataKeyField: string
 ): void {
     db.createObjectStore(tokenStoreName);
     db.createObjectStore(dataStoreName, { keyPath: dataKeyField });
 }
 
-async function withRestore<T>(
+async function withSyncFallback<T>(
     dbName: string,
     func: () => Promise<T>
 ): Promise<T> {
@@ -40,12 +41,17 @@ async function openSyncDb(
     dbName: string,
     tokenStoreName: string,
     dataStoreName: string,
-    dataKeyPath: string,
+    dataKeyPath: string
 ): Promise<IDBPDatabase> {
     try {
         return openDB(dbName, undefined, {
             upgrade: (db) =>
-                createSyncObjectStores(dataStoreName, tokenStoreName, db, dataKeyPath),
+                createSyncObjectStores(
+                    dataStoreName,
+                    tokenStoreName,
+                    db,
+                    dataKeyPath
+                ),
             blocking: (_v1, _v2, event) => {
                 const db = event.target as IDBDatabase;
                 db.close();
@@ -161,10 +167,7 @@ function readValue<T>(el: Element, fields: Field[]): T {
     const obj: { [key: string]: FieldValue } = {};
     fields.forEach((f) => {
         const key = f.key || f.field;
-        obj[key] = processFieldValue(
-            el.getAttribute(`ows_${f.field}`),
-            f.type
-        );
+        obj[key] = processFieldValue(el.getAttribute(`ows_${f.field}`), f.type);
     });
     return obj as unknown as T;
 }
@@ -223,48 +226,67 @@ export async function removeLocalCache(dbName: string): Promise<void> {
     return deleteDB(dbName);
 }
 
+// Does the main work
+// Checks if we have a token or items, and syncs the changes that occured since last sync
+// If no token or items. Will do a full sync.
 export async function syncList<T>(
+    db: IDBPDatabase,
     sp: SPFI,
     listName: string,
     config: IncSyncConfig
-): Promise<() => Promise<T[]>> {
-    return withRestore(config.dbName, async () => {
-        const dataKeyPath = config.fields[0].key || config.fields[0].field;
-        const db = await openSyncDb(
-            config.dbName,
-            config.tokenStoreName,
-            config.dataStoreName,
-            dataKeyPath,
+): Promise<void> {
+    const token = await getLocalToken(db, config.tokenStoreName);
+    const items = await getLocalItems<T>(db, config.dataStoreName);
+    if (!isValidToken(token) || !hasItems(items)) {
+        const xml = await getAllListItemsXml(sp, listName, config.fields);
+        const doc = getDocument(xml);
+        const newToken = getRemoteToken(doc);
+        const newItems = parseListItems(doc, config.fields);
+        await setLocalToken(db, config.tokenStoreName, newToken);
+        await setLocalItems(db, config.dataStoreName, newItems);
+    } else {
+        // Get changes and merge them with current items
+        const changes = await getChangesSinceToken(
+            sp,
+            listName,
+            token,
+            config.fields
         );
-        const token = await getLocalToken(db, config.tokenStoreName);
-        const items = await getLocalItems<T>(db, config.dataStoreName);
-        if (!isValidToken(token) || !hasItems(items)) {
-            const xml = await getAllListItemsXml(sp, listName, config.fields);
-            const doc = getDocument(xml);
-            const newToken = getRemoteToken(doc);
+        const doc = getDocument(changes);
+        if (hasChanges(doc)) {
+            // Process deletes
+            const deletes = getDeletes(doc);
+            await deleteLocalItems(db, config.dataStoreName, deletes);
+            // Process changes/inserts
             const newItems = parseListItems(doc, config.fields);
-            await setLocalToken(db, config.tokenStoreName, newToken);
             await setLocalItems(db, config.dataStoreName, newItems);
-        } else {
-            // Get changes and merge them with current items
-            const changes = await getChangesSinceToken(
-                sp,
-                listName,
-                token,
-                config.fields
-            );
-            const doc = getDocument(changes);
-            if (hasChanges(doc)) {
-                // Process deletes
-                const deletes = getDeletes(doc);
-                await deleteLocalItems(db, config.dataStoreName, deletes);
-                // Process changes/inserts
-                const newItems = parseListItems(doc, config.fields);
-                await setLocalItems(db, config.dataStoreName, newItems);
-                const newToken = getRemoteToken(doc);
-                await setLocalToken(db, config.tokenStoreName, newToken);
-            }
+            const newToken = getRemoteToken(doc);
+            await setLocalToken(db, config.tokenStoreName, newToken);
         }
-        return () => getLocalItems<T>(db, config.dataStoreName);
-    });
+    }
 }
+
+type SyncServiceType = {
+    db: IDBPDatabase;
+    config: IncSyncConfig;
+    initService: (sp: SPFI, listName: string, config: IncSyncConfig) => Promise<void>;
+    getItems: <T>() => Promise<T[]>;
+};
+
+export const SyncService: SyncServiceType = {
+    db: null,
+    config: null,
+    initService: async function (sp, listName, config) {
+        return withSyncFallback(config.dbName, async () => {
+            this.config = config;
+            this.db = await openSyncDb(
+                config.dbName,
+                config.tokenStoreName,
+                config.dataStoreName,
+                config.dataKeyField
+            );
+            await syncList(this.db, sp, listName, config);
+        });
+    },
+    getItems: async function<T>() { return getLocalItems<T>(this.db, this.config.dataStoreName) },
+};
