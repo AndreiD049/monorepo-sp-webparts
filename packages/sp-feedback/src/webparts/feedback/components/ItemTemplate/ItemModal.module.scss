@@ -1,0 +1,25 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.modal {
+    min-width: 90vw;
+    height: 80vh;
+    padding: 4px;
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.modalContent {
+    overflow: auto;
+}
+
+.closeButton {
+    height: 26px;
+    width: 26px;
+    padding: 15px 0;
+    align-self: flex-end;
+
+    &:hover {
+        background-color: transparent;
+        color: "[theme: black, default: #000000]";
+    }
+}

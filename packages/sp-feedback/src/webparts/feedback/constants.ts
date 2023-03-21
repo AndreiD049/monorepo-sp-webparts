@@ -77,6 +77,10 @@ export const INCREMENTAL_SYNC_CONFIG: IncSyncConfig = {
             field: 'IsService',
             type: 'Boolean',
         },
+        {
+            field: 'Modified',
+            type: 'String'
+        }
     ],
     dataKeyField: 'Id',
 };

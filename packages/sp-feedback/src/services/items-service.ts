@@ -4,7 +4,7 @@ import { IItemAddResult, IItemUpdateResult, IList, SPFI } from 'sp-preset';
 import { IFeedbackItemRaw } from '../models/IFeedbackItem';
 import { Item } from '../webparts/feedback/item';
 
-const SELECT = ['Id', 'Title', 'Tags', 'Fields', 'IsService', 'Created', 'Author/Id', 'Author/EMail', 'Author/Title']
+const SELECT = ['Id', 'Title', 'Tags', 'Fields', 'IsService', 'Created', 'Author/Id', 'Author/EMail', 'Author/Title', 'Modified']
 const EXPAND = ['Author']
 
 export class ItemsService {

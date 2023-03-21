@@ -10,6 +10,7 @@ export interface IFeedbackItem {
     Fields: IFields;
     IsService: boolean;
     Created: string | Date;
+    Modified: string | Date;
     Author: {
         Id: number;
         EMail: string;

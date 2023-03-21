@@ -8,13 +8,14 @@ import { GlobalContext } from '../Feedback';
 import { isItemEditable, toggleItemEditable } from './editable-item';
 import { ItemProperties, ItemPropertiesEditable } from './ItemProperties';
 import { TagsTemplate } from './TagsTemplate';
-import styles from './ItemTemplate.module.scss';
 import { ConnectDragSource } from 'react-dnd';
+import styles from './ItemTemplate.module.scss';
 
 export interface IItemTemplateProps
     extends React.HTMLAttributes<HTMLDivElement> {
     item: Item;
     source?: ConnectDragSource;
+    collapsible?: boolean;
 }
 
 export const ItemHeaderTemplate: React.FC<{
@@ -32,24 +33,19 @@ export const ItemHeaderTemplate: React.FC<{
     const title = React.useMemo(() => {
         if (props.editable) {
             return (
-                    <TextField
-                        value={props.item.getFieldOr(
-                            'caption',
-                            props.item.Title
-                        )}
-                        onChange={(_ev, value) =>
-                            props.setItem((prev) =>
-                                prev.setField('caption', value)
-                            )
-                        }
-                        width="100%"
-                    />
+                <TextField
+                    value={props.item.getFieldOr('caption', props.item.Title)}
+                    onChange={(_ev, value) =>
+                        props.setItem((prev) => prev.setField('caption', value))
+                    }
+                    width="100%"
+                />
             );
         }
         return (
-                <Text variant="large">
-                    {props.item.getFieldOr('caption', props.item.Title)}
-                </Text>
+            <Text variant="large">
+                {props.item.getFieldOr('caption', props.item.Title)}
+            </Text>
         );
     }, [props.editable, props.item]);
 
@@ -71,12 +67,14 @@ export const ItemBodyTemplate: React.FC<{
     item: Item;
     editable: boolean;
     setItem: React.Dispatch<React.SetStateAction<Item>>;
-}> = (props) => {
+    collapsible?: boolean;
+}> = ({ collapsible = true, ...props }) => {
     const content = React.useRef<HTMLDivElement>(null);
     const [icon, setIcon] = React.useState('DoubleChevronUp');
-    const [collapsed, setCollapsed] = React.useState(true);
+    const [collapsed, setCollapsed] = React.useState(collapsible);
 
     React.useEffect(() => {
+        if (!collapsible) return;
         if (!content.current) return;
         if (!collapsed) {
             content.current.style.maxHeight = '400px';
@@ -121,10 +119,11 @@ export const ItemBodyTemplate: React.FC<{
                 role="button"
                 className={styles.itemDescriptionButton}
                 onClick={() => {
+                    if (!collapsible) return;
                     setCollapsed((prev) => !prev);
                 }}
             >
-                <Icon iconName={icon} />
+                {collapsible && <Icon iconName={icon} />}
                 Description
             </div>
             <div
@@ -132,7 +131,7 @@ export const ItemBodyTemplate: React.FC<{
                 ref={content}
             >
                 <DescriptionEditor
-                    key={`${props.editable}`}
+                    key={`${props.editable}-${props.item?.Modified}`}
                     content={props.item.getFieldOr('text', '')}
                     editable={props.editable}
                     onUpdate={handleChange}
@@ -143,7 +142,7 @@ export const ItemBodyTemplate: React.FC<{
 };
 
 // Save handler
-function saveHandler(saveFunc: () => void): (ev: KeyboardEvent) => void {
+function saveHandler(saveFunc: () => void): ((ev: KeyboardEvent) => void) {
     return function (ev: KeyboardEvent) {
         if (ev.key === 's' && ev.ctrlKey === true) {
             ev.preventDefault();
@@ -152,7 +151,11 @@ function saveHandler(saveFunc: () => void): (ev: KeyboardEvent) => void {
     };
 }
 
-export const ItemTemplate: React.FC<IItemTemplateProps> = (props) => {
+export const ItemTemplate: React.FC<IItemTemplateProps> = ({
+    collapsible = true,
+    ...props
+}) => {
+    const rootEventListener = React.useRef<HTMLDivElement>(null);
     const { indexManager } = React.useContext(GlobalContext);
     const [item, setItem] = React.useState(props.item);
     const editable = React.useMemo(
@@ -175,16 +178,16 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = (props) => {
 
     // Save on ctrl-s
     React.useEffect(() => {
-        if (editable) {
+        if (editable && rootEventListener.current) {
             const handler = saveHandler(() => handleSave());
-            document.addEventListener('keydown', handler);
+            rootEventListener.current.addEventListener('keydown', handler);
 
-            return () => document.removeEventListener('keydown', handler);
+            return () => rootEventListener.current.removeEventListener('keydown', handler);
         }
-    }, [editable, handleSave]);
+    }, [editable, handleSave, rootEventListener]);
 
     return (
-        <div className={styles.container} style={props.style}>
+        <div className={styles.container} style={props.style} ref={rootEventListener} tabIndex={1}>
             <ItemHeaderTemplate
                 item={item}
                 setItem={setItem}
@@ -196,6 +199,7 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = (props) => {
                 item={item}
                 editable={editable}
                 setItem={setItem}
+                collapsible={collapsible}
             />
         </div>
     );

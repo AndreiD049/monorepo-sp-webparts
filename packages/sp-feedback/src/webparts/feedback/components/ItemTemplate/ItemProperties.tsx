@@ -50,7 +50,7 @@ export const ItemPropertiesEditable: React.FC<{
 
     const handleClickValue = React.useCallback(
         (element: HTMLElement, field: string) => {
-            const values = indexManager.getValues(field);
+            const values = indexManager.getValues(field, $eq('is service', 'false'));
             showListOptionsCallout(element, {
                 options: values.map((v) => makeSimpleListOption(v)),
                 allowNewVlaues: true,

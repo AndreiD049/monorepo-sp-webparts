@@ -32,7 +32,7 @@ import { GlobalContext } from '../../Feedback';
 import { FilterBuilder } from '../../FilterBuilder';
 import { GroupByField } from '../../FilterBuilder/GroupByField';
 import { SortByField } from '../../FilterBuilder/SortByField';
-import { useItemModal } from '../../ItemTemplate/ItemModal';
+import { ItemModal } from '../../ItemTemplate/ItemModal';
 import { BOARD, DOUBLE_COL, TRIPLE_COL } from '../../LayoutSelect';
 import { ListView } from '../../ListView';
 import { showSaveFilterDialog } from '../../SaveFilterDialog';
@@ -153,7 +153,6 @@ export const Main: React.FC<IMainProps> = (props) => {
         return viewInfo.appliedLayout;
     }, [indexManager]);
     const { filterComponent, selectedFilters } = useFilterBar();
-    const itemModal = useItemModal();
 
     React.useEffect(() => {
         console.time('filter');
@@ -205,7 +204,7 @@ export const Main: React.FC<IMainProps> = (props) => {
             <div className={styles.filters}>{filterComponent}</div>
 
             {body}
-            {itemModal}
+            <ItemModal />
         </div>
     );
 };

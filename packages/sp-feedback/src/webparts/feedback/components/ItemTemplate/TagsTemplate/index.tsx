@@ -70,7 +70,7 @@ const Tag: React.FC<{
     }, [indexManager, target, props.tag])
     
     return (
-        <div className={styles.tag} role="button" onClick={handleClick} ref={target}>
+        <div className={styles.tag} role="button" onClick={handleClick} ref={target} tabIndex={0}>
             <span>{props.tag}</span>
             {removeButton}
         </div>

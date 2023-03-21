@@ -14,7 +14,8 @@ type SPECIAL_KEYS =
     | 'author id'
     | 'author email'
     | 'author title'
-    | 'created';
+    | 'created'
+    | 'modified';
 export const SPECIAL_FIELDS: SPECIAL_KEYS[] = [
     'title',
     'id',
@@ -25,6 +26,7 @@ export const SPECIAL_FIELDS: SPECIAL_KEYS[] = [
     'author id',
     'author email',
     'author title',
+    'modified'
 ];
 
 export class Item implements IFeedbackItem {
@@ -34,6 +36,7 @@ export class Item implements IFeedbackItem {
     IsService: boolean;
     Author: { Id: number; EMail: string; Title: string };
     Created: Date;
+    Modified: Date;
     Fields: IFields;
 
     constructor(item?: IFeedbackItemRaw | IFeedbackItem) {
@@ -43,6 +46,7 @@ export class Item implements IFeedbackItem {
             this.Tags = item.Tags;
             this.IsService = item.IsService;
             this.Created = new Date(item.Created);
+            this.Modified = new Date(item.Modified);
             this.Author = item.Author;
             if (typeof item.Fields === 'string') {
                 this.Fields = this.readFields(item.Fields) || {};
@@ -170,6 +174,9 @@ function setSpecialFieldValue(
         case 'created':
             result.Created = value as Date;
             break;
+        case 'modified':
+            result.Modified = value as Date;
+            break;
         case 'author id':
             if (!result.Author) {
                 result.Author = { Id: null, EMail: null, Title: null };
@@ -212,6 +219,9 @@ function getSpecialFieldValue<T>(item: Item, field: SPECIAL_KEYS): T {
             break;
         case 'created':
             result = item.Created as unknown as T;
+            break;
+        case 'modified':
+            result = item.Modified as unknown as T;
             break;
         case 'author id':
             result = (item.Author?.Id || null) as unknown as T;
