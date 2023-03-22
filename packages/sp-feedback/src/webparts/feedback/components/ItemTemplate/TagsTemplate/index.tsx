@@ -72,7 +72,7 @@ const Tag: React.FC<{
     }, [indexManager, target, props.tag])
     
     return (
-        <div className={styles.tag} role="button" onClick={handleClick} ref={target}>
+        <div className={styles.tag} role="button" onClick={handleClick} ref={target} tabIndex={1}>
             <span>{props.tag}</span>
             {removeButton}
         </div>
@@ -116,7 +116,7 @@ export const TagsTemplate: React.FC<ITagsTemplateProps> = (props) => {
     }, [props.editable]);
 
     return (
-        <div className={`${styles.container} ${styles.tagsFont}`} tabIndex={1}>
+        <div className={`${styles.container} ${styles.tagsFont}`} tabIndex={0}>
             {props.tags.map((tag) => (
                 <Tag
                     key={tag}

@@ -61,7 +61,7 @@ export const TopMenu: React.FC<ITopMenuProps> = (props) => {
                     style: { color: FeedbackWebPart.theme.palette.white },
                 },
                 onClick: () => {
-                    async function run() {
+                    async function run(): Promise<void> {
                         await removeLocalCache(INCREMENTAL_SYNC_CONFIG.dbName)
                         const db = await openDatabase(DB_NAME, STORE_NAME);
                         await removeCached(db, /.*/);

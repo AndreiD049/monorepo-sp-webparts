@@ -62,11 +62,19 @@ const BoardColumn: React.FC<IBoardColumnProps> = (props) => {
         }),
         drop: (item: { id: number | string }) => {
             props.setMovedItems((prev) => [...prev, item.id]);
-            dispatchItemUpdated(item.id, { [props.groupField]: props.label }, null, () => {
-                props.setMovedItems((prev) => prev.filter((i) => i !== item.id));
-            });
+            dispatchItemUpdated(
+                item.id,
+                { [props.groupField]: props.label },
+                null,
+                () => {
+                    props.setMovedItems((prev) =>
+                        prev.filter((i) => i !== item.id)
+                    );
+                }
+            );
         },
-        canDrop: (item) => props.items.find((i) => i.Id === item.id) === undefined
+        canDrop: (item) =>
+            props.items.find((i) => i.Id === item.id) === undefined,
     });
 
     const dndStyles: React.CSSProperties = React.useMemo(() => {
@@ -78,7 +86,11 @@ const BoardColumn: React.FC<IBoardColumnProps> = (props) => {
     }, [isOver, canDrop]);
 
     return (
-        <div className={`${styles.column} scroll-bar`} style={dndStyles} ref={drop}>
+        <div
+            className={`${styles.column} scroll-bar`}
+            style={dndStyles}
+            ref={drop}
+        >
             <Text className={styles.columnLabel} variant="large" block>
                 {props.label} ({props.items.length})
             </Text>
@@ -100,11 +112,20 @@ export const BoardView: React.FC<IBoardViewProps> = (props) => {
     const [movedItems, setMovedItems] = React.useState<(string | number)[]>([]);
 
     const groupedItems = React.useMemo(
-        () => getGroupedItems(props.items, props.groupField, getFieldSetup(indexManager, props.groupField)),
+        () =>
+            getGroupedItems(
+                props.items,
+                props.groupField,
+                getFieldSetup(indexManager, props.groupField)
+            ),
         [props.items]
     );
     const groupKeys = React.useMemo(
-        () => getGroupKeys(groupedItems, getFieldSetup(indexManager, props.groupField)),
+        () =>
+            getGroupKeys(
+                groupedItems,
+                getFieldSetup(indexManager, props.groupField)
+            ),
         [groupedItems]
     );
 
