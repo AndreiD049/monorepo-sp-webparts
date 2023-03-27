@@ -20,9 +20,12 @@ build.configureWebpack.mergeConfig({
                 emitError: true,
                 exclude: (instance) => {
                     // Sometimes different dependencies use the same package with different versions, if there is no possibility to avoid it, we can skip
-                    const ignoredDuplicates = new Set(['@microsoft/load-themed-styles', '@fluentui/dom-utilities', '@fluentui/theme'])
-                    if (ignoredDuplicates.has(instance.name))
-                        return true;
+                    const ignoredDuplicates = new Set([
+                        '@microsoft/load-themed-styles',
+                        '@fluentui/dom-utilities',
+                        '@fluentui/theme',
+                    ]);
+                    if (ignoredDuplicates.has(instance.name)) return true;
                     return false;
                 },
             })
@@ -39,7 +42,7 @@ build.configureWebpack.mergeConfig({
                 __dirname,
                 'node_modules/@microsoft/load-themed-styles/'
             ),
-            'tslib': path.resolve(
+            tslib: path.resolve(
                 // eslint-disable-next-line no-undef
                 __dirname,
                 'node_modules/tslib/'

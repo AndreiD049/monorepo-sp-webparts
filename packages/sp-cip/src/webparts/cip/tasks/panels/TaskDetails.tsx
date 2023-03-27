@@ -25,9 +25,10 @@ import MainService from '../../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { AttachmentSection } from '../../components/AttachmentSection';
 import { RelativeTasks } from '../../components/RelativeTasks';
-import { Dialog, showDialog } from 'sp-components';
-import { DIALOG_ID_PANEL } from '../../utils/constants';
+import { Callout, Dialog, showDialog } from 'sp-components';
+import { CALLOUT_ID_PANEL, DIALOG_ID_PANEL } from '../../utils/constants';
 import { TimeLog } from '../../components/TimeLog';
+import ResponsibleCell from '../cells/ResponsibleCell';
 
 export const TaskDetails: React.FC = () => {
     const params = useParams();
@@ -75,7 +76,7 @@ export const TaskDetails: React.FC = () => {
     }, []);
 
     const editableInformation = !editable ? (
-        <StackItem>
+        <StackItem style={{ width: '100%' }}>
             <TextField
                 label="Title"
                 value={editData.title}
@@ -176,16 +177,27 @@ export const TaskDetails: React.FC = () => {
                     dialogProps: {
                         title: 'Log time',
                     },
-                    content: (
-                        <TimeLog
-                            task={task}
-                            dialogId={DIALOG_ID_PANEL}
-                        />
-                    ),
+                    content: <TimeLog task={task} dialogId={DIALOG_ID_PANEL} />,
                 }),
         });
         return items;
     }, [editable, editData]);
+
+    const farItems = [
+        {
+            key: 'responsible',
+            text: 'Responsible',
+            onRender: () =>
+                task ? (
+                    <ResponsibleCell
+                        task={task}
+                        disabled={false}
+                        calloutId={CALLOUT_ID_PANEL}
+                        loadingId="details"
+                    />
+                ) : null,
+        },
+    ];
 
     const handleDismiss = React.useCallback(() => {
         try {
@@ -218,6 +230,7 @@ export const TaskDetails: React.FC = () => {
                         },
                     }}
                     items={commandItems}
+                    farItems={farItems}
                 />
                 {task && (
                     <Stack>
@@ -258,6 +271,7 @@ export const TaskDetails: React.FC = () => {
                 )}
             </div>
             <Dialog id={DIALOG_ID_PANEL} />
+            <Callout id={CALLOUT_ID_PANEL} />
             <LoadingAnimation elementId="details" initialOpen />
         </Panel>
     );

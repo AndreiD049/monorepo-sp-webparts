@@ -21,7 +21,7 @@
     "@microsoft/sp-webpart-base": "1.16.1",
     "@rast999/drag-and-drop": "^1.0.4",
     "@rast999/react-movable": "^1.0.6",
-    "@service/sp-cip": "file:../sp-cip",
+    "@service/sp-cip": "file:../service-sp-cip/",
     "idb-proxy": "file:../idb-proxy",
     "json-configuration": "file:../json-config-property-pane-control/",
     "office-ui-fabric-react": "7.199.1",

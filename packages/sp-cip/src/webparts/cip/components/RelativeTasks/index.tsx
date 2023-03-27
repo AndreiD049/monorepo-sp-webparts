@@ -1,9 +1,12 @@
+import { isFinished } from '@service/sp-cip';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { Icon, Label, Link } from 'office-ui-fabric-react';
+import { Icon, Label, Link, PersonaSize } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainService from '../../services/main-service';
+import { formatProgress } from '../../tasks/cells/ProgressCell';
 import { nodeSetOpen } from '../../utils/dom-events';
+import { SimplePersona } from '../SimplePersona';
 import styles from './RelativeTasks.module.scss';
 
 export interface IRelativeTasksProps {
@@ -15,6 +18,23 @@ interface IRelatives {
     parent: ITaskOverview;
     children: ITaskOverview[];
 }
+
+const TaskLine: React.FC<{ task: ITaskOverview }> = (props) => {
+    const isTaskFinished = isFinished(props.task);
+
+    return (
+        <div className={styles.taskLine}>
+            <Icon iconName={isTaskFinished ? 'CompletedSolid' : 'CircleRing'} />
+            <SimplePersona
+                task={props.task}
+                size={PersonaSize.size8}
+                personaProps={{ styles: { details: { paddingRight: 0 } } }}
+            />
+            <span>&quot;{props.task.Title}&quot;</span>
+            <span>({formatProgress(props.task.Progress)})</span>
+        </div>
+    );
+};
 
 export const RelativeTasks: React.FC<IRelativeTasksProps> = (props) => {
     const taskService = MainService.getTaskService();
@@ -62,7 +82,7 @@ export const RelativeTasks: React.FC<IRelativeTasksProps> = (props) => {
                             handleNavigate(`/task/${relatives.parent.Id}`);
                         }}
                     >
-                        {relatives.parent.Title}
+                        <TaskLine task={relatives.parent} />
                     </Link>
                 ) : (
                     <Link disabled>-</Link>
@@ -70,19 +90,21 @@ export const RelativeTasks: React.FC<IRelativeTasksProps> = (props) => {
             </span>
             {relatives.children?.length > 0 && (
                 <span>
-                    {relatives.children.map((c) => (
-                        <span key={c.Id} className={styles.subtask}>
-                            <Icon title="Subtask" iconName="Childof" />
-                            <Link
-                                onClick={() => {
-                                    nodeSetOpen(props.task.Id, true);
-                                    handleNavigate(`/task/${c.Id}`);
-                                }}
-                            >
-                                {c.Title}
-                            </Link>
-                        </span>
-                    ))}
+                    {relatives.children
+                        .sort((a, b) => (a.Id > b.Id ? 1 : -1))
+                        .map((c) => (
+                            <span key={c.Id} className={styles.subtask}>
+                                <Icon title="Subtask" iconName="Childof" />
+                                <Link
+                                    onClick={() => {
+                                        nodeSetOpen(props.task.Id, true);
+                                        handleNavigate(`/task/${c.Id}`);
+                                    }}
+                                >
+                                    <TaskLine task={c} />
+                                </Link>
+                            </span>
+                        ))}
                 </span>
             )}
         </div>

@@ -10,11 +10,11 @@ import { TaskDetails } from '../tasks/panels/TaskDetails';
 import { LoadingAnimation } from './utils/LoadingAnimation';
 import MainService from '../services/main-service';
 import styles from './Cip.module.scss';
-import { DIALOG_ID, SELECTED_TEAM_KEY } from '../utils/constants';
+import { CALLOUT_ID, DIALOG_ID, SELECTED_TEAM_KEY } from '../utils/constants';
 import useWebStorage from 'use-web-storage-api';
 import { CipTimer } from './CipTimer';
 import { ActionLogPanel } from './ActionLogPanel';
-import { Dialog } from 'sp-components';
+import { Callout, Dialog } from 'sp-components';
 
 interface ICipProps {
     properties: ICipWebPartProps;
@@ -94,7 +94,8 @@ const Cip: React.FC<ICipProps> = (props) => {
                         <Route path="actionlog" element={<ActionLogPanel />} />
                     </Route>
                 </Routes>
-                <Dialog id={DIALOG_ID}/>
+                <Dialog id={DIALOG_ID} />
+                <Callout id={CALLOUT_ID} />
                 <CipTimer />
             </HashRouter>
         </GlobalContext.Provider>

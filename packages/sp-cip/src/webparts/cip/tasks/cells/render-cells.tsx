@@ -24,13 +24,18 @@ export const RenderCell: React.FC<IRenderCellProps> = (props) => {
         case 'title':
             return <TitleCell node={props.node} nestLevel={nestLevel} />;
         case 'responsible':
-            return <ResponsibleCell node={props.node} />;
+            return (
+                <ResponsibleCell
+                    task={props.node.getTask()}
+                    disabled={props.node.Display === 'disabled'}
+                />
+            );
         case 'status':
             return <StatusCell node={props.node} />;
         case 'priority':
             return <PriorityCell node={props.node} />;
         case 'actions':
-            return <ActionsCell node={props.node} />
+            return <ActionsCell node={props.node} />;
         case 'progress':
             return <ProgressCell node={props.node} />;
         case 'duedate':
@@ -42,7 +47,9 @@ export const RenderCell: React.FC<IRenderCellProps> = (props) => {
         default:
             return (
                 <Text variant="medium" block>
-                    {props.node.getTask()[props.fieldName as keyof ITaskOverview] + ''}
+                    {props.node.getTask()[
+                        props.fieldName as keyof ITaskOverview
+                    ] + ''}
                 </Text>
             );
     }

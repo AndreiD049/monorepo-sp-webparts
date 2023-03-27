@@ -1,7 +1,7 @@
 @import '~@fluentui/react/dist/sass/References.scss';
 
 .container {
-    margin-bottom: .5em;
+    margin-bottom: 0.5em;
 }
 
 .parent {
@@ -12,8 +12,16 @@
 
 .subtask {
     display: block;
-    margin-left: .4em;
+    margin-left: 0.4em;
     display: flex;
     flex-flow: row nowrap;
     gap: 4px;
+}
+
+.taskLine {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-start;
 }

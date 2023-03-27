@@ -16,6 +16,10 @@ export interface IProgressCellProps {
     node: TaskNode;
 }
 
+export function formatProgress(value: number): string {
+    return `${Math.round(value * 100)}%`;
+}
+
 const ProgressCellCallout: React.FC<IProgressCellProps> = (props) => {
     const { currentUser } = React.useContext(GlobalContext);
     const taskService = MainService.getTaskService();
@@ -29,7 +33,10 @@ const ProgressCellCallout: React.FC<IProgressCellProps> = (props) => {
             });
             loadingStart();
             if (value === 1) {
-                const newItem = await finishTask(props.node.getTask(), currentUser.Id);
+                const newItem = await finishTask(
+                    props.node.getTask(),
+                    currentUser.Id
+                );
                 taskUpdated(newItem);
                 if (newItem.ParentId) {
                     taskUpdated(await taskService.getTask(newItem.ParentId));
@@ -41,7 +48,7 @@ const ProgressCellCallout: React.FC<IProgressCellProps> = (props) => {
                 await actionService.addAction(
                     props.node.Id,
                     'Progress',
-                    `${Math.round(value * 100)}%`,
+                    formatProgress(value),
                     currentUser.Id,
                     new Date().toISOString()
                 );
@@ -101,10 +108,9 @@ export const ProgressCell: React.FC<IProgressCellProps> = (props) => {
             onClick={handleClick}
             disabled={isDisabled}
         >
-            <Text
-                variant="medium"
-                className={styles['progress-value']}
-            >{`${Math.round(props.node.getTask()?.Progress * 100)}%`}</Text>
+            <Text variant="medium" className={styles['progress-value']}>
+                {formatProgress(props.node.getTask()?.Progress)}
+            </Text>
             <div
                 className={`${styles['progress-bar']} ${
                     isDisabled ? styles.disabled : ''

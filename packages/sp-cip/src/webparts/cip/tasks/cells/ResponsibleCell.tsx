@@ -1,3 +1,4 @@
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import {
     IPersonaProps,
     Persona,
@@ -7,14 +8,16 @@ import {
     Text,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { hideCallout, showCallout } from 'sp-components';
+import { SimplePersona } from '../../components/SimplePersona';
 import {
     loadingStart,
     loadingStop,
 } from '../../components/utils/LoadingAnimation';
 import MainService from '../../services/main-service';
-import { calloutVisibility, taskUpdated } from '../../utils/dom-events';
+import { CALLOUT_ID } from '../../utils/constants';
+import { taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
-import { TaskNode } from '../graph/TaskNode';
 import { TaskNodeContext } from '../TaskNodeContext';
 import styles from './Cells.module.scss';
 
@@ -46,26 +49,24 @@ const ResponsibleCellCallout: React.FC<IResponsibleCellProps> = (props) => {
 
     const handleClick = React.useCallback(
         (newId: number) => async () => {
-            loadingStart('default');
-            calloutVisibility({ visible: false });
-            const task = props.node.getTask();
+            loadingStart(props.loadingId || 'default');
+            hideCallout(props.calloutId);
+            const task = props.task;
             await taskService.updateTask(task.Id, {
                 ResponsibleId: newId,
             });
-            const newTask = await taskService.getTask(props.node.Id);
+            const newTask = await taskService.getTask(task.Id);
             await actionService.addAction(
-                props.node.Id,
+                task.Id,
                 'Responsible',
-                `${props.node.getTask().Responsible.Title}|${
-                    newTask.Responsible.Title
-                }`,
+                `${task.Responsible.Title}|${newTask.Responsible.Title}`,
                 currentUser.Id,
                 new Date().toISOString()
             );
             taskUpdated(newTask);
-            loadingStop('default');
+            loadingStop(props.loadingId || 'default');
         },
-        [props.node]
+        [props.task]
     );
 
     const userElements = React.useMemo(() => {
@@ -112,39 +113,37 @@ const ResponsibleCellCallout: React.FC<IResponsibleCellProps> = (props) => {
 };
 
 type IResponsibleCellProps = {
-    node: TaskNode;
+    task: ITaskOverview;
+    disabled?: boolean;
+    calloutId?: string;
+    loadingId?: string;
 };
 
 const ResponsibleCell = (props: IResponsibleCellProps): JSX.Element => {
     const { isTaskFinished } = React.useContext(TaskNodeContext);
-    const task = props.node.getTask();
+    const calloutId = props.calloutId || CALLOUT_ID;
     const elemRef = React.useRef(null);
 
-    const handleClick = React.useCallback(
-        (evt) => {
-            calloutVisibility({
-                target: elemRef,
-                visible: true,
-                RenderComponent: ResponsibleCellCallout,
-                componentProps: props,
-            });
-        },
-        [props.node]
-    );
+    const handleClick = React.useCallback(() => {
+        showCallout({
+            id: calloutId,
+            content: (
+                <ResponsibleCellCallout {...props} calloutId={calloutId} />
+            ),
+            calloutProps: {
+                target: elemRef.current,
+            },
+        });
+    }, [props.task]);
 
     return (
         <button
             className={`${styles.button} ${styles.responsible_button}`}
-            disabled={props.node.Display === 'disabled' || isTaskFinished}
+            disabled={props.disabled || isTaskFinished}
             ref={elemRef}
             onClick={handleClick}
         >
-            <Persona
-                text={task.Responsible.Title}
-                size={PersonaSize.size24}
-                imageUrl={`/_layouts/15/userphoto.aspx?AccountName=${task.Responsible.EMail}&Size=M`}
-                title={task.Responsible.Title}
-            />
+            <SimplePersona task={props.task} />
         </button>
     );
 };
