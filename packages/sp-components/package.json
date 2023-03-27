@@ -4,12 +4,12 @@
   "description": "Shared components for Sharepoint Framework",
   "type": "module",
   "main": "dist/index.js",
+  "author": "Dimitrascu Andrei",
+  "license": "MIT",
   "scripts": {
     "build": "rollup -c --environment BUILD:production",
     "dev": "rollup -c --watch"
   },
-  "author": "Dimitrascu Andrei",
-  "license": "MIT",
   "devDependencies": {
     "@microsoft/sp-component-base": "1.16.1",
     "@rollup/plugin-node-resolve": "^15.0.0",
@@ -17,29 +17,31 @@
     "node-sass": "^7.0.3",
     "office-ui-fabric-react": "7.199.1",
     "postcss": "^8.4.18",
-    "react": "17.0.1",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
     "rollup": "^3.2.2",
     "rollup-plugin-cleaner": "^1.0.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-typescript2": "^0.34.1",
-    "sp-preset": "^2.0.19",
-    "sp-react-notifications": "^1.0.23",
+    "sp-preset": "file:../sp-preset/",
+    "sp-react-notifications": "file:../sp-notifications/",
     "typescript": "^4.8.4"
   },
   "peerDependencies": {
     "office-ui-fabric-react": "7.199.1",
-    "react": "17.0.1",
-    "sp-react-notifications": "^1.0.23"
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "sp-react-notifications": "file:../sp-notifications/"
   },
   "dependencies": {
-    "@service/sp-cip": "^1.0.0",
-    "@service/sp-tasks": "^1.0.0",
-    "colored-text": "^1.0.0",
+    "@service/sp-cip": "file:../service-sp-cip/",
+    "@service/sp-tasks": "file:../service-sp-tasks/",
     "@tiptap/extension-mention": "^2.0.0-beta.212",
     "@tiptap/pm": "^2.0.0-beta.212",
     "@tiptap/react": "^2.0.0-beta.212",
     "@tiptap/starter-kit": "^2.0.0-beta.212",
-    "@tiptap/suggestion": "^2.0.0-beta.212"
+    "@tiptap/suggestion": "^2.0.0-beta.212",
+    "colored-text": "file:../colored-text/"
   }
 }
