@@ -129,7 +129,7 @@ export const DueDateCell = ({ node }: { node: TaskNode }): JSX.Element => {
             'days'
         );
         // round days
-        dur = dur.set({days: Math.ceil(dur.days)}).normalize();
+        dur = dur.set({ days: Math.ceil(dur.days) }).normalize();
         const durArray = [
             { type: 'year', value: dur.years },
             { type: 'month', value: dur.months },
@@ -149,6 +149,9 @@ export const DueDateCell = ({ node }: { node: TaskNode }): JSX.Element => {
     }, [node, textRef]);
 
     const dateClassName = React.useMemo(() => {
+        if (node.getTask().FinishDate) {
+            return '';
+        }
         const due = new Date(node.getTask().DueDate);
         const today = new Date();
         const diff =

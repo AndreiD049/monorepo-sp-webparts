@@ -1,12 +1,13 @@
 @import '~@fluentui/react/dist/sass/References.scss';
 
-$buttonSide: 30px;
+$buttonSide: 33px;
 
 .round-button {
+    padding: 0;
+    overflow: hidden;
     border-radius: 20px;
-    background-color: "[theme: neutralTertiaryAlt, default: #3c3c3c]";
-    border: 1px solid;
-    border-color: "[theme: neutralQuaternary, default: #666666]";
+    background-color: '[theme: neutralTertiaryAlt, default: #3c3c3c]';
+    border: none;
     outline: none;
     width: $buttonSide;
     height: $buttonSide;
@@ -16,7 +17,7 @@ $buttonSide: 30px;
     justify-content: center;
     user-select: none;
     cursor: pointer;
-    transition: background-color .2s ease-out;
+    transition: background-color 0.2s ease-out;
     font-size: 1.2em;
     position: relative;
 
@@ -27,7 +28,7 @@ $buttonSide: 30px;
     }
 
     &:hover {
-        background-color: "[theme: neutralTertiary, default: #666666]";
+        background-color: '[theme: neutralTertiary, default: #666666]';
     }
 
     &.round-open-button {
@@ -51,14 +52,14 @@ $buttonSide: 30px;
 }
 
 .title__front-buttons_subtasks_none {
-    margin-right: .8em;
+    margin-right: 0.8em;
 }
 
 .title__subtask-counter {
     line-height: $buttonSide;
     display: flex;
     flex-flow: row nowrap;
-    font-size: .9em;
+    font-size: 0.9em;
     word-break: keep-all;
 }
 
@@ -87,12 +88,12 @@ $buttonSide: 30px;
     min-width: 50px;
     display: flex;
     flex-flow: row nowrap;
-    gap: .5em;
+    gap: 0.5em;
 }
 
 .action-buttons-container {
     opacity: 0.5;
-    transition: opacity .2s;
+    transition: opacity 0.2s;
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
@@ -105,8 +106,8 @@ $buttonSide: 30px;
     &__action-button {
         width: 1.5em;
         height: 1.5em;
-        margin-right: .5em;
-        
+        margin-right: 0.5em;
+
         i {
             font-size: 1em;
         }
@@ -118,13 +119,13 @@ $buttonSide: 30px;
 }
 
 .callout {
-  padding: .5em;
+    padding: 0.5em;
 }
 
 .center-content {
     display: flex;
     flex-flow: column nowrap;
-    align-items:  stretch;
+    align-items: stretch;
 }
 
 .callout-progress {
@@ -146,8 +147,8 @@ $buttonSide: 30px;
 .progress {
     position: relative;
     width: 100%;
-    color: "[theme: white, default: #fff]";
-    background-color: "[theme: neutralQuaternaryAlt, default: #fff]" !important;
+    color: '[theme: white, default: #fff]';
+    background-color: '[theme: neutralQuaternaryAlt, default: #fff]' !important;
     border: 1px solid lightgray;
     text-align: start;
 
@@ -160,7 +161,7 @@ $buttonSide: 30px;
 
     &-bar {
         position: absolute;
-        background-color: "[theme: themeSecondary, default: #a4262c]";
+        background-color: '[theme: themeSecondary, default: #a4262c]';
         height: 100%;
         z-index: 1;
         top: 0;
@@ -169,8 +170,8 @@ $buttonSide: 30px;
     }
 
     .disabled {
-        color:  "[theme: neutralTertiary, default: #f4f4f4]";
-        background-color:  "[theme: neutralLight, default: #f4f4f4]";
+        color: '[theme: neutralTertiary, default: #f4f4f4]';
+        background-color: '[theme: neutralLight, default: #f4f4f4]';
     }
 }
 
@@ -188,7 +189,7 @@ $buttonSide: 30px;
 }
 
 .responsible_user {
-    padding: .3em;
+    padding: 0.3em;
     cursor: pointer;
     display: block;
     background: none;
@@ -196,7 +197,7 @@ $buttonSide: 30px;
     width: 100%;
 
     &:hover {
-        background-color: "[theme: neutralLighter, default: #f4f4f4]";
+        background-color: '[theme: neutralLighter, default: #f4f4f4]';
     }
 }
 
@@ -220,7 +221,7 @@ $buttonSide: 30px;
 
 .dueDateDurationText {
     width: 100%;
-    color: "[theme: neutralTertiary, default: lightgray]";
+    color: '[theme: neutralTertiary, default: lightgray]';
     white-space: pre;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -191,7 +191,7 @@ export const TaskDetails: React.FC = () => {
                 task ? (
                     <ResponsibleCell
                         task={task}
-                        disabled={false}
+                        disabled={task.FinishDate ? true : false}
                         calloutId={CALLOUT_ID_PANEL}
                         loadingId="details"
                     />

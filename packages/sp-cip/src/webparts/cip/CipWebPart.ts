@@ -29,7 +29,7 @@ interface IConfiguration {
     teamsList: {
         name: string;
         fieldName: string;
-    }
+    };
     remotes: IRemoteSource[];
     additionalEmails?: string[];
 }
@@ -78,7 +78,6 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
             // Cleanup expired actions from past
             const db = await openDatabase(DB_NAME, STORE_NAME);
             await removeExpired(db);
-            
         } catch (err) {
             SPnotify({
                 message: err.toString(),

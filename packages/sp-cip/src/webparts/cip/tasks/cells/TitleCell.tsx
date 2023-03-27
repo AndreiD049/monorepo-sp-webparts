@@ -1,3 +1,5 @@
+import { isFinished } from '@service/sp-cip';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import {
     DefaultButton,
     Icon,
@@ -7,37 +9,71 @@ import {
     Text,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { finishTask } from '../../utils/task';
-import useParentStroke from '../../components/ParentStroke';
-import { TaskNode } from '../graph/TaskNode';
-import { nodeSetOpen, taskUpdated } from '../../utils/dom-events';
 import { useNavigate } from 'react-router';
+import { hideDialog, showDialog } from 'sp-components';
+import useParentStroke from '../../components/ParentStroke';
+import Pill from '../../components/pill/Pill';
 import {
     loadingStart,
     loadingStop,
 } from '../../components/utils/LoadingAnimation';
-import { TaskNodeContext } from '../TaskNodeContext';
-import Pill from '../../components/pill/Pill';
 import MainService from '../../services/main-service';
-import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { isFinished } from '@service/sp-cip';
-import { GlobalContext } from '../../utils/GlobalContext';
-import { hideDialog, showDialog } from 'sp-components';
-import styles from './Cells.module.scss';
 import { DIALOG_ID } from '../../utils/constants';
+import { nodeSetOpen, taskUpdated } from '../../utils/dom-events';
+import { GlobalContext } from '../../utils/GlobalContext';
+import { finishTask } from '../../utils/task';
+import { TaskNode } from '../graph/TaskNode';
+import { TaskNodeContext } from '../TaskNodeContext';
+import styles from './Cells.module.scss';
 
 interface ICheckExpandButtonProps
     extends React.HTMLAttributes<HTMLButtonElement> {
     node: TaskNode;
 }
 
-const SubtaskCounter: React.FC<{ item: ITaskOverview }> = ({ item }) => {
+const SliceCircle: React.FC<{ completed: number; total: number }> = ({
+    completed,
+    total,
+}) => {
+    const { theme } = React.useContext(GlobalContext);
+    const radius = 47;
+    const circumference = 2 * Math.PI * radius;
+    const progress = completed / total;
+    const strokeDashoffset = circumference * (1 - progress);
+
     return (
-        <div className={styles['title__subtask-counter']}>
-            <span>{item.FinishedSubtasks}</span>
-            <span className={styles['title__subtask-delimiter']}>|</span>
-            <span>{item.Subtasks}</span>
-        </div>
+        <svg viewBox="0 0 100 100" height="100%">
+            <circle
+                cx="50"
+                cy="50"
+                r={radius}
+                fill="none"
+                stroke="#ddd"
+                strokeWidth="10"
+                transform="rotate(-90 50 50)"
+            />
+            <circle
+                cx="50"
+                cy="50"
+                r={radius}
+                fill="none"
+                stroke={theme.palette.themePrimary}
+                strokeWidth="10"
+                strokeDasharray={`${circumference} ${circumference}`}
+                strokeDashoffset={strokeDashoffset}
+                transform="rotate(-90 50 50)"
+            />
+            <text
+                x="50"
+                y="50"
+                textAnchor="middle"
+                dominantBaseline="central"
+                fontWeight="bold"
+                fontSize="2em"
+            >
+                {`${completed}/${total}`}
+            </text>
+        </svg>
     );
 };
 
@@ -70,7 +106,12 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
 
     const content = React.useMemo(() => {
         if (item.Subtasks > 0 && item.FinishedSubtasks !== item.Subtasks) {
-            return <SubtaskCounter item={item} />;
+            return (
+                <SliceCircle
+                    completed={item.FinishedSubtasks}
+                    total={item.Subtasks}
+                />
+            );
         } else {
             return (
                 <Icon iconName={`${isTaskFinished ? 'Cancel' : 'CheckMark'}`} />
@@ -264,7 +305,9 @@ export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
                     }
                 }}
             />
-            {node.isOrphan && <Pill value="Subtask" style={{  minWidth: '75px' }} />}
+            {node.isOrphan && (
+                <Pill value="Subtask" style={{ minWidth: '75px' }} />
+            )}
             <div className={styles['title-cell']}>
                 <Text
                     variant="medium"
