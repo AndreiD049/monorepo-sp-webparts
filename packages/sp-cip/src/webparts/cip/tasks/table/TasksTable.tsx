@@ -1,8 +1,10 @@
 import {
     DetailsList,
     DetailsListLayoutMode,
+    ScrollablePane,
     SelectionMode,
-    Separator,
+    Sticky,
+    StickyPositionType,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import CipCommandBar from '../../components/command-bar/CipCommandBar';
@@ -21,7 +23,6 @@ export interface ITasksTableProps {
 }
 
 const TasksTable: React.FC<ITasksTableProps> = (props) => {
-    const tableRef = React.useRef(null);
     const { CalloutComponent } = useCallout();
     const [filters, dispatch] = React.useReducer(filtersReducer, {
         search: '',
@@ -49,15 +50,6 @@ const TasksTable: React.FC<ITasksTableProps> = (props) => {
 
     const { groups, groupProps } = useGroups(items, showCategories);
 
-    /** Resize table to fit to current screen. Avoid showing vertical scrollbar */
-    /**
-    React.useEffect(() => {
-        const el: HTMLDivElement = tableRef.current.querySelector('.ms-DetailsList');
-        const rect = el.getBoundingClientRect();
-        el.style.maxHeight = `${window.innerHeight - rect.top - 14}px`;
-    }, [tableRef.current, items]);
-     */
-
     return (
         <>
             <CipCommandBar
@@ -71,51 +63,51 @@ const TasksTable: React.FC<ITasksTableProps> = (props) => {
                 }
                 onShowCategoriesToggle={handleToggleShowCategories}
             />
-            <div ref={tableRef}>
-                <DetailsList
+            <div className={styles.tableWrapper}>
+                <ScrollablePane
+                    className={styles.scrollbar}
                     styles={{
-                        root: {
-                            overflowX: 'scroll',
-                            width: '100%',
-                            selectors: {
-                                '& [role=grid]': {
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'start',
-                                    height: '70vh',
+                        stickyAbove: { zIndex: 999 },
+                        contentContainer: { className: 'test' },
+                    }}
+                >
+                    <DetailsList
+                        styles={{
+                            root: {
+                                display: 'initial',
+                                '& div[role="grid"]': {
+                                    paddingBottom: '40px',
                                 },
                             },
-                        },
-                        headerWrapper: {
-                            flex: '0 0 auto',
-                        },
-                        contentWrapper: {
-                            flex: '1 1 auto',
-                            overflowY: 'auto',
-                            overflowX: 'hidden',
-                            minWidth: '100%',
-                            paddingBottom: '4em'
-                        },
-                    }}
-                    className={styles.table}
-                    groups={groups}
-                    groupProps={groupProps}
-                    layoutMode={DetailsListLayoutMode.fixedColumns}
-                    selectionMode={SelectionMode.none}
-                    onRenderDetailsFooter={() => <Separator styles={{ root: { width: '100%' } }} />}
-                    columns={columns}
-                    items={items}
-                    onRenderRow={(props) => (
-                        <Task
-                            isFiltered={filters.search !== ''}
-                            rowProps={props}
-                            node={props.item.data}
-                            style={{
-                                marginLeft: showCategories ? '36px' : '0px',
-                            }}
-                        />
-                    )}
-                />
+                        }}
+                        className={styles.table}
+                        groups={groups}
+                        groupProps={groupProps}
+                        layoutMode={DetailsListLayoutMode.fixedColumns}
+                        selectionMode={SelectionMode.none}
+                        onRenderDetailsHeader={(props, defaultRender) => {
+                            return (
+                                <Sticky
+                                    stickyPosition={StickyPositionType.Header}
+                                >
+                                    {defaultRender(props)}
+                                </Sticky>
+                            );
+                        }}
+                        columns={columns}
+                        items={items}
+                        onRenderRow={(props) => (
+                            <Task
+                                isFiltered={filters.search !== ''}
+                                rowProps={props}
+                                node={props.item.data}
+                                style={{
+                                    marginLeft: showCategories ? '36px' : '0px',
+                                }}
+                            />
+                        )}
+                    />
+                </ScrollablePane>
             </div>
             {CalloutComponent}
         </>

@@ -1,5 +1,4 @@
 import { isFinished } from '@service/sp-cip';
-import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import {
     DefaultButton,
     Icon,
