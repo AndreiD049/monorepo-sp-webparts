@@ -1,4 +1,4 @@
-import { IncSyncConfig } from "../../features/incremental-sync";
+import { IncSyncConfig } from '../../features/incremental-sync';
 
 export const DB_NAME = 'Spfx_Feedback';
 export const STORE_NAME = `${location.origin}/${location.pathname}`;
@@ -37,6 +37,8 @@ export const FORM_FIELD_SETUP = 'FB:/FORM_FIELD_SETUP';
 export const FIELD_VALUES = 'FB:/FIELD_VALUES';
 
 export const ADMINS = 'FB:/Administrators';
+
+export const EXCLUDED_PROPERTIES_RE = /text|caption|^\$/;
 
 // Drag & Drop item types
 export const ITEM_TYPES = {
@@ -79,8 +81,8 @@ export const INCREMENTAL_SYNC_CONFIG: IncSyncConfig = {
         },
         {
             field: 'Modified',
-            type: 'String'
-        }
+            type: 'String',
+        },
     ],
     dataKeyField: 'Id',
 };

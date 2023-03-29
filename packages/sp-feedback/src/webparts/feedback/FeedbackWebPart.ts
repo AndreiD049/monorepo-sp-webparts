@@ -16,6 +16,7 @@ import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { IFeedbackConfig } from '../../models/IFeedbackConfig';
 import { SyncService } from '../../features/incremental-sync';
 import { INCREMENTAL_SYNC_CONFIG } from './constants';
+import { azureDevopsService } from '../../features/azure-integration';
 
 export interface IFeedbackWebPartProps {
     description: string;
@@ -47,12 +48,19 @@ export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebP
                 }),
             ]);
 
-        const sp = FeedbackWebPart.SPBuilder.getSP(this.properties.config?.rootUrl);
-        MainService.initService(
-            sp,
-            this.properties.config
+        const sp = FeedbackWebPart.SPBuilder.getSP(
+            this.properties.config?.rootUrl
         );
-        await SyncService.initService(sp, this.properties.config?.listName, INCREMENTAL_SYNC_CONFIG);
+        MainService.initService(sp, this.properties.config);
+        await SyncService.initService(
+            sp,
+            this.properties.config?.listName,
+            INCREMENTAL_SYNC_CONFIG
+        );
+        azureDevopsService.init(
+            this.properties.config?.azureDevopsUrl,
+            this.properties.config?.azureDevopsToken
+        );
     }
 
     protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {

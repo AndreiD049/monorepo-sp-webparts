@@ -3,4 +3,6 @@ export interface IFeedbackConfig {
     listName: string;
     attachmentsRoot: string;
     supportEmail: string;
+    azureDevopsUrl?: string;
+    azureDevopsToken?: string;
 }

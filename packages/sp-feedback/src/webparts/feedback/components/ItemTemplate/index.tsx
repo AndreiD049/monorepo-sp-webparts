@@ -10,6 +10,11 @@ import { ItemProperties, ItemPropertiesEditable } from './ItemProperties';
 import { TagsTemplate } from './TagsTemplate';
 import { ConnectDragSource } from 'react-dnd';
 import styles from './ItemTemplate.module.scss';
+import { EXCLUDED_PROPERTIES_RE } from '../../constants';
+import {
+    AzureFields,
+    cachedDevopsService,
+} from '../../../../features/azure-integration';
 
 export interface IItemTemplateProps
     extends React.HTMLAttributes<HTMLDivElement> {
@@ -90,7 +95,10 @@ export const ItemBodyTemplate: React.FC<{
     };
 
     const properties = React.useMemo(() => {
-        const properties = objectToTable(props.item.Fields, /text|caption/);
+        const properties = objectToTable(
+            props.item.Fields,
+            EXCLUDED_PROPERTIES_RE
+        );
         if (props.editable) {
             return (
                 <ItemPropertiesEditable
@@ -102,7 +110,10 @@ export const ItemBodyTemplate: React.FC<{
         }
         return (
             <ItemProperties
-                properties={objectToTable(props.item.Fields, /text|caption/)}
+                properties={objectToTable(
+                    props.item.Fields,
+                    EXCLUDED_PROPERTIES_RE
+                )}
             />
         );
     }, [props.editable, props.item]);
@@ -114,7 +125,17 @@ export const ItemBodyTemplate: React.FC<{
                 editable={props.editable}
                 setItem={props.setItem}
             />
-            {properties}
+            <div>
+                <div>{properties}</div>
+                {cachedDevopsService.isActive &&
+                    props.item.getField(AzureFields.title) && (
+                        <div>
+                            {props.item.getField(AzureFields.title)} -{' '}
+                            {props.item.getField(AzureFields.state)} (
+                            {props.item.getField(AzureFields.type)})
+                        </div>
+                    )}
+            </div>
             <div
                 role="button"
                 className={styles.itemDescriptionButton}
@@ -142,7 +163,7 @@ export const ItemBodyTemplate: React.FC<{
 };
 
 // Save handler
-function saveHandler(saveFunc: () => void): ((ev: KeyboardEvent) => void) {
+function saveHandler(saveFunc: () => void): (ev: KeyboardEvent) => void {
     return function (ev: KeyboardEvent) {
         if (ev.key === 's' && ev.ctrlKey === true) {
             ev.preventDefault();
@@ -159,7 +180,8 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = ({
     const { indexManager } = React.useContext(GlobalContext);
     const [item, setItem] = React.useState(props.item);
     const editable = React.useMemo(
-        () => props.item ? isItemEditable(props.item.Id, indexManager) : false,
+        () =>
+            props.item ? isItemEditable(props.item.Id, indexManager) : false,
         [props.item, indexManager]
     );
 
@@ -184,12 +206,21 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = ({
             const handler = saveHandler(() => handleSave());
             rootEventListener.current.addEventListener('keydown', handler);
 
-            return () => rootEventListener.current.removeEventListener('keydown', handler);
+            return () =>
+                rootEventListener.current.removeEventListener(
+                    'keydown',
+                    handler
+                );
         }
     }, [editable, handleSave, rootEventListener]);
 
     return (
-        <div className={styles.container} style={props.style} ref={rootEventListener} tabIndex={1}>
+        <div
+            className={styles.container}
+            style={props.style}
+            ref={rootEventListener}
+            tabIndex={1}
+        >
             <ItemHeaderTemplate
                 item={item || new Item()}
                 setItem={setItem}

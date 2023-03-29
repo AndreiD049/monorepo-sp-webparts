@@ -1,5 +1,6 @@
 import { ActionButton } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { EXCLUDED_PROPERTIES_RE } from '../../constants';
 import { $eq } from '../../indexes/filter';
 import { Item } from '../../item';
 import { GlobalContext } from '../Feedback';
@@ -50,7 +51,10 @@ export const ItemPropertiesEditable: React.FC<{
 
     const handleClickValue = React.useCallback(
         (element: HTMLElement, field: string) => {
-            const values = indexManager.getValues(field, $eq('is service', 'false'));
+            const values = indexManager.getValues(
+                field,
+                $eq('is service', 'false')
+            );
             showListOptionsCallout(element, {
                 options: values.map((v) => makeSimpleListOption(v)),
                 allowNewVlaues: true,
@@ -70,13 +74,19 @@ export const ItemPropertiesEditable: React.FC<{
     const handleClickNewField = React.useCallback(
         (element: HTMLButtonElement) => {
             const fields = indexManager.getFields($eq('isservice', 'false'));
+            const nonSpecialFields = fields.filter(
+                (v) => !EXCLUDED_PROPERTIES_RE.test(v)
+            );
+            console.log(nonSpecialFields);
             showListOptionsCallout(element, {
-                options: fields.map((f) => makeSimpleListOption(f)),
+                options: nonSpecialFields.map((f) => makeSimpleListOption(f)),
                 allowNewVlaues: true,
                 onSelect: (opt) => {
-                    props.setItem((prev) => prev.setField(opt.key.toString(), null));
+                    props.setItem((prev) =>
+                        prev.setField(opt.key.toString(), null)
+                    );
                     hideListOptionsCallout();
-                }
+                },
             });
         },
         [props.item, props.setItem, indexManager]
