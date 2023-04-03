@@ -14,7 +14,7 @@
 .comment {
     padding: .2em 0;
     font-style: italic;
-    white-space: pre;
+    white-space: pre-wrap;
     background-color: "[theme: themeLighterAlt, default: #f0d3d4]";
     padding: 2px 8px;
 }
