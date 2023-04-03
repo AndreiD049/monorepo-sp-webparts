@@ -25,8 +25,9 @@ const iconButtonStyles = {
 };
 
 export const ActionLogTime: React.FC<IActionLogTimeProps> = (props) => {
-    const [logged, setLogged] = React.useState(0);
-    const [comment, setComment] = React.useState('');
+  const { currentUser } = React.useContext(GlobalContext);
+  const [logged, setLogged] = React.useState(0);
+  const [comment, setComment] = React.useState('');
 
   React.useEffect(() => {
     const indexOfPipe = props.action.Comment.indexOf('|');
@@ -42,17 +43,19 @@ export const ActionLogTime: React.FC<IActionLogTimeProps> = (props) => {
     })
   };
 
-    return (
-        <div className={styles.container}>
-            <div className={styles.topHeader}>
-                <div>Time log: {formatHours(logged)} hour(s)</div>
-                <IconButton styles={iconButtonStyles} onClick={handleEdit} iconProps={{ iconName: 'Edit' }} />
-            </div>
-            {comment && (
-                <div className={styles.comment}>
-                    <Text variant="medium">{comment}</Text>
-                </div>
-            )}
+  return (
+    <div className={styles.container}>
+      <div className={styles.topHeader}>
+        <div>Time log: {formatHours(logged)} hour(s)</div>
+        {(currentUser.Id === props.action.Author.Id || currentUser.Id === props.action.User?.Id) &&
+          <IconButton styles={iconButtonStyles} onClick={handleEdit} iconProps={{ iconName: 'Edit' }} />
+        }
+      </div>
+      {comment && (
+        <div className={styles.comment}>
+          <Text variant="medium">{comment}</Text>
         </div>
-    );
+      )}
+    </div>
+  );
 };
