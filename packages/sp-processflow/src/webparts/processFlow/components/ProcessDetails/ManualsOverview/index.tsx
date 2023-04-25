@@ -14,6 +14,7 @@ import {
     PANEL_DIALOG,
 } from '../../../utils/constants';
 import { addManual, editManual } from '../../ManualDialog';
+import { completeManualLink } from '../../ProcessFlowTable/ProcessCell';
 import styles from './ManualsOverview.module.scss';
 
 export interface IManualsOverviewProps {
@@ -58,7 +59,7 @@ export const ManualsOverview: React.FC<IManualsOverviewProps> = (props) => {
                 <IconButton
                     iconProps={{ iconName: 'OpenInNewTab' }}
                     onClick={() =>
-                        window.open(manual[1], '_blank', 'noreferrer,noopener')
+                        window.open(completeManualLink(manual[1]), '_blank', 'noreferrer,noopener')
                     }
                 />
                 <IconButton

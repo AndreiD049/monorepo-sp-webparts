@@ -9,7 +9,9 @@
         "componentId": "a7fdea8a-6086-4094-b22e-04981e1cdbd6",
         "PageType": 8,
         "RootFolder": "/sites/BSG/Lists/Web application form",
-        "properties": { "approverListName": "Contact person Petrochemicals" }
+        "properties": {
+          "approverListName": "Contact person Petrochemicals"
+        }
       }
     },
     "msdsForm_NewForm": {

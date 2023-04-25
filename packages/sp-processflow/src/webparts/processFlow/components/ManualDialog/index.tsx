@@ -16,13 +16,15 @@ export interface IManualDialogProps {
     operation: 'edit' | 'add';
     name?: string;
     link?: string;
-    onDone: (name: string, link: string) => void;
+	page?: number;
+    onDone: (name: string, link: string, page: number) => void;
 }
 
 export const ManualDialog: React.FC<IManualDialogProps> = (props) => {
     const [error, setError] = React.useState('');
     const [name, setName] = React.useState(props.name || '');
     const [link, setLink] = React.useState(props.link || '');
+    const [page, setPage] = React.useState(props.page || 1);
 
     const okText = React.useMemo(() => {
         switch (props.operation) {
@@ -41,9 +43,18 @@ export const ManualDialog: React.FC<IManualDialogProps> = (props) => {
             setError('Blank values not allowed');
             return;
         }
-        props.onDone(name, link);
+        props.onDone(name, link, page);
         hideDialog(props.dialogId);
-    }, [name, link]);
+    }, [name, link, page]);
+
+	const validatePage = (val: string): number => {
+		if (val === '') return 0;
+		const num = Number.parseInt(val);
+		if (isNaN(num) || num < 1) {
+			return 1;
+		}
+		return num;
+	}
 
     return (
         <form className={styles.container} onSubmit={handlePressOk}>
@@ -60,6 +71,13 @@ export const ManualDialog: React.FC<IManualDialogProps> = (props) => {
                 value={link}
                 onChange={(_ev, value) => setLink(value)}
             />
+			<TextField 
+                label="Open on page"
+				onChange={(_ev, newValue) => setPage(validatePage(newValue))}
+				type="number"
+				value={page === 0 ? '' : page.toString()}
+				min={1}
+			/>
             <div className={styles.footer}>
                 <PrimaryButton type='submit'>{okText}</PrimaryButton>
                 <DefaultButton onClick={() => hideDialog(props.dialogId)}>
@@ -90,7 +108,7 @@ export async function addManual(
                     <ManualDialog
                         dialogId={dialogId}
                         operation="add"
-                        onDone={async (name, link) => {
+                        onDone={async (name, link, page) => {
                             try {
                                 showSpinner(LOADING_SPINNER_PANEL);
                                 const { ProcessService } = MainService;
@@ -99,9 +117,9 @@ export async function addManual(
                                 );
                                 let manuals = process.Manual || '';
                                 if (manuals.length === 0) {
-                                    manuals = `${name}${MANUAL_SEPARATOR}${link}`;
+                                    manuals = `${name}${MANUAL_SEPARATOR}${link}${MANUAL_SEPARATOR}${page}`;
                                 } else {
-                                    manuals += `\n${name}${MANUAL_SEPARATOR}${link}`;
+                                    manuals += `\n${name}${MANUAL_SEPARATOR}${link}${MANUAL_SEPARATOR}${page}`;
                                 }
                                 manuals = manuals.replace(/^\n/, '');
                                 await ProcessService.updateProcess(processId, {
@@ -145,7 +163,7 @@ export async function editManual(
                         operation="edit"
                         name={name}
                         link={link}
-                        onDone={async (newName, newLink) => {
+                        onDone={async (newName, newLink, page) => {
                             try {
                                 showSpinner(LOADING_SPINNER_PANEL);
                                 const { ProcessService } = MainService;
@@ -153,8 +171,8 @@ export async function editManual(
                                     processId
                                 );
                                 const manuals = `${process.Manual || ''}`.replace(
-                                    `${name}${MANUAL_SEPARATOR}${link}`,
-                                    `${newName}${MANUAL_SEPARATOR}${newLink}`
+                                    new RegExp(`${name}${MANUAL_SEPARATOR}${link}.*`),
+                                    `${newName}${MANUAL_SEPARATOR}${newLink}${MANUAL_SEPARATOR}${page}`
                                 );
                                 await ProcessService.updateProcess(processId, {
                                     Manual: manuals,

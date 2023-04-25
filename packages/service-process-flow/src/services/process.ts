@@ -2,6 +2,7 @@ import { getAllPaged } from '@service/sp-cip';
 import { IField, IItemAddResult, IItemUpdateResult, IList, SPFI } from 'sp-preset';
 import { IProcess } from '../models';
 import { IServiceProps } from '../models/IServiceProps';
+import { processManualLink } from '../utils/manual-link';
 
 const SELECT = [
     'Id',
@@ -22,7 +23,7 @@ export class ProcessService {
     private categoryChoices: string[] = [];
     private categoryField: IField;
 
-    constructor(private props: IServiceProps) {
+    constructor(private props: IServiceProps & { manualSP: SPFI }) {
         this.list = this.props.sp.web.lists.getByTitle(this.props.listName);
         this.systemField = this.list.fields.getByTitle('System');
         this.categoryField = this.list.fields.getByTitle('Category');
@@ -64,6 +65,9 @@ export class ProcessService {
     async updateProcess(id: number, payload: Partial<IProcess>): Promise<IItemUpdateResult> {
         if (payload.System) await this.updateSystemChoices([payload.System]);
         if (payload.Category) await this.updateCategoryOptions([payload.Category]);
+		if (payload.Manual) {
+			payload.Manual = await processManualLink(this.props.manualSP, payload.Manual);
+		}
         return this.list.items.getById(id).update(payload);
     }
 

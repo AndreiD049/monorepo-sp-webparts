@@ -1,5 +1,7 @@
 export interface IProcessFlowConfig {
     rootSite: string;
+	// Root site where manuals are found
+    manualsRootSite: string;
     // List of processes
     processListName: string;
     // List of flows separated by teams/customers

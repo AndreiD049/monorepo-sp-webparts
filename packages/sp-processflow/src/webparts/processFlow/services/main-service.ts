@@ -275,6 +275,7 @@ export class MainService {
     public static InitServices(options: {
         sp: SPFI;
         userSP: SPFI;
+        manualSP: SPFI;
         config: IProcessFlowConfig;
     }): void {
         this.UserService = createCacheProxy(
@@ -296,6 +297,7 @@ export class MainService {
         this.ProcessService = createCacheProxy(
             new ProcessService({
                 sp: options.sp,
+				manualSP: options.manualSP,
                 listName: options.config.processListName,
             }),
             processCacheOptions

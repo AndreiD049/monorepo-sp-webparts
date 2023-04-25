@@ -79,6 +79,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
             const db = await openDatabase(DB_NAME, STORE_NAME);
             await removeExpired(db);
         } catch (err) {
+            console.log(err);
             SPnotify({
                 message: err.toString(),
                 messageType: MessageBarType.severeWarning,

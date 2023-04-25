@@ -9,6 +9,13 @@ export interface IProcessCellProps {
     process: IProcess;
 }
 
+export function completeManualLink(link: string, page?: string): string {
+	if (link.includes('sourcedoc=')) {
+		return `${link}&action=embedview&${page ? 'wdStartOn=' + page : ''}`;
+	}
+	return link;
+}
+
 const ManualLinks: React.FC<{ manuals: string[][] }> = (props) => {
     return (
         <div className={styles.links}>
@@ -17,7 +24,7 @@ const ManualLinks: React.FC<{ manuals: string[][] }> = (props) => {
                     key={m[0] + m[1]}
                     iconProps={{ iconName: 'OpenInNewTab' }}
                     onClick={() => {
-                        window.open(m[1], '_blank', 'noreferrer,noopener');
+                        window.open(completeManualLink(m[1]), '_blank', 'noreferrer,noopener');
                         hideCallout(MAIN_CALLOUT);
                     }}
                 >
@@ -36,7 +43,7 @@ export const ProcessCell: React.FC<IProcessCellProps> = (props) => {
             .filter((l) => l !== '')
             .map((l) => l.split(MANUAL_SEPARATOR));
         if (lines.length === 1) {
-            window.open(lines[0][1], '_blank', 'noreferrer,noopener');
+            window.open(completeManualLink(lines[0][1]), '_blank', 'noreferrer,noopener');
         } else {
             showCallout({
                 id: MAIN_CALLOUT,

@@ -31,7 +31,7 @@ export const TIMERS_KEY = (root: string): string =>
     `${root}/cip-timers/${VERSION}`;
 export const FILTERS_ASSIGNED = 'sp-cip-filter-assigned-to';
 
-export const DB_NAME = 'SPFx_CIP';
+export const DB_NAME = 'SPFx_CIP_' + location.pathname;
 export const STORE_NAME = location.origin + location.pathname + `/${VERSION}`;
 
 export const SELECTED_TEAM_KEY = `/sp-cip-selected-team/${VERSION}`;
