@@ -14,6 +14,15 @@ export interface IProcess {
     // FlowId: the flow to which this procedure is bound.
     FlowId: number;
     // Manuals: links to the manuals for this exact procedure
+	// Stored as JSON
+	// example:
+	// {
+	//		"Id": "123124-123141ree13-1asdasd",
+	//		"Name": "Some manual.docx",
+	//		"isDoc": true,
+	//		"Link": "https://devadmintools.sharepoint.com/:w:/s/Admin-tools/EQH1WopWibNPqyNXPNsA4iEB_TmwhJF24vGDua2DrC38IQ?e=glVhQq",
+	//		"page": 1
+	// }
     Manual?: string;
     // How many minutes per UOM the task requires
     Allocation?: number;

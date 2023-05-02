@@ -1,34 +1,28 @@
-import { IProcess } from '@service/process-flow';
+import { IProcess, readManualJson } from '@service/process-flow';
+import { IManualJson } from '@service/process-flow/dist/models';
 import { ActionButton, IconButton } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { hideCallout, showCallout } from 'sp-components';
-import { MAIN_CALLOUT, MANUAL_SEPARATOR } from '../../../utils/constants';
+import { MAIN_CALLOUT } from '../../../utils/constants';
 import styles from './ProcessCell.module.scss';
 
 export interface IProcessCellProps {
     process: IProcess;
 }
 
-export function completeManualLink(link: string, page?: string): string {
-	if (link.includes('sourcedoc=')) {
-		return `${link}&action=embedview&${page ? 'wdStartOn=' + page : ''}`;
-	}
-	return link;
-}
-
-const ManualLinks: React.FC<{ manuals: string[][] }> = (props) => {
+const ManualLinks: React.FC<{ manuals: IManualJson[] }> = (props) => {
     return (
         <div className={styles.links}>
             {props.manuals.map((m) => (
                 <ActionButton
-                    key={m[0] + m[1]}
+                    key={m.Link + m.Name}
                     iconProps={{ iconName: 'OpenInNewTab' }}
                     onClick={() => {
-                        window.open(completeManualLink(m[1]), '_blank', 'noreferrer,noopener');
+                        window.open(m.Link, '_blank', 'noreferrer,noopener');
                         hideCallout(MAIN_CALLOUT);
                     }}
                 >
-                    {m[0]}
+                    {m.Filename || m.Name}
                 </ActionButton>
             ))}
         </div>
@@ -39,20 +33,18 @@ export const ProcessCell: React.FC<IProcessCellProps> = (props) => {
     const buttonRef = React.useRef(null);
     const handleManualsOpen = React.useCallback(() => {
         if (!props.process.Manual) return null;
-        const lines = props.process.Manual.split('\n')
-            .filter((l) => l !== '')
-            .map((l) => l.split(MANUAL_SEPARATOR));
-        if (lines.length === 1) {
-            window.open(completeManualLink(lines[0][1]), '_blank', 'noreferrer,noopener');
-        } else {
+		const manuals = readManualJson(props.process.Manual);
+		if (manuals.length === 1) {
+			window.open(manuals[0].Link, '_blank', 'noreferrer,noopener');
+		} else {
             showCallout({
                 id: MAIN_CALLOUT,
                 calloutProps: {
                     target: buttonRef,
                 },
-                content: <ManualLinks manuals={lines} />,
+                content: <ManualLinks manuals={manuals} />,
             });
-        }
+		}
     }, [props.process, buttonRef]);
 
     return (

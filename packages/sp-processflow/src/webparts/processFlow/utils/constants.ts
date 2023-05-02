@@ -25,9 +25,6 @@ export const PASTE_USER_PROCESS = 'sp-processflow-userprocess-paste';
 export const COPY_LOCATION = 'sp-processflow-location-copy';
 export const PASTE_LOCATION = 'sp-processflow-location-paste';
 
-// Separators
-export const MANUAL_SEPARATOR = '\t';
-
 // LocalStorage keys
 export const GROUP_SORTING_KEY = 'sp-processflow-group-sorting';
 

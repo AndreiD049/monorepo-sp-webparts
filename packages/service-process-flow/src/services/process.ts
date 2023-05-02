@@ -1,8 +1,8 @@
 import { getAllPaged } from '@service/sp-cip';
 import { IField, IItemAddResult, IItemUpdateResult, IList, SPFI } from 'sp-preset';
-import { IProcess } from '../models';
+import { IManualJson, IProcess } from '../models';
 import { IServiceProps } from '../models/IServiceProps';
-import { processManualLink } from '../utils/manual-link';
+import { docsMap, getFileNameExtension, isDocLink, processManualLink } from '../utils/manual-link';
 
 const SELECT = [
     'Id',
@@ -15,6 +15,17 @@ const SELECT = [
     'UOM',
     'Team',
 ];
+
+export function readManualJson(manual: string | undefined): IManualJson[] {
+	if (!manual) return [];
+	try {
+		const json = JSON.parse(manual);
+		if (!Array.isArray(json)) return [];
+		return json;
+	} catch {
+		return [];
+	}
+}
 
 export class ProcessService {
     private list: IList;
@@ -70,6 +81,53 @@ export class ProcessService {
 		}
         return this.list.items.getById(id).update(payload);
     }
+
+	async updateManual(processId: number, manualLink: string): Promise<IItemUpdateResult> {
+		return this.list.items.getById(processId).update({ Manual: manualLink });
+	}
+
+	async addManual(processId: number, manualLink: string, name: string, page: number): Promise<IItemUpdateResult> {
+		const process = await this.getById(processId);
+		const manuals = readManualJson(process.Manual);
+		const newManualJson = await this.readJsonFromManualLink(manualLink, name, page);
+		manuals.push(newManualJson);
+		return this.list.items.getById(processId).update({ Manual: JSON.stringify(manuals) });
+	}
+
+	async deleteManual(processId: number, manualName?: string, manualLink?: string) {
+		const process = await this.getById(processId);
+		const manuals = readManualJson(process.Manual);
+		const newManuals = manuals.filter((manual) => {
+			if (manualName) {
+				return manual.Name !== manualName;
+			}
+			return manual.Link !== manualLink;
+		});
+		return this.list.items.getById(processId).update({ Manual: JSON.stringify(newManuals) });
+	}
+
+	private async readJsonFromManualLink(manualLink: string, name: string, page: number): Promise<IManualJson> {
+		let fileInfo;
+		// try to add the manual
+		try {
+			fileInfo = await this.props.manualSP.web.getFileByUrl(manualLink)();
+		} catch {
+			// Manual link cannot be found
+			// Save it as a minimal link
+			return {
+				Name: name,
+				Link: manualLink,
+			};
+		}
+		return {
+			Id: fileInfo.UniqueId,
+			Name: name,
+			Filename: fileInfo.Name,
+			isDoc: isDocLink(fileInfo.Name),
+			Link: manualLink,
+			Page: page,
+		}
+	};
 
     async removeProcess(id: number): Promise<void> {
         await this.list.items.getById(id).recycle();

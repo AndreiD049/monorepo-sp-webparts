@@ -8,7 +8,7 @@ import {
 import * as React from 'react';
 import { hideDialog, hideSpinner, showDialog, showSpinner } from 'sp-components';
 import { MainService } from '../../services/main-service';
-import { LOADING_SPINNER_PANEL, MAIN_DIALOG, MANUAL_SEPARATOR } from '../../utils/constants';
+import { LOADING_SPINNER_PANEL, MAIN_DIALOG } from '../../utils/constants';
 import styles from './ManualDialog.module.scss';
 
 export interface IManualDialogProps {
@@ -112,20 +112,9 @@ export async function addManual(
                             try {
                                 showSpinner(LOADING_SPINNER_PANEL);
                                 const { ProcessService } = MainService;
-                                const process = await ProcessService.getById(
-                                    processId
-                                );
-                                let manuals = process.Manual || '';
-                                if (manuals.length === 0) {
-                                    manuals = `${name}${MANUAL_SEPARATOR}${link}${MANUAL_SEPARATOR}${page}`;
-                                } else {
-                                    manuals += `\n${name}${MANUAL_SEPARATOR}${link}${MANUAL_SEPARATOR}${page}`;
-                                }
-                                manuals = manuals.replace(/^\n/, '');
-                                await ProcessService.updateProcess(processId, {
-                                    Manual: manuals,
-                                });
-                                resolve(manuals);
+								await ProcessService.addManual(processId, link, name, page);
+								const newProcess = await ProcessService.getById(processId);
+                                resolve(newProcess.Manual);
                             } finally {
                                 hideSpinner(LOADING_SPINNER_PANEL);
                             }
@@ -166,18 +155,8 @@ export async function editManual(
                         onDone={async (newName, newLink, page) => {
                             try {
                                 showSpinner(LOADING_SPINNER_PANEL);
-                                const { ProcessService } = MainService;
-                                const process = await ProcessService.getById(
-                                    processId
-                                );
-                                const manuals = `${process.Manual || ''}`.replace(
-                                    new RegExp(`${name}${MANUAL_SEPARATOR}${link}.*`),
-                                    `${newName}${MANUAL_SEPARATOR}${newLink}${MANUAL_SEPARATOR}${page}`
-                                );
-                                await ProcessService.updateProcess(processId, {
-                                    Manual: manuals,
-                                });
-                                resolve(manuals);
+								// TODO: implement
+                                resolve("TODO");
                             } finally {
                                 hideSpinner(LOADING_SPINNER_PANEL);
                             }

@@ -4,20 +4,12 @@
     min-width: 1px;
 }
 
-.manuals {
-    & > * + * {
-        margin-top: .3em;
-    }
+.infoIcon {
+	cursor: help;
+}
 
-    &Row {
-        display: flex;
-        flex-flow: row nowrap;
-        align-items: center;
-        justify-content: flex-start;
-        gap: .5em;
-    }
-
-    &RowLink {
-        flex-grow: 2;
-    }
+.manualsTable {
+	& td {
+		padding: 0 .5em;
+	}
 }

@@ -1,5 +1,6 @@
 import { groupBy } from '@microsoft/sp-lodash-subset';
-import { IFlowLocation, IProcess, IUserProcess } from '@service/process-flow';
+import { IFlowLocation, IProcess, IUserProcess, readManualJson } from '@service/process-flow';
+import { IManualJson } from '@service/process-flow/dist/models';
 import { Dictionary } from 'lodash';
 import {
     ActionButton,
@@ -28,7 +29,6 @@ import { MainService } from '../../services/main-service';
 import {
     LOADING_SPINNER,
     LOADING_SPINNER_PANEL,
-    MANUAL_SEPARATOR,
     PANEL_DIALOG,
 } from '../../utils/constants';
 import {
@@ -199,14 +199,9 @@ const Details: React.FC<{ processId: number }> = (props) => {
     const { ProcessService, FlowLocationService, UserProcessService } =
         MainService;
     const [process, setProcess] = React.useState<IProcess>(null);
-    const manuals = React.useMemo(() => {
-        if (!process?.Manual) return [];
-        const lines: string[] = process.Manual?.split('\n');
-        return lines
-            .filter((l) => l !== '')
-            .map((line: string) => {
-                return line.split(MANUAL_SEPARATOR);
-            });
+    const manuals: IManualJson[] = React.useMemo(() => {
+		if (!process) return [];
+        return readManualJson(process.Manual);
     }, [process]);
     const [locations, setLocations] = React.useState<IFlowLocation[]>([]);
     const [userProcesses, setUserProcesses] = React.useState<IUserProcess[]>(

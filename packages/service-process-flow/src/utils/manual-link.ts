@@ -1,7 +1,22 @@
 import { SPFI } from "sp-preset";
 
-function getLinksFromManualString(link: string): string[] {
-	return link.split('\n').map((man) => man.split('\t')[1]).filter((link) => Boolean(link));
+export const docsMap: { [key: string]: boolean } = {
+	'docx': true,
+	'doc': true,
+	'xls': true,
+	'xlsx': true,
+	'ppt': true,
+	'pptx': true,
+}
+
+export function getFileNameExtension(fileName: string): string {
+	const tokens = fileName.split('.');
+	return tokens[tokens.length - 1];
+};
+
+export function isDocLink(fileName: string): boolean {
+	const ext = getFileNameExtension(fileName);
+	return docsMap[ext];
 }
 
 function getUrlPrefix(sp: SPFI) {
@@ -35,9 +50,8 @@ function replaceLinksInManualString(initial: string, links: string[]): string {
 }
 
 export async function processManualLink(sp: SPFI, link: string): Promise<string> {
-	const links = getLinksFromManualString(link);
 	const prefix = getUrlPrefix(sp);
-	const ids = await Promise.all(links.map(async (l) => getFileId(sp, l)));
+	const ids = await Promise.all([].map(async (l) => getFileId(sp, l)));
 	return replaceLinksInManualString(
 		link, 
 		ids.map((i) => joinPrefixWithId(prefix, i))
