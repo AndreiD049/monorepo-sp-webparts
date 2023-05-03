@@ -2,8 +2,9 @@ import { IProcess, readManualJson } from '@service/process-flow';
 import { IManualJson } from '@service/process-flow/dist/models';
 import { ActionButton, IconButton } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { hideCallout, showCallout } from 'sp-components';
-import { MAIN_CALLOUT } from '../../../utils/constants';
+import { hideCallout, showCallout, showPanel } from 'sp-components';
+import { MAIN_CALLOUT, PANEL_MANUALS } from '../../../utils/constants';
+import { ManualPanelDetails } from '../../ManualPanelDetails';
 import styles from './ProcessCell.module.scss';
 
 export interface IProcessCellProps {
@@ -18,11 +19,17 @@ const ManualLinks: React.FC<{ manuals: IManualJson[] }> = (props) => {
                     key={m.Link + m.Name}
                     iconProps={{ iconName: 'OpenInNewTab' }}
                     onClick={() => {
-                        window.open(m.Link, '_blank', 'noreferrer,noopener');
                         hideCallout(MAIN_CALLOUT);
+						showPanel(
+							PANEL_MANUALS,
+							{
+								headerText: m.Name,
+							},
+							<ManualPanelDetails manual={m} />
+						);
                     }}
                 >
-                    {m.Filename || m.Name}
+                    {m.Name} { m.Filename ? `(${m.Filename})` : '' }
                 </ActionButton>
             ))}
         </div>
@@ -35,7 +42,13 @@ export const ProcessCell: React.FC<IProcessCellProps> = (props) => {
         if (!props.process.Manual) return null;
 		const manuals = readManualJson(props.process.Manual);
 		if (manuals.length === 1) {
-			window.open(manuals[0].Link, '_blank', 'noreferrer,noopener');
+			showPanel(
+				PANEL_MANUALS,
+				{
+					headerText: manuals[0].Name,
+				},
+				<ManualPanelDetails manual={manuals[0]} />
+			)
 		} else {
             showCallout({
                 id: MAIN_CALLOUT,
@@ -50,7 +63,7 @@ export const ProcessCell: React.FC<IProcessCellProps> = (props) => {
     return (
         <div className={styles.container}>
             <span>{props.process.Title}</span>
-            {props.process.Manual && (
+            {props.process.Manual && props.process.Manual !== '[]' && (
                 <IconButton
                     elementRef={buttonRef}
                     className={styles.manualInfo}

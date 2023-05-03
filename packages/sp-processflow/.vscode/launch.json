@@ -3,11 +3,12 @@
   "configurations": [
     {
       "name": "Hosted workbench",
-      "type": "pwa-chrome",
+      "type": "chrome",
       "request": "launch",
       "url": "https://devadmintools.sharepoint.com/sites/Admin-tools/SitePages/Process-Flow.aspx?debug=true&noredir=true&debugManifestsFile=https://localhost:4321/temp/manifests.js",
       "webRoot": "${workspaceRoot}",
       "sourceMaps": true,
+      "cleanUp": "onlyTab",
       "sourceMapPathOverrides": {
         "webpack:///.././src/*": "${webRoot}/src/*",
         "webpack:///../../../src/*": "${webRoot}/src/*",

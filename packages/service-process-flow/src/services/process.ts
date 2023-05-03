@@ -2,7 +2,7 @@ import { getAllPaged } from '@service/sp-cip';
 import { IField, IItemAddResult, IItemUpdateResult, IList, SPFI } from 'sp-preset';
 import { IManualJson, IProcess } from '../models';
 import { IServiceProps } from '../models/IServiceProps';
-import { docsMap, getFileNameExtension, isDocLink, processManualLink } from '../utils/manual-link';
+import { docsMap, getFileNameExtension, getUrlPrefix, isDocLink, sanitizeLinkingUrl } from '../utils/manual-link';
 
 const SELECT = [
     'Id',
@@ -76,9 +76,6 @@ export class ProcessService {
     async updateProcess(id: number, payload: Partial<IProcess>): Promise<IItemUpdateResult> {
         if (payload.System) await this.updateSystemChoices([payload.System]);
         if (payload.Category) await this.updateCategoryOptions([payload.Category]);
-		if (payload.Manual) {
-			payload.Manual = await processManualLink(this.props.manualSP, payload.Manual);
-		}
         return this.list.items.getById(id).update(payload);
     }
 
@@ -91,6 +88,22 @@ export class ProcessService {
 		const manuals = readManualJson(process.Manual);
 		const newManualJson = await this.readJsonFromManualLink(manualLink, name, page);
 		manuals.push(newManualJson);
+		return this.list.items.getById(processId).update({ Manual: JSON.stringify(manuals) });
+	}
+
+	async editManual(processId: number, index: number, manualLink: string, name: string, page: number): Promise<IItemUpdateResult> {
+		const process = await this.getById(processId);
+		let manuals = readManualJson(process.Manual);
+		if (index >= manuals.length) throw new Error('Index out of range');
+		
+		const newManual = await this.readJsonFromManualLink(manualLink, name, page);
+
+		// Update the manual at index
+		manuals = manuals.map((manual, i) => {
+			if (i === index) return newManual;
+			return manual;
+		});
+
 		return this.list.items.getById(processId).update({ Manual: JSON.stringify(manuals) });
 	}
 
@@ -119,15 +132,37 @@ export class ProcessService {
 				Link: manualLink,
 			};
 		}
+		const isDoc = isDocLink(fileInfo.Name);
 		return {
 			Id: fileInfo.UniqueId,
 			Name: name,
 			Filename: fileInfo.Name,
-			isDoc: isDocLink(fileInfo.Name),
+			isDoc: isDoc,
+			DesktopLink: isDoc ? `${docsMap[getFileNameExtension(fileInfo.Name)]}${sanitizeLinkingUrl(fileInfo.LinkingUri)}` : undefined,
 			Link: manualLink,
 			Page: page,
 		}
 	};
+
+	getManualLink(manual: IManualJson, linkType: 'embed' | 'browser' | 'desktop'): string | null {
+		if (linkType === 'browser') {
+			return manual.Link;
+		}
+		if (linkType === 'desktop') {
+			if (!manual.isDoc || !manual.DesktopLink) {
+				return null;
+			}
+			return manual.DesktopLink;
+		}
+		if (!manual.isDoc) {
+			return getUrlPrefix(this.props.manualSP) + `_layouts/15/embed.aspx?UniqueId=${manual.Id}`;
+		}
+		let embedUrl = getUrlPrefix(this.props.manualSP) + `_layouts/15/Doc.aspx?sourcedoc={${manual.Id}}&action=embedview`;
+		if (manual.Page && manual.Page > 1) {
+			embedUrl += `&wdStartOn=${manual.Page}`;
+		}
+		return embedUrl;
+	}
 
     async removeProcess(id: number): Promise<void> {
         await this.list.items.getById(id).recycle();

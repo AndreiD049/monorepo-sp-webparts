@@ -97,7 +97,7 @@ const processCacheOptions: ICacheProxyOptions<ProcessService> = {
                 );
             },
         },
-        'updateProcess': {
+        '(updateProcess|addManual|updateManual|deleteManual)': {
             isPattern: true,
             after: async (db, service, args, returnValue) => {
                 const id: number = args[0];

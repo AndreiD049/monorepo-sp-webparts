@@ -6,6 +6,8 @@ export const PANEL_DIALOG = 'sp-processflow-panel-dialog';
 export const MAIN_CALLOUT = 'sp-processflow-main-callout';
 export const MAIN_PANEL = 'sp-processflow-main-panel';
 export const MAIN_PANEL_FORM = 'sp-processflow-newprocess';
+export const PANEL_MANUALS = 'sp-processflow-panel-manuals';
+export const PANEL_MANUALS_DETAILS = 'sp-processflow-panel-manuals-details';
 export const LOADING_SPINNER = 'sp-processflow-loadingspinner';
 export const LOADING_SPINNER_PANEL = 'sp-processflow-loadingspinner-panel';
 

@@ -132,7 +132,9 @@ export async function editManual(
     processId: number,
     name: string,
     link: string,
-    dialogId: string = MAIN_DIALOG
+    dialogId: string = MAIN_DIALOG,
+	index: number,
+	page: number
 ): Promise<string> {
     return new Promise((resolve, reject) => {
         try {
@@ -152,11 +154,14 @@ export async function editManual(
                         operation="edit"
                         name={name}
                         link={link}
+						page={page}
                         onDone={async (newName, newLink, page) => {
                             try {
                                 showSpinner(LOADING_SPINNER_PANEL);
-								// TODO: implement
-                                resolve("TODO");
+								const { ProcessService } = MainService;
+								await ProcessService.editManual(processId, index, newLink, newName, page);
+								const updatedProcess = await ProcessService.getById(processId);
+                                resolve(updatedProcess.Manual);
                             } finally {
                                 hideSpinner(LOADING_SPINNER_PANEL);
                             }
