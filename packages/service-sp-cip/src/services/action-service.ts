@@ -95,14 +95,14 @@ export class ActionService {
     async getActions(taskId: number): Promise<IAction[]> {
         return wrap(
             this.list.items.filter(
-                `ListId eq '${await this.taskListId}' and ItemId eq ${taskId} and ActivityType ne 'Comment'`
+                `ItemId eq ${taskId} and ListId eq '${await this.taskListId}' and ActivityType ne 'Comment'`
             )
         )();
     };
 
     async getActionsFromTo(dateFrom: Date, dateTo: Date): Promise<IAction[]> {
         return getAllPaged(wrap(
-            this.list.items.filter(`ListId eq '${await this.taskListId}' and Date ge '${dateODataFormat(dateFrom)}T00:00:00' and Date le '${dateODataFormat(dateTo)}T23:59:59'`)
+            this.list.items.filter(`Date ge '${dateODataFormat(dateFrom)}T00:00:00' and ListId eq '${await this.taskListId}' and Date le '${dateODataFormat(dateTo)}T23:59:59'`)
         ));
     }
 
