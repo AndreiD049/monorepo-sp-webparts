@@ -17,12 +17,12 @@
     "tslib": "2.3.1"
   },
   "peerDependencies": {
-    "@microsoft/sp-core-library": "*",
-    "@microsoft/sp-http": "*",
-    "@microsoft/sp-lodash-subset": "*",
-    "@microsoft/sp-page-context": "*",
-    "@microsoft/sp-property-pane": "*",
-    "@microsoft/sp-webpart-base": "*",
+    "@microsoft/sp-core-library": "1.16.1",
+    "@microsoft/sp-http": "1.16.1",
+    "@microsoft/sp-lodash-subset": "1.16.1",
+    "@microsoft/sp-page-context": "1.16.1",
+    "@microsoft/sp-property-pane": "1.16.1",
+    "@microsoft/sp-webpart-base": "1.16.1",
     "office-ui-fabric-react": "7.185.7",
     "react": "*",
     "react-dom": "*"
