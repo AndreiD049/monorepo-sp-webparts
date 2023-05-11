@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "sp-sandbox-client-side-solution",
+    "id": "f596dab3-b5b9-43dd-921c-7c550cb66456",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.17.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "sp-sandbox description"
+      },
+      "longDescription": {
+        "default": "sp-sandbox description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "sp-sandbox Feature",
+        "description": "The feature that activates elements of the sp-sandbox solution.",
+        "id": "fe169f8a-4ff1-4b47-9ae2-d9d1cf96d58a",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/sp-sandbox.sppkg"
+  }
+}

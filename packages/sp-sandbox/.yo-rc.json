@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "16.19.1",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.9.1"
+    },
+    "version": "1.17.2",
+    "libraryName": "sp-sandbox",
+    "libraryId": "f596dab3-b5b9-43dd-921c-7c550cb66456",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "sp-sandbox",
+    "solutionShortDescription": "sp-sandbox description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
