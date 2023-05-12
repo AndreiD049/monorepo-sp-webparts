@@ -4,7 +4,17 @@
     display: flex;
     flex-flow: row nowrap;
     align-items: stretch;
-    justify-content: space-between;  
+    justify-content: flex-start;  
+	gap: 1em;
+}
+
+.borderedBox {
+    border: 1px solid "[theme: neutralLighter, default: #f4f4f4]";
+}
+
+.userPicker {
+	max-width: 200px;
+	padding: .9em;
 }
 
 .customerBox {
@@ -15,7 +25,6 @@
     gap: 0.5em;
     max-width: 350px;
     padding: .9em;
-    border: 1px solid "[theme: neutralLighter, default: #f4f4f4]";
 }
 
 .topRow {

@@ -8,6 +8,7 @@ export interface IGlobalContext {
     selectedTeam: string;
     selectedFlow: ICustomerFlow;
     teamUsers: IUserListInfo[];
+    selectedUsers: IUserListInfo[];
 }
 
 export const sentinelContext: IGlobalContext = {
@@ -16,6 +17,7 @@ export const sentinelContext: IGlobalContext = {
     selectedTeam: null,
     selectedFlow: null,
     teamUsers: [],
+    selectedUsers: [],
 }
 
 export const GlobalContext = React.createContext<IGlobalContext>(sentinelContext);

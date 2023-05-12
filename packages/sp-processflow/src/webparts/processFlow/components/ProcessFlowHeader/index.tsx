@@ -1,10 +1,13 @@
 import { ICustomerFlow } from '@service/process-flow';
+import { isNaN } from 'lodash';
 import { IconButton } from 'office-ui-fabric-react';
 import * as React from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { MainService } from '../../services/main-service';
 import { CustomerGroupPicker } from '../CustomerGroupPicker';
 import { DBCustomersPicker } from '../DBCustomersPicker';
 import { StatusLegend } from '../StatusLegend';
+import { UserPicker } from '../UserPicker';
 import styles from './ProcessFlowHeader.module.scss';
 
 export interface IProcessFlowHeaderProps {
@@ -22,6 +25,7 @@ export const ProcessFlowHeader: React.FC<IProcessFlowHeaderProps> = (props) => {
     );
     const [choiceCustomerGroup, setChoiceCustomerGroup] = React.useState([]);
     const [choiceDbCustomers, setChoiceDBCustomers] = React.useState([]);
+	const [search, setSearch] = useSearchParams();
 
     React.useEffect(() => {
         if (props.flow) {
@@ -61,7 +65,7 @@ export const ProcessFlowHeader: React.FC<IProcessFlowHeaderProps> = (props) => {
 
     return (
         <div className={styles.container}>
-            <div className={styles.customerBox}>
+            <div className={`${styles.customerBox} ${styles.borderedBox}`}>
                 <div className={styles.topRow}>
                     <CustomerGroupPicker
                         options={
@@ -103,6 +107,17 @@ export const ProcessFlowHeader: React.FC<IProcessFlowHeaderProps> = (props) => {
                     }}
                 />
             </div>
+			<div className={`${styles.borderedBox} ${styles.userPicker}`}>
+				<UserPicker
+					selectedIds={search.get('users')?.split(',').map(u => +u.trim()).filter((n) => !isNaN(n)) || []}
+					onUserSelected={function (users) {
+						setSearch((prev) => {
+							prev.set('users', users.map(u => u.data).join(', '));
+							return prev;
+						});
+					}}
+				/>
+			</div>
             <StatusLegend />
         </div>
     );

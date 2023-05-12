@@ -56,9 +56,9 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
     const handleFlowSelected = React.useCallback(
         (flow: ICustomerFlow) => {
             props.onFlowSelected(flow);
-            navigate(`/team/${selectedTeam}/flow/${flow.Id}`);
+            navigate(`/team/${selectedTeam}/flow/${flow.Id}?${searchParams.toString()}`);
         },
-        [selectedTeam]
+        [selectedTeam, searchParams]
     );
 
     const handleTeamSelected = React.useCallback(
@@ -81,7 +81,7 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                         const selectedFlow = foundFlow || result[0];
                         props.onFlowSelected(selectedFlow)
                     } else if (result[0].Id) {
-                        navigate(`/team/${selectedTeam}/flow/${result[0].Id}`);
+                        navigate(`/team/${selectedTeam}/flow/${result[0].Id}?${searchParams.toString()}`);
                     }
                 }
             } else {
@@ -92,11 +92,11 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
             }
         }
         run().catch((err) => console.error(err));
-    }, [selectedTeam, params.flowId]);
+    }, [selectedTeam, searchParams, params.flowId]);
 
     const teamOptions: IComboBoxOption[] = React.useMemo(
         () =>
-            teams.map((team) => ({
+            teams.filter((t) => t !== 'NA').map((team) => ({
                 key: team,
                 text: team,
             })),

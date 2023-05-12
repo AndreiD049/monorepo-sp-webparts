@@ -107,7 +107,8 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
     const navigate = useNavigate();
     const { ProcessService, FlowLocationService, UserProcessService } =
         MainService;
-    const { teamUsers, selectedTeam, selectedFlow } = React.useContext(GlobalContext);
+    const { teamUsers, selectedTeam, selectedFlow } =
+        React.useContext(GlobalContext);
     const [groupSorting, setGroupSorting] = useWebStorage<{
         [key: number]: string[];
     }>(
@@ -132,16 +133,21 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
     }, [searchParams, search]);
 
     const columnUsers = React.useMemo(() => {
-        const userSet = new Set(teamUsers.map((u) => u.User.Id));
-        const result = teamUsers.map((u) => u.User);
-        userProcesses.forEach((up) => {
-            if (!userSet.has(up.User.Id)) {
-                result.push(up.User);
-                userSet.add(up.User.Id);
-            }
-        });
+        let result = teamUsers.map((u) => u.User);
+        const usersParam = searchParams.get('users');
+        const selectedUserIds = usersParam
+            ? searchParams
+                  .get('users')
+                  .split(',')
+                  .map((u) => parseInt(u))
+                  .filter((u) => !isNaN(u))
+            : [];
+
+        if (selectedUserIds.length > 0) {
+            result = result.filter((u) => selectedUserIds.includes(u.Id));
+        }
         return result;
-    }, [userProcesses]);
+    }, [teamUsers, searchParams]);
 
     const locations = React.useMemo(
         () => uniq(flowLocations.map((l) => l.Title)),
@@ -284,9 +290,15 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
         async function locationDeleteHandler(data: number): Promise<void> {
             setFlowLocations((prev) => prev.filter((l) => l.Id !== data));
         }
-        const userProcessUpdate = listenUserProcessUpdated(userProcessAddedHandler);
-        const userProcessAdded = listenUserProcessAdded(userProcessAddedHandler);
-        const userProcessRemoved = listenUserProcessRemoved(userProcessRemovedHandler);
+        const userProcessUpdate = listenUserProcessUpdated(
+            userProcessAddedHandler
+        );
+        const userProcessAdded = listenUserProcessAdded(
+            userProcessAddedHandler
+        );
+        const userProcessRemoved = listenUserProcessRemoved(
+            userProcessRemovedHandler
+        );
         const addProcess = listenProcessAdded(processAddedHandler);
         const updateProcess = listenProcessUpdated(processUpdatedHandler);
         const removeProcess = listenProcessRemoved(processRemovedHandler);
@@ -323,7 +335,9 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 styles={listStyles(ProcessFlowWebPart.currentTheme)}
                 onItemInvoked={(item) => {
                     navigate(
-                        `/team/${selectedTeam}/flow/${selectedFlow.Id}/process/${item.process.Id}?${searchParams.toString()}`
+                        `/team/${selectedTeam}/flow/${
+                            selectedFlow.Id
+                        }/process/${item.process.Id}?${searchParams.toString()}`
                     );
                 }}
             />
