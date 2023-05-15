@@ -32,6 +32,7 @@ const schema: ItemSchema = {
     Responsible: {
         type: 'Person',
         indexed: true,
+        keyPath: 'Responsible.EMail',
     },
 };
 
@@ -54,10 +55,6 @@ export function Sandbox(props: ISandboxProps): JSX.Element {
                 setItems(items);
             })
             .catch((err) => console.error(err));
-
-        return () => {
-            provider.close().catch((err) => console.error(err));
-        };
     }, []);
 
     return (

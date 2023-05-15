@@ -11,7 +11,6 @@ import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import * as strings from 'SandboxWebPartStrings';
 import { Sandbox } from './components/Sandbox';
 import { ISandboxProps } from './components/ISandboxProps';
-import { IDBStoreProvider } from 'sp-incremental-sync';
 import SPBuilder from 'sp-preset';
 
 export interface ISandboxWebPartProps {
@@ -48,27 +47,6 @@ export default class SandboxWebPart extends BaseClientSideWebPart<ISandboxWebPar
 		console.log('init');
 
 		SandboxWebPart.SPBuilder = new SPBuilder(this.context);
-		const sp = SandboxWebPart.SPBuilder.getSP();
-		
-		const provider = new IDBStoreProvider({
-			dbName: 'data',
-			list: sp.web.lists.getByTitle('Sync list'),
-			schema: {
-				ID: {
-					type: 'Integer',
-					indexed: true,
-				},
-				Title: {
-					type: 'String',
-					indexed: true,
-				},
-				Samples: {
-					type: 'Integer',
-					indexed: false
-				}
-			}
-		});
-		console.info(provider);
 	}
 
 
