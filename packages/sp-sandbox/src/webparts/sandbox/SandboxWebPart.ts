@@ -9,9 +9,9 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
 
 import * as strings from 'SandboxWebPartStrings';
-import Sandbox from './components/Sandbox';
+import { Sandbox } from './components/Sandbox';
 import { ISandboxProps } from './components/ISandboxProps';
-import { SyncedList } from 'sp-incremental-sync';
+import { IDBStoreProvider } from 'sp-incremental-sync';
 import SPBuilder from 'sp-preset';
 
 export interface ISandboxWebPartProps {
@@ -25,7 +25,7 @@ export interface ISampleData {
 }
 
 export default class SandboxWebPart extends BaseClientSideWebPart<ISandboxWebPartProps> {
-	public static IncSyncList: SyncedList<ISampleData>;
+	public static SPBuilder: SPBuilder;
 	private _isDarkTheme: boolean = false;
 	private _environmentMessage: string = '';
 
@@ -47,22 +47,28 @@ export default class SandboxWebPart extends BaseClientSideWebPart<ISandboxWebPar
 	protected async onInit(): Promise<void> {
 		console.log('init');
 
-		const builder = new SPBuilder(this.context);
-		const sp = builder.getSP();
-
-		SandboxWebPart.IncSyncList = new SyncedList({
-			dbName: 'sandboxDb',
-			storeName: 'sandboxStore',
-
-			sp: sp,
-			listName: 'Sync list',
-
+		SandboxWebPart.SPBuilder = new SPBuilder(this.context);
+		const sp = SandboxWebPart.SPBuilder.getSP();
+		
+		const provider = new IDBStoreProvider({
+			dbName: 'data',
+			list: sp.web.lists.getByTitle('Sync list'),
 			schema: {
-				ID: 'Number',
-				Title: 'String',
-				Samples: 'Number',
+				ID: {
+					type: 'Integer',
+					indexed: true,
+				},
+				Title: {
+					type: 'String',
+					indexed: true,
+				},
+				Samples: {
+					type: 'Integer',
+					indexed: false
+				}
 			}
 		});
+		console.info(provider);
 	}
 
 

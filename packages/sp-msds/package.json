@@ -1,6 +1,6 @@
 {
   "name": "sp-msds",
-  "version": "0.0.51",
+  "version": "0.5.1",
   "private": true,
   "engines": {
     "node": ">=16.13.0 <17.0.0"
@@ -18,13 +18,13 @@
     "@microsoft/sp-listview-extensibility": "1.16.1",
     "@microsoft/sp-lodash-subset": "1.16.1",
     "@microsoft/sp-office-ui-fabric-core": "1.16.1",
-    "@service/sp-cip": "^1.0.0",
-    "idb-proxy": "^1.0.0",
+    "@service/sp-cip": "file:../service-sp-cip",
+    "idb-proxy": "file:../idb-proxy",
     "office-ui-fabric-react": "^7.199.1",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-hook-form": "^7.42.1",
-    "sp-components": "^1.0.0",
+    "sp-components": "file:../sp-components",
     "tslib": "2.3.1"
   },
   "devDependencies": {
