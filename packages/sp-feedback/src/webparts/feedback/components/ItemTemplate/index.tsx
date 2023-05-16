@@ -32,7 +32,7 @@ export const ItemHeaderTemplate: React.FC<{
 }> = (props) => {
     const { indexManager } = React.useContext(GlobalContext);
     const handleEdit = (): void => {
-        toggleItemEditable(props.item.Id, indexManager);
+        toggleItemEditable(props.item.ID, indexManager);
     };
 
     const title = React.useMemo(() => {
@@ -181,7 +181,7 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = ({
     const [item, setItem] = React.useState(props.item);
     const editable = React.useMemo(
         () =>
-            props.item ? isItemEditable(props.item.Id, indexManager) : false,
+            props.item ? isItemEditable(props.item.ID, indexManager) : false,
         [props.item, indexManager]
     );
 
@@ -193,11 +193,11 @@ export const ItemTemplate: React.FC<IItemTemplateProps> = ({
 
     const handleSave = React.useCallback(async () => {
         const newItem = await item.replaceImagesIn('text');
-        dispatchItemUpdated(newItem.Id, {
+        dispatchItemUpdated(newItem.ID, {
             ...newItem.Fields,
             tags: newItem.Tags,
         });
-        toggleItemEditable(newItem.Id, indexManager);
+        toggleItemEditable(newItem.ID, indexManager);
     }, [item, indexManager]);
 
     // Save on ctrl-s

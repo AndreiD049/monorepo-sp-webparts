@@ -65,7 +65,7 @@ const useFilterBar = (): UseFilterType => {
                 <FooterOkCancel
                     onOk={() => {
                         hideDialog(DIALOG_ID);
-                        dispatchItemDeleted(selectedFilters.selectedItem.Id);
+                        dispatchItemDeleted(selectedFilters.selectedItem.ID);
                     }}
                     onCancel={() => hideDialog(DIALOG_ID)}
                 />

@@ -12,7 +12,7 @@ export const SingleColumnLayout: React.FC<ILayoutProps> = (props) => {
         <div className={styles.container}>
             {
                 props.items.map((i) => (
-                    <ItemTemplate item={i} key={i.Id} />
+                    <ItemTemplate item={i} key={i.ID} />
                 ))
             }
         </div>

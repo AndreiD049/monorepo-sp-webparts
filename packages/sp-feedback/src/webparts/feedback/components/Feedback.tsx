@@ -6,7 +6,6 @@ import { IFeedbackWebPartProps } from '../FeedbackWebPart';
 import { $eq } from '../indexes/filter';
 import { IndexManager } from '../indexes/index-manager';
 import {
-    dispatchItemUpdated,
     itemAddedEventBuilder,
     itemDeletedEventBuilder,
     itemUpdatedEventBuilder,
@@ -19,16 +18,6 @@ import '../styles.scss';
 import { Callout, Dialog, Footer } from 'sp-components';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { SyncService } from '../../../features/incremental-sync';
-import { IFeedbackItemRaw } from '../../../models/IFeedbackItem';
-import {
-    cachedDevopsService,
-    createAzureItemsMap,
-    getAllAzureLinkedFeedbacks,
-    getAzureItemChanges,
-    getAzureItemIdsFromMap,
-    getChangedFields,
-} from '../../../features/azure-integration';
 
 interface IGlobalContextProps {
     indexManager: IndexManager;
@@ -53,9 +42,7 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
     React.useEffect(() => {
         async function run(): Promise<void> {
             // Get normal items
-            const items = (await SyncService.getItems<IFeedbackItemRaw>()).map(
-                (i) => new Item(i)
-            );
+            const items = (await MainService.SyncProvider.getData()).map((i) => new Item(i));
             // Get temp items if any
             const tempItems = MainService.TempItemService.getAllTempItems();
 
@@ -140,28 +127,6 @@ export const Feedback: React.FC<IFeedbackProps> = (props) => {
             removeUpdate();
             removeDelete();
         };
-    }, [info?.indexManager]);
-
-    React.useEffect(() => {
-        async function run(): Promise<void> {
-            if (!info?.indexManager) return;
-            cachedDevopsService.isSynced = true;
-            console.log('run');
-            // check azure linked items
-            const azureItems = getAllAzureLinkedFeedbacks(
-                info.indexManager,
-                cachedDevopsService
-            );
-            const map = createAzureItemsMap(azureItems);
-            const ids = getAzureItemIdsFromMap(map);
-            const azureWorkitems = await cachedDevopsService.getWorkItems(ids);
-            const changes = getAzureItemChanges(azureWorkitems.value, map);
-            changes.forEach((c) => {
-                dispatchItemUpdated(c.item.Id, getChangedFields(c));
-            });
-        }
-        if (cachedDevopsService.isSynced) return;
-        run().catch((err) => console.error(err));
     }, [info?.indexManager]);
 
     if (!info) return null;

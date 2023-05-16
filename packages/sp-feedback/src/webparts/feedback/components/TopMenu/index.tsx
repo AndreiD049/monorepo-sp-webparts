@@ -1,19 +1,15 @@
-import { openDatabase, removeCached } from 'idb-proxy';
 import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { Outlet, useNavigate } from 'react-router';
 import { Panel } from 'sp-components';
-import { removeLocalCache } from '../../../../features/incremental-sync';
 import {
-    DB_NAME,
-    INCREMENTAL_SYNC_CONFIG,
     MAIN_PANEL,
-    STORE_NAME,
 } from '../../constants';
 import FeedbackWebPart from '../../FeedbackWebPart';
 import { FilterDropdown } from '../FilterDropdown';
 import { LayoutSelect } from '../LayoutSelect';
 import styles from './TopMenu.module.scss';
+import { MainService } from '../../services/main-service';
 
 export interface ITopMenuProps {
     // Props go here
@@ -62,9 +58,7 @@ export const TopMenu: React.FC<ITopMenuProps> = (props) => {
                 },
                 onClick: () => {
                     async function run(): Promise<void> {
-                        await removeLocalCache(INCREMENTAL_SYNC_CONFIG.dbName)
-                        const db = await openDatabase(DB_NAME, STORE_NAME);
-                        await removeCached(db, /.*/);
+                        await MainService.SyncProvider.forget();
                         location.reload();
                     }
                     run().catch((err) => console.error(err));

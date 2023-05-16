@@ -95,7 +95,7 @@ export class IndexManager {
     private fieldIndexes: IndexMap;
 
     constructor(public items: Item[]) {
-        this.idIndex = new Index(items, (item) => item.Id?.toString());
+        this.idIndex = new Index(items, (item) => item.ID?.toString());
         this.tagIndex = new Index(items, (item) => item.Tags);
         this.titleIndex = new Index(items, (item) => item.Title);
         this.isServiceIndex = new Index(items, (item) =>
@@ -181,7 +181,7 @@ export class IndexManager {
 
     public itemRemoved(id: number | string): IndexManager {
         if (typeof id === 'number') {
-            this.items = this.items.filter((i) => i.Id !== id);
+            this.items = this.items.filter((i) => i.ID !== id);
         } else {
             this.items = this.items.filter((i) => i.Title !== id);
         }
@@ -189,8 +189,8 @@ export class IndexManager {
     }
 
     public itemUpdated(oldItem: Item, newItem: Item): IndexManager {
-        if (oldItem.Id !== undefined && newItem.Id !== undefined) {
-            this.items = this.items.map((i) => (i.Id === oldItem.Id ? newItem : i));
+        if (oldItem.ID !== undefined && newItem.ID !== undefined) {
+            this.items = this.items.map((i) => (i.ID === oldItem.ID ? newItem : i));
         } else {
             this.items = this.items.map((i) => (i.Title === oldItem.Title ? newItem : i));
         }

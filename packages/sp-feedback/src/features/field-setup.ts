@@ -24,7 +24,7 @@ function emptySetup(): FieldSetup {
 
 export function getFieldsSetupId(indexManager: IndexManager): string | number {
     const item = indexManager.filterFirst($eq('title', FIELD_VALUES));
-    return item?.Id || null;
+    return item?.ID || null;
 }
 
 export function getFieldsSetup(indexManager: IndexManager): FieldsSetup {

@@ -59,7 +59,7 @@ const Tag: React.FC<{
         const items = getItemsTaggedWith(indexManager, props.tag);
         showListOptionsCallout(target.current, {
             options: items.map((i) => ({
-                key: i.Id,
+                key: i.ID,
                 text: i.getFieldOr('caption', i.Title),
                 data: i,
             })),

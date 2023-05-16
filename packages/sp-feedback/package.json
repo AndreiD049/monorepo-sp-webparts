@@ -24,7 +24,6 @@
         "@tiptap/pm": "^2.0.0-beta.218",
         "@tiptap/react": "^2.0.0-beta.218",
         "@tiptap/starter-kit": "^2.0.0-beta.218",
-        "idb": "^7.1.1",
         "idb-proxy": "file:../idb-proxy/",
         "json-configuration": "file:../json-config-property-pane-control/",
         "office-ui-fabric-react": "^7.199.1",
@@ -35,6 +34,7 @@
         "react-router": "^6.8.1",
         "react-router-dom": "^6.8.1",
         "sp-components": "file:../sp-components/",
+        "sp-incremental-sync": "file:../sp-incremental-sync",
         "sp-preset": "file:../sp-preset/",
         "spfx-fast-serve": "^3.0.6",
         "tslib": "2.3.1"

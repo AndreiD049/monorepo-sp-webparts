@@ -12,11 +12,8 @@ import { IJsonConfig, PropertyPaneJsonConfiguration } from 'json-configuration';
 import * as strings from 'FeedbackWebPartStrings';
 import { Feedback, IFeedbackProps } from './components/Feedback';
 import { MainService } from './services/main-service';
-import SPBuilder, { InjectHeaders } from 'sp-preset';
+import SPBuilder, { IList, InjectHeaders } from 'sp-preset';
 import { IFeedbackConfig } from '../../models/IFeedbackConfig';
-import { SyncService } from '../../features/incremental-sync';
-import { INCREMENTAL_SYNC_CONFIG } from './constants';
-import { azureDevopsService } from '../../features/azure-integration';
 
 export interface IFeedbackWebPartProps {
     description: string;
@@ -25,10 +22,12 @@ export interface IFeedbackWebPartProps {
 
 export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebPartProps> {
     public static SPBuilder: SPBuilder = null;
+    public static list: IList = null;
     public static theme: IReadonlyTheme = null;
 
     public render(): void {
         if (!this.properties.config) return null;
+        if (!this.properties.config.rootUrl) return null;
         const element: React.ReactElement<IFeedbackProps> = React.createElement(
             Feedback,
             {
@@ -52,15 +51,6 @@ export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebP
             this.properties.config?.rootUrl
         );
         MainService.initService(sp, this.properties.config);
-        await SyncService.initService(
-            sp,
-            this.properties.config?.listName,
-            INCREMENTAL_SYNC_CONFIG
-        );
-        azureDevopsService.init(
-            this.properties.config?.azureDevopsUrl,
-            this.properties.config?.azureDevopsToken
-        );
     }
 
     protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {

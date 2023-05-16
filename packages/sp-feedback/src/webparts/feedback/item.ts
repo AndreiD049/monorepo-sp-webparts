@@ -30,7 +30,7 @@ export const SPECIAL_FIELDS: SPECIAL_KEYS[] = [
 ];
 
 export class Item implements IFeedbackItem {
-    Id: number | string;
+    ID: number | string;
     Title: string;
     Tags: string[];
     IsService: boolean;
@@ -41,7 +41,7 @@ export class Item implements IFeedbackItem {
 
     constructor(item?: IFeedbackItemRaw | IFeedbackItem) {
         if (item) {
-            this.Id = item.Id;
+            this.ID = item.ID;
             this.Title = item.Title;
             this.Tags = item.Tags;
             this.IsService = item.IsService;
@@ -159,7 +159,7 @@ function setSpecialFieldValue(
     let result = item.clone();
     switch (field.toLowerCase()) {
         case 'id':
-            result.Id = value as number;
+            result.ID = value as number;
             break;
         case 'is service':
         case 'isservice':
@@ -205,7 +205,7 @@ function getSpecialFieldValue<T>(item: Item, field: SPECIAL_KEYS): T {
     let result: T;
     switch (field) {
         case 'id':
-            result = item.Id as unknown as T;
+            result = item.ID as unknown as T;
             break;
         case 'is service':
         case 'isservice':

@@ -46,7 +46,7 @@ export const SaveFilterDialog: React.FC<ISaveFilterDialogProps> = (props) => {
         if (!willOverwrite) {
             dispatchItemAdded(newSavedFilter.asRaw(), null, () => handleUpdateSelectedFilter(newFilterName));
         } else {
-            dispatchItemUpdated(props.filterInfo.selectedItem.Id, newSavedFilter.Fields, null, () => handleUpdateSelectedFilter(newFilterName));
+            dispatchItemUpdated(props.filterInfo.selectedItem.ID, newSavedFilter.Fields, null, () => handleUpdateSelectedFilter(newFilterName));
         }
         props.onHide();
     };

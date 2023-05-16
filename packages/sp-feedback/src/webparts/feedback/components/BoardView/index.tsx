@@ -33,7 +33,7 @@ const DraggableItem: React.FC<IItemTemplateProps & { isMoved: boolean }> = (
     const [{ isDragging }, drag] = useDrag(
         {
             type: ITEM_TYPES.Item,
-            item: { id: props.item.Id },
+            item: { id: props.item.ID },
             collect: (monitor) => ({
                 isDragging: monitor.isDragging(),
             }),
@@ -74,7 +74,7 @@ const BoardColumn: React.FC<IBoardColumnProps> = (props) => {
             );
         },
         canDrop: (item) =>
-            props.items.find((i) => i.Id === item.id) === undefined,
+            props.items.find((i) => i.ID === item.id) === undefined,
     });
 
     const dndStyles: React.CSSProperties = React.useMemo(() => {
@@ -97,9 +97,9 @@ const BoardColumn: React.FC<IBoardColumnProps> = (props) => {
             <div className={styles.columnBody}>
                 {props.items.map((item) => (
                     <DraggableItem
-                        key={item.Id}
+                        key={item.ID}
                         item={item}
-                        isMoved={props.movedItems.indexOf(item.Id) !== -1}
+                        isMoved={props.movedItems.indexOf(item.ID) !== -1}
                     />
                 ))}
             </div>

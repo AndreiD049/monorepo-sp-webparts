@@ -19,7 +19,7 @@ export const NColumnLayout: React.FC<INColumnLayoutProps> = (props) => {
             {columns.map((items, idx) => (
                 <div key={idx} className={styles.column}>
                     {items.map((item) => (
-                        <ItemTemplate item={item} key={item.Id} />
+                        <ItemTemplate item={item} key={item.ID} />
                     ))}
                 </div>
             ))}

@@ -42,7 +42,7 @@ export class ItemsService {
         const cleanedPayload: Partial<IFeedbackItemRaw> = {
             ...payload,
             Author: undefined,
-            Id: undefined,
+            ID: undefined,
         };
         return this.itemsList.items.getById(id).update(cleanedPayload);
     }

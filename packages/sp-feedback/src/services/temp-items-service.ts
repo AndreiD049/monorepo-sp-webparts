@@ -50,8 +50,8 @@ export class TempItemsService {
         if (isRaw(item)) {
             target = fromRaw(item);
         }
-        if (!target.Id) {
-            target.Id = target.Title;
+        if (!target.ID) {
+            target.ID = target.Title;
         }
         localStorage.setItem(`${PREFIX}/${target.Title}`, JSON.stringify(target));
     }
