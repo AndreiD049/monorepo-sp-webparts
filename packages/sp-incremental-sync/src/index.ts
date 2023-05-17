@@ -4,13 +4,16 @@ import { IDBPDatabase, openDB, deleteDB } from 'idb';
 const NEXT_ATTR = 'ListItemCollectionPositionNext';
 const COUNT_ATTR = 'ItemCount';
 const TOKEN = 'LastChangeToken';
+const MAX_REQUESTS = 100;
 
-type ColumnType = 'Integer' | 'Float' | 'String' | 'Boolean' | 'Person';
+type ColumnType = 'Integer' | 'Float' | 'String' | 'Boolean' | 'Person' | 'MultiChoice';
 
 export type ItemSchema = {
     [field: string]: {
         type: ColumnType;
         indexed?: boolean;
+        keyPath?: string | string[];
+        transform?: (value: any) => any;
     };
 };
 
@@ -25,6 +28,7 @@ type ParsedResponce<T> = {
     itemCount: number;
     nextToken: string;
     items: { [uniqueId: string]: T };
+    moreChanges: boolean;
 };
 
 function mergeResponses<T>(
@@ -56,6 +60,7 @@ function parseResponce<T>(
         nextToken: '',
         itemCount: 0,
         items: {},
+        moreChanges: false,
     };
 
     const xml = new DOMParser().parseFromString(responceXML.trim(), 'text/xml');
@@ -84,6 +89,9 @@ function parseResponce<T>(
             const uniqueId = element.getAttribute('UniqueId');
             result.deletedItems.push(id + ';#' + uniqueId);
         }
+
+        // More changes
+        result.moreChanges = changes.getAttribute('MoreChanges') === 'TRUE';
     }
 
     const data = xml.querySelector('data');
@@ -129,6 +137,12 @@ function parseItem<T>(item: Element, schema: ItemSchema): T {
 
         if (value) {
             result[key] = parseValue(value, schema[key].type);
+            
+            // does the value need transformation?
+            const transform = schema[key].transform;
+            if (transform) {
+                result[key] = transform(result[key]);
+            }
         }
     }
 
@@ -146,7 +160,9 @@ function parseValue(value: string, type: ColumnType) {
         case 'Person':
             const [ID, rest] = value.split(';#');
             const [Title, LoginName, EMail] = rest.split(',#');
-            return { ID, Title, LoginName, EMail };
+            return { ID: parseInt(ID), Title, LoginName, EMail };
+        case 'MultiChoice':
+            return value.split(';#').slice(1, -1);
         default:
             return value;
     }
@@ -174,15 +190,18 @@ function parseValue(value: string, type: ColumnType) {
 // - when the last sync was
 // - the token
 // - the schema
-// TODO: add Where clause, also store it in meta table
-type StoreConfig = {
+export type StoreConfig = {
     list: IList;
     schema: ItemSchema;
     dbName: string;
+    where?: string; // https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ms467521(v=office.14)#query-schema-elements
     rowLimit?: string;
+    maxRequests?: number;
 };
 
 const META_STORE = 'meta_info';
+const SCHEMA_KEY = 'schema';
+const QUERY_KEY = 'query';
 const DATA_STORE = 'data';
 const MAX_ROWS = '100';
 
@@ -196,20 +215,21 @@ interface StoreProvider<T> {
 }
 
 export class IDBStoreProvider<T> implements StoreProvider<T> {
-    private db: Promise<IDBPDatabase>;
+    // private db: Promise<IDBPDatabase>;
 
     constructor(private config: StoreConfig) {
-        this.db = this.createDb();
         this.config.rowLimit = this.config.rowLimit || MAX_ROWS;
+        this.config.maxRequests = this.config.maxRequests || MAX_REQUESTS;
+        this.config.where = this.config.where || '';
     }
 
-    private createDb() {
+    private openDatabase() {
         const self = this;
         return openDB(this.config.dbName, undefined, {
             async upgrade(database) {
                 // Create the meta store
                 const meta = database.createObjectStore(META_STORE);
-				
+
                 // Create the data store
                 const data = database.createObjectStore(DATA_STORE);
 
@@ -219,9 +239,13 @@ export class IDBStoreProvider<T> implements StoreProvider<T> {
                     const key = keys[i];
                     const column = self.config.schema[key];
                     if (column.indexed) {
-                        data.createIndex(key, key);
+                        data.createIndex(key, column.keyPath || key);
                     }
                 }
+            },
+            blocking(_currentVersion, _blockedVersion, event) {
+                const db = event.target as IDBDatabase;
+                db.close();
             },
         });
     }
@@ -229,27 +253,49 @@ export class IDBStoreProvider<T> implements StoreProvider<T> {
     private async syncData(resync: boolean = false) {
         try {
             const list = this.config.list;
-            const token = await this.getToken();
+            const token = await this.getItem(META_STORE, TOKEN);
 
+            const prevSchema: string = await this.getItem(
+                META_STORE,
+                SCHEMA_KEY
+            );
+
+            // If schema changed, should resync
+            if (
+                !resync &&
+                prevSchema &&
+                prevSchema !== serializeSchema(this.config.schema)
+            ) {
+                // delete the database and create a new one, since schema changed
+                await this.forget();
+                await this.syncData(true);
+            }
             const responce = await list.getListItemChangesSinceToken({
                 ChangeToken: token,
+                Query: this.config.where || '',
                 RowLimit: this.config.rowLimit,
             });
+            
+            const query = (await this.getItem(META_STORE, QUERY_KEY)) || '';
+            // If query changed, should resync
+            if (!resync && query !== this.config.where) {
+                await this.forget();
+                await this.syncData(true);
+            }
 
             const parsed = parseResponce<T>(responce, this.config.schema);
 
             if (parsed.shouldResync && !resync) {
-                await this.setToken('');
+                await this.setItem(META_STORE, TOKEN, '')
                 await this.syncData(true);
             }
 
             let nextToken = parsed.nextToken;
-            while (nextToken) {
+            let maxRequests = this.config.maxRequests || 0;
+            for(let r = 0; r < maxRequests && nextToken; r++) {
                 const nextBatch = await list.getListItemChangesSinceToken({
-                    QueryOptions: `<QueryOptions>
-						<ExpandUserField>TRUE</ExpandUserField>
-						<Paging ListItemCollectionPositionNext="${nextToken}" />
-					</QueryOptions>`,
+                    QueryOptions: `<QueryOptions><ExpandUserField>TRUE</ExpandUserField><Paging ListItemCollectionPositionNext="${nextToken}" /></QueryOptions>`,
+                    Query: this.config.where || '',
                     RowLimit: this.config.rowLimit,
                 });
 
@@ -262,85 +308,129 @@ export class IDBStoreProvider<T> implements StoreProvider<T> {
                 nextToken = newParsed.nextToken;
             }
 
-            if (parsed.deletedItems.length > 0) {
-                for (let d = 0; d < parsed.deletedItems.length; d++) {
-                    const deletedId = parsed.deletedItems[d];
-                    await this.deleteDataItem(deletedId);
-                }
+            let moreChanges = parsed.moreChanges;
+            for (let r = 0; r < maxRequests && moreChanges; r++) {
+                const nextBatch = await list.getListItemChangesSinceToken({
+                    ChangeToken: parsed.token,
+                    Query: this.config.where || '',
+                    RowLimit: this.config.rowLimit,
+                });
+
+                const newParsed = parseResponce<T>(
+                    nextBatch,
+                    this.config.schema
+                );
+                mergeResponses(parsed, newParsed);
+                parsed.token = newParsed.token;
+                moreChanges = newParsed.moreChanges;
+            }
+
+            for (let d = 0; d < parsed.deletedItems.length; d++) {
+                const deletedId = parsed.deletedItems[d];
+                await this.deleteDataItem(deletedId);
             }
 
             await this.setData(parsed.items);
-            await this.setToken(parsed.token);
+            await this.setItem(META_STORE, TOKEN, parsed.token);
+            await this.setItem(META_STORE, QUERY_KEY, this.config.where || '')
+            await this.setItem(
+                META_STORE,
+                SCHEMA_KEY,
+                serializeSchema(this.config.schema)
+            );
         } catch (e) {
             await this.forget();
         }
     }
 
-    private async getToken() {
-        const db = await this.db;
-        const tx = db.transaction(META_STORE, 'readonly');
-        const store = tx.objectStore(META_STORE);
-        const result = await store.get(TOKEN);
-        return result || '';
+    private async setItem(store: string, key: string, item: any) {
+        await this.withOpenDb(async (db) => {
+            const tx = db.transaction(store, 'readwrite');
+            const so = tx.objectStore(store);
+            await so.put(item, key);
+            await tx.done;
+        });
     }
 
-    private async setToken(token: string) {
-        const db = await this.db;
-        const tx = db.transaction(META_STORE, 'readwrite');
-        const store = tx.objectStore(META_STORE);
-        await store.put(token, TOKEN);
-        await tx.done;
+    private async getItem(store: string, key: string) {
+        return this.withOpenDb(async (db) => {
+            const tx = db.transaction(store, 'readonly');
+            const so = tx.objectStore(store);
+            const result = await so.get(key);
+            await tx.done;
+            return result;
+        });
     }
 
     private async setData(data: { [uniqueId: string]: T }) {
-        const db = await this.db;
-        const tx = db.transaction(DATA_STORE, 'readwrite');
-        const store = tx.objectStore(DATA_STORE);
-        const keys = Object.keys(data);
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
-            const item = data[key];
-            await store.put(item, key);
-        }
-        await tx.done;
+        await this.withOpenDb(async (db) => {
+            const tx = db.transaction(DATA_STORE, 'readwrite');
+            const store = tx.objectStore(DATA_STORE);
+            const keys = Object.keys(data);
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+                const item = data[key];
+                await store.put(item, key);
+            }
+            await tx.done;
+        });
     }
 
     private async deleteDataItem(uniqueId: string) {
-        const db = await this.db;
-        const tx = db.transaction(DATA_STORE, 'readwrite');
-        const store = tx.objectStore(DATA_STORE);
-        await store.delete(uniqueId);
-        await tx.done;
+        await this.withOpenDb(async (db) => {
+            const tx = db.transaction(DATA_STORE, 'readwrite');
+            const store = tx.objectStore(DATA_STORE);
+            await store.delete(uniqueId);
+            await tx.done;
+        });
     }
 
     async getData(): Promise<T[]> {
         await this.syncData();
-        const db = await this.db;
-        const tx = db.transaction(DATA_STORE, 'readonly');
-        const store = tx.objectStore(DATA_STORE);
-        const result = await store.getAll();
-        await tx.done;
-        return result;
+        return this.withOpenDb(async (db) => {
+            const tx = db.transaction(DATA_STORE, 'readonly');
+            const store = tx.objectStore(DATA_STORE);
+            const result = await store.getAll();
+            await tx.done;
+            return result;
+        });
     }
 
     async getDataByKey(key: string, value: any): Promise<T[]> {
         await this.syncData();
-        // Get data from index by key
-        const db = await this.db;
-        const tx = db.transaction(DATA_STORE, 'readonly');
-        const store = tx.objectStore(DATA_STORE);
-        const index = store.index(key);
-        const result = await index.getAll(value);
-        await tx.done;
-        return result;
+        return this.withOpenDb(async (db) => {
+            // Get data from index by key
+            const tx = db.transaction(DATA_STORE, 'readonly');
+            const store = tx.objectStore(DATA_STORE);
+            const index = store.index(key);
+            const result = await index.getAll(value);
+            await tx.done;
+            return result;
+        });
     }
 
     async forget(): Promise<void> {
         await deleteDB(this.config.dbName);
     }
-
-    async close(): Promise<void> {
-        const db = await this.db;
-        db.close();
+    
+    updateConfig(config: Partial<StoreConfig>) {
+        this.config = {
+            ...this.config,
+            ...config,
+        };
     }
+
+    // Do something to the db, after the callback is executed
+    // the db will be closed
+    private async withOpenDb<T>(func: (db: IDBPDatabase) => T): Promise<T> {
+        const db = await this.openDatabase();
+        const result = await func(db);
+        db.close();
+        return result;
+    }
+}
+
+// Utils
+function serializeSchema(schema: ItemSchema): string {
+    return JSON.stringify(schema);
 }

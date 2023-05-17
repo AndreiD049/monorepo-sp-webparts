@@ -16,6 +16,9 @@ export const schema: ItemSchema = {
     },
     Fields: {
         type: 'String',
+        transform(value) {
+            return JSON.parse(value);
+        },
     },
     IsService: {
         type: 'Boolean',

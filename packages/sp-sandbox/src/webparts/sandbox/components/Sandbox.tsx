@@ -9,6 +9,9 @@ type SampleItem = {
     ID: number;
     Title: string;
     Samples: number;
+    Data: string;
+    MultiData: string[];
+    Archived: boolean;
     Responsible: {
         ID: number;
         Title: string;
@@ -34,6 +37,17 @@ const schema: ItemSchema = {
         indexed: true,
         keyPath: 'Responsible.EMail',
     },
+    Data: {
+        type: 'String',
+        indexed: true,
+    },
+    MultiData: {
+        type: 'MultiChoice',
+        indexed: true,
+    },
+    Archived: {
+        type: 'Boolean',
+    }
 };
 
 export function Sandbox(props: ISandboxProps): JSX.Element {
@@ -57,6 +71,19 @@ export function Sandbox(props: ISandboxProps): JSX.Element {
             .catch((err) => console.error(err));
     }, []);
 
+    const onSearch = async (): Promise<void> => {
+        const input = document.getElementById('where') as HTMLTextAreaElement;
+        if (!input) return;
+
+        const where = input.value;
+
+        provider.updateConfig({
+            where,
+        });
+        const items = await provider.getData();
+        setItems(items);
+    };
+
     return (
         <div>
             <h1>Sandbox</h1>
@@ -68,13 +95,29 @@ export function Sandbox(props: ISandboxProps): JSX.Element {
             <section>
                 <h2>Items</h2>
 
+                <textarea id="where" placeholder="Where" />
+                <button onClick={onSearch}>Search</button>
+
                 <ul>
                     {items.map((item) => {
                         return (
                             <li key={item.ID}>
-                                {item.Title} ({item.Samples}) -{' '}
-                                {item.Responsible?.Title} (
-                                {item.Responsible?.EMail}) - { item.Responsible?.LoginName } - { item.Responsible?.ID }
+                                <p>ID: {item.ID}</p>
+                                <p>Title: {item.Title}</p>
+                                <p>Samples: {item.Samples}</p>
+                                <p>Data: {item.Data}</p>
+                                <div>
+                                    <p>Responsible:</p>
+                                    <p style={{ marginLeft: 10 }}>
+                                        ID: {item.Responsible?.ID}
+                                    </p>
+                                    <p style={{ marginLeft: 10 }}>
+                                        Title: {item.Responsible?.Title}
+                                    </p>
+                                    <p style={{ marginLeft: 10 }}>
+                                        EMail: {item.Responsible?.EMail}
+                                    </p>
+                                </div>
                             </li>
                         );
                     })}

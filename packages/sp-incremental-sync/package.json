@@ -4,7 +4,7 @@
   "description": "Sharepoint incremental Sync changes since last token",
   "main": "dist/index.js",
   "type": "module",
-  "types": "./dist/src/index.d.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c --environment BUILD:production",
