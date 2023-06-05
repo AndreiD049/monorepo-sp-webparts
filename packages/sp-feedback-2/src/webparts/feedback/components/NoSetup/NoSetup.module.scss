@@ -1,0 +1,33 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.image {
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 20px;
+}
+
+.settingName {
+    text-decoration: underline;
+}
+
+.checkValueStatus {
+    padding-left: 8px;
+    font-weight: bold;
+
+    &.ok {
+        text-decoration: none;
+        color: $ms-color-success;
+    }
+
+    &.nok {
+        text-decoration: none;
+        color: $ms-color-error;
+    }
+}

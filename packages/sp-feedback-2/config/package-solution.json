@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "sp-feedback-2-client-side-solution",
+    "id": "5d7f0f2e-b224-48b8-b1eb-fb46328e0bdd",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.17.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "sp-feedback-2 description"
+      },
+      "longDescription": {
+        "default": "sp-feedback-2 description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "sp-feedback-2 Feature",
+        "description": "The feature that activates elements of the sp-feedback-2 solution.",
+        "id": "eb071b11-2830-4365-855b-4a9cc39b6fb5",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/sp-feedback-2.sppkg"
+  }
+}

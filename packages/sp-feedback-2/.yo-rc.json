@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "16.19.1",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.9.1"
+    },
+    "version": "1.17.2",
+    "libraryName": "sp-feedback-2",
+    "libraryId": "5d7f0f2e-b224-48b8-b1eb-fb46328e0bdd",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "sp-feedback-2",
+    "solutionShortDescription": "sp-feedback-2 description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
