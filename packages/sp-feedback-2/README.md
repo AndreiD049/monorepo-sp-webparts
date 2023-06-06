@@ -51,3 +51,4 @@ User lands on his personal page where he sees following info:
 - His recent feedbacks
 - Other people's recent feedbacks (Idealy that are somehow related to the feedbacks user left, or just any)
 - Breakdown of his feedback states. Maybe a bar chart with feedback per state (how many finished, how many new, approved etc)
+- Leave a link to https://icons8.com/ somewhere on the app

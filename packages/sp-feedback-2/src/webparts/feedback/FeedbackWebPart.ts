@@ -11,6 +11,8 @@ import { IReadonlyTheme } from "@microsoft/sp-component-base";
 import * as strings from "FeedbackWebPartStrings";
 import { NoSetup } from "./components/NoSetup";
 import { Router } from "./Router";
+import { SettingsService } from "./services/settings-service";
+import SPBuilder from "sp-preset";
 
 export interface IFeedbackWebPartProps {
   listRootUrl: string;
@@ -23,7 +25,7 @@ export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebP
 
   public async render(): Promise<void> {
     let element: React.ReactElement;
-
+    
     if (this.settingsDone) {
       element = React.createElement(
         Router,
@@ -47,6 +49,10 @@ export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebP
     ) {
       this.settingsDone = true;
     }
+    
+    // Init services
+    const sp = new SPBuilder(this.context).getSP(this.properties.listRootUrl);
+    SettingsService.initService(sp, this.properties.settingListTitle)
   }
 
   protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {

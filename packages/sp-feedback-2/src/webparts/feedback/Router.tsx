@@ -5,6 +5,7 @@ import { IFeedbackWebPartProps } from "./FeedbackWebPart";
 import { Settings } from "./pages/Settings";
 import { Board } from "./pages/Board";
 import { Home } from "./pages/Home";
+import { AppSettings } from "./features/applications/AppSettings";
 
 export const Router: React.FC<IFeedbackWebPartProps> = (props) => {
   const router = createHashRouter([
@@ -19,6 +20,16 @@ export const Router: React.FC<IFeedbackWebPartProps> = (props) => {
         {
           path: "settings",
           element: <Settings />,
+          children: [
+            {
+                path: "general",
+                element: <div>General</div>
+            },
+            {
+                path: "applications",
+                element: <AppSettings />
+            }
+          ]
         },
         {
           path: "new",
