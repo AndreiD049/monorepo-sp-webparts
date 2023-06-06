@@ -10,7 +10,6 @@ import { IReadonlyTheme } from "@microsoft/sp-component-base";
 
 import * as strings from "FeedbackWebPartStrings";
 import { NoSetup } from "./components/NoSetup";
-import { GlobalContextProvider } from "./Context";
 import { Router } from "./Router";
 
 export interface IFeedbackWebPartProps {
@@ -27,13 +26,8 @@ export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebP
 
     if (this.settingsDone) {
       element = React.createElement(
-        GlobalContextProvider,
-        {
-          listRootUrl: this.properties.listRootUrl,
-          listTitle: this.properties.listTitle,
-          settingListTitle: this.properties.settingListTitle,
-        },
-        React.createElement(Router)
+        Router,
+        {...this.properties}
       );
     } else {
       element = React.createElement(NoSetup, { properties: this.properties });
