@@ -18,3 +18,49 @@
     border-bottom: 1px solid $ms-color-neutralSecondaryAlt;
     margin-bottom: 1em;
 }
+
+.table {
+    border-collapse: separate;
+    border-spacing: 0 .75em;
+    border-radius: 5px;
+    
+    & tr {
+        background-color: $ms-color-neutralLighterAlt;
+        height: 60px;
+    }
+    
+    & td {
+        padding: 0 2em;
+    }
+    
+    & img {
+        display: block;
+    }
+    
+    .tableControlButtons {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: stretch;
+        gap: .5em;
+        
+        & button:first-child {
+            margin-top: 4px;
+        }
+    }
+}
+
+.addDialog {
+    width: 400px;
+
+    & form {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: stretch;
+        gap: .5em;
+    }
+    
+    & img {
+        max-width: 100%;
+        margin: auto;
+    }
+}
