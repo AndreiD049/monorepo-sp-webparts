@@ -260,25 +260,31 @@ export const AppSettings: React.FC<IAppSettingsProps> = (props) => {
                                         alt={app.Data.name}
                                     />
                                 </td>
-                                <td>{app.Data.name}</td>
-                                <td className={styles.tableControlButtons}>
-                                    <button
-                                        onClick={() =>
-                                            document.dispatchEvent(
-                                                new CustomEvent<IApplication>(
-                                                    EDIT_DIALOG_OPEN,
-                                                    { detail: app }
+                                <td>
+                                    <span className={styles.nameLabel}>{app.Data.name}</span>
+                                </td>
+                                <td>
+                                    <div className={styles.buttons}>
+                                        <button
+                                            onClick={() =>
+                                                document.dispatchEvent(
+                                                    new CustomEvent<IApplication>(
+                                                        EDIT_DIALOG_OPEN,
+                                                        { detail: app }
+                                                    )
                                                 )
-                                            )
-                                        }
-                                    >
-                                        🔧 Edit
-                                    </button>
-                                    <button
-                                        onClick={() => onDeleteSetting(app.ID)}
-                                    >
-                                        🗑️ Delete
-                                    </button>
+                                            }
+                                        >
+                                            🔧 Edit
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                onDeleteSetting(app.ID)
+                                            }
+                                        >
+                                            🗑️ Delete
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
