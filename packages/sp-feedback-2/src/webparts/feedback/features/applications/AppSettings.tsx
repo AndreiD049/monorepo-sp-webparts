@@ -11,33 +11,46 @@ import { SettingsService } from '../../services/settings-service';
 
 export interface IAppSettingsProps {}
 
+const ADD_DIALOG_OPEN = 'AddDialogOpen';
+const EDIT_DIALOG_OPEN = 'EditDialogOpen';
+
 const AddDialog: React.FC<{ onAdded: (app: IApplication) => void }> = (
     props
 ) => {
-    const [imgUrl, setImgUrl] = React.useState('');
+    const dialogRef = React.useRef(null);
+    const [newApp, setNewApp] = React.useState<IApplication['Data']>({
+        name: '',
+        active: true,
+        imageUrl: '',
+    });
 
     const closeDialog = (): void => {
-        const dialog = document.getElementById('appAddDialog') as any;
-        dialog.close();
+        if (!dialogRef.current) {
+            return;
+        }
+
+        dialogRef.current.close();
     };
+
+    React.useEffect(() => {
+        const handler = (ev: CustomEvent): void => {
+            if (!dialogRef.current) {
+                return;
+            }
+
+            dialogRef.current.showModal();
+        };
+
+        document.addEventListener(ADD_DIALOG_OPEN, handler);
+
+        return () => document.removeEventListener(ADD_DIALOG_OPEN, handler);
+    }, []);
 
     const onAddApplication = async (ev: React.FormEvent): Promise<void> => {
         closeDialog();
         ev.preventDefault();
 
-        const nameEl = document.getElementById('name') as HTMLInputElement;
-        const name = nameEl.value;
-        nameEl.value = '';
-
-        const imageUrlEl = document.getElementById(
-            'imageUrl'
-        ) as HTMLInputElement;
-        const imageUrl = imageUrlEl.value;
-        imageUrlEl.value = '';
-
-        setImgUrl('');
-
-        const added = await addApplication({ name, imageUrl, active: true });
+        const added = await addApplication(newApp);
         props.onAdded(added);
     };
 
@@ -46,20 +59,44 @@ const AddDialog: React.FC<{ onAdded: (app: IApplication) => void }> = (
             id="appAddDialog"
             onKeyDown={(evt) => evt.key === 'Escape' && closeDialog()}
             className={styles.addDialog}
+            ref={dialogRef}
         >
             <h1>Add application</h1>
             <p>Application for the user to select</p>
             <form onSubmit={onAddApplication}>
                 <label htmlFor="name">Name</label>
-                <input required type="text" name="name" id="name" />
+                <input
+                    required
+                    type="text"
+                    value={newApp.name}
+                    autoComplete="off"
+                    onChange={(ev) => {
+                        if (typeof ev.target.value === 'string') {
+                            setNewApp((prev) => ({
+                                ...prev,
+                                name: ev.target.value,
+                            }));
+                        }
+                    }}
+                />
+
                 <label htmlFor="imageUrl">Image URL</label>
                 <input
                     type="text"
-                    name="imageUrl"
-                    id="imageUrl"
-                    onChange={(evt) => setImgUrl(evt.target.value)}
+                    value={newApp.imageUrl}
+                    autoComplete="off"
+                    onChange={(ev) => {
+                        if (typeof ev.target.value === 'string') {
+                            setNewApp((prev) => ({
+                                ...prev,
+                                imageUrl: ev.target.value,
+                            }));
+                        }
+                    }}
                 />
-                {imgUrl && <img src={imgUrl} alt="Preview" />}
+
+                {newApp.imageUrl && <img src={newApp.imageUrl} alt="Preview" />}
+
                 <button type="submit">Add</button>
             </form>
         </dialog>
@@ -69,74 +106,90 @@ const AddDialog: React.FC<{ onAdded: (app: IApplication) => void }> = (
 const EditDialog: React.FC<{
     onEdited: (app: IApplication) => void;
 }> = (props) => {
-    const nameEl = React.useRef<HTMLInputElement>(null);
-    const imageUrlEl = React.useRef<HTMLInputElement>(null);
-    const [app, setApp] = React.useState(null);
-    const [imgUrl, setImgUrl] = React.useState('');
+    const dialogRef = React.useRef(null);
+    const [app, setApp] = React.useState<IApplication>(null);
 
     const closeDialog = (): void => {
-        const dialog = document.getElementById('appEditDialog') as any;
-        dialog.close();
-    };
+        if (!dialogRef.current) {
+            return;
+        }
 
-    const showDialog = (): void => {
-        const dialog = document.getElementById('appEditDialog') as any;
-        dialog.showModal();
+        dialogRef.current.close();
     };
 
     const onSubmit = async (ev: React.FormEvent): Promise<void> => {
         closeDialog();
         ev.preventDefault();
-        const name = nameEl.current.value;
-        const imageUrl = imageUrlEl.current.value;
-        const edited = await editApplication(app.ID, {
-            name,
-            imageUrl,
-            active: true,
-        });
+
+        const edited = await editApplication(app.ID, app.Data);
         props.onEdited(edited);
     };
 
     React.useEffect(() => {
         const handler = (ev: CustomEvent<IApplication>): void => {
+            if (!dialogRef.current) {
+                return;
+            }
+
             setApp(ev.detail);
-            setImgUrl(ev.detail.Data.imageUrl);
-            nameEl.current.value = ev.detail.Data.name;
-            imageUrlEl.current.value = ev.detail.Data.imageUrl;
-            showDialog();
+            dialogRef.current.showModal();
         };
-        document.addEventListener('showEditDialog', handler);
-        return () => document.removeEventListener('showEditDialog', handler);
+
+        document.addEventListener(EDIT_DIALOG_OPEN, handler);
+
+        return () => document.removeEventListener(EDIT_DIALOG_OPEN, handler);
     }, []);
 
     return (
         <dialog
             id="appEditDialog"
             className={styles.addDialog}
+            ref={dialogRef}
             onKeyDown={(ev) => ev.key === 'Escape' && closeDialog()}
         >
             <h1>Edit application</h1>
-            <p>Warning: editing the application does not change existing feedbacks</p>
+            <p>
+                Warning: editing the application does not change existing
+                feedbacks
+            </p>
             <form onSubmit={onSubmit}>
                 <label htmlFor="name">Name</label>
                 <input
-                    ref={nameEl}
                     required
                     type="text"
-                    name="name"
-                    id="name"
+                    autoComplete="off"
+                    value={app?.Data.name}
+                    onChange={(ev) => {
+                        if (typeof ev.target.value === 'string') {
+                            setApp((prev) => ({
+                                ...prev,
+                                Data: { ...prev.Data, name: ev.target.value },
+                            }));
+                        }
+                    }}
                 />
+
                 <label htmlFor="imageUrl">Image URL</label>
                 <input
-                    ref={imageUrlEl}
                     type="text"
-                    name="imageUrl"
-                    id="imageUrl"
-                    onChange={(ev) => setImgUrl(ev.target.value)}
+                    autoComplete="off"
+                    value={app?.Data.imageUrl}
+                    onChange={(ev) => {
+                        if (typeof ev.target.value === 'string') {
+                            setApp((prev) => ({
+                                ...prev,
+                                Data: {
+                                    ...prev.Data,
+                                    imageUrl: ev.target.value,
+                                },
+                            }));
+                        }
+                    }}
                 />
-                {imgUrl && (
-                    <img src={imgUrl} alt="Preview" />
+                {app?.Data.imageUrl && (
+                    <img src={app.Data.imageUrl} alt="Preview" />
                 )}
+
                 <button type="submit">Save</button>
             </form>
         </dialog>
@@ -167,8 +220,9 @@ export const AppSettings: React.FC<IAppSettingsProps> = (props) => {
     };
 
     const foundApps = search
-        ? apps.filter((app) =>
-              app.Data.name.toLowerCase().indexOf(search.toLowerCase()) > -1
+        ? apps.filter(
+              (app) =>
+                  app.Data.name.toLowerCase().indexOf(search.toLowerCase()) > -1
           )
         : apps;
 
@@ -212,7 +266,7 @@ export const AppSettings: React.FC<IAppSettingsProps> = (props) => {
                                         onClick={() =>
                                             document.dispatchEvent(
                                                 new CustomEvent<IApplication>(
-                                                    'showEditDialog',
+                                                    EDIT_DIALOG_OPEN,
                                                     { detail: app }
                                                 )
                                             )
@@ -231,7 +285,9 @@ export const AppSettings: React.FC<IAppSettingsProps> = (props) => {
                     </tbody>
                 </table>
             </div>
+
             <AddDialog onAdded={(app) => setApps((prev) => [...prev, app])} />
+
             <EditDialog
                 onEdited={(app) =>
                     setApps((prev) =>
