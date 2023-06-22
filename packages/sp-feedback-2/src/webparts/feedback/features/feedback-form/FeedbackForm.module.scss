@@ -1,0 +1,113 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 1em;
+    padding: 1em;
+    background-color: $ms-color-neutralLighter;
+}
+
+.form-heading {
+    font-size: 1.3em;
+	text-decoration: underline;
+    text-align: center;
+}
+
+.step {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.control {
+    padding-right: 5em;
+    border-right: 1px solid $ms-color-neutralTertiaryAlt;
+    min-height: 200px;
+	min-width: 200px;
+}
+
+.visualization {
+    padding-left: 5em;
+	min-width: 200px;
+
+	& img {
+		height: 100px;
+	}
+
+	& img.show {
+		animation: fade-in .5s ease-in;
+		animation-fill-mode: forwards;
+	}
+}
+
+
+.step-visualization {
+	background-color: "[theme: themePrimary, default: #0078d4]";
+	position: relative;
+
+	& .center-image {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	& .step-line {
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translate(-50%, 100%) scaleY(0);
+		transform-origin: center top;
+		width: 5px;
+		background-color: "[theme: themePrimary, default: #0078d4]";
+	}
+
+	& .step-line.show {
+		animation: step-animation .5s ease-in;
+		animation-fill-mode: forwards;
+	}
+}
+
+.country-dropdown {
+	min-width: 200px;
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes step-animation {
+	from {
+		transform: translate(-50%, 100%) scaleY(0);
+	}
+	to {
+		transform: translate(-50%, 100%) scaleY(1);
+	}
+}
+
+@media screen and (max-width: 600px) {
+	.step {
+		flex-flow: column nowrap;
+		align-items: center;
+	}
+
+	.control {
+		border-right: none;
+		min-width: 0;
+		min-height: 0;
+		padding: 3em 0;
+	}
+
+	.visualization {
+		padding-left: 0;
+		min-width: 0;
+	}
+}
+

@@ -6,6 +6,7 @@ import { Settings } from "./pages/Settings";
 import { Board } from "./pages/Board";
 import { Home } from "./pages/Home";
 import { AppSettings } from "./features/applications/AppSettings";
+import { FeedbackForm } from "./features/feedback-form/FeedbackForm";
 
 export const Router: React.FC<IFeedbackWebPartProps> = (props) => {
   const router = createHashRouter([
@@ -33,7 +34,7 @@ export const Router: React.FC<IFeedbackWebPartProps> = (props) => {
         },
         {
           path: "new",
-          element: <div>New</div>,
+          element: <FeedbackForm />,
         },
         {
           path: "board",
