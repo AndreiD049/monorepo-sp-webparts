@@ -15,6 +15,14 @@ class SettingsProvider {
     public async getSettings(title: string): Promise<IBaseSetting[]> {
         return this.list.items.filter(`Title eq '${title}'`)();
     }
+
+    public async getSettingsAs<T>(title: string): Promise<T[]> {
+        return this.list.items.filter(`Title eq '${title}'`)()
+			.then((settings) => settings.map((setting) => ({
+				...setting,
+				Data: JSON.parse(setting.Data) as T,
+		})));
+    }
     
     public async addSetting(setting: Partial<IBaseSetting>): Promise<IBaseSetting> {
         const added = await this.list.items.add(setting);

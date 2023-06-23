@@ -5,8 +5,7 @@ import { IApplication } from './IApplication';
 const APPLICATIONS_TITLE = 'APPLICATION';
 
 export async function getApplications(): Promise<IApplication[]> {
-    const appsRaw = await SettingsService.getSettings(APPLICATIONS_TITLE);
-    const apps: IApplication[] = appsRaw.map((app) => parseApplication(app));
+    const apps = await SettingsService.getSettingsAs<IApplication>(APPLICATIONS_TITLE);
     return apps;
 }
 

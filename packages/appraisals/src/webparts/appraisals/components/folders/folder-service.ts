@@ -93,7 +93,7 @@ export default class ManageFolderService {
         await this.ensureUserAndRoleDefinitionInfo();
         const query = `ContentType eq 'Folder'`;
         const folders: IUserFolder[] = (
-            await this.list.items.filter(query).select(...LIST_SELECT)()
+            await this.list.items.filter(query).select(...LIST_SELECT).top(300)()
         ).map((folder: IUserFolder) => {
             folder.folderUser = this.userList.find(
                 (u) => u.Title === folder.Title
