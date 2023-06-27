@@ -140,8 +140,9 @@
 		min-width: 0;
 	}
 
-	.rich-editor {
-		min-width: 90%;
+	.rich-editor, .feedback-title {
+		align-self: flex-start;
+		min-width: 90vw;
 	}
 }
 

@@ -7,7 +7,7 @@
   },
   "main": "lib/index.js",
   "scripts": {
-    "build": "gulp bundle",
+	"build": "gulp clean && gulp bundle --ship && gulp package-solution --ship",
     "clean": "gulp clean",
     "test": "gulp test",
     "serve": "gulp bundle --custom-serve --max_old_space_size=4096 && fast-serve"

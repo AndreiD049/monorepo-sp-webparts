@@ -1,5 +1,4 @@
 import * as React from 'react';
-import styles from './FeedbackForm.module.scss';
 import { NavigationBar } from '../../components/NavigationBar';
 import { Link, useNavigate } from 'react-router-dom';
 import { ICountry, getCountries } from './countries';
@@ -17,6 +16,9 @@ import {
 } from 'office-ui-fabric-react';
 import { RichEditor } from '../../components/RichEditor/RichEditor';
 import { FeedbackService } from '../feedback/feedback-service';
+import { Done } from './Done';
+import styles from './FeedbackForm.module.scss';
+import doneStyles from './Done.module.scss';
 
 export interface IFeedbackFormProps {
     // Props go here
@@ -26,7 +28,7 @@ const additionalOptionOther: IDropdownOption = {
     key: 'other',
     text: 'Other',
     data: {
-        Data: { code: 'other' },
+		Data: { code: 'other', name: 'Other' },
     },
 };
 
@@ -36,6 +38,7 @@ const additionalOptionNA: IDropdownOption = {
     data: {
         Data: {
             code: 'na',
+			name: 'NA',
             imageUrl: require('../../assets/na.png'),
         },
     },
@@ -242,6 +245,14 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
 			Title: title,
             Description: description,
         });
+
+		const animation = document.getElementById('done-animation') as HTMLDivElement;
+		animation.classList.add(doneStyles.show);
+
+		const animationText = animation.firstElementChild as HTMLDivElement;
+		animationText.classList.add(doneStyles.show);
+
+		setTimeout(() => navigate('/'), 3000);
     };
 
     return (
@@ -480,6 +491,7 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                     </div>
                 </form>
             </div>
+			<Done />
         </>
     );
 };
