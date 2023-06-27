@@ -8,6 +8,7 @@ export function FormDropdown<T>(props: {
 	onChange: (option: T) => void;
 	transform: (option: T) => IDropdownOption;
 	additionalOptions?: IDropdownOption[];
+	disabled?: boolean;
 }): JSX.Element {
 	const options = props.options.map((opt) => props.transform(opt)).concat(props.additionalOptions || []);
 
@@ -27,6 +28,7 @@ export function FormDropdown<T>(props: {
 			placeholder="--Select--"
 			options={options}
 			onChange={handleChange}
+			disabled={props.disabled}
 		/>
 	);
 }

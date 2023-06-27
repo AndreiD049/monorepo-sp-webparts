@@ -85,17 +85,23 @@
 	min-width: 200px;
 }
 
-.rich-editor {
+.rich-editor, .feedback-title {
 	min-width: 600px;
+}
 
-	& :global(.ProseMirror) {
-		outline: none;
-		min-height: 150px;
-		border: 5px solid;
-		border-color: "[theme: themePrimary, default: #0078d4]";
-		border-radius: 2px;
-		padding: 5px;
-	}
+.form-buttons {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	justify-content: flex-end;
+	margin-top: 1em;
+}
+
+.form-invisible-input {
+	height: 0;
+	width: 0;
+	border: none;
+	outline: none;
 }
 
 @keyframes fade-in {

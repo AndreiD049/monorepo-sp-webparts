@@ -9,6 +9,8 @@ import styles from './RichEditor.module.scss';
 export interface IRichEditorProps {
 	id?: string;
 	editable?: boolean;
+	initialCotnent?: string;
+	onChange: (html: string) => void;
 }
 
 export async function getBase64DataFromFile(file: File): Promise<string> {
@@ -36,7 +38,12 @@ const ImageDialog: React.FC<{ isOpen: boolean; onDismiss: () => void, onSubmit: 
 	let body;
 	if (type === 'attach') {
 		body = (
-			<label htmlFor="file-input" className={styles['file-input-wrapper']}>
+			<button className={styles['file-input-wrapper']}
+				onClick={() => {
+					const input = document.getElementById("file-input") as HTMLInputElement;
+					input.click();
+				}}
+			>
 				<span
 					className={styles['file-input-label']}
 				>
@@ -50,13 +57,12 @@ const ImageDialog: React.FC<{ isOpen: boolean; onDismiss: () => void, onSubmit: 
 					id="file-input"
 					accept="image/*"
 					onChange={(ev) => {
-						console.log(ev, file, setFile);
 						const target = ev.target as HTMLInputElement;
 						if (target.files.length === 0) return;
 						setFile(target.files[0]);
 					}}
 				/>
-			</label>
+			</button>
 		);
 	} else {
 		body = <div>
@@ -65,9 +71,9 @@ const ImageDialog: React.FC<{ isOpen: boolean; onDismiss: () => void, onSubmit: 
 	}
 
 	const onDismiss = (): void => {
-		setFile(null);
-		setUrl('');
 		props.onDismiss();
+			setFile(null);
+			setUrl('');
 	}
 
 	const onSubmit = async (): Promise<void> => {
@@ -131,6 +137,7 @@ export const RichEditor: React.FC<IRichEditorProps> = ({
 	...props
 }) => {
 	const [imageDialogOpen, setImageDialogOpen] = React.useState<boolean>(false);
+
 	const editor = useEditor({
 		extensions: [
 			StarterKit,
@@ -146,9 +153,10 @@ export const RichEditor: React.FC<IRichEditorProps> = ({
 				},
 			}),
 		],
-		onUpdate: (innerProps) => console.log(innerProps.editor.getHTML()),
-		onBlur: (innerProps) => console.log(innerProps.editor.getHTML()),
-		content: '<p>Hello World! 🌎️</p>',
+		onUpdate: (innerProps) => props.onChange(innerProps.editor.getHTML()),
+		onBlur: (innerProps) => props.onChange(innerProps.editor.getHTML()),
+		content: props.initialCotnent || '',
+		editable: editable,
 	});
 
 	return (

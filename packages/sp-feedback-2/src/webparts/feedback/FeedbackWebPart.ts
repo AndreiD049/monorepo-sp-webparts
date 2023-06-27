@@ -13,6 +13,7 @@ import { NoSetup } from "./components/NoSetup";
 import { Router } from "./Router";
 import { SettingsService } from "./services/settings-service";
 import SPBuilder from "sp-preset";
+import { FeedbackService } from "./features/feedback/feedback-service";
 
 export interface IFeedbackWebPartProps {
   listRootUrl: string;
@@ -53,6 +54,7 @@ export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebP
     // Init services
     const sp = new SPBuilder(this.context).getSP(this.properties.listRootUrl);
     SettingsService.initService(sp, this.properties.settingListTitle)
+    FeedbackService.initService(sp, this.properties.listTitle)
   }
 
   protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {

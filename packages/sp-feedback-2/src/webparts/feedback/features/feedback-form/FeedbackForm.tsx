@@ -1,14 +1,22 @@
 import * as React from 'react';
 import styles from './FeedbackForm.module.scss';
 import { NavigationBar } from '../../components/NavigationBar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ICountry, getCountries } from './countries';
 import { IApplication } from '../applications/IApplication';
 import { getApplications } from '../applications/applications';
 import { FormDropdown } from './FormDropdown';
 import { getRequestTypes, IRequestType } from './request-types';
-import { ChoiceGroup, IDropdownOption, Label } from 'office-ui-fabric-react';
+import {
+    ChoiceGroup,
+    DefaultButton,
+    IDropdownOption,
+    Label,
+    PrimaryButton,
+    TextField,
+} from 'office-ui-fabric-react';
 import { RichEditor } from '../../components/RichEditor/RichEditor';
+import { FeedbackService } from '../feedback/feedback-service';
 
 export interface IFeedbackFormProps {
     // Props go here
@@ -17,7 +25,9 @@ export interface IFeedbackFormProps {
 const additionalOptionOther: IDropdownOption = {
     key: 'other',
     text: 'Other',
-    data: null,
+    data: {
+        Data: { code: 'other' },
+    },
 };
 
 const additionalOptionNA: IDropdownOption = {
@@ -25,6 +35,7 @@ const additionalOptionNA: IDropdownOption = {
     text: 'Not applicable',
     data: {
         Data: {
+            code: 'na',
             imageUrl: require('../../assets/na.png'),
         },
     },
@@ -159,6 +170,7 @@ const Step: React.FC<{
 };
 
 export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
+    const navigate = useNavigate();
     const [country, setCountry] = React.useState<ICountry>(null);
     const [application, setApplication] = React.useState<IApplication>(null);
     const [countries, setCountries] = React.useState<ICountry[]>([]);
@@ -166,6 +178,10 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
     const [type, setType] = React.useState<IRequestType>(null);
     const [types, setTypes] = React.useState<IRequestType[]>([]);
     const [priority, setPriority] = React.useState<string>(null);
+    const [title, setTitle] = React.useState<string>('');
+    const [description, setDescription] = React.useState<string>('');
+    const [controlsDisabled, setControlsDisabled] =
+        React.useState<boolean>(false);
 
     React.useEffect(() => {
         getCountries()
@@ -201,9 +217,32 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
     }, []);
 
     let countryImage;
-    if (country && country.Data) {
+    if (country && country.Data.code !== 'other') {
         countryImage = `https://flagcdn.com/256x192/${country.Data.code.toLowerCase()}.png`;
     }
+
+    const onCancel = (): void => {
+        const confirmed = confirm(
+            'Are you sure you want to cancel?\nAll changes will be lost.'
+        );
+        if (confirmed) {
+            navigate('/');
+        }
+    };
+
+    const onSubmit = async (evt: React.FormEvent): Promise<void> => {
+        setControlsDisabled(true);
+        evt.preventDefault();
+        await FeedbackService.addFeedback({
+            Application: application?.Data.name,
+            Country: country?.Data.code,
+            Category: type?.Data.code,
+            Priority: priority,
+            Status: 'New',
+			Title: title,
+            Description: description,
+        });
+    };
 
     return (
         <>
@@ -215,49 +254,68 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                 <div className={styles['form-heading']}>
                     <h1>New feedback</h1>
                 </div>
-                <form>
+                <form onSubmit={onSubmit}>
                     <Step
                         id="country"
                         control={
-                            <FormDropdown
-                                options={countries}
-                                label="Country"
-                                onChange={(c) => {
-                                    setCountry(c);
-                                    animateLine('country');
-                                    animateImage('country');
-                                }}
-                                transform={(opt) => ({
-                                    key: opt.Data.code,
-                                    text: opt.Data.name,
-                                    data: opt,
-                                })}
-                                additionalOptions={[additionalOptionOther]}
-                            />
+                            <>
+                                <FormDropdown
+									disabled={controlsDisabled}
+                                    options={countries}
+                                    label="Country"
+                                    onChange={(c) => {
+                                        setCountry(c);
+                                        animateLine('country');
+                                        animateImage('country');
+                                    }}
+                                    transform={(opt) => ({
+                                        key: opt.Data.code,
+                                        text: opt.Data.name,
+                                        data: opt,
+                                    })}
+                                    additionalOptions={[additionalOptionOther]}
+                                />
+                                <input
+                                    tabIndex={-1}
+                                    name="country"
+                                    className={styles['form-invisible-input']}
+                                    required
+                                    value={country?.Data.code}
+                                />
+                            </>
                         }
                         imageSrc={countryImage}
                     />
                     <Step
                         id="application"
                         control={
-                            <FormDropdown
-                                options={applications}
-                                label="System"
-                                onChange={(c) => {
-                                    setApplication(c);
-                                    animateLine('application');
-                                    animateImage('application');
-                                }}
-                                transform={(opt) => ({
-                                    key: opt.Data.name,
-                                    text: opt.Data.name,
-                                    data: opt,
-                                })}
-                                additionalOptions={[
-                                    additionalOptionOther,
-                                    additionalOptionNA,
-                                ]}
-                            />
+                            <>
+                                <FormDropdown
+									disabled={controlsDisabled}
+                                    options={applications}
+                                    label="System"
+                                    onChange={(c) => {
+                                        setApplication(c);
+                                        animateLine('application');
+                                        animateImage('application');
+                                    }}
+                                    transform={(opt) => ({
+                                        key: opt.Data.name,
+                                        text: opt.Data.name,
+                                        data: opt,
+                                    })}
+                                    additionalOptions={[
+                                        additionalOptionOther,
+                                        additionalOptionNA,
+                                    ]}
+                                />
+                                <input
+                                    tabIndex={-1}
+                                    className={styles['form-invisible-input']}
+                                    required
+                                    value={application?.Data.name}
+                                />
+                            </>
                         }
                         imageSrc={
                             application ? application.Data.imageUrl : null
@@ -266,21 +324,30 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                     <Step
                         id="type"
                         control={
-                            <FormDropdown
-                                options={types}
-                                label="Request type"
-                                onChange={(c) => {
-                                    setType(c);
-                                    animateLine('type');
-                                    animateImage('type');
-                                }}
-                                transform={(opt) => ({
-                                    key: opt.Data.code,
-                                    text: opt.Data.name,
-                                    data: opt,
-                                })}
-                                additionalOptions={[additionalOptionOther]}
-                            />
+                            <>
+                                <FormDropdown
+									disabled={controlsDisabled}
+                                    options={types}
+                                    label="Request type"
+                                    onChange={(c) => {
+                                        setType(c);
+                                        animateLine('type');
+                                        animateImage('type');
+                                    }}
+                                    transform={(opt) => ({
+                                        key: opt.Data.code,
+                                        text: opt.Data.name,
+                                        data: opt,
+                                    })}
+                                    additionalOptions={[additionalOptionOther]}
+                                />
+                                <input
+                                    tabIndex={-1}
+                                    className={styles['form-invisible-input']}
+                                    required
+                                    value={type?.Data.code}
+                                />
+                            </>
                         }
                         imageSrc={type ? type.Data.imageUrl : null}
                     />
@@ -289,6 +356,7 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                         control={
                             <div>
                                 <ChoiceGroup
+									disabled={controlsDisabled}
                                     id="priority"
                                     required
                                     onChange={(_e, c) => {
@@ -351,23 +419,64 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                                 : require('../../assets/priority_medium.png')
                         }
                     />
+                    <div className={styles['feedback-title']}>
+                        <TextField
+							disabled={controlsDisabled}
+                            id="title"
+                            label="Title"
+                            required
+                            value={title}
+                            onChange={(_e, value) => setTitle(value)}
+                        />
+                    </div>
                     <div className={styles['rich-editor']}>
                         <Label
                             htmlFor="details"
                             onClick={() => {
-                                const container = document.getElementById('details');
+                                const container =
+                                    document.getElementById('details');
                                 if (!container) return;
-								
-								const editor = container.querySelector('.ProseMirror') as HTMLDivElement;
-								if (!editor) return;
 
-								editor.focus();
+                                const editor = container.querySelector(
+                                    '.ProseMirror'
+                                ) as HTMLDivElement;
+                                if (!editor) return;
+
+                                editor.focus();
                             }}
-							required
+                            required
                         >
                             Description
                         </Label>
-                        <RichEditor id="details" />
+                        <RichEditor
+                            id="details"
+							editable={!controlsDisabled}
+							key={controlsDisabled.toString()}
+                            initialCotnent={description}
+                            onChange={(html) => setDescription(html)}
+                        />
+
+                        <div className={styles['form-buttons']}>
+                            <PrimaryButton
+                                disabled={controlsDisabled}
+                                type="submit"
+                            >
+                                Submit
+                            </PrimaryButton>
+                            <DefaultButton
+                                disabled={controlsDisabled}
+                                type="button"
+                            >
+                                Save as draft
+                            </DefaultButton>
+                            <DefaultButton
+                                disabled={controlsDisabled}
+                                onClick={onCancel}
+                                type="button"
+                            >
+                                Cancel
+                            </DefaultButton>
+                        </div>
                     </div>
                 </form>
             </div>

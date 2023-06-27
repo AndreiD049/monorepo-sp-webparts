@@ -40,41 +40,59 @@
 }
 
 .image-dialog {
-	& .body {
-		margin-top: 1em;
-	}
+    & .body {
+        margin-top: 1em;
+    }
 
-	& .file-input-wrapper {
-		  display: inline-block;
-		  position: relative;
-		  padding: 10px 20px;
-		  background-color: "[theme: themePrimary, default: #0078d4]";
-		  color: "[theme: white, default: #fff]";
-		  border-radius: 2px;
-		  cursor: pointer;
+    & .file-input-wrapper {
+        display: inline-block;
+        position: relative;
+        padding: 10px 20px;
+        background-color: '[theme: themePrimary, default: #0078d4]';
+        color: '[theme: white, default: #fff]';
+        border-radius: 2px;
+        border: none;
+        cursor: pointer;
 
-		  & input[type='file'] {
-			  display: none;
-		  }
+        & input[type='file'] {
+            display: none;
+        }
 
-		  &:hover {
-			background-color: "[theme: themeDarkAlt, default: #106ebe]";
-		  }
-	}
+        &:hover {
+            background-color: '[theme: themeDarkAlt, default: #106ebe]';
+        }
+    }
 
-	& .file-input-label {
-		display: block;
-		font-weight: bold;
-		margin-bottom: 5px;
-	}
+    & .file-input-label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
 
-	& .file-name {
-		display: inline-block;
-		margin-left: 10px;
-	}
+    & .file-name {
+        display: inline-block;
+        margin-left: 10px;
+    }
 }
 
 :global(.ProseMirror) {
+    outline: none;
+    min-height: 150px;
+    border: 1px solid;
+    border-color: '[theme: themePrimary, default: #0078d4]';
+    border-radius: 2px;
+    padding: 5px;
+    background-color: '[theme: primaryBackground, default: #fff]';
+
+    &:focus-visible {
+        outline: 1px solid '[theme: themePrimary, default: #0078d4]';
+    }
+
+	&[contenteditable='false'] {
+		background-color: rgb(240, 240, 240);
+		color: rgb(189, 189, 189);
+	}
+
     > * + * {
         margin-top: 0.75em;
     }
@@ -153,4 +171,3 @@
         margin: 2rem 0;
     }
 }
-
