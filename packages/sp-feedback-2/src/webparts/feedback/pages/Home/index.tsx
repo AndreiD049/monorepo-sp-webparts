@@ -2,6 +2,7 @@ import * as React from 'react';
 import styles from './Home.module.scss';
 import { Link } from 'react-router-dom';
 import { NavigationBar } from '../../components/NavigationBar';
+import { FeedbackCard, testFeedback } from '../../features/feedback/FeedbackCard';
 
 export interface IHomeProps {
     // Props go here
@@ -16,6 +17,7 @@ export const Home: React.FC<IHomeProps> = (props) => {
                 <Link to="/settings">Settings</Link>
             </NavigationBar>
             <p>Home</p>
+			<FeedbackCard feedback={testFeedback} />
         </div>
     );
 };

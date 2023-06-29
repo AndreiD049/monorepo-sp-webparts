@@ -9,6 +9,8 @@ import { getRequestTypes, IRequestType } from './request-types';
 import {
     ChoiceGroup,
     DefaultButton,
+    Icon,
+    IconButton,
     IDropdownOption,
     Label,
     PrimaryButton,
@@ -28,7 +30,7 @@ const additionalOptionOther: IDropdownOption = {
     key: 'other',
     text: 'Other',
     data: {
-		Data: { code: 'other', name: 'Other' },
+        Data: { code: 'other', name: 'Other' },
     },
 };
 
@@ -38,11 +40,13 @@ const additionalOptionNA: IDropdownOption = {
     data: {
         Data: {
             code: 'na',
-			name: 'NA',
+            name: 'NA',
             imageUrl: require('../../assets/na.png'),
         },
     },
 };
+
+const defaultImage = { src: require('../../assets/default.png') };
 
 const RoundImage: React.FC<{
     src: string;
@@ -69,7 +73,7 @@ const RoundImage: React.FC<{
         <div style={containerStyle} className={props.className}>
             <img
                 ref={imageRef}
-                src={props.src || require('../../assets/default.png')}
+                src={props.src || defaultImage.src}
                 style={imageStyle}
                 alt="Round image"
             />
@@ -109,7 +113,8 @@ function animateLine(id: string): void {
     line.classList.add(styles.show);
 }
 
-function animateImage(id: string): void {
+let imageTimer = 0;
+function animateImage(id: string, imgSrc: string): void {
     const control = document.getElementById(id) as HTMLDivElement;
     if (!control) return;
 
@@ -120,10 +125,19 @@ function animateImage(id: string): void {
         `.${styles['step-visualization']} img`
     ) as HTMLImageElement;
 
-    image.classList.add(styles.show);
-    setTimeout(() => {
-        image.classList.remove(styles.show);
-    }, 500);
+    image.classList.add(styles.hide);
+
+	if (imageTimer > 0) {
+		clearTimeout(imageTimer);
+	}
+    imageTimer = setTimeout(() => {
+        image.src = imgSrc || defaultImage.src;
+		imageTimer = 0;
+        image.onload = () => {
+            image.classList.remove(styles.hide);
+            image.classList.add(styles.show);
+        };
+    }, 300);
 }
 
 const StepRoundImage: React.FC<{
@@ -133,8 +147,8 @@ const StepRoundImage: React.FC<{
 }> = (props) => {
     const containerStyle: React.CSSProperties = {
         borderRadius: '50%',
-        width: props.width * 1.2,
-        height: props.height * 1.2,
+        width: props.width * 1.1,
+        height: props.height * 1.1,
     };
     const container = React.useRef<HTMLDivElement>(null);
 
@@ -160,7 +174,7 @@ const StepRoundImage: React.FC<{
 const Step: React.FC<{
     id?: string;
     control: React.ReactNode;
-    imageSrc: string;
+    imageSrc?: string;
 }> = (props) => {
     return (
         <div className={styles.step} id={props.id}>
@@ -169,6 +183,59 @@ const Step: React.FC<{
                 <StepRoundImage src={props.imageSrc} width={120} height={120} />
             </div>
         </div>
+    );
+};
+
+const Attachments: React.FC<{disabled: boolean}> = (props) => {
+    const [attachments, setAttachments] = React.useState<File[]>([]);
+
+    return (
+        <>
+            <Label className={styles.attachments}>
+                <span className={styles['label-text']}>Attachments:</span>
+                <input
+                    id="attachments"
+                    type="file"
+					disabled={props.disabled}
+                    multiple
+                    aria-multiselectable="true"
+                    accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.tar,.gz,.tgz,.bz2,.xz,.mp3,.mp4,.avi,.mkv,.mov,.flv,.wmv,.wma,.wav,.ogg,.m4a,.aac,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.tar,.gz,.tgz,.bz2,.xz,.mp3,.mp4,.avi,.mkv,.mov,.flv,.wmv,.wma,.wav,.ogg,.m4a,.aac"
+                    onChange={(e) => {
+                        const files = e.target.files;
+                        if (files) {
+                            setAttachments([
+                                ...attachments,
+                                ...Array.from(files),
+                            ]);
+                        }
+                    }}
+                />
+                <span aria-disabled={props.disabled} role="button" className={styles['custom-button']}>
+                    <Icon iconName="Attach" /> Choose files
+                </span>
+            </Label>
+            {attachments.length > 0 && (
+                <ul className={styles['attachments-list']}>
+                    {attachments.map((file) => (
+                        <li key={file.name}>
+                            <Icon iconName="Attach" />
+                            <span>{file.name}</span>
+                            <IconButton
+                                iconProps={{ iconName: 'Cancel' }}
+								tabIndex={-1}
+                                onClick={() =>
+                                    setAttachments(
+                                        attachments.filter(
+                                            (f) => f.name !== file.name
+                                        )
+                                    )
+                                }
+                            />
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </>
     );
 };
 
@@ -210,7 +277,7 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
             });
     }, []);
 
-    // Select country dropdown first
+    // Focus on country dropdown first
     React.useEffect(() => {
         const country = document.getElementById('country') as HTMLDivElement;
         const select = country.querySelector(
@@ -218,11 +285,6 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
         ) as HTMLDivElement;
         select.focus();
     }, []);
-
-    let countryImage;
-    if (country && country.Data.code !== 'other') {
-        countryImage = `https://flagcdn.com/256x192/${country.Data.code.toLowerCase()}.png`;
-    }
 
     const onCancel = (): void => {
         const confirmed = confirm(
@@ -242,17 +304,19 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
             Category: type?.Data.code,
             Priority: priority,
             Status: 'New',
-			Title: title,
+            Title: title,
             Description: description,
         });
 
-		const animation = document.getElementById('done-animation') as HTMLDivElement;
-		animation.classList.add(doneStyles.show);
+        const animation = document.getElementById(
+            'done-animation'
+        ) as HTMLDivElement;
+        animation.classList.add(doneStyles.show);
 
-		const animationText = animation.firstElementChild as HTMLDivElement;
-		animationText.classList.add(doneStyles.show);
+        const animationText = animation.firstElementChild as HTMLDivElement;
+        animationText.classList.add(doneStyles.show);
 
-		setTimeout(() => navigate('/'), 3000);
+        setTimeout(() => navigate('/'), 3000);
     };
 
     return (
@@ -271,13 +335,17 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                         control={
                             <>
                                 <FormDropdown
-									disabled={controlsDisabled}
+                                    disabled={controlsDisabled}
                                     options={countries}
                                     label="Country"
                                     onChange={(c) => {
                                         setCountry(c);
                                         animateLine('country');
-                                        animateImage('country');
+                                        animateImage(
+                                            'country',
+                                            c.Data.code !== 'other' &&
+                                                `https://flagcdn.com/256x192/${c.Data.code.toLowerCase()}.png`
+                                        );
                                     }}
                                     transform={(opt) => ({
                                         key: opt.Data.code,
@@ -295,20 +363,22 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                                 />
                             </>
                         }
-                        imageSrc={countryImage}
                     />
                     <Step
                         id="application"
                         control={
                             <>
                                 <FormDropdown
-									disabled={controlsDisabled}
+                                    disabled={controlsDisabled}
                                     options={applications}
                                     label="System"
-                                    onChange={(c) => {
-                                        setApplication(c);
+                                    onChange={(app) => {
+                                        setApplication(app);
                                         animateLine('application');
-                                        animateImage('application');
+                                        animateImage(
+                                            'application',
+                                            app.Data.imageUrl
+                                        );
                                     }}
                                     transform={(opt) => ({
                                         key: opt.Data.name,
@@ -328,22 +398,19 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                                 />
                             </>
                         }
-                        imageSrc={
-                            application ? application.Data.imageUrl : null
-                        }
                     />
                     <Step
                         id="type"
                         control={
                             <>
                                 <FormDropdown
-									disabled={controlsDisabled}
+                                    disabled={controlsDisabled}
                                     options={types}
                                     label="Request type"
                                     onChange={(c) => {
                                         setType(c);
                                         animateLine('type');
-                                        animateImage('type');
+                                        animateImage('type', c.Data.imageUrl);
                                     }}
                                     transform={(opt) => ({
                                         key: opt.Data.code,
@@ -360,17 +427,17 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                                 />
                             </>
                         }
-                        imageSrc={type ? type.Data.imageUrl : null}
                     />
                     <Step
                         id="priority"
                         control={
                             <div>
                                 <ChoiceGroup
-									disabled={controlsDisabled}
+                                    disabled={controlsDisabled}
                                     id="priority"
                                     required
                                     onChange={(_e, c) => {
+										animateImage('priority', c.imageSrc);
                                         setPriority(c.key);
                                     }}
                                     label="Priorty"
@@ -424,15 +491,11 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                                 />
                             </div>
                         }
-                        imageSrc={
-                            priority
-                                ? require(`../../assets/priority_${priority}.png`)
-                                : require('../../assets/priority_medium.png')
-                        }
+                        imageSrc={require('../../assets/priority_medium.png')}
                     />
                     <div className={styles['feedback-title']}>
                         <TextField
-							disabled={controlsDisabled}
+                            disabled={controlsDisabled}
                             id="title"
                             label="Title"
                             required
@@ -459,13 +522,16 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                         >
                             Description
                         </Label>
+
                         <RichEditor
                             id="details"
-							editable={!controlsDisabled}
-							key={controlsDisabled.toString()}
+                            editable={!controlsDisabled}
+                            key={controlsDisabled.toString()}
                             initialCotnent={description}
                             onChange={(html) => setDescription(html)}
                         />
+
+                        <Attachments disabled={controlsDisabled} />
 
                         <div className={styles['form-buttons']}>
                             <PrimaryButton
@@ -491,7 +557,7 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                     </div>
                 </form>
             </div>
-			<Done />
+            <Done />
         </>
     );
 };
