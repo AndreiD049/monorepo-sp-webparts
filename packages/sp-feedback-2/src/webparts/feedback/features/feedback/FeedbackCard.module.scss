@@ -1,10 +1,18 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
 
 :root {
-	--new: #69797e;
-	--newTransparent: #{rgba(#69797e, 0.2)};
-	--review: #fce100;
-	--reviewTransparent: #{rgba(#fce100, 0.2)};
+	--new: #{$ms-color-sharedGray20};
+	--newTransparent: #{rgba($ms-color-sharedGray20, 0.2)};
+	--review: #{$ms-color-sharedYellow10};
+	--reviewTransparent: #{rgba($ms-color-sharedYellow10, 0.2)};
+	--approved: #{$ms-color-sharedCyan10};
+	--approvedTransparent: #{rgba($ms-color-sharedCyan10, 0.2)};
+	--rejected: #{$ms-color-sharedRed10};
+	--rejectedTransparent: #{rgba($ms-color-sharedRed10, 0.2)};
+	--implemented: #{$ms-color-sharedYellowGreen10};
+	--implementedTransparent: #{rgba($ms-color-sharedYellowGreen10, 0.2)};
+	--closed: #{$ms-color-sharedRedOrange10};
+	--closedTransparent: #{rgba($ms-color-sharedRedOrange10, 0.2)};
 }
 
 .container {
@@ -29,10 +37,44 @@
 			background-color: var(--reviewTransparent);
 		}
 	}
+
+	&:global(.approved) {
+		border-color: var(--approved);
+
+		.tags {
+			background-color: var(--approvedTransparent);
+		}
+	}
+
+	&:global(.rejected) {
+		border-color: var(--rejected);
+
+		.tags {
+			background-color: var(--rejectedTransparent);
+		}
+	}
+
+	&:global(.implemented) {
+		border-color: var(--implemented);
+
+		.tags {
+			background-color: var(--implementedTransparent);
+		}
+	}
+
+	&:global(.closed) {
+		border-color: var(--closed);
+
+		.tags {
+			background-color: var(--closedTransparent);
+		}
+	}
 }
 
 .card-content {
-	width: 450px;
+	padding: .5em;
+	width: 500px;
+	font-size: .9em;
 }
 
 .card-title {
@@ -73,9 +115,9 @@
 		white-space: nowrap;
 		padding: 0.2em 1em;
 		border-radius: 10px;
+		cursor: pointer;
 	}
 
-	/* Hide .tags scrollbar */
 	&::-webkit-scrollbar {
 		display: none;
 	}

@@ -54,6 +54,17 @@ export const FeedbackCard: React.FC<{ feedback: IFeedback }> = (props) => {
                 <table>
                     <tbody>
                         <tr>
+                            <td>Owner:</td>
+                            <td>
+                                <Persona
+                                    title={props.feedback.Owner.Title}
+                                    text={props.feedback.Owner.Title}
+                                    imageUrl={`/_layouts/15/userphoto.aspx?AccountName=${props.feedback.Owner.EMail}=M`}
+                                    size={PersonaSize.size24}
+                                />
+							</td>
+                        </tr>
+                        <tr>
                             <td>Created:</td>
                             <td>12.01.2023</td>
                         </tr>
@@ -86,23 +97,27 @@ export const FeedbackCard: React.FC<{ feedback: IFeedback }> = (props) => {
                     </tbody>
                 </table>
             </div>
-			<div className={styles.tags}>
-				<div className={styles.tag}>Tag1</div>
-				<div className={styles.tag}>Tag value</div>
-				<div className={styles.tag}>Tag2 value</div>
-				<div className={styles.tag}>Tag3 value</div>
-				<div className={styles.tag}>Tag4 value</div>
-				<div className={styles.tag}>TagN Value</div>
-				<div className={styles.tag}>TagN Value</div>
-				<div className={styles.tag}>TagN Value</div>
-				<div className={styles.tag}>TagN Value</div>
-				<div className={styles.tag}>TagN Value</div>
-				<div className={styles.tag}>Tag10 Value</div>
-			</div>
-			<div className={styles.footer}>
-				<DefaultButton className={styles.button} iconProps={{ iconName: 'Go' }}>Details</DefaultButton>
-				<DefaultButton className={styles.button} iconProps={{ iconName: 'ChevronDown' }}>More</DefaultButton>
-			</div>
+            <div className={styles.tags}>
+                {props.feedback.Tags.map((tag, index) => (
+                    <div key={index} className={styles.tag}>
+						#{tag}
+                    </div>
+                ))}
+            </div>
+            <div className={styles.footer}>
+                <DefaultButton
+                    className={styles.button}
+                    iconProps={{ iconName: 'Go' }}
+                >
+                    Details
+                </DefaultButton>
+                <DefaultButton
+                    className={styles.button}
+                    iconProps={{ iconName: 'ChevronDown' }}
+                >
+                    More
+                </DefaultButton>
+            </div>
         </div>
     );
 };

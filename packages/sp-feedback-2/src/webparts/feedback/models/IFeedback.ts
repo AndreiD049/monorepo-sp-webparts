@@ -4,7 +4,7 @@ export interface IFeedback {
     ID: number;
     Title: string;
     Category: string;
-    // New, In review, Approved, Rejected, Implemented, Closed
+    // New, Review, Approved, Rejected, Implemented, Closed
     Status: string;
     Description: string; // Multiline text
     Application: string;
