@@ -5,10 +5,10 @@ import styles from './FeedbackCard.module.scss';
 
 export const testFeedback: IFeedback = {
     ID: 1,
-    Title: 'Test feedback',
+    Title: 'Test feedback with very long title. Some more.',
     Description: '<p>Test feedback <strong>description</strong></p>',
     Category: 'Bug',
-    Status: 'Review',
+    Status: 'New',
     Application: 'PLATO',
     DevOpsItems: [],
     Owner: {
@@ -33,13 +33,10 @@ export const FeedbackCard: React.FC<{ feedback: IFeedback }> = (props) => {
         <div
             className={`${styles.container} ${styles['card-content']} ${status}`}
         >
+			<div className={styles['card-title']}>{props.feedback.Title}</div>
             <div className={styles['card-header']}>
                 <table>
                     <tbody>
-                        <tr>
-                            <td>Title:</td>
-                            <td>{props.feedback.Title}</td>
-                        </tr>
                         <tr>
                             <td>System:</td>
                             <td>{props.feedback.Application}</td>
