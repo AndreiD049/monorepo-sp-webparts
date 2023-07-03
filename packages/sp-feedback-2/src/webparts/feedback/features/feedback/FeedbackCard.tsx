@@ -3,25 +3,6 @@ import * as React from 'react';
 import { IFeedback } from '../../models/IFeedback';
 import styles from './FeedbackCard.module.scss';
 
-export const testFeedback: IFeedback = {
-    ID: 1,
-    Title: 'Test feedback with very long title. Some more.',
-    Description: '<p>Test feedback <strong>description</strong></p>',
-    Category: 'Bug',
-    Status: 'New',
-    Application: 'PLATO',
-    DevOpsItems: [],
-    Owner: {
-        ID: 6,
-        Title: 'Dimitrascu Andrei',
-        EMail: 'andrei.dimitrascu@gmail.com',
-    },
-    RemarksBU: '',
-    Tags: ['tag1', 'tag2'],
-    Country: 'MD',
-    Priority: 'Low',
-};
-
 export const FeedbackCard: React.FC<{ feedback: IFeedback }> = (props) => {
     const status = props.feedback?.Status.toLowerCase();
 
@@ -29,11 +10,43 @@ export const FeedbackCard: React.FC<{ feedback: IFeedback }> = (props) => {
         return null;
     }
 
+    let tags;
+    if (props.feedback.Tags && props.feedback.Tags.length > 0) {
+        tags = (
+            <div className={styles.tags}>
+                {props.feedback.Tags.map((tag, index) => (
+                    <div key={index} className={styles.tag}>
+                        #{tag}
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
+    let owner = (
+		<Persona
+			title="No owner"
+			text="No owner"
+			imageUrl='/_layouts/15/userphoto.aspx?AccountName=unknown&Size=M'
+			size={PersonaSize.size24}
+		/>
+	)
+    if (props.feedback.Owner) {
+        owner = (
+            <Persona
+                title={props.feedback.Owner.Title}
+                text={props.feedback.Owner.Title}
+                imageUrl={`/_layouts/15/userphoto.aspx?AccountName=${props.feedback.Owner?.EMail}&Size=M`}
+                size={PersonaSize.size24}
+            />
+        );
+    }
+
     return (
         <div
             className={`${styles.container} ${styles['card-content']} ${status}`}
         >
-			<div className={styles['card-title']}>{props.feedback.Title}</div>
+            <div className={styles['card-title']}>{props.feedback.Title}</div>
             <div className={styles['card-header']}>
                 <table>
                     <tbody>
@@ -55,18 +68,15 @@ export const FeedbackCard: React.FC<{ feedback: IFeedback }> = (props) => {
                     <tbody>
                         <tr>
                             <td>Owner:</td>
-                            <td>
-                                <Persona
-                                    title={props.feedback.Owner.Title}
-                                    text={props.feedback.Owner.Title}
-                                    imageUrl={`/_layouts/15/userphoto.aspx?AccountName=${props.feedback.Owner.EMail}=M`}
-                                    size={PersonaSize.size24}
-                                />
-							</td>
+                            <td>{owner}</td>
                         </tr>
                         <tr>
                             <td>Created:</td>
-                            <td>12.01.2023</td>
+                            <td>
+                                {new Date(
+                                    props.feedback.Created
+                                ).toLocaleDateString()}
+                            </td>
                         </tr>
                         <tr>
                             <td style={{ textAlign: 'end' }}>By:</td>
@@ -81,7 +91,11 @@ export const FeedbackCard: React.FC<{ feedback: IFeedback }> = (props) => {
                         </tr>
                         <tr>
                             <td>Modified:</td>
-                            <td>15.01.2021</td>
+                            <td>
+                                {new Date(
+                                    props.feedback.Modified
+                                ).toLocaleDateString()}
+                            </td>
                         </tr>
                         <tr>
                             <td style={{ textAlign: 'end' }}>By:</td>
@@ -97,13 +111,7 @@ export const FeedbackCard: React.FC<{ feedback: IFeedback }> = (props) => {
                     </tbody>
                 </table>
             </div>
-            <div className={styles.tags}>
-                {props.feedback.Tags.map((tag, index) => (
-                    <div key={index} className={styles.tag}>
-						#{tag}
-                    </div>
-                ))}
-            </div>
+            {tags}
             <div className={styles.footer}>
                 <DefaultButton
                     className={styles.button}
