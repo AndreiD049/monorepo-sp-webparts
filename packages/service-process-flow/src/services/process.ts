@@ -12,6 +12,7 @@ const SELECT = [
     'FlowId',
     'Manual',
     'Allocation',
+    'OrderIndex',
     'UOM',
     'Team',
 ];

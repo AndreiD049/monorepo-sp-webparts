@@ -18,6 +18,7 @@ import { SPnotify } from 'sp-react-notifications';
 import { MessageBarType } from 'office-ui-fabric-react';
 import { setupLists } from './utils/setup-lists';
 import { MainService } from './services/main-service';
+import './styles.css';
 
 export interface IProcessFlowWebPartProps {
   description: string;

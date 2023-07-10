@@ -24,6 +24,7 @@ export interface IProcess {
 	//		"page": 1
 	// }
     Manual?: string;
+	OrderIndex: number;
     // How many minutes per UOM the task requires
     Allocation?: number;
     Team: string;

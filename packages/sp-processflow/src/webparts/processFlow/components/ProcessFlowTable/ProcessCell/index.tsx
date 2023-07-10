@@ -37,7 +37,9 @@ const ManualLinks: React.FC<{ manuals: IManualJson[] }> = (props) => {
 };
 
 export const ProcessCell: React.FC<IProcessCellProps> = (props) => {
+	const containerRef = React.useRef(null);
     const buttonRef = React.useRef(null);
+
     const handleManualsOpen = React.useCallback(() => {
         if (!props.process.Manual) return null;
 		const manuals = readManualJson(props.process.Manual);
@@ -61,7 +63,7 @@ export const ProcessCell: React.FC<IProcessCellProps> = (props) => {
     }, [props.process, buttonRef]);
 
     return (
-        <div className={styles.container}>
+        <div ref={containerRef} className={styles.container}>
             <span>{props.process.Title}</span>
             {props.process.Manual && props.process.Manual !== '[]' && (
                 <IconButton

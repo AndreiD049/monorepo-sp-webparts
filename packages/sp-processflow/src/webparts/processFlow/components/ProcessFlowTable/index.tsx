@@ -11,6 +11,7 @@ import {
     DetailsListLayoutMode,
     IDetailsListStyleProps,
     IDetailsListStyles,
+    IGroup,
     IStyleFunctionOrObject,
     SelectionMode,
 } from 'office-ui-fabric-react';
@@ -50,61 +51,41 @@ const listStyles: (
     currentTheme: IReadonlyTheme
 ) => ({
     root: {
-        overflowX: 'auto',
-        '& [role=grid]': {
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'start',
-            height: '70vh',
-        },
         "& [role=gridcell][aria-colindex='3']": {
             borderRight: '1px solid ' + currentTheme.palette.neutralLighterAlt,
+            backgroundColor: currentTheme.palette.white,
+            position: 'sticky',
+            left: 0,
+            zIndex: 100,
         },
-        '&::-webkit-scrollbar': {
-            width: '10px',
-            height: '10px',
+
+        "& [role=columnheader][aria-colindex='2']": {
+            backgroundColor: currentTheme.palette.white,
+            position: 'sticky',
+            left: 0,
+            zIndex: 100,
+		},
+        "& [role=row]:hover [role=gridcell][aria-colindex='3'], & [role=columnheader][aria-colindex='2']:hover": {
+			backgroundColor: currentTheme.palette.neutralLighter,
         },
-        '&::-webkit-scrollbar-track': {
-            backgroundColor: currentTheme.palette.neutralLighter,
-        },
-        '&::-webkit-scrollbar-thumb': {
-            backgroundColor: currentTheme.palette.neutralTertiary,
-            borderRadius: '6px',
-        },
-        '&::-webkit-scrollbar-thumb:hover': {
-            backgroundColor: '#555',
-        },
-    },
-    headerWrapper: {
-        flex: '0 0 auto',
+        overflow: 'visible',
     },
     contentWrapper: {
         flex: '1 1 auto',
-        overflowX: 'hidden',
-        overflowY: 'auto',
-        '&::-webkit-scrollbar': {
-            width: '10px',
-            height: '10px',
-        },
-        '&::-webkit-scrollbar-track': {
-            backgroundColor: currentTheme.palette.neutralLighter,
-        },
-        '&::-webkit-scrollbar-thumb': {
-            backgroundColor: currentTheme.palette.neutralTertiary,
-            borderRadius: '6px',
-        },
-        '&::-webkit-scrollbar-thumb:hover': {
-            backgroundColor: '#555',
-        },
+    },
+    headerWrapper: {
+        position: 'sticky',
+        top: -1,
+        zIndex: 1,
     },
 });
 
 export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [search, setSearch] = React.useState(
         searchParams.get('search') || ''
     );
-    const navigate = useNavigate();
     const { ProcessService, FlowLocationService, UserProcessService } =
         MainService;
     const { teamUsers, selectedTeam, selectedFlow } =
@@ -124,6 +105,10 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
     const [userProcesses, setUserProcesses] = React.useState<IUserProcess[]>(
         []
     );
+
+	// Drag n drop rows
+	const [draggedItem, setDraggedItem] = React.useState<IProcessFlowRow>(null);
+	const [draggedIndex, setDraggedIndex] = React.useState<number>(-1);
 
     React.useEffect(() => {
         const value = searchParams.get('search');
@@ -332,6 +317,57 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 items={groupping.sortedItems}
                 selectionMode={SelectionMode.none}
                 layoutMode={DetailsListLayoutMode.fixedColumns}
+				dragDropEvents={{
+					canDrag: () => true,
+					canDrop: (drop) => {
+						if (!drop) return true;
+						const data: IProcessFlowRow | IGroup = drop.data;
+						if ('count' in data && draggedItem && draggedItem.process.Category !== data.name) return false;
+						if ('process' in data && draggedItem && draggedItem.process.Category !== data.process.Category) return false;
+						return true;
+					},
+					onDragStart: (item: IProcessFlowRow, index) => {
+						if ('count'	in item) return;
+						setDraggedItem(item);
+						setDraggedIndex(index);
+					},
+					onDragEnd: (item: IProcessFlowRow) => {
+						setDraggedItem(null);
+						setDraggedIndex(-1);
+					},
+					onDragEnter: (item: IProcessFlowRow | IGroup) => {
+						// Drag over a group
+						if ('count' in item) {
+								return '';
+						} 
+						// No dragged item
+						if (!draggedItem) {
+							return '';
+						}
+						// Dragging over itself
+						if (item.process.Id === draggedItem.process.Id) {
+								return '';
+						}
+						// Dragging over a different category
+						if (item.process.Category !== draggedItem.process.Category) {
+							return '';
+						}
+						// if dragging from bottom, show the top border, else bottom
+						const index = groupping.sortedItems.indexOf(item);
+						if (index < draggedIndex) {
+							return styles.dragTop;
+						} else {
+							return styles.dragBottom;
+						}
+					},
+					onDragLeave: () => {
+						return;
+					},
+					onDrop: (item: IProcessFlowRow, event) => {
+						console.log('item', item);
+						return true;
+					}
+				}}
                 styles={listStyles(ProcessFlowWebPart.currentTheme)}
                 onItemInvoked={(item) => {
                     navigate(
