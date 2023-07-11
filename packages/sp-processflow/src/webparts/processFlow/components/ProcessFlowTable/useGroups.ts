@@ -15,6 +15,16 @@ export interface IUseGroupProps {
     flow: ICustomerFlow;
 }
 
+function sortByOrder(a: IProcessFlowRow, b: IProcessFlowRow): number {
+	if (a.process.OrderIndex === null) {
+		return 1;
+	}
+	if (b.process.OrderIndex === null) {
+		return -1;
+	}
+	return a.process.OrderIndex - b.process.OrderIndex;
+}
+
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function useGroups(props: IUseGroupProps) {
     const theme = ProcessFlowWebPart.currentTheme;
@@ -48,9 +58,9 @@ export function useGroups(props: IUseGroupProps) {
         });
     }, [groupedItems, props.groupSorting]);
 
-    const sortedItems = React.useMemo(() => {
+    const sortedItems: IProcessFlowRow[] = React.useMemo(() => {
         return sortedGroups.reduce((acc, group) => {
-            return [...acc, ...groupedItems[group]];
+            return [...acc, ...(groupedItems[group].sort(sortByOrder))];
         }, []);
     }, [sortedGroups, props.groupSorting]);
 

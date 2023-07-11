@@ -179,6 +179,24 @@ export class ProcessService {
         return this.categoryChoices;
     }
 
+	async updateProcessesOrdering(processes: IProcess[]): Promise<IProcess[]> {
+        const [batchedSP, execute] = this.props.sp.batched();
+		const results: IProcess[] = [];
+		processes.forEach((process, index) => {
+			if (process.OrderIndex !== index) {
+				batchedSP.web.lists.getByTitle(this.props.listName).items.getById(process.Id).update({
+					OrderIndex: index
+				});
+				results.push({
+					...process,
+					OrderIndex: index
+				});
+			}
+		});
+		await execute();
+		return results;
+	}
+
     private async updateSystemChoices(systems: string[]): Promise<void> {
         if (this.systemChoices.length === 0) {
             this.systemChoices = await this.getSystemChoices();

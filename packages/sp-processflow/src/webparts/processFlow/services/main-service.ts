@@ -97,7 +97,7 @@ const processCacheOptions: ICacheProxyOptions<ProcessService> = {
                 );
             },
         },
-        '(updateProcess|addManual|updateManual|deleteManual)': {
+        '(updateProcess$|addManual|updateManual|deleteManual)': {
             isPattern: true,
             after: async (db, service, args, returnValue) => {
                 const id: number = args[0];
@@ -112,6 +112,18 @@ const processCacheOptions: ICacheProxyOptions<ProcessService> = {
                 processUpdated(newProcess);
             }
         },
+		'updateProcessesOrdering': {
+			isPattern: true,
+			after: async (db, service, _args, returnValue) => {
+				const processes: IProcess[] = returnValue;
+				for (const process of processes) {
+					await updateCached(db, /ProcessService.*getBy.*/, (values) => {
+						return values.map((p: IProcess) => p.Id === process.Id ? process : p);
+					});
+					processUpdated(process);
+				}
+			}
+		},
         'removeProcess': {
             isPattern: true,
             after: async (db, _service, args) => {

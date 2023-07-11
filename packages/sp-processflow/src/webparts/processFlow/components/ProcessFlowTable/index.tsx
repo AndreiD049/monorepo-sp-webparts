@@ -108,7 +108,6 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
 
 	// Drag n drop rows
 	const [draggedItem, setDraggedItem] = React.useState<IProcessFlowRow>(null);
-	const [draggedIndex, setDraggedIndex] = React.useState<number>(-1);
 
     React.useEffect(() => {
         const value = searchParams.get('search');
@@ -322,18 +321,18 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
 					canDrop: (drop) => {
 						if (!drop) return true;
 						const data: IProcessFlowRow | IGroup = drop.data;
-						if ('count' in data && draggedItem && draggedItem.process.Category !== data.name) return false;
+						// If we're dragging over a group header
+						if ('count' in data) return false;
+						// If we're dragging over the item itself
 						if ('process' in data && draggedItem && draggedItem.process.Category !== data.process.Category) return false;
 						return true;
 					},
 					onDragStart: (item: IProcessFlowRow, index) => {
 						if ('count'	in item) return;
 						setDraggedItem(item);
-						setDraggedIndex(index);
 					},
 					onDragEnd: (item: IProcessFlowRow) => {
 						setDraggedItem(null);
-						setDraggedIndex(-1);
 					},
 					onDragEnter: (item: IProcessFlowRow | IGroup) => {
 						// Drag over a group
@@ -354,6 +353,12 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
 						}
 						// if dragging from bottom, show the top border, else bottom
 						const index = groupping.sortedItems.indexOf(item);
+						const draggedIndex = groupping.sortedItems.indexOf(draggedItem);
+
+						if (index === -1 || draggedIndex === -1) {
+							return '';
+						}
+
 						if (index < draggedIndex) {
 							return styles.dragTop;
 						} else {
@@ -363,8 +368,29 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
 					onDragLeave: () => {
 						return;
 					},
-					onDrop: (item: IProcessFlowRow, event) => {
-						console.log('item', item);
+					onDrop: async (item: IProcessFlowRow) => {
+						showSpinner(LOADING_SPINNER);
+						const draggedIndex = groupping.sortedItems.indexOf(draggedItem);
+						const targetIndex = groupping.sortedItems.indexOf(item);
+
+						if (draggedIndex === -1 || targetIndex === -1) {
+							hideSpinner(LOADING_SPINNER);
+							return;
+						}
+
+						if (draggedIndex === targetIndex) {
+							hideSpinner(LOADING_SPINNER);
+							return;
+						}
+
+						// insert process at index
+						const processes = [...groupping.sortedItems.map((r) => r.process)];
+						const draggedProcess = processes.splice(draggedIndex, 1)[0];
+						processes.splice(targetIndex, 0, draggedProcess);
+
+						await ProcessService.updateProcessesOrdering(processes);
+
+						hideSpinner(LOADING_SPINNER);
 						return true;
 					}
 				}}
