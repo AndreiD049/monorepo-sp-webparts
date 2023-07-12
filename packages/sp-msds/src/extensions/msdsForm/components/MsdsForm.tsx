@@ -123,6 +123,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 		watch,
 		formState: { dirtyFields, isDirty },
 	} = useForm<Partial<IMSDSRequest & { Attachments: File[] }>>({
+		mode: 'onChange',
 		defaultValues: {
 			Urgency: 'Medium',
 		},
@@ -452,6 +453,10 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 											disabled:
 												field.ProductName ===
 												'Disabled',
+											pattern: {
+												value: /^[a-zA-Z0-9\s_.-]+$/,
+												message: 'PLATO doesn\'t allow special characters in product names. Please adjust the product name accordingly.',
+											},
 											maxLength: {
 												value: 35,
 												message:
