@@ -47,7 +47,7 @@ class FeedbackServiceProvider {
         const result = await this.list.items
             .select(...SELECT)
             .expand(...EXPAND)
-            .filter(`Author/Id eq ${userId}`)();
+            .filter(`Author/Id eq ${userId}`).orderBy('Created', false)();
         return result;
     }
 }

@@ -4,7 +4,7 @@
     min-height: 50px;
     background-color: "[theme: themeSecondary, default: #0078d4]";
 
-    & *:first-child {
+    & > *:first-child {
         margin-left: 1em;
     }
 }

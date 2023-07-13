@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { NavigationBar } from '../../components/NavigationBar';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ICountry, getCountries } from './countries';
 import { IApplication } from '../applications/IApplication';
 import { getApplications } from '../applications/applications';
@@ -321,10 +320,6 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
 
     return (
         <>
-            <NavigationBar>
-                <Link to="/board">Board</Link>
-                <Link to="/settings">Settings</Link>
-            </NavigationBar>
             <div className={styles.container}>
                 <div className={styles['form-heading']}>
                     <h1>New feedback</h1>

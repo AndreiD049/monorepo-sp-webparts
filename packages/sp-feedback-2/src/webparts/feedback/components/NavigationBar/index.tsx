@@ -1,15 +1,94 @@
+import { Icon } from '@microsoft/sp-component-base/node_modules/@fluentui/react';
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import styles from './NavigationBar.module.scss';
 
+type LinkProps = {
+    name: string;
+    to: string;
+    icon?: string;
+};
+
 export interface INavigationBarProps {
-    // Props go here
+    links: LinkProps[];
+    farLinks?: LinkProps[];
 }
 
 export const NavigationBar: React.FC<INavigationBarProps> = (props) => {
     return (
         <div className={`${styles.container} ${styles.layout}`}>
             <img src="https://placehold.co/40" alt="Logo" />
-            {props.children}
+            <div
+                style={{
+                    display: 'flex',
+                    flexFlow: 'row nowrap',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                }}
+            >
+                <div
+                    style={{
+                        display: 'flex',
+                        flexFlow: 'row nowrap',
+                        gap: '1em',
+                    }}
+                >
+                    {props.links.map((link) => (
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexFlow: 'row nowrap',
+                                alignItems: 'center',
+                                gap: '4px',
+                                color: 'white',
+                                borderBottom: '2px solid white',
+								cursor: 'pointer'
+                            }}
+                        >
+                            {link.icon && <Icon iconName={link.icon} />}
+                            <Link
+                                to={link.to}
+                                style={{
+                                    color: 'inherit',
+                                    textDecoration: 'none',
+                                }}
+                            >
+                                {link.name}
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+                <div
+                    style={{
+                        marginRight: '1em',
+                    }}
+                >
+                    {props.farLinks.map((link) => (
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexFlow: 'row nowrap',
+                                alignItems: 'center',
+                                gap: '4px',
+                                color: 'white',
+                                borderBottom: '2px solid white',
+								cursor: 'pointer'
+                            }}
+                        >
+                            {link.icon && <Icon iconName={link.icon} />}
+                            <Link
+                                to={link.to}
+                                style={{
+                                    color: 'inherit',
+                                    textDecoration: 'none',
+                                }}
+                            >
+                                {link.name}
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };
