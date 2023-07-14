@@ -15,6 +15,7 @@ import { SettingsService } from './services/settings-service';
 import SPBuilder from 'sp-preset';
 import { FeedbackService } from './features/feedback/feedback-service';
 import { UserService } from './features/users/users-service';
+import './styles.css';
 
 export interface IFeedbackWebPartProps {
     listRootUrl: string;

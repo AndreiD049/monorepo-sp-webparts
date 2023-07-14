@@ -43,6 +43,10 @@ class FeedbackServiceProvider {
         return result;
     }
 
+	public async getFeedback(id: number): Promise<IFeedback> {
+		return this.list.items.getById(id).select(...SELECT).expand(...EXPAND)();
+	}
+
     public async getUserFeedbacks(userId: number): Promise<IFeedback[]> {
         const result = await this.list.items
             .select(...SELECT)

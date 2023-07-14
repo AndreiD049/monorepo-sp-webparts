@@ -1,11 +1,13 @@
 import { IPerson } from "./IPerson";
 
+export type StatusType = 'New' | 'Review' | 'Approved' | 'Rejected' | 'Implemented' | 'Closed';
+
 export interface IFeedback {
     ID: number;
     Title: string;
     Category: string;
     // New, Review, Approved, Rejected, Implemented, Closed
-    Status: string;
+    Status: StatusType;
     Description: string; // Multiline text
     Application: string;
     DevOpsItems: string[];

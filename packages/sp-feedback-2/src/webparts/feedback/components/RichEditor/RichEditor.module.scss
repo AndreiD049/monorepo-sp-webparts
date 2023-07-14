@@ -88,11 +88,6 @@
         outline: 1px solid '[theme: themePrimary, default: #0078d4]';
     }
 
-	&[contenteditable='false'] {
-		background-color: rgb(240, 240, 240);
-		color: rgb(189, 189, 189);
-	}
-
     > * + * {
         margin-top: 0.75em;
     }

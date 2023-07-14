@@ -26,19 +26,19 @@ export interface IFeedbackFormProps {
 }
 
 const additionalOptionOther: IDropdownOption = {
-    key: 'other',
+    key: 'Other',
     text: 'Other',
     data: {
-        Data: { code: 'other', name: 'Other' },
+        Data: { code: 'Other', name: 'Other' },
     },
 };
 
 const additionalOptionNA: IDropdownOption = {
-    key: 'na',
+    key: 'Na',
     text: 'Not applicable',
     data: {
         Data: {
-            code: 'na',
+            code: 'Na',
             name: 'NA',
             imageUrl: require('../../assets/na.png'),
         },
@@ -112,7 +112,7 @@ function animateLine(id: string): void {
     line.classList.add(styles.show);
 }
 
-let imageTimer = 0;
+const imageTimer: { [key: string]: number } = {};
 function animateImage(id: string, imgSrc: string): void {
     const control = document.getElementById(id) as HTMLDivElement;
     if (!control) return;
@@ -126,12 +126,12 @@ function animateImage(id: string, imgSrc: string): void {
 
     image.classList.add(styles.hide);
 
-	if (imageTimer > 0) {
-		clearTimeout(imageTimer);
+	if (imageTimer[id] > 0) {
+		clearTimeout(imageTimer[id]);
 	}
-    imageTimer = setTimeout(() => {
+    imageTimer[id] = setTimeout(() => {
         image.src = imgSrc || defaultImage.src;
-		imageTimer = 0;
+		imageTimer[id] = 0;
         image.onload = () => {
             image.classList.remove(styles.hide);
             image.classList.add(styles.show);

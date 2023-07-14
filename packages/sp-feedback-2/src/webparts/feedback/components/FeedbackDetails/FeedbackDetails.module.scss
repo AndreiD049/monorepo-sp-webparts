@@ -1,0 +1,68 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    min-width: 1px;
+}
+
+.title {
+	background-color: "[theme: themePrimary, default: #0078d4]";
+	height: 60px;
+	font-size: 1.3rem;
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 .5em;
+
+	& .titleText {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
+
+	&, & i {
+		color: "[theme: white, default: #fff]";
+	}
+
+	& i {
+		font-size: 1.5rem;
+	}
+
+	.closeButton {
+		background-color: "[theme: themePrimary, default: #0078d4]";
+	}
+}
+
+.body {
+	height: calc(80vh - 60px);
+	overflow: auto;
+	padding: 1em .5em;
+}
+
+.dropdown {
+	display: inline-flex;
+	align-items: center;
+	position: relative;
+	background-color: transparent;
+
+	& input {
+		border: 1px solid transparent;
+		background-color: transparent;
+	}
+
+	&:hover input, & input:focus-visible {
+		border: 1px solid "[theme: themePrimary, default: #0078d4]";
+		outline: none;
+	}
+
+	& .dropdownIcon {
+		position: absolute;
+		right: 4px;
+		visibility: hidden;
+		user-select: none;
+	}
+
+	&:hover input + .dropdownIcon, & input:focus-visible + .dropdownIcon {
+		visibility: visible;
+	}
+}

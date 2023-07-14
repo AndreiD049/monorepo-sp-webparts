@@ -6,6 +6,7 @@ export interface IRequestType {
 		code: string;
 		name: string;
 		imageUrl: string;
+		iconName?: string;
 	}
 }
 
