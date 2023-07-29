@@ -2,9 +2,8 @@ import * as React from 'react';
 import { Outlet } from 'react-router-dom';
 import { NavigationBar } from '../components/NavigationBar';
 import { GlobalContextProvider, RequestTypesDict } from '../Context';
-import {
-    getRequestTypes,
-} from '../features/feedback-form/request-types';
+import { getCountries, ICountry } from '../features/feedback-form/countries';
+import { getRequestTypes } from '../features/feedback-form/request-types';
 import { FeedbackModal } from '../features/feedback/FeedbackModal';
 import { IFeedbackWebPartProps } from '../FeedbackWebPart';
 
@@ -12,6 +11,7 @@ export const Main: React.FC<IFeedbackWebPartProps> = (props) => {
     const [requestTypes, setRequestTypes] = React.useState<RequestTypesDict>(
         {}
     );
+    const [countries, setCountries] = React.useState<ICountry[]>([]);
 
     React.useEffect(() => {
         getRequestTypes()
@@ -25,6 +25,9 @@ export const Main: React.FC<IFeedbackWebPartProps> = (props) => {
             .catch((error) => {
                 console.log(error);
             });
+        getCountries()
+            .then((countries) => setCountries(countries))
+            .catch((err) => console.error(err));
     }, []);
 
     return (
@@ -32,7 +35,8 @@ export const Main: React.FC<IFeedbackWebPartProps> = (props) => {
             listRootUrl={props.listRootUrl}
             listTitle={props.listTitle}
             settingListTitle={props.settingListTitle}
-			requestTypes={requestTypes}
+            requestTypes={requestTypes}
+            countries={countries}
         >
             <NavigationBar
                 links={[

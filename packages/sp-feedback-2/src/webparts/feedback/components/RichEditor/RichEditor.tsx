@@ -153,8 +153,8 @@ export const RichEditor: React.FC<IRichEditorProps> = ({
 				},
 			}),
 		],
-		onUpdate: (innerProps) => props.onChange(innerProps.editor.getHTML()),
-		onBlur: (innerProps) =>  props.onChange(innerProps.editor.getHTML()),
+		onUpdate: (innerProps) => props.onChange && props.onChange(innerProps.editor.getHTML()),
+		onBlur: (innerProps) =>  props.onChange && props.onChange(innerProps.editor.getHTML()),
 		content: props.initialCotnent || '',
 		editable: editable,
 	});

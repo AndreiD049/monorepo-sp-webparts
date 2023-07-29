@@ -13,11 +13,13 @@
 	align-items: center;
 	justify-content: space-between;
 	padding: 0 .5em;
+	flex-grow: 2;
 
 	& .titleText {
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+		flex-grow: 2;
 	}
 
 	&, & i {
@@ -34,9 +36,21 @@
 }
 
 .body {
-	height: calc(80vh - 60px);
+	height: calc(95vh - 60px);
 	overflow: auto;
-	padding: 1em .5em;
+	display: flex;
+	flex-flow: column nowrap;
+}
+
+.properties {
+	padding: 0px .5em;
+	min-height: 200px;
+	flex-grow: 2;
+}
+
+.bottomTabs {
+	padding: 0px .5em;
+	min-height: 270px;
 }
 
 .dropdown {
@@ -65,4 +79,13 @@
 	&:hover input + .dropdownIcon, & input:focus-visible + .dropdownIcon {
 		visibility: visible;
 	}
+}
+
+.tagBar {
+	display: flex;
+	flex-flow: row wrap;
+	background-color: $ms-color-gray30;
+	padding: .5em 0;
+	padding-left: .5em;
+	gap: .5em;
 }

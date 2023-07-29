@@ -338,7 +338,7 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                                         animateLine('country');
                                         animateImage(
                                             'country',
-                                            c.Data.code !== 'other' &&
+                                            c.Data.code !== 'Other' &&
                                                 `https://flagcdn.com/256x192/${c.Data.code.toLowerCase()}.png`
                                         );
                                     }}

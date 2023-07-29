@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FeedbackDetails } from '../../components/FeedbackDetails';
 
-export const FeedbackModal: React.FC = (props) => {
+export const FeedbackModal: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const id = searchParams.get('feedback');
 	const blocking = searchParams.get('blocking') === 'true';
@@ -31,9 +31,10 @@ export const FeedbackModal: React.FC = (props) => {
             onDismiss={onDismiss}
             styles={{
                 main: {
-					minWidth: '80vw',
-					minHeight: '80vh',
+					minWidth: '95vw',
+					minHeight: '95vh',
 					overflow: 'hidden',
+					border: '1px solid lightgray',
                 },
 				scrollableContent: {
 					overflow: 'hidden',

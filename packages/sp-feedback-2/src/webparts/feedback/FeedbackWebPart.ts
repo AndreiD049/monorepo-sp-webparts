@@ -16,6 +16,7 @@ import SPBuilder from 'sp-preset';
 import { FeedbackService } from './features/feedback/feedback-service';
 import { UserService } from './features/users/users-service';
 import './styles.css';
+import { TagService } from './features/tags/TagAddButton/tag-service';
 
 export interface IFeedbackWebPartProps {
     listRootUrl: string;
@@ -58,6 +59,7 @@ export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebP
         );
         SettingsService.initService(sp, this.properties.settingListTitle);
         FeedbackService.initService(sp, this.properties.listTitle);
+		TagService.initService(sp, this.properties.listTitle);
         UserService.initService(sp);
     }
 

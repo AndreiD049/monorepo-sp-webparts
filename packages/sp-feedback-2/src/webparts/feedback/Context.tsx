@@ -1,4 +1,5 @@
 import * as React from "react";
+import { ICountry } from "./features/feedback-form/countries";
 import { IRequestType } from "./features/feedback-form/request-types";
 
 export type RequestTypesDict = { [code: string]: IRequestType };
@@ -8,6 +9,7 @@ export interface IGlobalContext {
     listTitle: string;
     settingListTitle: string;
 	requestTypes: RequestTypesDict;
+	countries: ICountry[];
 }
 
 export const GlobalContext = React.createContext<IGlobalContext>({
@@ -15,6 +17,7 @@ export const GlobalContext = React.createContext<IGlobalContext>({
     listTitle: "",
     settingListTitle: "",
 	requestTypes: null,
+	countries: [],
 });
 
 export const GlobalContextProvider: React.FC<IGlobalContext> = (props) => {
