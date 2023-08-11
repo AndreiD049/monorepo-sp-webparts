@@ -1,16 +1,12 @@
-type Identifier<T> = {
+export type Identifier<T> = {
 	id: number;
 	value: T;
 }
-export type EventTypes = 'tag-add' | 'tag-delete';
-type EventTypeDetails = {
-    'tag-add': Identifier<string>;
-    'tag-delete': Identifier<string>;
-};
+export type EventTypes = 'tag-add' | 'tag-delete' | 'feedback-updated';
 
-export function on(
+export function on<T>(
     event: EventTypes,
-    cb: (a: CustomEvent<EventTypeDetails[typeof event]>) => void
+    cb: (a: CustomEvent<T>) => void
 ): () => void {
     document.addEventListener(event, cb);
 
@@ -19,7 +15,7 @@ export function on(
     };
 }
 
-export function dispEvent(event: EventTypes, payload: EventTypeDetails[typeof event]) {
+export function dispEvent<T>(event: EventTypes, payload: T) {
 	document.dispatchEvent(
         new CustomEvent(event, {
             detail: payload,

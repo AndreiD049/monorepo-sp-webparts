@@ -24,16 +24,3 @@
 	}
 }
 
-.copyButton {
-	background-color: inherit;
-	border: inherit;
-	cursor: pointer;
-	margin-left: .5em;
-	opacity: .5;
-	outline: inherit;
-	transition: opacity .5s;
-
-	&:hover, &:focus-within {
-		opacity: 1;
-	}
-}

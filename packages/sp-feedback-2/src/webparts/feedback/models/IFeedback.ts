@@ -1,6 +1,7 @@
 import { IPerson } from "./IPerson";
 
 export type StatusType = 'New' | 'Review' | 'Approved' | 'Rejected' | 'Implemented' | 'Closed';
+export const STATUS_TYPES: StatusType[] = ['New', 'Review', 'Approved', 'Rejected', 'Implemented', 'Closed'];
 
 export interface IFeedback {
     ID: number;

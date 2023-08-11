@@ -6,6 +6,7 @@ import { FeedbackService } from '../../features/feedback/feedback-service';
 import styles from './Home.module.scss';
 import { IconButton } from 'office-ui-fabric-react';
 import { useSearchParams } from 'react-router-dom';
+import { Identifier, on } from '../../features/events';
 
 export interface IHomeProps {
     // Props go here
@@ -23,6 +24,26 @@ export const Home: React.FC<IHomeProps> = () => {
             })
             .catch((err) => console.error(err));
     }, []);
+
+	// Handle update event
+	React.useEffect(() => {
+		on<Identifier<Partial<IFeedback>>>('feedback-updated', (ev) => {
+			const { id, value } = ev.detail;
+			setFeedbacks((prev) => {
+				return prev.map((feedback) => {
+					if (feedback.ID === id) {
+						return {
+							...feedback,
+							...value,
+						};
+					}
+					return feedback;
+				});
+			});
+		});
+	}, []);
+
+		
 
     React.useEffect(() => {
         if (!currentUser) {

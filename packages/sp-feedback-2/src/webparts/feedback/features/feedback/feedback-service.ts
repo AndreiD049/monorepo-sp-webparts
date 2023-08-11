@@ -1,5 +1,6 @@
 import { IItemAddResult, IList, SPFI } from 'sp-preset';
 import { IFeedback } from '../../models/IFeedback';
+import { dispEvent, Identifier } from '../events';
 
 const SELECT = [
     'ID',
@@ -46,6 +47,17 @@ class FeedbackServiceProvider {
 	public async getFeedback(id: number): Promise<IFeedback> {
 		return this.list.items.getById(id).select(...SELECT).expand(...EXPAND)();
 	}
+
+    public async updateFeedback(id: number, payload: Partial<IFeedback>) {
+		const result = await this.list.items.getById(id).update(payload);
+		
+		dispEvent<Identifier<typeof payload>>('feedback-updated', {
+			id,
+			value: payload,
+		})
+		
+		return result;
+    }
 
     public async getUserFeedbacks(userId: number): Promise<IFeedback[]> {
         const result = await this.list.items

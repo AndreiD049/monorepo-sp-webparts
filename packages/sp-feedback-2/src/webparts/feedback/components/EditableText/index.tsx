@@ -1,4 +1,3 @@
-import { Icon } from 'office-ui-fabric-react';
 import * as React from 'react';
 import styles from './EditableText.module.scss';
 
@@ -16,20 +15,16 @@ export const EditableText: React.FC<
     );
     const [val, setVal] = React.useState<string>(props.value || '');
 
-	const handleChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+	const handleChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
 		const target = ev.target;
 		setVal(target.value);
 	}
 
-	const handleSync = () => {
+	const handleSync = (): void => {
 		if (val !== originalVal) {
 			setOriginalVal(val);
 			props.handleUpdate(val);
 		}
-	}
-
-	const handleCopyToClipboard = async () => {
-		await navigator.clipboard.writeText(val);
 	}
 
     return (
@@ -41,9 +36,6 @@ export const EditableText: React.FC<
                 onChange={handleChange}
                 onBlur={handleSync}
             />
-            <button className={styles.copyButton} onClick={handleCopyToClipboard}>
-                <Icon iconName="Copy" />
-            </button>
         </div>
     );
 };

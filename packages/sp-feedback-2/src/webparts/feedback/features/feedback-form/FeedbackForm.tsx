@@ -432,7 +432,7 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                                     id="priority"
                                     required
                                     onChange={(_e, c) => {
-										animateImage('priority', c.imageSrc);
+										animateImage('priority', c.title);
                                         setPriority(c.key);
                                     }}
                                     label="Priorty"
@@ -446,47 +446,24 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                                         {
                                             key: 'low',
                                             text: 'Low',
-                                            imageSrc: require('../../assets/priority_low.png'),
-                                            selectedImageSrc: require('../../assets/priority_low.png'),
-                                            imageSize: {
-                                                width: 16,
-                                                height: 16,
-                                            },
-                                            imageAlt: 'Low priority',
+                                            title: require('../../assets/low_urgency.jpg'),
                                         },
                                         {
                                             key: 'medium',
                                             text: 'Medium',
-                                            imageSrc: require('../../assets/priority_medium.png'),
-                                            selectedImageSrc: require('../../assets/priority_medium.png'),
-                                            imageSize: {
-                                                width: 16,
-                                                height: 16,
-                                            },
-                                            imageAlt: 'Medium priority',
-                                            styles: {
-                                                labelWrapper: {
-                                                    maxWidth: 'unset',
-                                                },
-                                            },
+                                            title: require('../../assets/medium_urgency.jpg'),
                                         },
                                         {
                                             key: 'high',
                                             text: 'High',
-                                            imageSrc: require('../../assets/priority_high.png'),
-                                            selectedImageSrc: require('../../assets/priority_high.png'),
-                                            imageSize: {
-                                                width: 16,
-                                                height: 16,
-                                            },
-                                            imageAlt: 'High priority',
+                                            title: require('../../assets/high_urgency.jpg'),
                                         },
                                     ]}
                                     defaultSelectedKey="medium"
                                 />
                             </div>
                         }
-                        imageSrc={require('../../assets/priority_medium.png')}
+                        imageSrc={require('../../assets/medium_urgency.jpg')}
                     />
                     <div className={styles['feedback-title']}>
                         <TextField

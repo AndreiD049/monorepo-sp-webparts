@@ -1,61 +1,184 @@
+import { debounce } from '@microsoft/sp-lodash-subset';
 import {
-    Callout,
     Icon,
     IconButton,
+    IDropdownOption,
     Pivot,
     PivotItem,
     PivotLinkFormat,
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { GlobalContext } from '../../Context';
-import { on } from '../../features/events';
+import { Identifier, on } from '../../features/events';
 import { ICountry } from '../../features/feedback-form/countries';
 import { FeedbackService } from '../../features/feedback/feedback-service';
 import { TagAddButton } from '../../features/tags/TagAddButton';
 import { TagPill } from '../../features/tags/TagPill';
-import { IFeedback } from '../../models/IFeedback';
+import { IFeedback, StatusType, STATUS_TYPES } from '../../models/IFeedback';
 import { EditableText } from '../EditableText';
+import { PropertyDropdown } from '../PropertyDropdown';
 import { RichEditor } from '../RichEditor/RichEditor';
 import styles from './FeedbackDetails.module.scss';
+
+const LABEL_WIDTH = 75;
+const DROPDOWN_WIDTH = 200;
+const COUNTRY_CDN_URL = 'https://flagcdn.com';
 
 export interface IFeedbackDetailsProps {
     feedbackId: number;
     onDismiss: () => void;
 }
 
-const EditDropdown: React.FC = () => {
-    const target = React.useRef(null);
-    const [calloutVisible, setCalloutVisible] = React.useState(false);
+const StatusDropdown: React.FC<{
+    value: string;
+    onChange: (value: StatusType) => void;
+}> = (props) => {
+    const [val, setVal] = React.useState(props.value);
+    const options = STATUS_TYPES.map((status) => ({
+        key: status,
+        text: status,
+    }));
+
+    const handleChange = (
+        _e: React.FormEvent<HTMLDivElement>,
+        option?: IDropdownOption
+    ) => {
+        if (option) {
+            setVal(option.key as string);
+            props.onChange(option.key as StatusType);
+        }
+    };
 
     return (
-        <div ref={target} className={styles.dropdown}>
-            <input
-                type="text"
-                autoComplete="off"
-                value="Test value"
-                onFocus={() => setCalloutVisible((prev) => !prev)}
-                onBlur={() => setCalloutVisible(false)}
-            />
-            <div className={styles.dropdownIcon}></div>
-            <Callout
-                styles={{
-                    root: {
-                        minWidth: target.current
-                            ? target.current.clientWidth
-                            : 0,
-                    },
-                }}
-                target={target}
-                isBeakVisible={false}
-                hidden={!calloutVisible}
-            >
-                <ul>
-                    <li>Item 1</li>
-                    <li>Item 2</li>
-                    <li>Item 3</li>
-                </ul>
-            </Callout>
-        </div>
+        <PropertyDropdown
+            label="Status"
+            placeholder="Select an option"
+            options={options}
+            selectedKey={val}
+            onChange={handleChange}
+            styles={{
+                dropdown: {
+                    width: DROPDOWN_WIDTH,
+                },
+                label: {
+                    width: LABEL_WIDTH,
+                },
+            }}
+        />
+    );
+};
+
+const CategoryDropdown: React.FC<{
+    value: string;
+    onChange: (value: string) => void;
+}> = (props) => {
+    const { requestTypes } = React.useContext(GlobalContext);
+    const [val, setVal] = React.useState(props.value);
+    const options: IDropdownOption[] = Object.keys(requestTypes).map((key) => ({
+        key,
+        text: requestTypes[key].Data.name,
+        data: requestTypes[key].Data.iconName,
+    }));
+
+    const handleChange = (
+        _e: React.FormEvent<HTMLDivElement>,
+        option?: IDropdownOption
+    ) => {
+        if (option) {
+            setVal(option.key as string);
+            props.onChange(option.key as string);
+        }
+    };
+
+    const renderOption = (option?: IDropdownOption): JSX.Element => {
+        const elements = [];
+        if (option.data) {
+            elements.push(
+                <Icon iconName={option.data} style={{ marginRight: '.5em' }} />
+            );
+        }
+
+        elements.push(<span>{option.text}</span>);
+
+        return <div>{elements}</div>;
+    };
+
+    return (
+        <PropertyDropdown
+            label="Category"
+            placeholder="Select an option"
+            options={options}
+            selectedKey={val}
+            onChange={handleChange}
+            onRenderOption={renderOption}
+            onRenderTitle={(options, defaultRender) => renderOption(options[0])}
+            styles={{
+                dropdown: {
+                    width: DROPDOWN_WIDTH,
+                },
+                label: {
+                    width: LABEL_WIDTH,
+                },
+            }}
+        />
+    );
+};
+
+const CountryDropdown: React.FC<{
+    value: string;
+    onChange: (value: string) => void;
+}> = (props) => {
+    const [val, setVal] = React.useState(props.value);
+    const { countries } = React.useContext(GlobalContext);
+    const options = countries.map((country) => ({
+        key: country.Data.code,
+        text: country.Data.name,
+    }));
+
+    const onChange = (
+        event: React.FormEvent<HTMLDivElement>,
+        option?: IDropdownOption
+    ) => {
+        if (option) {
+            setVal(option.key as string);
+            props.onChange(option.key as string);
+        }
+    };
+
+    const renderOption = (option?: IDropdownOption): JSX.Element => {
+        const elements = [];
+        if (option) {
+			const countryCode = (option.key as String).toLowerCase();
+			const w20 = COUNTRY_CDN_URL + '/w20/' + countryCode + '.png';
+			const w40 = COUNTRY_CDN_URL + '/w40/' + countryCode + '.png';
+            elements.push(
+                <img src={w20} srcSet={w40} width="20" height="13.5" style={{ marginRight: '.5em' }} />
+            );
+        }
+
+        elements.push(<span>{option.text}</span>);
+
+        return <div>{elements}</div>;
+    };
+
+    return (
+        <PropertyDropdown
+            label="Country"
+            placeholder="Select an option"
+            options={options}
+            selectedKey={val}
+            onChange={onChange}
+			onRenderOption={renderOption}
+			onRenderTitle={(options) => renderOption(options[0])}
+            styles={{
+                dropdown: {
+                    width: DROPDOWN_WIDTH,
+                },
+                label: {
+                    width: LABEL_WIDTH,
+                },
+            }}
+        />
     );
 };
 
@@ -74,7 +197,7 @@ export const FeedbackDetails: React.FC<IFeedbackDetailsProps> = (props) => {
     }, []);
 
     React.useEffect(() => {
-        const clear = on('tag-add', (ev) => {
+        const clear = on<Identifier<string>>('tag-add', (ev) => {
             const { id, value } = ev.detail;
             if (id !== feedback.ID) return;
             setFeedback((prev) => {
@@ -94,7 +217,7 @@ export const FeedbackDetails: React.FC<IFeedbackDetailsProps> = (props) => {
     }, [feedback]);
 
     React.useEffect(() => {
-        const clear = on('tag-delete', (ev) => {
+        const clear = on<Identifier<string>>('tag-delete', (ev) => {
             const { id, value } = ev.detail;
             if (id !== feedback.ID) return;
             setFeedback((prev) => ({
@@ -130,6 +253,24 @@ export const FeedbackDetails: React.FC<IFeedbackDetailsProps> = (props) => {
         country = countries.find((c) => c.Data.code === feedback.Country);
     }
 
+    const handlePropUpdate = async (prop: keyof IFeedback, value: any) => {
+        try {
+            await FeedbackService.updateFeedback(feedback.ID, {
+                [prop]: value,
+            });
+            setFeedback((prev) => ({
+                ...prev,
+                [prop]: value,
+            }));
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const debouncedUpdate = debounce(handlePropUpdate, 1000, {
+        trailing: true,
+    });
+
     return (
         <div className={styles.container}>
             <div className={styles.title}>
@@ -137,7 +278,9 @@ export const FeedbackDetails: React.FC<IFeedbackDetailsProps> = (props) => {
                     {titleIcon}
                     <EditableText
                         value={feedback.Title}
-                        handleUpdate={(v) => console.log(v)}
+                        handleUpdate={(value) =>
+                            handlePropUpdate('Title', value)
+                        }
                     />
                 </span>
                 <IconButton
@@ -152,15 +295,21 @@ export const FeedbackDetails: React.FC<IFeedbackDetailsProps> = (props) => {
                     <TagAddButton feedbackId={feedback.ID} />
                 </div>
                 <div className={styles.properties}>
+                    <StatusDropdown
+                        value={feedback.Status}
+                        onChange={(val) => debouncedUpdate('Status', val)}
+                    />
                     <p>
-                        <b>Status:</b> <EditDropdown />
+                        <CategoryDropdown
+                            value={feedback.Category}
+                            onChange={(val) => debouncedUpdate('Category', val)}
+                        />
                     </p>
                     <p>
-                        <b>Category:</b> {feedback.Category}
-                    </p>
-                    <p>
-                        <b>Country:</b>{' '}
-                        {country ? country.Data.name : feedback.Country}
+                        <CountryDropdown
+                            value={country && country.Data && country.Data.code}
+                            onChange={(val) => debouncedUpdate('Country', val)}
+                        />
                     </p>
                 </div>
                 <div className={styles.bottomTabs}>
