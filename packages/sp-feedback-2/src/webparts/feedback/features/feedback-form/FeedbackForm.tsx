@@ -20,6 +20,7 @@ import { FeedbackService } from '../feedback/feedback-service';
 import { Done } from './Done';
 import styles from './FeedbackForm.module.scss';
 import doneStyles from './Done.module.scss';
+import { AttachmentService } from '../attachments/attachments-service';
 
 export interface IFeedbackFormProps {
     // Props go here
@@ -34,11 +35,11 @@ const additionalOptionOther: IDropdownOption = {
 };
 
 const additionalOptionNA: IDropdownOption = {
-    key: 'Na',
+    key: 'NA',
     text: 'Not applicable',
     data: {
         Data: {
-            code: 'Na',
+            code: 'NA',
             name: 'NA',
             imageUrl: require('../../assets/na.png'),
         },
@@ -126,12 +127,12 @@ function animateImage(id: string, imgSrc: string): void {
 
     image.classList.add(styles.hide);
 
-	if (imageTimer[id] > 0) {
-		clearTimeout(imageTimer[id]);
-	}
+    if (imageTimer[id] > 0) {
+        clearTimeout(imageTimer[id]);
+    }
     imageTimer[id] = setTimeout(() => {
         image.src = imgSrc || defaultImage.src;
-		imageTimer[id] = 0;
+        imageTimer[id] = 0;
         image.onload = () => {
             image.classList.remove(styles.hide);
             image.classList.add(styles.show);
@@ -185,8 +186,11 @@ const Step: React.FC<{
     );
 };
 
-const Attachments: React.FC<{disabled: boolean}> = (props) => {
-    const [attachments, setAttachments] = React.useState<File[]>([]);
+const Attachments: React.FC<{
+    disabled: boolean;
+    attachments: File[];
+    onChange: (attachments: File[]) => void;
+}> = (props) => {
 
     return (
         <>
@@ -195,36 +199,40 @@ const Attachments: React.FC<{disabled: boolean}> = (props) => {
                 <input
                     id="attachments"
                     type="file"
-					disabled={props.disabled}
+                    disabled={props.disabled}
                     multiple
                     aria-multiselectable="true"
                     accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.tar,.gz,.tgz,.bz2,.xz,.mp3,.mp4,.avi,.mkv,.mov,.flv,.wmv,.wma,.wav,.ogg,.m4a,.aac,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.tar,.gz,.tgz,.bz2,.xz,.mp3,.mp4,.avi,.mkv,.mov,.flv,.wmv,.wma,.wav,.ogg,.m4a,.aac"
                     onChange={(e) => {
                         const files = e.target.files;
                         if (files) {
-                            setAttachments([
-                                ...attachments,
+                            props.onChange([
+                                ...props.attachments,
                                 ...Array.from(files),
                             ]);
                         }
                     }}
                 />
-                <span aria-disabled={props.disabled} role="button" className={styles['custom-button']}>
+                <span
+                    aria-disabled={props.disabled}
+                    role="button"
+                    className={styles['custom-button']}
+                >
                     <Icon iconName="Attach" /> Choose files
                 </span>
             </Label>
-            {attachments.length > 0 && (
+            {props.attachments.length > 0 && (
                 <ul className={styles['attachments-list']}>
-                    {attachments.map((file) => (
+                    {props.attachments.map((file) => (
                         <li key={file.name}>
                             <Icon iconName="Attach" />
                             <span>{file.name}</span>
                             <IconButton
                                 iconProps={{ iconName: 'Cancel' }}
-								tabIndex={-1}
+                                tabIndex={-1}
                                 onClick={() =>
-                                    setAttachments(
-                                        attachments.filter(
+                                    props.onChange(
+                                        props.attachments.filter(
                                             (f) => f.name !== file.name
                                         )
                                     )
@@ -251,6 +259,7 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
     const [description, setDescription] = React.useState<string>('');
     const [controlsDisabled, setControlsDisabled] =
         React.useState<boolean>(false);
+    const [attachments, setAttachments] = React.useState<File[]>([]);
 
     React.useEffect(() => {
         getCountries()
@@ -297,7 +306,7 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
     const onSubmit = async (evt: React.FormEvent): Promise<void> => {
         setControlsDisabled(true);
         evt.preventDefault();
-        await FeedbackService.addFeedback({
+        const added = await FeedbackService.addFeedback({
             Application: application?.Data.name,
             Country: country?.Data.code,
             Category: type?.Data.code,
@@ -311,6 +320,10 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
             'done-animation'
         ) as HTMLDivElement;
         animation.classList.add(doneStyles.show);
+
+		if (attachments.length > 0) {
+			await AttachmentService.addAttachments(added.data.ID, attachments);
+		}
 
         const animationText = animation.firstElementChild as HTMLDivElement;
         animationText.classList.add(doneStyles.show);
@@ -432,7 +445,7 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                                     id="priority"
                                     required
                                     onChange={(_e, c) => {
-										animateImage('priority', c.title);
+                                        animateImage('priority', c.title);
                                         setPriority(c.key);
                                     }}
                                     label="Priorty"
@@ -503,7 +516,11 @@ export const FeedbackForm: React.FC<IFeedbackFormProps> = () => {
                             onChange={(html) => setDescription(html)}
                         />
 
-                        <Attachments disabled={controlsDisabled} />
+                        <Attachments
+                            disabled={controlsDisabled}
+                            attachments={attachments}
+                            onChange={setAttachments}
+                        />
 
                         <div className={styles['form-buttons']}>
                             <PrimaryButton

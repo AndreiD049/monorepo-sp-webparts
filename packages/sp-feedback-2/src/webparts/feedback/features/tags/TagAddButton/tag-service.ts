@@ -1,4 +1,4 @@
-import { IList, SPFI } from "sp-preset";
+import { IItemUpdateResult, IList, SPFI } from "sp-preset";
 import { FeedbackService } from "../../feedback/feedback-service";
 
 class TagServiceProvider {
@@ -25,7 +25,7 @@ class TagServiceProvider {
 		return Array.from(result);
 	}
 
-	public async addTag(feedbackId: number, tag: string) {
+	public async addTag(feedbackId: number, tag: string): Promise<IItemUpdateResult> {
 		const feedback = await FeedbackService.getFeedback(feedbackId);
 
 		let payload = feedback.Tags;
@@ -41,7 +41,7 @@ class TagServiceProvider {
 		return this.list.items.getById(feedbackId).update({ Tags: payload });
 	}
 
-	public async removeTag(feedbackId: number, tag: string) {
+	public async removeTag(feedbackId: number, tag: string): Promise<IItemUpdateResult> {
 		const feedback = await FeedbackService.getFeedback(feedbackId);
 
 		const payload = feedback.Tags;

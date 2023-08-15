@@ -20,7 +20,8 @@
       "./node_modules/@microsoft"
     ],
     "types": [
-      "webpack-env"
+      "webpack-env",
+	  "@types/wicg-file-system-access"
     ],
     "lib": [
       "es5",

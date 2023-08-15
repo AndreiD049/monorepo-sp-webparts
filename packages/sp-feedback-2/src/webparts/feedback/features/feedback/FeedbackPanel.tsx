@@ -1,12 +1,11 @@
-import { Modal } from 'office-ui-fabric-react';
+import { Panel, PanelType } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FeedbackDetails } from '../../components/FeedbackDetails';
 
-export const FeedbackModal: React.FC = () => {
+export const FeedbackPanel: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const id = searchParams.get('feedback');
-	const blocking = searchParams.get('blocking') === 'true';
 
     if (id === null) {
         return null;
@@ -25,23 +24,21 @@ export const FeedbackModal: React.FC = () => {
 	};
 
     return (
-        <Modal
+        <Panel
             isOpen={true}
-			isBlocking={blocking}
+			isLightDismiss={true}
+			type={PanelType.large}
             onDismiss={onDismiss}
-            styles={{
-                main: {
-					minWidth: '95vw',
-					minHeight: '95vh',
-					overflow: 'hidden',
-					border: '1px solid lightgray',
-                },
-				scrollableContent: {
-					overflow: 'hidden',
+			styles={{
+				commands: {
+					display: 'none',
+				},
+				content: {
+					padding: 0,
 				}
-            }}
+			}}
         >
 			<FeedbackDetails feedbackId={parseInt(id)} onDismiss={onDismiss} />
-        </Modal>
+        </Panel>
     );
 };

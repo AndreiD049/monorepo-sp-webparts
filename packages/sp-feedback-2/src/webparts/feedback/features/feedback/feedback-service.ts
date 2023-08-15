@@ -1,4 +1,4 @@
-import { IItemAddResult, IList, SPFI } from 'sp-preset';
+import { IAttachmentInfo, IItemAddResult, IItemUpdateResult, IList, SPFI } from 'sp-preset';
 import { IFeedback } from '../../models/IFeedback';
 import { dispEvent, Identifier } from '../events';
 
@@ -44,11 +44,22 @@ class FeedbackServiceProvider {
         return result;
     }
 
+	public async addAttachments(id: number, files: File[]): Promise<void> {
+		const item = this.list.items.getById(id);
+		for (const file of files) {
+			await item.attachmentFiles.add(file.name, file);
+		}
+	}
+
 	public async getFeedback(id: number): Promise<IFeedback> {
 		return this.list.items.getById(id).select(...SELECT).expand(...EXPAND)();
 	}
 
-    public async updateFeedback(id: number, payload: Partial<IFeedback>) {
+	public async getFeedbackAttachments(id: number): Promise<IAttachmentInfo[]> {
+		return this.list.items.getById(id).attachmentFiles();
+	}
+
+    public async updateFeedback(id: number, payload: Partial<IFeedback>): Promise<IItemUpdateResult> {
 		const result = await this.list.items.getById(id).update(payload);
 		
 		dispEvent<Identifier<typeof payload>>('feedback-updated', {

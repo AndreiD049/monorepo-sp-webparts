@@ -1,4 +1,5 @@
 import * as React from "react";
+import { IApplication } from "./features/applications/IApplication";
 import { ICountry } from "./features/feedback-form/countries";
 import { IRequestType } from "./features/feedback-form/request-types";
 
@@ -10,6 +11,8 @@ export interface IGlobalContext {
     settingListTitle: string;
 	requestTypes: RequestTypesDict;
 	countries: ICountry[];
+	applications: IApplication[];
+	isTestManager: boolean;
 }
 
 export const GlobalContext = React.createContext<IGlobalContext>({
@@ -18,6 +21,8 @@ export const GlobalContext = React.createContext<IGlobalContext>({
     settingListTitle: "",
 	requestTypes: null,
 	countries: [],
+	applications: [],
+	isTestManager: false,
 });
 
 export const GlobalContextProvider: React.FC<IGlobalContext> = (props) => {

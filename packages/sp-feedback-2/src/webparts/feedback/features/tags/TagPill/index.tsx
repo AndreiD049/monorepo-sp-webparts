@@ -7,10 +7,11 @@ import styles from './TagPill.module.scss';
 export interface ITagPillProps {
     feedbackId: number;
     tag: string;
+	disabled?: boolean;
 }
 
 export const TagPill: React.FC<ITagPillProps> = (props) => {
-    const handleDeleteTag = async () => {
+    const handleDeleteTag = async (): Promise<void> => {
         const confirmed = confirm(
             `Removing tag "${props.tag}".\nAre you sure?`
         );
@@ -23,7 +24,7 @@ export const TagPill: React.FC<ITagPillProps> = (props) => {
     return (
         <div className={styles.container}>
             <span>{props.tag}</span>
-            <button className={styles.removeButton} onClick={handleDeleteTag}>
+            <button className={styles.removeButton} onClick={handleDeleteTag} disabled={props.disabled}>
                 <Icon iconName="Cancel" />
             </button>
         </div>

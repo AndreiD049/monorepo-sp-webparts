@@ -16,6 +16,7 @@ import {
 
 export interface ITagAddButtonProps {
     feedbackId: number;
+	disabled?: boolean;
 }
 
 const TagIconButton: React.FC<
@@ -36,12 +37,12 @@ export const TagAddButton: React.FC<ITagAddButtonProps> = (props) => {
         createCompletionList([], '', true)
     );
 
-    const clearInputValue = () => {
+    const clearInputValue = (): void => {
         if (!input.current) return;
         input.current.value = '';
     };
 
-    const lockControls = () => {
+    const lockControls = (): void => {
         input.current.disabled = true;
 
         const parent = input.current.parentElement;
@@ -60,7 +61,7 @@ export const TagAddButton: React.FC<ITagAddButtonProps> = (props) => {
         }
     };
 
-    const unlockControls = () => {
+    const unlockControls = (): void => {
         input.current.disabled = false;
 
         const parent = input.current.parentElement;
@@ -79,7 +80,7 @@ export const TagAddButton: React.FC<ITagAddButtonProps> = (props) => {
         }
     };
 
-    const showInput = () => {
+    const showInput = (): void => {
         const parent = input.current.parentElement;
         parent.classList.remove(styles.hidden);
         parent.classList.add(styles.shown);
@@ -87,7 +88,7 @@ export const TagAddButton: React.FC<ITagAddButtonProps> = (props) => {
         unlockControls();
     };
 
-    const hideInput = () => {
+    const hideInput = (): void => {
         const parent = input.current.parentElement;
         parent.classList.remove(styles.shown);
         parent.classList.add(styles.hidden);
@@ -96,17 +97,17 @@ export const TagAddButton: React.FC<ITagAddButtonProps> = (props) => {
         setIsCalloutHidden(true);
     };
 
-    const getInputValue = () => {
+    const getInputValue = (): string => {
         if (!input.current) return '';
         return input.current.value;
     };
 
-    const handleClickNew = () => {
+    const handleClickNew = (): void => {
         showInput();
         input.current.focus();
     };
 
-    const handleTextChange = (ev: React.ChangeEvent) => {
+    const handleTextChange = (ev: React.ChangeEvent): void => {
         const target = ev.target as HTMLInputElement;
         if (!target) return;
 
@@ -121,12 +122,12 @@ export const TagAddButton: React.FC<ITagAddButtonProps> = (props) => {
         }
     };
 
-    const updateFeedbackTags = async (value: string) => {
+    const updateFeedbackTags = async (value: string): Promise<void> => {
         await TagService.addTag(props.feedbackId, value);
         dispEvent('tag-add', { id: props.feedbackId, value: value });
     };
 
-    const handleAddTag = async () => {
+    const handleAddTag = async (): Promise<void> => {
         lockControls();
         const val = getInputValue();
         if (val !== '') {
@@ -136,13 +137,13 @@ export const TagAddButton: React.FC<ITagAddButtonProps> = (props) => {
         hideInput();
     };
 
-    const handleClickOption = async (option: string) => {
+    const handleClickOption = async (option: string): Promise<void> => {
         lockControls();
         await updateFeedbackTags(option);
         hideInput();
     };
 
-    const handleKeys = async (ev: React.KeyboardEvent) => {
+    const handleKeys = async (ev: React.KeyboardEvent): Promise<void> => {
         if (ev.key === 'Enter') {
             await handleAddTag();
             return;
@@ -196,7 +197,7 @@ export const TagAddButton: React.FC<ITagAddButtonProps> = (props) => {
             </div>
             <TagIconButton
                 iconName="Add"
-                disabled={isInputShown}
+                disabled={props.disabled || isInputShown}
                 onClick={handleClickNew}
             />
             <Callout

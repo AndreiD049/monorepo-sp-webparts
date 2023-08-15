@@ -11,6 +11,7 @@ export interface IRichEditorProps {
 	editable?: boolean;
 	initialCotnent?: string;
 	onChange?: (html: string) => void;
+	onBlur?: (html: string) => void;
 }
 
 export async function getBase64DataFromFile(file: File): Promise<string> {
@@ -138,6 +139,16 @@ export const RichEditor: React.FC<IRichEditorProps> = ({
 }) => {
 	const [imageDialogOpen, setImageDialogOpen] = React.useState<boolean>(false);
 
+	let onChange = props.onChange;
+	if (!onChange) {
+		onChange = () => null;
+	}
+
+	let onBlur = props.onBlur;
+	if (!onBlur) {
+		onBlur = () => null;
+	}
+
 	const editor = useEditor({
 		extensions: [
 			StarterKit,
@@ -153,8 +164,8 @@ export const RichEditor: React.FC<IRichEditorProps> = ({
 				},
 			}),
 		],
-		onUpdate: (innerProps) => props.onChange && props.onChange(innerProps.editor.getHTML()),
-		onBlur: (innerProps) =>  props.onChange && props.onChange(innerProps.editor.getHTML()),
+		onUpdate: (innerProps) => onChange(innerProps.editor.getHTML()),
+		onBlur: (innerProps) =>  onBlur(innerProps.editor.getHTML()),
 		content: props.initialCotnent || '',
 		editable: editable,
 	});

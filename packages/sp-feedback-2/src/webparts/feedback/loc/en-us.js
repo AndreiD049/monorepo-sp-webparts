@@ -13,6 +13,7 @@ define([], function() {
     "AppOutlookEnvironment": "The app is running in Outlook",
     "RootUrl": "Root URL (site where list is located)",
     "ListTitle": "Title of the main list",
-    "SettingListTitle": "Title of the setting list"
+    "SettingListTitle": "Title of the setting list",
+    "AttachmentsLibraryTitle": "Title of the attachments library"
   }
 });

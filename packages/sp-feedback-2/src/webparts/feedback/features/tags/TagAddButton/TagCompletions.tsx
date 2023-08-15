@@ -14,8 +14,6 @@ export const TagCompletions: React.FC<
 
 	if (!list) return null;
 	
-	console.log(list.allowCustomValues);
-
     return (
         <div className={styles.container} {...props}>
             {list.filteredOptions.map((fo, idx) => (
@@ -25,6 +23,7 @@ export const TagCompletions: React.FC<
                     }`}
 					role="button"
 					onClick={() => props.handleSelect(fo)}
+					key={fo}
                 >
                     {fo}
                 </div>
@@ -37,7 +36,7 @@ export const TagCompletions: React.FC<
 					role="button"
 					onClick={() => props.handleSelect(list.value)}
                 >
-                    Create new value <b>"{list.value}"</b>
+                    Create new value <b>&quot;{list.value}&quot;</b>
                 </div>
             )}
         </div>

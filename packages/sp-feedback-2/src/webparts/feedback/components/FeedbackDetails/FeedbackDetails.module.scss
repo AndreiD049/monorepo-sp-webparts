@@ -45,7 +45,10 @@
 .properties {
 	padding: .5em;
 	min-height: 200px;
-	flex-grow: 2;
+
+	& > * + * {
+		margin-top: .5rem;
+	}
 }
 
 .bottomTabs {

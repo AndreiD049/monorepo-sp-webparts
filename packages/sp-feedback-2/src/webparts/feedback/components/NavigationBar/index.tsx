@@ -17,7 +17,12 @@ export interface INavigationBarProps {
 export const NavigationBar: React.FC<INavigationBarProps> = (props) => {
     return (
         <div className={`${styles.container} ${styles.layout}`}>
-            <img src="https://placehold.co/40" alt="Logo" />
+            <img
+                src={require('../../assets/uservoice_60.png')}
+                height="60"
+                alt="Logo"
+                style={{ marginRight: '.5em' }}
+            />
             <div
                 style={{
                     display: 'flex',
@@ -41,9 +46,9 @@ export const NavigationBar: React.FC<INavigationBarProps> = (props) => {
                                 alignItems: 'center',
                                 color: 'white',
                                 borderBottom: '2px solid white',
-								cursor: 'pointer'
+                                cursor: 'pointer',
                             }}
-							key={link.to}
+                            key={link.to}
                         >
                             <Link
                                 to={link.to}
@@ -52,7 +57,12 @@ export const NavigationBar: React.FC<INavigationBarProps> = (props) => {
                                     textDecoration: 'none',
                                 }}
                             >
-								{link.icon && <Icon iconName={link.icon} style={{ marginRight: '4px' }} />}
+                                {link.icon && (
+                                    <Icon
+                                        iconName={link.icon}
+                                        style={{ marginRight: '4px' }}
+                                    />
+                                )}
                                 {link.name}
                             </Link>
                         </div>
@@ -72,9 +82,9 @@ export const NavigationBar: React.FC<INavigationBarProps> = (props) => {
                                 gap: '4px',
                                 color: 'white',
                                 borderBottom: '2px solid white',
-								cursor: 'pointer'
+                                cursor: 'pointer',
                             }}
-							key={link.to}
+                            key={link.to}
                         >
                             <Link
                                 to={link.to}
@@ -83,7 +93,12 @@ export const NavigationBar: React.FC<INavigationBarProps> = (props) => {
                                     textDecoration: 'none',
                                 }}
                             >
-								{link.icon && <Icon iconName={link.icon} style={{ marginRight: '4px' }} />}
+                                {link.icon && (
+                                    <Icon
+                                        iconName={link.icon}
+                                        style={{ marginRight: '4px' }}
+                                    />
+                                )}
                                 {link.name}
                             </Link>
                         </div>

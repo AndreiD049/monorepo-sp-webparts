@@ -17,15 +17,24 @@ import { FeedbackService } from './features/feedback/feedback-service';
 import { UserService } from './features/users/users-service';
 import './styles.css';
 import { TagService } from './features/tags/TagAddButton/tag-service';
+import AccessControl, {
+    IUserGroupPermissions,
+    setupAccessControl,
+} from 'property-pane-access-control';
+import { AttachmentService } from './features/attachments/attachments-service';
+import { initializeFileTypeIcons } from '@fluentui/react-file-type-icons';
 
 export interface IFeedbackWebPartProps {
     listRootUrl: string;
     listTitle: string;
     settingListTitle: string;
+    attachmentLibraryName: string;
+    permissions: IUserGroupPermissions;
 }
 
 export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebPartProps> {
     private settingsDone: boolean = false;
+	public static theme: IReadonlyTheme;
 
     public async render(): Promise<void> {
         let element: React.ReactElement;
@@ -59,14 +68,25 @@ export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebP
         );
         SettingsService.initService(sp, this.properties.settingListTitle);
         FeedbackService.initService(sp, this.properties.listTitle);
-		TagService.initService(sp, this.properties.listTitle);
+        AttachmentService.initService(
+            sp,
+            this.properties.listTitle,
+            this.properties.attachmentLibraryName
+        );
+        TagService.initService(sp, this.properties.listTitle);
         UserService.initService(sp);
+
+        setupAccessControl(this.context);
+
+		initializeFileTypeIcons();
     }
 
     protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {
         if (!currentTheme) {
             return;
         }
+
+		FeedbackWebPart.theme = currentTheme;
 
         const { semanticColors } = currentTheme;
 
@@ -113,6 +133,21 @@ export default class FeedbackWebPart extends BaseClientSideWebPart<IFeedbackWebP
                                 }),
                                 PropertyPaneTextField('settingListTitle', {
                                     label: strings.SettingListTitle,
+                                }),
+                                PropertyPaneTextField('attachmentLibraryName', {
+                                    label: strings.AttachmentsLibraryTitle,
+                                }),
+                            ],
+                        },
+                        {
+                            groupName: 'Permissions',
+                            groupFields: [
+                                AccessControl('permissions', {
+                                    key: 'permissions',
+                                    permissions: ['test-managers'],
+                                    context: this.context,
+                                    selectedUserGroups:
+                                        this.properties.permissions,
                                 }),
                             ],
                         },

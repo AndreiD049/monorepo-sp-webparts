@@ -16,6 +16,7 @@ import { TagAddButton } from '../../features/tags/TagAddButton';
 import { TagPill } from '../../features/tags/TagPill';
 import { IFeedback, StatusType, STATUS_TYPES } from '../../models/IFeedback';
 import { EditableText } from '../EditableText';
+import { FeedbackAttachments } from '../FeedbackAttachments';
 import { PropertyDropdown } from '../PropertyDropdown';
 import { RichEditor } from '../RichEditor/RichEditor';
 import styles from './FeedbackDetails.module.scss';
@@ -31,6 +32,7 @@ export interface IFeedbackDetailsProps {
 
 const StatusDropdown: React.FC<{
     value: string;
+	editable: boolean;
     onChange: (value: StatusType) => void;
 }> = (props) => {
     const [val, setVal] = React.useState(props.value);
@@ -42,7 +44,10 @@ const StatusDropdown: React.FC<{
     const handleChange = (
         _e: React.FormEvent<HTMLDivElement>,
         option?: IDropdownOption
-    ) => {
+    ): void => {
+		if (!props.editable) {
+			return;
+		}
         if (option) {
             setVal(option.key as string);
             props.onChange(option.key as StatusType);
@@ -56,6 +61,7 @@ const StatusDropdown: React.FC<{
             options={options}
             selectedKey={val}
             onChange={handleChange}
+			readonly={!props.editable}
             styles={{
                 dropdown: {
                     width: DROPDOWN_WIDTH,
@@ -70,6 +76,7 @@ const StatusDropdown: React.FC<{
 
 const CategoryDropdown: React.FC<{
     value: string;
+	editable: boolean;
     onChange: (value: string) => void;
 }> = (props) => {
     const { requestTypes } = React.useContext(GlobalContext);
@@ -83,7 +90,10 @@ const CategoryDropdown: React.FC<{
     const handleChange = (
         _e: React.FormEvent<HTMLDivElement>,
         option?: IDropdownOption
-    ) => {
+    ): void => {
+		if (!props.editable) {
+			return;
+		}
         if (option) {
             setVal(option.key as string);
             props.onChange(option.key as string);
@@ -109,9 +119,10 @@ const CategoryDropdown: React.FC<{
             placeholder="Select an option"
             options={options}
             selectedKey={val}
+			readonly={!props.editable}
             onChange={handleChange}
             onRenderOption={renderOption}
-            onRenderTitle={(options, defaultRender) => renderOption(options[0])}
+            onRenderTitle={(options) => renderOption(options[0])}
             styles={{
                 dropdown: {
                     width: DROPDOWN_WIDTH,
@@ -126,6 +137,7 @@ const CategoryDropdown: React.FC<{
 
 const CountryDropdown: React.FC<{
     value: string;
+	editable: boolean;
     onChange: (value: string) => void;
 }> = (props) => {
     const [val, setVal] = React.useState(props.value);
@@ -136,9 +148,12 @@ const CountryDropdown: React.FC<{
     }));
 
     const onChange = (
-        event: React.FormEvent<HTMLDivElement>,
+        _event: React.FormEvent<HTMLDivElement>,
         option?: IDropdownOption
-    ) => {
+    ): void => {
+		if (!props.editable) {
+			return;
+		}
         if (option) {
             setVal(option.key as string);
             props.onChange(option.key as string);
@@ -148,11 +163,17 @@ const CountryDropdown: React.FC<{
     const renderOption = (option?: IDropdownOption): JSX.Element => {
         const elements = [];
         if (option) {
-			const countryCode = (option.key as String).toLowerCase();
-			const w20 = COUNTRY_CDN_URL + '/w20/' + countryCode + '.png';
-			const w40 = COUNTRY_CDN_URL + '/w40/' + countryCode + '.png';
+            const countryCode = (option.key as string).toLowerCase();
+            const w20 = COUNTRY_CDN_URL + '/w20/' + countryCode + '.png';
+            const w40 = COUNTRY_CDN_URL + '/w40/' + countryCode + '.png';
             elements.push(
-                <img src={w20} srcSet={w40} width="20" height="13.5" style={{ marginRight: '.5em' }} />
+                <img
+                    src={w20}
+                    srcSet={w40}
+                    width="20"
+                    height="13.5"
+                    style={{ marginRight: '.5em' }}
+                />
             );
         }
 
@@ -167,9 +188,66 @@ const CountryDropdown: React.FC<{
             placeholder="Select an option"
             options={options}
             selectedKey={val}
+			readonly={!props.editable}
             onChange={onChange}
-			onRenderOption={renderOption}
-			onRenderTitle={(options) => renderOption(options[0])}
+            onRenderOption={renderOption}
+            onRenderTitle={(options) => renderOption(options[0])}
+            styles={{
+                dropdown: {
+                    width: DROPDOWN_WIDTH,
+                },
+                label: {
+                    width: LABEL_WIDTH,
+                },
+            }}
+        />
+    );
+};
+
+const ApplicationDropdown: React.FC<{
+    value: string;
+	editable: boolean;
+    onChange: (val: string) => void;
+}> = (props) => {
+    const { applications } = React.useContext(GlobalContext);
+    const [val, setVal] = React.useState(props.value);
+    const options = applications
+        .map((app) => ({
+            key: app.Data.name,
+            text: app.Data.name,
+        }))
+        .concat([
+            {
+                key: 'NA',
+                text: 'Not applicable',
+            },
+            {
+                key: 'Other',
+                text: 'Other',
+            },
+        ]);
+
+    const handleChange = (
+        _e: React.FormEvent<HTMLDivElement>,
+        option?: IDropdownOption
+    ): void => {
+		if (!props.editable) {
+			return;
+		}
+        if (option) {
+            setVal(option.key as string);
+            props.onChange(option.key as StatusType);
+        }
+    };
+
+    return (
+        <PropertyDropdown
+            label="Application"
+            placeholder="Select an option"
+            options={options}
+			readonly={!props.editable}
+            selectedKey={val}
+            onChange={handleChange}
             styles={{
                 dropdown: {
                     width: DROPDOWN_WIDTH,
@@ -184,7 +262,12 @@ const CountryDropdown: React.FC<{
 
 export const FeedbackDetails: React.FC<IFeedbackDetailsProps> = (props) => {
     const [feedback, setFeedback] = React.useState<IFeedback>(null);
-    const { requestTypes, countries } = React.useContext(GlobalContext);
+    const { requestTypes, countries, isTestManager } = React.useContext(GlobalContext);
+
+	let canEdit = isTestManager;
+	if (feedback && feedback.Status === 'New') {
+		canEdit = true;
+	}
 
     React.useEffect(() => {
         FeedbackService.getFeedback(props.feedbackId)
@@ -234,7 +317,6 @@ export const FeedbackDetails: React.FC<IFeedbackDetailsProps> = (props) => {
     }
 
     const requestType = requestTypes[feedback.Category];
-
     const iconName = requestType ? requestType.Data.iconName : null;
     let titleIcon = null;
     if (requestType && iconName) {
@@ -244,7 +326,7 @@ export const FeedbackDetails: React.FC<IFeedbackDetailsProps> = (props) => {
     let tags = null;
     if (feedback.Tags) {
         tags = feedback.Tags.map((tag) => (
-            <TagPill tag={tag} feedbackId={feedback.ID} />
+            <TagPill key={tag} tag={tag} feedbackId={feedback.ID} disabled={!canEdit} />
         ));
     }
 
@@ -253,7 +335,7 @@ export const FeedbackDetails: React.FC<IFeedbackDetailsProps> = (props) => {
         country = countries.find((c) => c.Data.code === feedback.Country);
     }
 
-    const handlePropUpdate = async (prop: keyof IFeedback, value: any) => {
+    const handlePropUpdate = async (prop: keyof IFeedback, value: any): Promise<void> => {
         try {
             await FeedbackService.updateFeedback(feedback.ID, {
                 [prop]: value,
@@ -267,17 +349,19 @@ export const FeedbackDetails: React.FC<IFeedbackDetailsProps> = (props) => {
         }
     };
 
-    const debouncedUpdate = debounce(handlePropUpdate, 1000, {
+    const debouncedUpdate = (): (typeof handlePropUpdate) => debounce(handlePropUpdate, 1000, {
         trailing: true,
     });
 
     return (
         <div className={styles.container}>
+            {/* Editable title of the feedback */}
             <div className={styles.title}>
                 <span className={styles.titleText}>
                     {titleIcon}
                     <EditableText
                         value={feedback.Title}
+						readOnly={!canEdit}
                         handleUpdate={(value) =>
                             handlePropUpdate('Title', value)
                         }
@@ -289,29 +373,39 @@ export const FeedbackDetails: React.FC<IFeedbackDetailsProps> = (props) => {
                     onClick={props.onDismiss}
                 />
             </div>
+
+            {/* Main details of the feedback */}
             <div className={styles.body}>
                 <div className={styles.tagBar}>
                     {tags}
-                    <TagAddButton feedbackId={feedback.ID} />
+                    <TagAddButton feedbackId={feedback.ID} disabled={!canEdit} />
                 </div>
                 <div className={styles.properties}>
                     <StatusDropdown
                         value={feedback.Status}
-                        onChange={(val) => debouncedUpdate('Status', val)}
+                        onChange={(val) => debouncedUpdate()('Status', val)}
+						editable={isTestManager}
                     />
-                    <p>
-                        <CategoryDropdown
-                            value={feedback.Category}
-                            onChange={(val) => debouncedUpdate('Category', val)}
-                        />
-                    </p>
-                    <p>
+                    <ApplicationDropdown
+                        value={feedback.Application}
+                        onChange={(val) => debouncedUpdate()('Application', val)}
+						editable={canEdit}
+                    />
+                    <CategoryDropdown
+                        value={feedback.Category}
+                        onChange={(val) => debouncedUpdate()('Category', val)}
+						editable={canEdit}
+                    />
+                    {country && country.Data && (
                         <CountryDropdown
-                            value={country && country.Data && country.Data.code}
-                            onChange={(val) => debouncedUpdate('Country', val)}
+                            value={country.Data.code}
+                            onChange={(val) => debouncedUpdate()('Country', val)}
+							editable={canEdit}
                         />
-                    </p>
+                    )}
                 </div>
+
+                {/* Bottom tabs */}
                 <div className={styles.bottomTabs}>
                     <Pivot
                         linkFormat={PivotLinkFormat.links}
@@ -323,10 +417,18 @@ export const FeedbackDetails: React.FC<IFeedbackDetailsProps> = (props) => {
                         }}
                     >
                         <PivotItem headerText="Description">
-                            <RichEditor initialCotnent={feedback.Description} />
+                            <RichEditor
+                                initialCotnent={feedback.Description}
+								editable={canEdit}
+                                onBlur={async (html) => {
+                                    if (html !== feedback.Description) {
+                                        await debouncedUpdate()('Description', html);
+                                    }
+                                }}
+                            />
                         </PivotItem>
                         <PivotItem headerText="Attachments">
-                            <b>Attachments</b>
+							<FeedbackAttachments feedbackId={feedback?.ID} />
                         </PivotItem>
                         <PivotItem headerText="Notes">
                             <b>Notes</b>

@@ -1,10 +1,13 @@
+import { canCurrentUser } from 'property-pane-access-control';
 import * as React from 'react';
 import { Outlet } from 'react-router-dom';
 import { NavigationBar } from '../components/NavigationBar';
 import { GlobalContextProvider, RequestTypesDict } from '../Context';
+import { getApplications } from '../features/applications/applications';
+import { IApplication } from '../features/applications/IApplication';
 import { getCountries, ICountry } from '../features/feedback-form/countries';
 import { getRequestTypes } from '../features/feedback-form/request-types';
-import { FeedbackModal } from '../features/feedback/FeedbackModal';
+import { FeedbackPanel } from '../features/feedback/FeedbackPanel';
 import { IFeedbackWebPartProps } from '../FeedbackWebPart';
 
 export const Main: React.FC<IFeedbackWebPartProps> = (props) => {
@@ -12,6 +15,8 @@ export const Main: React.FC<IFeedbackWebPartProps> = (props) => {
         {}
     );
     const [countries, setCountries] = React.useState<ICountry[]>([]);
+	const [apps, setApps] = React.useState<IApplication[]>([]);
+	const [isTestManager, setIsTestManager] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         getRequestTypes()
@@ -28,6 +33,12 @@ export const Main: React.FC<IFeedbackWebPartProps> = (props) => {
         getCountries()
             .then((countries) => setCountries(countries))
             .catch((err) => console.error(err));
+		getApplications()
+			.then((apps) => setApps(apps))
+			.catch((err) => console.error(err));
+		canCurrentUser('test-managers', props.permissions)
+			.then((isTestManager) => setIsTestManager(isTestManager))
+			.catch((err) => console.error(err));
     }, []);
 
     return (
@@ -37,6 +48,8 @@ export const Main: React.FC<IFeedbackWebPartProps> = (props) => {
             settingListTitle={props.settingListTitle}
             requestTypes={requestTypes}
             countries={countries}
+			applications={apps}
+			isTestManager={isTestManager}
         >
             <NavigationBar
                 links={[
@@ -50,7 +63,7 @@ export const Main: React.FC<IFeedbackWebPartProps> = (props) => {
                 ]}
             />
             <Outlet />
-            <FeedbackModal />
+			<FeedbackPanel />
         </GlobalContextProvider>
     );
 };

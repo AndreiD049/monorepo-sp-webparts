@@ -7,6 +7,7 @@ import styles from './Home.module.scss';
 import { IconButton } from 'office-ui-fabric-react';
 import { useSearchParams } from 'react-router-dom';
 import { Identifier, on } from '../../features/events';
+import { HomeBarChart } from './HomeBarChart';
 
 export interface IHomeProps {
     // Props go here
@@ -14,7 +15,7 @@ export interface IHomeProps {
 
 export const Home: React.FC<IHomeProps> = () => {
     const [currentUser, setCurrentUser] = React.useState<ISiteUserInfo>(null);
-    const [_, setSearchParams] = useSearchParams();
+    const [, setSearchParams] = useSearchParams();
     const [feedbacks, setFeedbacks] = React.useState<IFeedback[]>([]);
 
     React.useEffect(() => {
@@ -136,13 +137,9 @@ export const Home: React.FC<IHomeProps> = () => {
                 </div>
                 <div
                     className={`${styles.border}`}
-                    style={{ borderLeft: 'none', backgroundColor: '#fff' }}
+                    style={{ borderLeft: 'none', backgroundColor: '#fff', minWidth: '40%' }}
                 >
-                    <img
-                        src="https://www.iconpacks.net/icons/1/free-pie-chart-icon-683-thumb.png"
-                        title="This is a chart"
-                        width="500px"
-                    />
+					<HomeBarChart feedbacks={feedbacks} />
                 </div>
             </div>
 

@@ -3,7 +3,7 @@
   "solution": {
     "name": "sp-feedback-2-client-side-solution",
     "id": "5d7f0f2e-b224-48b8-b1eb-fb46328e0bdd",
-    "version": "1.0.0.0",
+    "version": "1.0.0.1",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,

@@ -47,8 +47,8 @@ export function getFilteredOptions(options: string[], value: string): string[] {
     });
 }
 
-export function selectNextOption(list: CompletionList) {
-    const result = { ...list };
+export function selectNextOption(list: CompletionList): CompletionList {
+    const result: CompletionList = { ...list };
 
     const nextIdx = result.selectedIdx + 1;
     if (nextIdx > result.filteredOptions.length) {
@@ -68,7 +68,7 @@ export function selectNextOption(list: CompletionList) {
     return result;
 }
 
-export function selectPrevOption(list: CompletionList) {
+export function selectPrevOption(list: CompletionList): CompletionList {
     const result = { ...list };
 
     const prevIdx = result.selectedIdx - 1;
@@ -80,7 +80,7 @@ export function selectPrevOption(list: CompletionList) {
     return result;
 }
 
-export function getSelectedValue(list: CompletionList) {
+export function getSelectedValue(list: CompletionList): string {
 	if (isNewValueSelected(list)) return list.value;
     if (!isIdxWithinRange(list)) return null;
 
@@ -112,6 +112,6 @@ export function isNewValue(list: CompletionList): boolean {
     return true;
 }
 
-export function isIdxSelected(list: CompletionList, idx: number) {
+export function isIdxSelected(list: CompletionList, idx: number): boolean {
     return list.selectedIdx === idx;
 }

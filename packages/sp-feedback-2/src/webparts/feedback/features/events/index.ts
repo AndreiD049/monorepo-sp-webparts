@@ -15,7 +15,7 @@ export function on<T>(
     };
 }
 
-export function dispEvent<T>(event: EventTypes, payload: T) {
+export function dispEvent<T>(event: EventTypes, payload: T): void {
 	document.dispatchEvent(
         new CustomEvent(event, {
             detail: payload,

@@ -5,6 +5,7 @@ export interface IEditableTextProps {
     handleUpdate: (val: string) => void;
     value?: string;
 	readOnly?: boolean;
+	style?: React.CSSProperties;
 }
 
 export const EditableText: React.FC<
@@ -30,9 +31,11 @@ export const EditableText: React.FC<
     return (
         <div {...props} className={styles.container}>
             <input
+				style={props.style}
                 type="text"
                 tabIndex={0}
                 value={val}
+				readOnly={readOnly}
                 onChange={handleChange}
                 onBlur={handleSync}
             />
