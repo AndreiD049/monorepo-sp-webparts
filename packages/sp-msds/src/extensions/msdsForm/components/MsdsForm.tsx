@@ -318,7 +318,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 								<div className="width-25p">
 									<MSDSCheckbox
 										id="HasMsds"
-										label="3.Do you have an (European) msds? / Not older than 3 years"
+										label="3.Do you have an SDS? / Not older than 3 years"
 										title="EU format (16 sections - mention of EU norms / guidelines) / Max 3 years old"
 										control={control}
 										rules={{
@@ -686,9 +686,9 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 								<div className="width-20p">
 									<MSDSTextField
 										id="MeltingPoint"
-										label="16.Melting point? °C"
+										label="16.Melting point? °C/°F"
 										fieldProps={{
-											suffix: '°C',
+											suffix: '°C/°F',
 											type: 'number',
 											autoComplete: 'off',
 										}}
