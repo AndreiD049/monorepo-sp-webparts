@@ -29,7 +29,7 @@ function sortByOrder(a: IProcessFlowRow, b: IProcessFlowRow): number {
 export function useGroups(props: IUseGroupProps) {
     const theme = ProcessFlowWebPart.currentTheme;
     const groupedItems = React.useMemo(
-        () => groupBy(props.items, (i) => i.process.Category),
+        () => groupBy(props.items, (i) => i.process.Category.trim()),
         [props.items]
     );
 
