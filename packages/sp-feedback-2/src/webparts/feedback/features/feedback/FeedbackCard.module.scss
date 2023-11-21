@@ -1,0 +1,144 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+:root {
+	--new: #{$ms-color-sharedGray20};
+	--newTransparent: #{rgba($ms-color-sharedGray20, 0.2)};
+	--review: #{$ms-color-sharedYellow10};
+	--reviewTransparent: #{rgba($ms-color-sharedYellow10, 0.2)};
+	--approved: #{$ms-color-sharedCyan10};
+	--approvedTransparent: #{rgba($ms-color-sharedCyan10, 0.2)};
+	--rejected: #{$ms-color-sharedRed10};
+	--rejectedTransparent: #{rgba($ms-color-sharedRed10, 0.2)};
+	--implemented: #{$ms-color-sharedYellowGreen10};
+	--implementedTransparent: #{rgba($ms-color-sharedYellowGreen10, 0.2)};
+	--closed: #{$ms-color-sharedRedOrange10};
+	--closedTransparent: #{rgba($ms-color-sharedRedOrange10, 0.2)};
+}
+
+.container {
+	border: 2px solid;
+	border-left: 8px solid;
+	border-color: '[theme: themePrimary, default: #0078d4]';
+	box-shadow: 0px 0px 10px -3px rgba(0,0,0,0.2);
+	border-radius: 2px;
+
+	&:global(.new) {
+		border-color: var(--new);
+
+		.tags, .card-title {
+			background-color: var(--newTransparent);
+		}
+	}
+
+	&:global(.review) {
+		border-color: var(--review);
+
+		.tags, .card-title {
+			background-color: var(--reviewTransparent);
+		}
+	}
+
+	&:global(.approved) {
+		border-color: var(--approved);
+
+		.tags {
+			background-color: var(--approvedTransparent);
+		}
+	}
+
+	&:global(.rejected) {
+		border-color: var(--rejected);
+
+		.tags {
+			background-color: var(--rejectedTransparent);
+		}
+	}
+
+	&:global(.implemented) {
+		border-color: var(--implemented);
+
+		.tags {
+			background-color: var(--implementedTransparent);
+		}
+	}
+
+	&:global(.closed) {
+		border-color: var(--closed);
+
+		.tags {
+			background-color: var(--closedTransparent);
+		}
+	}
+}
+
+.card-content {
+	width: 500px;
+	font-size: .9em;
+}
+
+.card-title {
+	font-size: 1.1em;
+	font-weight: bold;
+	margin-bottom: 0.5em;
+	padding: 0.5em;
+}
+
+.card-header {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 1em;
+	margin: 0 0.5em;
+
+	& table td:first-child {
+		padding-right: 0.3em;
+		font-weight: bold;
+		vertical-align: top;
+	}
+}
+
+.tags {
+	margin-top: 1em;
+	display: flex;
+	flex-flow: row nowrap;
+	overflow: auto;
+	gap: .5em;
+	padding: 0.5em;
+	font-size: 0.8em;
+	margin: 0 0.5em;
+
+	.tag {
+		color: "[theme: white, default: #ffffff]";
+		background-color: "[theme: black, default: #000000]";
+		white-space: nowrap;
+		padding: 0.2em 1em;
+		border-radius: 10px;
+		cursor: pointer;
+	}
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+.footer {
+	margin: 1em 0.5em;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: center;
+	gap: .5em;
+
+	& .button {
+		color: "[theme: white, default: #ffffff]";
+		background-color: "[theme: black, default: #000000]";
+		border-radius: 4px;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	.card-content {
+		width: 90vw;
+		font-size: 0.8em;
+	}
+}

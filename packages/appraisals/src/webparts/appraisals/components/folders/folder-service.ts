@@ -27,13 +27,13 @@ export default class ManageFolderService {
     private listTitle: string;
 
     constructor(private defaultRole?: string) {
-        this.cachedSP = AppraisalsWebPart.SPBuilder.getSP().using(
+        this.cachedSP = AppraisalsWebPart.SPBuilder.getSP(AppraisalsWebPart.RootUrl).using(
             Caching({
                 keyFactory: (url) => url,
                 expireFunc: () => new Date(Date.now() + MINUTE * 5),
             })
         );
-        this.sp = AppraisalsWebPart.SPBuilder.getSP();
+        this.sp = AppraisalsWebPart.SPBuilder.getSP(AppraisalsWebPart.RootUrl);
         this.list = this.sp.web.lists.getByTitle(LIST_NAME);
         this.userService = new UserService();
     }
@@ -93,7 +93,7 @@ export default class ManageFolderService {
         await this.ensureUserAndRoleDefinitionInfo();
         const query = `ContentType eq 'Folder'`;
         const folders: IUserFolder[] = (
-            await this.list.items.filter(query).select(...LIST_SELECT)()
+            await this.list.items.filter(query).select(...LIST_SELECT).top(300)()
         ).map((folder: IUserFolder) => {
             folder.folderUser = this.userList.find(
                 (u) => u.Title === folder.Title

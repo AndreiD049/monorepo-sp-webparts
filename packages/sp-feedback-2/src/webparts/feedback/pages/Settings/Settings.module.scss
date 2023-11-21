@@ -1,0 +1,39 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.body {
+    height: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow: auto;
+    
+    .outlet {
+        padding-left: 16px;
+        padding-right: 16px;
+        width: 100%;
+    }
+}
+
+.settingsNav {
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .5em;
+
+    min-width: 150px;
+    border-right: 1px solid $ms-color-neutralSecondaryAlt;
+    
+    // Settings
+    & > p:first-child {
+        font-size: 1.2em;
+        padding-bottom: 1px;
+        border-bottom: 1px solid $ms-color-neutralSecondaryAlt;
+    }
+    
+    .setting {
+        min-width: 100px;
+    }
+}

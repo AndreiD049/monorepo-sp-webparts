@@ -8,6 +8,7 @@ export interface ICustomer {
     Id: number;
     Title: string;
     Name: string;
+	Database: string;
 }
 
 export interface IApprovers {
@@ -44,21 +45,23 @@ export class LookupService {
     }
 
     public static async getCustomer(id: number): Promise<ICustomer> {
-        return this.customerList.items.getById(id).select('Id,Title,Name')();
+        return this.customerList.items.getById(id).select('Id,Title,Name,Database')();
     }
 
     public static async getAllCustomers(
+		database: string,
         top: number = 300
     ): Promise<ICustomer[]> {
-        return this.customerList.items.select('Id,Title,Name').top(top)();
+        return this.customerList.items.select('Id,Title,Name,Database').filter(`Database eq '${database}'`).top(top)();
     }
 
     public static async getCustomerFilter(
-        filter: string
+        filter: string,
+		database: string
     ): Promise<ICustomer[]> {
         return this.customerList.items
-            .select('Id,Title,Name')
-            .filter(`substringof('${filter}', Title)`)();
+            .select('Id,Title,Name,Database')
+            .filter(`substringof('${filter}', Title) and Database eq '${database}'`)();
     }
 
     public static async getAllDatabases(): Promise<string[]> {

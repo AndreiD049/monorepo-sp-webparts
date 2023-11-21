@@ -1,0 +1,19 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    min-height: 50px;
+    background-color: "[theme: themeSecondary, default: #0078d4]";
+
+    & > *:first-child {
+        margin-left: 1em;
+    }
+	padding: 0.125em 0;
+}
+
+.layout {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .5em;
+}

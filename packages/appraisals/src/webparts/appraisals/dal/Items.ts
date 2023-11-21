@@ -39,7 +39,7 @@ export default class ItemService {
     private userService: UserService;
 
     constructor() {
-        this.sp = AppraisalsWebPart.SPBuilder.getSP();
+        this.sp = AppraisalsWebPart.SPBuilder.getSP(AppraisalsWebPart.RootUrl);
         this.list = this.sp.web.lists.getByTitle(LIST_NAME);
         this.userService = new UserService();
     }

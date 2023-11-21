@@ -115,7 +115,7 @@ export const TaskSection: React.FC<ITaskSectionProps> = (props) => {
                 if (status === 'Finished' || status === 'Cancelled') {
                     payload.Completed = true;
                 } else {
-                    payload.Completed = false;
+                    payload.Completed = !t.Transferable;
                 }
                 const newLog = await logService.updateTaskLog(t.ID, payload);
                 setTaskLogs((prev) => prev.map((t) => (t.ID === newLog.ID ? newLog : t)));

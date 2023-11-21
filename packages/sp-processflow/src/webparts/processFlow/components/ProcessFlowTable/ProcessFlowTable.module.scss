@@ -35,3 +35,12 @@
 .tableHeaderText {
     font-size: .8em;
 }
+
+.dragBottom {
+	border-bottom: 3px solid "[theme: neutralSecondary, default: #c86c70]";
+}
+
+.dragTop {
+	border-top: 3px solid "[theme: neutralSecondary, default: #c86c70]";
+}
+

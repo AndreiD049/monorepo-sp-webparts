@@ -1,0 +1,44 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    min-width: 1px;
+}
+
+.border {
+	border: 1px solid lightgray;
+}
+
+.grow {
+	flex-grow: 1;
+}
+
+.feedbackList {
+	list-style: none;
+	margin-right: 1em;
+
+	& > li {
+		padding: 4px 0;
+		border-bottom: 1px solid lightgray;
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
+	}
+
+	& > li:hover {
+		background-color: lighten(lightgray, 10%);
+	}
+
+	& > li > span[data-type="index"] {
+		margin-right: 1em;
+		background-color: lightgray;
+		border-radius: 50%;
+		display: inline-block;
+		width: 1.5em;
+		height: 1.5em;
+		text-align: center;
+	}
+
+	& > li > span[data-type="created-date"] {
+		color: darken(lightgray, 10%);
+	}
+}

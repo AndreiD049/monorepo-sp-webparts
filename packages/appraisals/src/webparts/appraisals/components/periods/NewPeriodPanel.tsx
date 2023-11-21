@@ -7,7 +7,7 @@ import {
     PrimaryButton,
     DefaultButton,
     getTheme,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import IPeriod from '../../dal/IPeriod';
 import UserContext from '../../utils/UserContext';
 

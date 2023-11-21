@@ -13,7 +13,7 @@ import {
     Selection,
     getTheme,
     SelectionMode,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import IPeriod from '../../dal/IPeriod';
 import constants from '../../utils/constants';
 import NewPeriodPanel from './NewPeriodPanel';

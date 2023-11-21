@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MessageBarType } from 'office-ui-fabric-react';
+import { MessageBarType } from '@fluentui/react';
 import { SPnotify } from 'sp-react-notifications';
 import IItem, { ItemStatus, ItemType } from '../../dal/IItem';
 import IPeriod from '../../dal/IPeriod';

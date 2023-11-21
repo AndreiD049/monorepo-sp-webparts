@@ -2,7 +2,7 @@ import {
     IPersonaProps,
     ListPeoplePicker,
     PersonaSize,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { IUser } from '../../dal/IUser';
 import UserContext from '../../utils/UserContext';

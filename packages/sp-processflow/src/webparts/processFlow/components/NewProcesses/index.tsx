@@ -43,7 +43,6 @@ interface INewProcessRowProps {
 }
 
 export const NewProcessRow: React.FC<INewProcessRowProps> = (props) => {
-    console.log(props.categories);
     return (
         <div
             style={{
@@ -200,6 +199,7 @@ export const NewProcesses: React.FC<INewProcessesProps> = (props) => {
                 Manual: row.Manual,
                 Team: selectedTeam,
                 UOM: row.UOM,
+				OrderIndex: null,
             }));
             const newItems: IItemAddResult[] = await ProcessService.addProcesses(newProcesses);
             newItems.forEach((i) => processAdded(i.data.Id));

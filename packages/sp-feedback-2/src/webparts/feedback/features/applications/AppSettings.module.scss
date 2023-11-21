@@ -1,0 +1,90 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.headerTitle {
+    font-size: 1.2em;
+}
+
+.header {
+    border-bottom: 1px solid $ms-color-neutralSecondaryAlt;
+}
+
+.toolbar {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .5em;
+    padding: 1em 0;
+    border-bottom: 1px solid $ms-color-neutralSecondaryAlt;
+    margin-bottom: 1em;
+}
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+    
+    & tr:nth-child(even) {
+        background-color: $ms-color-neutralLighter;
+    }
+
+    & td {
+        border: 1px solid $ms-color-neutralSecondaryAlt;
+    }
+
+    & td:first-child {
+        text-align: center;
+        width: 50px;
+        min-width: 50px;
+    }
+    
+    & td:nth-child(2) {
+        width: 100px;
+        min-width: 100px;
+        
+        & img {
+            display: block;
+            margin: auto;
+        }
+    }
+    
+    & td:nth-child(3) {
+        min-width: 100px;
+    }
+    
+    & td:last-child {
+        width: 100px;
+    }
+    
+    .buttons {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
+        justify-content: space-around;
+        gap: .5em;
+        padding: 4px 0;
+        
+        & button {
+            width: 80px;
+        }
+    }
+    
+    .nameLabel {
+        margin-left: 4px;
+    }
+}
+
+.addDialog {
+    width: 400px;
+
+    & form {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: stretch;
+        gap: .5em;
+    }
+    
+    & img {
+        max-width: 100%;
+        margin: auto;
+    }
+}

@@ -67,6 +67,14 @@ export const headerProps = (theme: IReadonlyTheme | undefined): {} => ({
             '&:hover': {
                 backgroundColor: theme?.palette.themePrimary,
             },
+			'& div[role="gridcell"]': {
+				position: 'sticky',
+				left: 0,
+			},
+			'& div[role="gridcell"] + div': {
+				position: 'sticky',
+				left: 40,
+			}
         },
         expand: {
             color: '#ffffff',

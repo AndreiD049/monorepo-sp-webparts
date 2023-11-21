@@ -1,0 +1,26 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+	align-items: center;
+	background-color: transparent;
+	border: 1px solid transparent;
+	display: flex;
+	flex-flow: row nowrap;
+	flex-grow: 2;
+	justify-content: stretch;
+	outline: none;
+
+	& input {
+		background-color: inherit;
+		border: inherit;
+		color: "[theme: white, default: #ffffff]";
+		flex-grow: 2;
+		font-size: 1.3em;
+		outline: inherit;
+	}
+
+	& input:hover, & input:focus-within {
+		border: 1px solid;
+	}
+}
+

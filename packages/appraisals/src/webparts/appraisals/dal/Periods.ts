@@ -11,7 +11,7 @@ export default class PeriodService {
     private sp: SPFI;
 
     constructor() {
-        this.sp = AppraisalsWebPart.SPBuilder.getSP();
+        this.sp = AppraisalsWebPart.SPBuilder.getSP(AppraisalsWebPart.RootUrl);
     }
     
     async getPeriods(): Promise<IPeriod[]> {

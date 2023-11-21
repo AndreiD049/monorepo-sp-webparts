@@ -5,7 +5,7 @@ import {
     Pivot,
     PivotItem,
     SearchBox,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import UserContext from '../../utils/UserContext';
 import Folder, { siteUserInfoToPersona } from './Folder';

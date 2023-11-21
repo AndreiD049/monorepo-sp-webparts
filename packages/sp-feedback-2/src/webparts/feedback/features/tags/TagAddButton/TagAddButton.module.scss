@@ -1,0 +1,75 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+	border: none;
+	margin: 0;
+	padding: 0 .375em;
+	background-color: $ms-color-black;
+	color: $ms-color-white;
+	height: 25px;
+	line-height: 25px;
+	border-radius: 5px;
+	cursor: pointer;
+
+	&:not([disabled]):hover i {
+		font-weight: bold;
+	}
+
+	&[disabled] {
+		cursor: auto;
+		background-color: $ms-color-gray50;
+	}
+
+	& i {
+		line-height: 14px;
+		border-radius: 50%;
+	}
+
+	&:focus-within i, &:hover i {
+		background-color: "[theme: white, default: #ffffff]";
+		color: "[theme: black, default: #000000]"
+	}
+}
+
+.tagInputGroup {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	gap: .25em;
+	height: 25px;
+	overflow: hidden;
+	max-width: 0;
+	flex-shrink: 0;
+
+	& input {
+		width: 200px;
+		box-sizing: border-box;
+	}
+
+	&.shown {
+		animation: show-input 1s forwards;
+	}
+
+	&.hidden {
+		animation: hide-input .3s forwards;
+		outline: none;
+	}
+}
+
+@keyframes show-input {
+	from {
+		max-width: 50px;
+	};
+	to {
+		max-width: 100%;
+	};
+}
+
+@keyframes hide-input {
+	from {
+		max-width: 200px;
+	};
+	to {
+		max-width: 0;
+	};
+}

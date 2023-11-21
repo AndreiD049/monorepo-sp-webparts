@@ -1,0 +1,168 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.container {
+    min-width: 1px;
+}
+
+.toolbar {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.3em;
+    padding: 0.5em 0;
+    background-color: $ms-color-neutralLighter;
+
+    & button {
+        background-color: '[theme: primaryBackgroundColor, default: #fff]';
+        border: 1px solid '[theme: neutralPrimary, default: #333]';
+        font-size: 12px;
+        line-height: 20px;
+    }
+
+    & button:hover {
+        background-color: '[theme: neutralTertiaryAlt, default: #eaeaea]';
+    }
+
+    & button:active {
+        background-color: '[theme: neutralTertiary, default: #ccc]';
+    }
+
+    & button.active {
+        background-color: '[theme: themePrimary, default: #0078d4]';
+        color: '[theme: primaryBackgroundColor, default: #fff]';
+
+        &,
+        & i {
+            font-weight: bold;
+        }
+    }
+}
+
+.image-dialog {
+    & .body {
+        margin-top: 1em;
+    }
+
+    & .file-input-wrapper {
+        display: inline-block;
+        position: relative;
+        padding: 10px 20px;
+        background-color: '[theme: themePrimary, default: #0078d4]';
+        color: '[theme: white, default: #fff]';
+        border-radius: 2px;
+        border: none;
+        cursor: pointer;
+
+        & input[type='file'] {
+            display: none;
+        }
+
+        &:hover {
+            background-color: '[theme: themeDarkAlt, default: #106ebe]';
+        }
+    }
+
+    & .file-input-label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    & .file-name {
+        display: inline-block;
+        margin-left: 10px;
+    }
+}
+
+:global(.ProseMirror) {
+    outline: none;
+    min-height: 150px;
+    border: 1px solid;
+    border-color: '[theme: themePrimary, default: #0078d4]';
+    border-radius: 2px;
+    padding: 5px;
+    background-color: '[theme: primaryBackground, default: #fff]';
+
+    &:focus-visible {
+        outline: 1px solid '[theme: themePrimary, default: #0078d4]';
+    }
+
+    > * + * {
+        margin-top: 0.75em;
+    }
+
+    ul,
+    ol {
+        padding: 0 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    h4 {
+        font-size: 1rem;
+    }
+
+    h5 {
+        font-size: 0.875rem;
+    }
+
+    h6 {
+        font-size: 0.85rem;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        line-height: 1.1;
+    }
+
+    code {
+        background-color: rgba(#616161, 0.1);
+        color: #616161;
+    }
+
+    pre {
+        background: #0d0d0d;
+        color: #fff;
+        font-family: 'JetBrainsMono', monospace;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+
+        code {
+            color: inherit;
+            padding: 0;
+            background: none;
+            font-size: 0.8rem;
+        }
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    blockquote {
+        padding-left: 1rem;
+        border-left: 2px solid rgba(#0d0d0d, 0.1);
+    }
+
+    hr {
+        border: none;
+        border-top: 2px solid rgba(#0d0d0d, 0.1);
+        margin: 2rem 0;
+    }
+}

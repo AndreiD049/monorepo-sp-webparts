@@ -1,7 +1,7 @@
 import {
     getTheme,
     Stack,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { FC } from 'react';
 import IItem from '../../dal/IItem';

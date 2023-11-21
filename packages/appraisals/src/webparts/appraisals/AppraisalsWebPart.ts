@@ -21,9 +21,11 @@ export interface IAppraisalsWebPartProps {
     showOnlyLastPeriod: boolean;
     defaultFolderRole: string;
     defaultSupportEmails: string;
+	rootSiteUrl: string;
 }
 
 export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisalsWebPartProps> {
+	static RootUrl: string;
     static SPBuilder: SPBuilder;
     public render(): void {
         const element: React.ReactElement<IRootProps> = React.createElement(
@@ -38,6 +40,8 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
 
     protected async onInit(): Promise<void> {
         await super.onInit();
+
+		AppraisalsWebPart.RootUrl = this.properties.rootSiteUrl;
 
         AppraisalsWebPart.SPBuilder = new SPBuilder(this.context)
             .withRPM()
@@ -69,6 +73,10 @@ export default class AppraisalsWebPart extends BaseClientSideWebPart<IAppraisals
                         {
                             groupName: strings.GeneralGroupName,
                             groupFields: [
+								PropertyPaneTextField('rootSiteUrl', {
+									label: 'Root site url',
+									description: '',
+								}),
                                 PropertyPaneCheckbox('showOnlyLastPeriod', {
                                     checked:
                                         this.properties.showOnlyLastPeriod ||
