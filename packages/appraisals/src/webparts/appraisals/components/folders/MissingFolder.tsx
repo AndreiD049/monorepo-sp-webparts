@@ -1,4 +1,4 @@
-import { ActionButton, Persona } from 'office-ui-fabric-react';
+import { ActionButton, Persona } from '@fluentui/react';
 import * as React from 'react';
 import { ISiteUserInfo } from 'sp-preset';
 import ManageFolderService from './folder-service';

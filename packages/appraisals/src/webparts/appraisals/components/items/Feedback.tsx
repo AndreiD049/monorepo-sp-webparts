@@ -1,4 +1,4 @@
-import { Stack, TextField } from 'office-ui-fabric-react';
+import { Stack, TextField } from '@fluentui/react';
 import * as React from 'react';
 import IItem from '../../dal/IItem';
 import IPeriod from '../../dal/IPeriod';

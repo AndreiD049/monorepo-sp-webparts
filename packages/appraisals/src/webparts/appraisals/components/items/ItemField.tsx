@@ -6,7 +6,7 @@ import {
     Stack,
     StackItem,
     TextField,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { FC } from 'react';
 import IItem, { ItemStatus } from '../../dal/IItem';

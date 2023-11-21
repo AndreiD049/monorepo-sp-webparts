@@ -1,4 +1,4 @@
-import { getTheme, MessageBarType, Separator, Stack, StackItem, Text } from 'office-ui-fabric-react';
+import { getTheme, MessageBarType, Separator, Stack, StackItem, Text } from '@fluentui/react';
 import * as React from 'react';
 import IPeriod from '../../dal/IPeriod';
 import { IUser } from '../../dal/IUser';

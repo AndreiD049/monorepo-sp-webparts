@@ -7,7 +7,7 @@ import {
     IPersonaProps,
     PersonaCoin,
     Text,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import { ISiteUserInfo } from 'sp-preset';
 import ManageFolderService from './folder-service';
 import UserContext from '../../utils/UserContext';

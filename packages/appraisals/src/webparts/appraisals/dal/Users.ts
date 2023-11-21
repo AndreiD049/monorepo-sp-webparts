@@ -7,7 +7,7 @@ export default class UserService {
     private sp: SPFI;
 
     constructor() {
-        this.sp = AppraisalsWebPart.SPBuilder.getSP().using(Caching());
+        this.sp = AppraisalsWebPart.SPBuilder.getSP(AppraisalsWebPart.RootUrl).using(Caching());
     }
     
     async getCurrentUser(): Promise<IUser> {

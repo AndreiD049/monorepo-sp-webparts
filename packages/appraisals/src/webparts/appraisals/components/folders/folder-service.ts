@@ -27,13 +27,13 @@ export default class ManageFolderService {
     private listTitle: string;
 
     constructor(private defaultRole?: string) {
-        this.cachedSP = AppraisalsWebPart.SPBuilder.getSP().using(
+        this.cachedSP = AppraisalsWebPart.SPBuilder.getSP(AppraisalsWebPart.RootUrl).using(
             Caching({
                 keyFactory: (url) => url,
                 expireFunc: () => new Date(Date.now() + MINUTE * 5),
             })
         );
-        this.sp = AppraisalsWebPart.SPBuilder.getSP();
+        this.sp = AppraisalsWebPart.SPBuilder.getSP(AppraisalsWebPart.RootUrl);
         this.list = this.sp.web.lists.getByTitle(LIST_NAME);
         this.userService = new UserService();
     }

@@ -1,4 +1,4 @@
-import { getTheme, IContextualMenuItem, Text } from 'office-ui-fabric-react';
+import { getTheme, IContextualMenuItem, Text } from '@fluentui/react';
 import * as React from 'react';
 import { FC } from 'react';
 import IItem, { ItemStatus, ItemType } from '../../dal/IItem';

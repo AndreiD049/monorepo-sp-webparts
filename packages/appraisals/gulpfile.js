@@ -30,7 +30,9 @@ build.configureWebpack.mergeConfig({
     /** Do not bundle office-ui twice */
     generatedConfiguration.resolve.alias = {
         ...generatedConfiguration.resolve.alias,
-        'office-ui-fabric-react': path.resolve(__dirname, 'node_modules/office-ui-fabric-react/'),
+		'office-ui-fabric-react': path.resolve(__dirname, '../property-pane-access-control/node_modules/office-ui-fabric-react'),
+		'@fluentui': path.resolve(__dirname, 'node_modules/@fluentui'),
+		'tslib': path.resolve(__dirname, 'node_modules/tslib'),
         '@microsoft/load-themed-styles': path.resolve(__dirname, 'node_modules/@microsoft/load-themed-styles/'),
     }
 

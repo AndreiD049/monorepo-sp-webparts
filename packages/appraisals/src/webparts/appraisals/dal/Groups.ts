@@ -13,7 +13,7 @@ export default class GroupService {
     private sp: SPFI;
 
     constructor() {
-        this.sp = AppraisalsWebPart.SPBuilder.getSP().using(Caching());
+        this.sp = AppraisalsWebPart.SPBuilder.getSP(AppraisalsWebPart.RootUrl).using(Caching());
     }
     async getUserGroups(): Promise<IUserGroup[]> {
         return this.sp.web.currentUser.groups();
