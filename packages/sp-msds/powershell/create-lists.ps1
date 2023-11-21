@@ -8,6 +8,7 @@ if ($null -eq $customersList) {
     $customersList = New-PnPList -Title $customerListName -Template GenericList
 
     Add-PnPField -List $customersList -DisplayName "Name" -InternalName "Name" -Type Text -AddToDefaultView
+    Add-PnPField -List $customersList -DisplayName "Database" -InternalName "Database" -Type Text -AddToDefaultView
 }
 
 $contactListName = "Contact person Petrochemicals";

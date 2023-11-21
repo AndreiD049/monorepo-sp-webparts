@@ -126,13 +126,18 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 		mode: 'onChange',
 		defaultValues: {
 			Urgency: 'Medium',
+			WarehouseType: 'Default (non-hazardous)'
 		},
 		values: decodeItem(props.item) || {},
 	});
 
 	const site = watch('Site');
+	const database = watch("Database")
+	console.log(database);
+	const materialType = watch('MaterialType');
+	const hasSDS = watch("HasMsds");
 	const field = useFields(site);
-	const customers = useCustomers(props.item?.CustomerNameId);
+	const customers = useCustomers(database, props.item?.CustomerNameId);
 	const databases = useDatabases(site);
 	const approvers = useApprovers(site);
 	const currentUser = useCurrentUser();
@@ -315,32 +320,24 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 									/>
 								</div>
 
-								<div className="width-25p">
-									<MSDSCheckbox
-										id="HasMsds"
-										label="3.Do you have an SDS? / Not older than 3 years"
-										title="EU format (16 sections - mention of EU norms / guidelines) / Max 3 years old"
-										control={control}
-										rules={{
-											disabled:
-												field.HasMsds === 'Disabled',
-										}}
-									/>
-								</div>
-
 								<div className="width-20p">
-									<MSDSDatePicker
-										id="MSDSDate"
-										label="4.SDS issued date"
-										pickerProps={{
-											maxDate: new Date(),
-											allowTextInput: true,
+									<MsdsTagPickerField
+										id="MaterialType"
+										label="3.Material type"
+										tags={materialTypes.tags}
+										handleFilter={async (filter) => {
+											return handleFilter(
+												materialTypes.tags,
+												filter
+											);
 										}}
 										control={control}
 										rules={{
-											required: 'SDS Date is required',
+											required:
+												'Material type is required',
 											disabled:
-												field.MSDSDate === 'Disabled',
+												field.MaterialType ===
+												'Disabled',
 										}}
 										icon={
 											<Logo
@@ -353,6 +350,20 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 										}
 									/>
 								</div>
+
+								<div className="width-25p">
+									<MSDSCheckbox
+										id="HasMsds"
+										label="4.Do you have an SDS? / Not older than 3 years"
+										title="16 sections / guidelines / Max 3 years old"
+										control={control}
+										rules={{
+											disabled:
+												field.HasMsds === 'Disabled',
+										}}
+									/>
+								</div>
+
 							</div>
 
 							{/* Row 2 */}
@@ -360,9 +371,43 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 								className={`${styles.msdsRow} ${styles.msdsGap1} margin-top-2`}
 							>
 								<div className="width-20p">
+									<MSDSDatePicker
+										id="MSDSDate"
+										label="5.Latest SDS issued / revised"
+										pickerProps={{
+											maxDate: new Date(),
+											allowTextInput: true,
+										}}
+										control={control}
+										rules={{
+											required: materialType === 'Finished goods' ? 'MSDS Date is required' : false,
+											disabled:
+												field.MSDSDate === 'Disabled',
+											validate: (value) => {
+												const todayMinusThreeYears = new Date(new Date().setFullYear(new Date().getFullYear() - 3));
+												const date = new Date(value);
+												if (hasSDS && date < todayMinusThreeYears) {
+													return 'SDS Date must be within the last 3 years'
+												}
+												return true
+											}
+										}}
+										icon={
+											<Logo
+												style={{
+													marginRight: '.3em',
+													minWidth: '20px',
+													width: '20px',
+												}}
+											/>
+										}
+									/>
+								</div>
+
+								<div className="width-25p">
 									<MSDSTextField
 										id="CasNo"
-										label="5.SDS Cas No."
+										label="6.SDS Cas No."
 										title="CAS Registry Number is a unique numerical identifier assigned by Chemical Abstracts Service CAS"
 										control={control}
 										rules={{
@@ -384,15 +429,16 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 									/>
 								</div>
 
-								<div className="width-25p">
+								<div className="width-20p">
 									<MsdsTagPickerField
 										id="CustomerNameId"
-										label="6.Customer name in Plato"
+										label="7.Customer name in Plato"
 										tags={customers.tags}
 										handleFilter={async (filter) => {
 											const customerItems =
 												await LookupService.getCustomerFilter(
-													filter
+													filter,
+													database || ''
 												);
 											return customerItems.map((c) => ({
 												name: c.Title,
@@ -427,7 +473,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 											required: 'Customer is required',
 											disabled:
 												field.CustomerName ===
-												'Disabled',
+												'Disabled' || Boolean(database) === false,
 										}}
 										icon={
 											<Logo
@@ -444,7 +490,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 								<div className="width-25p">
 									<MSDSTextField
 										id="ProductName"
-										label="7.Product name to create in Plato"
+										label="8.Product name to create in Plato"
 										title="if created product name ≠ name on SDS, confirmation of customer to be attached"
 										control={control}
 										rules={{
@@ -475,36 +521,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 									/>
 								</div>
 
-								<div className="width-20p">
-									<MsdsTagPickerField
-										id="MaterialType"
-										label="8.Material type"
-										tags={materialTypes.tags}
-										handleFilter={async (filter) => {
-											return handleFilter(
-												materialTypes.tags,
-												filter
-											);
-										}}
-										control={control}
-										rules={{
-											required:
-												'Material type is required',
-											disabled:
-												field.MaterialType ===
-												'Disabled',
-										}}
-										icon={
-											<Logo
-												style={{
-													marginRight: '.3em',
-													minWidth: '20px',
-													width: '20px',
-												}}
-											/>
-										}
-									/>
-								</div>
 							</div>
 
 							{/* Row 3 */}
@@ -579,7 +595,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 									/>
 								</div>
 
-								<div className="width-25p">
+								<div className="width-20p">
 									<MsdsTagPickerField
 										id="Color"
 										label="11.What is the color of the product?"
@@ -606,7 +622,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 									/>
 								</div>
 
-								<div className="width-20p">
+								<div className="width-25p">
 									<MSDSCheckbox
 										id="PackedOperations"
 										label="12.PACKED OPERATIONS NEEDED?"
@@ -667,7 +683,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 									/>
 								</div>
 
-								<div className="width-25p">
+								<div className="width-20p">
 									<MSDSCheckbox
 										id="SiloOperations"
 										label="15.SILO OPERATION OPERATION NEEDED?"
@@ -683,7 +699,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 									/>
 								</div>
 
-								<div className="width-20p">
+								<div className="width-25p">
 									<MSDSTextField
 										id="MeltingPoint"
 										label="16.Melting point? °C/°F"
@@ -767,7 +783,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 									/>
 								</div>
 
-								<div className="width-25p">
+								<div className="width-20p">
 									<MSDSCheckbox
 										id="ForbiddenMixedSites"
 										label="19.Forbidden mixed production site in silo?"
@@ -793,7 +809,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 									/>
 								</div>
 
-								<div className="width-20p">
+								<div className="width-25p">
 									<MSDSTextField
 										id="DedicatedFlexiblesValves"
 										label="20.Dedicated Flexible(s)? Rotary Valve(s)?"
@@ -872,9 +888,9 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 										FormDisplayMode.New ? (
 										<MSDSAttachmentsNew
 											id="Attachments"
-											label="23.Attachments"
+											label="23.Attachments (NOTE: Name SDS PDF as product name)"
 											control={control}
-											title="Add SDS PDF and customer confirmation mail"
+											title="Add SDS PDF and customer confirmation mail. "
 											rules={{
 												required:
 													'Attachments are required',
@@ -883,8 +899,8 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 									) : (
 										<MsdsAttachmentsDetails
 											id="Attachments"
-											label="23.Attachments"
-											title="Add SDS PDF and customer confirmation mail"
+											label="23.Attachments (NOTE: Name SDS PDF as product name)"
+											title="Add SDS PDF and customer confirmation mail. NOTE: Rename the SDS file to the product name before uploading."
 											displayMode={props.displayMode}
 											attachments={attachments}
 											required
@@ -1035,7 +1051,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 								<div className="width-25p">
 									<MSDSCheckbox
 										id="ManipNotAllowed"
-										label="6.Manipulation (change) not allowed?"
+										label="6.Manipulation(change) not allowed"
 										control={control}
 										rules={{
 											disabled:

@@ -1,6 +1,6 @@
 {
   "name": "sp-msds",
-  "version": "0.5.3",
+  "version": "0.5.9",
   "private": true,
   "engines": {
     "node": ">=16.13.0 <17.0.0"
