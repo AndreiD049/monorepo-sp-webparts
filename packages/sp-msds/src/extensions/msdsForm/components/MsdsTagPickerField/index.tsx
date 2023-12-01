@@ -15,6 +15,7 @@ export interface IMsdsTagPickerFieldProps extends MSDSFormProps {
     className?: string;
     handleFilter: (filter: string) => Promise<ITag[]>;
     handleSelect?: (tag: ITag) => void;
+	getValue?: (value: ITag) => string|number;
     icon?: JSX.Element;
 }
 
@@ -27,6 +28,8 @@ export const MsdsTagPickerField: React.FC<IMsdsTagPickerFieldProps> = (
         },
         [props.tags]
     );
+
+	const getValue = props.getValue	|| ((value: ITag) => value.key);
 
     return (
         <div
@@ -57,7 +60,7 @@ export const MsdsTagPickerField: React.FC<IMsdsTagPickerFieldProps> = (
                     const selected = React.useMemo(() => {
                         if (field.value) {
                             return props.tags
-                                .filter((tag) => tag.key === field.value)
+                                .filter((tag) => getValue(tag) === field.value)
                                 .slice(0, 1);
                         }
                         return [];
@@ -84,7 +87,7 @@ export const MsdsTagPickerField: React.FC<IMsdsTagPickerFieldProps> = (
                                         selected.length > 0
                                             ? selected[0]
                                             : null;
-                                    field.onChange(value ? value.key : null);
+                                    field.onChange(value ? getValue(value) : null);
                                     if (props.handleSelect) {
                                         props.handleSelect(value);
                                     }

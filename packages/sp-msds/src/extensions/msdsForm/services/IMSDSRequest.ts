@@ -43,4 +43,10 @@ export interface IMSDSRequest {
     MOC: string;
     ExtraCheckNeeded: boolean;
     IsApprovalNeeded: boolean;
+
+	// Added 2023-12-01 after US request
+	SDSPublisher: string;
+	ProductNameOnSDS: string;
+	SDSVersion: string;
+	DescriptionOnDriversDocument: string;
 }

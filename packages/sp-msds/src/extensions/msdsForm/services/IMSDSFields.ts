@@ -40,4 +40,10 @@ export interface IMSDSFields {
     ClientRequirementsFnF: FieldChoices;
     MOC: FieldChoices;
     ExtraCheckNeeded: FieldChoices;
+
+	// Added 2023-12-01 after US request
+	SDSPublisher: FieldChoices;
+	ProductNameOnSDS: FieldChoices;
+	SDSVersion: FieldChoices;
+	DescriptionOnDriversDocument: FieldChoices;
 }
