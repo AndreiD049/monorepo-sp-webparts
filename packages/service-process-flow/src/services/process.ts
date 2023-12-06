@@ -155,6 +155,9 @@ export class ProcessService {
 			}
 			return manual.DesktopLink;
 		}
+		if (!manual.Id) {
+			return manual.Link;
+		}
 		if (!manual.isDoc) {
 			return getUrlPrefix(this.props.manualSP) + `_layouts/15/embed.aspx?UniqueId=${manual.Id}`;
 		}
