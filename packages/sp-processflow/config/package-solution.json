@@ -3,7 +3,7 @@
   "solution": {
     "name": "sp-processflow-client-side-solution",
     "id": "05b445ba-525a-43ea-a08e-a5b4a2b9a469",
-    "version": "1.0.2.1",
+    "version": "1.0.2.2",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
