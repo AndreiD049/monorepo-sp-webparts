@@ -158,7 +158,7 @@ export class ProcessService {
 		if (!manual.isDoc) {
 			return getUrlPrefix(this.props.manualSP) + `_layouts/15/embed.aspx?UniqueId=${manual.Id}`;
 		}
-		let embedUrl = getUrlPrefix(this.props.manualSP) + `_layouts/15/Doc.aspx?sourcedoc={${manual.Id}}&action=embedview`;
+		let embedUrl = getUrlPrefix(this.props.manualSP) + `_layouts/15/Doc.aspx?sourcedoc={${manual.Id}}&action=view`;
 		if (manual.Page && manual.Page > 1) {
 			embedUrl += `&wdStartOn=${manual.Page}`;
 		}
