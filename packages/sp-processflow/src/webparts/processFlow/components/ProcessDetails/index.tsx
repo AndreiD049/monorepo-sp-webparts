@@ -1,10 +1,18 @@
 import { groupBy } from '@microsoft/sp-lodash-subset';
-import { IFlowLocation, IProcess, IUserProcess, readManualJson } from '@service/process-flow';
+import {
+    IFlowLocation,
+    IProcess,
+    IUserProcess,
+    readManualJson,
+} from '@service/process-flow';
 import { IManualJson } from '@service/process-flow/dist/models';
+import { IProcessDetails } from '@service/process-flow/dist/models/IProcess';
 import { Dictionary } from 'lodash';
 import {
     ActionButton,
     IconButton,
+    Label,
+    NormalPeoplePicker,
     Panel,
     PanelType,
     Persona,
@@ -39,6 +47,7 @@ import {
     listenUserProcessUpdated,
 } from '../../utils/events';
 import { GlobalContext } from '../../utils/globalContext';
+import { getTeamPersonaProps } from '../../utils/varia';
 import { addLocation, deleteLocation, editLocation } from '../LocationDialog';
 import {
     CategoryTextField,
@@ -194,13 +203,62 @@ const UserProcessOverview: React.FC<{
     );
 };
 
+const ResponsiblePicker: React.FC<{
+    editable?: boolean;
+    selectedId?: number;
+    onChange: (id: number) => void;
+}> = ({ editable = false, ...props }) => {
+    const { teamUsers } = React.useContext(GlobalContext);
+    const teamUsersOptions = getTeamPersonaProps(teamUsers);
+    let selectedPerson: typeof teamUsersOptions = [];
+    if (props.selectedId) {
+        selectedPerson = teamUsersOptions.filter(
+            (u) => u.data === props.selectedId
+        );
+    }
+
+    return (
+        <div>
+            <Label htmlFor="details-responsible">Responsible</Label>
+            <NormalPeoplePicker
+                inputProps={{
+                    id: 'details-responsible',
+					readOnly: !editable,
+                }}
+                onResolveSuggestions={(filter, selected) => {
+                    if (!editable) return selected;
+                    return teamUsersOptions.filter((u) => {
+						return u.text.toLowerCase().indexOf(filter.toLowerCase()) > -1
+					});
+                }}
+                onEmptyResolveSuggestions={(selected) => {
+                    if (!editable) return selected;
+                    return teamUsersOptions;
+                }}
+                onChange={(items) => {
+                    if (!editable) return;
+                    if (items.length > 0) {
+						const id = (items[0] as { data: number }).data;
+                        props.onChange(id);
+                    }
+					if (items.length === 0) {
+                        props.onChange(null);
+					}
+                }}
+                selectedItems={selectedPerson}
+                itemLimit={1}
+            />
+        </div>
+    );
+};
+
 const Details: React.FC<{ processId: number }> = (props) => {
     const { selectedTeam, selectedFlow } = React.useContext(GlobalContext);
     const { ProcessService, FlowLocationService, UserProcessService } =
         MainService;
-    const [process, setProcess] = React.useState<IProcess>(null);
+    const [process, setProcess] = React.useState<IProcessDetails>(null);
     const manuals: IManualJson[] = React.useMemo(() => {
-		if (!process) return [];
+        if (!process) return [];
         return readManualJson(process.Manual);
     }, [process]);
     const [locations, setLocations] = React.useState<IFlowLocation[]>([]);
@@ -208,7 +266,7 @@ const Details: React.FC<{ processId: number }> = (props) => {
         []
     );
     const [editable, setEditable] = React.useState(false);
-    const [data, setData] = React.useState<Partial<IProcess>>({});
+    const [data, setData] = React.useState<Partial<IProcessDetails>>({});
     const navigate = useNavigate();
 
     React.useEffect(() => {
@@ -219,6 +277,8 @@ const Details: React.FC<{ processId: number }> = (props) => {
                 Category: process.Category,
                 Allocation: process.Allocation,
                 UOM: process.UOM,
+				Responsible: process.Responsible,
+				ResponsibleId: process.Responsible?.Id,
             });
         }
     }, [editable, process]);
@@ -253,7 +313,7 @@ const Details: React.FC<{ processId: number }> = (props) => {
                 prev.map((l) => (l.Id === data.Id ? data : l))
             );
         }
-        async function processUpdated(data: IProcess): Promise<void> {
+        async function processUpdated(data: IProcessDetails): Promise<void> {
             if (process.Id === data.Id) {
                 setProcess(data);
             }
@@ -288,9 +348,12 @@ const Details: React.FC<{ processId: number }> = (props) => {
         const keys = Object.keys(data);
         let changed = false;
         keys.forEach((k: keyof IProcess) => {
+			console.log(k);
             if (data[k] !== process[k]) changed = true;
         });
+		console.log(changed);
         if (changed) {
+			delete data.Responsible;
             await ProcessService.updateProcess(process.Id, data);
         }
         setEditable(false);
@@ -438,6 +501,17 @@ const Details: React.FC<{ processId: number }> = (props) => {
                 title={process.UOM}
                 readOnly={!editable}
                 onChange={handleFieldChange('UOM')}
+            />
+            <ResponsiblePicker
+                editable={editable}
+                selectedId={editable ? data.Responsible?.Id : process.Responsible?.Id}
+                onChange={(id) =>
+                    setData((prev) => ({
+                        ...prev,
+                        ResponsibleId: id,
+                        Responsible: { Id: id, Title: '', EMail: '' },
+                    }))
+                }
             />
 
             <Separator>Manuals</Separator>

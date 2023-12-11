@@ -1,6 +1,7 @@
 import { getAllPaged } from '@service/sp-cip';
 import { IField, IItemAddResult, IItemUpdateResult, IList, SPFI } from 'sp-preset';
 import { IManualJson, IProcess } from '../models';
+import { IProcessDetails } from '../models/IProcess';
 import { IServiceProps } from '../models/IServiceProps';
 import { docsMap, getFileNameExtension, getUrlPrefix, isDocLink, sanitizeLinkingUrl } from '../utils/manual-link';
 
@@ -15,7 +16,10 @@ const SELECT = [
     'OrderIndex',
     'UOM',
     'Team',
+	'ResponsibleId',
 ];
+
+const SELECT_DETAILS = [...SELECT, 'Responsible/Id', 'Responsible/Title', 'Responsible/EMail'];
 
 export function readManualJson(manual: string | undefined): IManualJson[] {
 	if (!manual) return [];
@@ -41,8 +45,8 @@ export class ProcessService {
         this.categoryField = this.list.fields.getByTitle('Category');
     }
 
-    async getById(id: number): Promise<IProcess> {
-        return this.list.items.getById(id).select(...SELECT)();
+    async getById(id: number): Promise<IProcessDetails> {
+        return this.list.items.getById(id).select(...SELECT_DETAILS).expand('Responsible')();
     }
 
     async getByFlow(flowId: number): Promise<IProcess[]> {

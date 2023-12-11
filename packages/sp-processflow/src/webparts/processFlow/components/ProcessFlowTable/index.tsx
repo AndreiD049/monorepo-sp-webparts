@@ -134,6 +134,15 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
         return result;
     }, [teamUsers, searchParams]);
 
+	const responsibles = React.useMemo(() => {
+		const responsibleParam = searchParams.get('responsible');
+		debugger;
+		if (!responsibleParam) {
+			return [];
+		}
+		return responsibleParam.split(',').map((r) => parseInt(r));
+	}, [searchParams]);
+
     const locations = React.useMemo(
         () => uniq(flowLocations.map((l) => l.Title)),
         [flowLocations]
@@ -167,12 +176,21 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 {}
             );
         const searchVal = search.toLowerCase();
-        const filteredProcesses =
+        let filteredProcesses =
             searchVal === ''
                 ? processes
                 : processes.filter((p) =>
                       p.Title.toLowerCase().includes(searchVal)
                   );
+		// Show only processes that have responsibles
+		if (responsibles.length > 0) {
+			const noone = responsibles.indexOf(-1) > -1;
+			if (noone) {
+				filteredProcesses = filteredProcesses.filter((p) => !p.ResponsibleId);
+			} else {
+				filteredProcesses = filteredProcesses.filter((p) => responsibles.indexOf(p.ResponsibleId) > -1);
+			}
+		}
         return filteredProcesses.map((p) => {
             let locations: IProcessFlowRow['locations'] = {};
             if (locationsByProcess[p.Id]) {

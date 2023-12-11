@@ -29,4 +29,13 @@ export interface IProcess {
     Allocation?: number;
     Team: string;
     UOM?: string;
+    ResponsibleId?: number;
+}
+
+export interface IProcessDetails extends IProcess {
+    Responsible: {
+        Id: number;
+        Title: string;
+        EMail: string;
+    };
 }

@@ -109,6 +109,7 @@ export const ProcessFlowHeader: React.FC<IProcessFlowHeaderProps> = (props) => {
             </div>
 			<div className={`${styles.borderedBox} ${styles.userPicker}`}>
 				<UserPicker
+					label="Selected users"
 					selectedIds={search.get('users')?.split(',').map(u => +u.trim()).filter((n) => !isNaN(n)) || []}
 					onUserSelected={function (users) {
 						setSearch((prev) => {
@@ -116,6 +117,27 @@ export const ProcessFlowHeader: React.FC<IProcessFlowHeaderProps> = (props) => {
 							return prev;
 						});
 					}}
+				/>
+			</div>
+			<div className={`${styles.borderedBox} ${styles.userPicker}`}>
+				<UserPicker
+					label="Responsible users"
+					selectedIds={search.get('responsible')?.split(',').map(u => +u.trim()).filter((n) => !isNaN(n)) || []}
+					onUserSelected={function (users) {
+						const no_responsible = users.filter((u) => u.data === -1);
+						if (no_responsible.length > 0) {
+							setSearch((prev) => {
+								prev.set('responsible', '-1');
+								return prev;
+							});
+							return;
+						}
+						setSearch((prev) => {
+							prev.set('responsible', users.map(u => u.data).join(', '));
+							return prev;
+						});
+					}}
+					additionalUsers={[{ id: null, data: -1, text: '(Empty)', secondaryText: 'No responsible' }]}
 				/>
 			</div>
             <StatusLegend />

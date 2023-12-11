@@ -3,24 +3,21 @@ import styles from './UserPicker.module.scss';
 import { IPersonaProps, NormalPeoplePicker } from 'office-ui-fabric-react';
 import { GlobalContext } from '../../utils/globalContext';
 import { Label } from '@fluentui/react';
+import { getTeamPersonaProps } from '../../utils/varia';
 
 export interface IUserPickerProps {
     selectedIds: number[];
     onUserSelected: (users: (IPersonaProps & { data?: number })[]) => void;
+	label?: string;
+	additionalUsers?: (IPersonaProps & { data: number })[];
 }
 
-export const UserPicker: React.FC<IUserPickerProps> = (props) => {
+export const UserPicker: React.FC<IUserPickerProps> = ({ label = "Selected users", ...props }) => {
     const { teamUsers } = React.useContext(GlobalContext);
-    const userOptions: (IPersonaProps & { data: number })[] = teamUsers.map(
-        (u) => {
-            return {
-                text: u.User.Title,
-                secondaryText: u.User.EMail,
-                data: u.User.Id,
-                imageUrl: `/_layouts/15/userphoto.aspx?accountname=${u.User.EMail}&Size=M`,
-            };
-        }
-    );
+    let userOptions = getTeamPersonaProps(teamUsers);
+	if (props.additionalUsers) {
+		userOptions = [...props.additionalUsers, ...userOptions];
+	}
     const selected = userOptions.filter(
         (u) => props.selectedIds.indexOf(u.data || -1) !== -1
     );
@@ -36,7 +33,7 @@ export const UserPicker: React.FC<IUserPickerProps> = (props) => {
 
     return (
         <div className={styles.container}>
-            <Label htmlFor="selectedUsers">Selected users</Label>
+            <Label htmlFor="selectedUsers">{label}</Label>
             <NormalPeoplePicker
                 inputProps={{ id: 'selectedUsers', placeholder: selected.length === 0 ? 'All users' : '' }}
                 selectedItems={selected}
