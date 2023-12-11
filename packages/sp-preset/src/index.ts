@@ -1,4 +1,6 @@
 import { RequestDigest, spfi, SPFI, SPFx } from '@pnp/sp';
+import { graphfi, SPFx as graphSPFx } from '@pnp/graph';
+import '@pnp/graph/users';
 import { TimelinePipe } from '@pnp/core';
 import '@pnp/sp/webs';
 import '@pnp/sp/lists';
@@ -76,6 +78,16 @@ export default class SPBuilder {
     return this.usingDefault(spfi(key));
   }
 
+  getGraph(key?: string) {
+    if (!key) {
+      return graphfi().using(graphSPFx(this.context));
+    }
+    if (key in this.tennants) {
+      return graphfi(this.tennants[key]).using(graphSPFx(this.context));
+    }
+    return graphfi(key).using(graphSPFx(this.context));
+  }
+
   private usingDefault(sp: SPFI) {
     let result = sp.using(RequestDigest()).using(SPFx(this.context));
     this.timelinePipes.forEach((pipe) => (result = result.using(pipe)));
@@ -84,7 +96,8 @@ export default class SPBuilder {
 }
 
 //Export usual stuff from sp
-export { SPFI } from '@pnp/sp';
+export { SPFI, spGet, spPost, spPatch, spDelete, spPostMerge, spPostDelete, spPostDeleteETag, SPQueryable } from '@pnp/sp';
+export { graphGet, graphPut, graphPost, graphPatch, graphDelete, GraphQueryable, graphfi, GraphFI, SPFx as gSPFx } from '@pnp/graph';
 
 export { ISite } from '@pnp/sp/sites';
 
@@ -191,7 +204,7 @@ export {
   IGroupUpdateResult,
 } from '@pnp/sp/site-groups';
 
-export { getHashCode, getGUID } from '@pnp/core';
+export { getHashCode, getGUID, AssignFrom } from '@pnp/core';
 
 /** Search */
 export {
