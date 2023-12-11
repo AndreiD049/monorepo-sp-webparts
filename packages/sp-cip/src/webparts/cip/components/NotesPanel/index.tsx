@@ -1,19 +1,16 @@
 import { Panel, PanelType } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { IFileInfo } from 'sp-preset';
 import MainService from '../../services/main-service';
 import styles from './NotesPanel.module.scss';
 
-export interface INotesPanelProps {
-    // Props go here
-}
-
-export const NotesPanel: React.FC<INotesPanelProps> = (props) => {
+export const NotesPanel: React.FC = () => {
 	const params = useParams();
 	const taskId = +params.taskId;
 	const navigate = useNavigate();
 	const [file, setFile] = React.useState<IFileInfo | null>(null);
+	const [searchParams,] = useSearchParams();
 	React.useEffect(() => {
 		async function run(): Promise<void> {
 			const taskService = MainService.getTaskService();
@@ -30,7 +27,15 @@ export const NotesPanel: React.FC<INotesPanelProps> = (props) => {
 		<Panel
 			isOpen
 			isLightDismiss
-			onDismiss={() => navigate('/')}
+			onDismiss={() => {
+				const from = searchParams.get('from');
+				console.log(from);
+				if (from) {
+					navigate(from);
+					return;
+				}
+				navigate('/');
+			}}
 			headerText="Notes"
 			type={PanelType.customNear}
 			customWidth="95vw"

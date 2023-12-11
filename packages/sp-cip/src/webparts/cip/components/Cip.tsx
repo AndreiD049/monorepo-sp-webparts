@@ -89,7 +89,7 @@ const Cip: React.FC<ICipProps> = (props) => {
                             element={<CreateTaskPanel />}
                         />
                         <Route
-                            path="task/:taskId/*"
+                            path="task/:taskId"
                             element={<TaskDetails />}
                         />
                         <Route
