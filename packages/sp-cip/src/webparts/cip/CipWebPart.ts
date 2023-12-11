@@ -30,8 +30,8 @@ interface IConfiguration {
         name: string;
         fieldName: string;
     };
-    remotes: IRemoteSource[];
     additionalEmails?: string[];
+    notesRoot?: string;
 }
 
 export interface ICipWebPartProps {
@@ -50,17 +50,11 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
         initializeFileTypeIcons();
         initNotifications();
 
-        const tennats: { [key: string]: string } = {};
-        this.properties.config?.remotes?.forEach(
-            (s) => (tennats[s.Name] = s.ListRoot)
-        );
-
         try {
             CipWebPart.SPBuilder = new SPBuilder(this.context)
                 .withRPM(600)
                 .withTennants({
                     Data: this.properties.config.rootSite,
-                    ...tennats,
                 })
                 .withAdditionalTimelines([
                     InjectHeaders({

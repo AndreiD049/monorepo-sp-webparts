@@ -8,7 +8,6 @@ import * as React from 'react';
 import { useNavigate } from 'react-router';
 import { relinkParent, setTimerOptions } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
-import { LinkRemoteDialog } from '../LinkRemoteDialog';
 import { AssigneeSelected, CipAssigneeSelector } from './CipAssigneeSelector';
 import { CipCategoriesToggle } from './CipCategoriesToggle';
 import { CipStatusSelector, StatusSelected } from './StatusSelector';
@@ -27,7 +26,7 @@ interface ICipCommandBarProps {
 }
 
 const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
-    const { properties, teams, selectedTeam } = React.useContext(GlobalContext);
+    const { teams, selectedTeam } = React.useContext(GlobalContext);
     const handleSearch = React.useCallback(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         debounce((_ev: any, value: string) => {
@@ -91,23 +90,6 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                 onClick: () => navigate('actionlog'),
             },
         ];
-        if (properties.config.remotes.length > 0) {
-            result.push({
-                key: 'linkRemote',
-                text: 'Link remote',
-                iconProps: {
-                    iconName: 'Link12',
-                },
-                onClick: () =>
-                    showDialog({
-                        id: DIALOG_ID,
-                        dialogProps: {
-                            title: 'Link task',
-                        },
-                        content: <LinkRemoteDialog />,
-                    }),
-            });
-        }
         return result;
     }, [timerVisible]);
 

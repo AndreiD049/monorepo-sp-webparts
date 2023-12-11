@@ -15,6 +15,7 @@ import useWebStorage from 'use-web-storage-api';
 import { CipTimer } from './CipTimer';
 import { ActionLogPanel } from './ActionLogPanel';
 import { Callout, Dialog } from 'sp-components';
+import { NotesPanel } from './NotesPanel';
 
 interface ICipProps {
     properties: ICipWebPartProps;
@@ -90,6 +91,10 @@ const Cip: React.FC<ICipProps> = (props) => {
                         <Route
                             path="task/:taskId/*"
                             element={<TaskDetails />}
+                        />
+                        <Route
+                            path="notes/:taskId"
+                            element={<NotesPanel />}
                         />
                         <Route path="actionlog" element={<ActionLogPanel />} />
                     </Route>

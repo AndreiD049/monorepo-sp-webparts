@@ -1,6 +1,4 @@
-import {
-    IconButton,
-} from 'office-ui-fabric-react';
+import { IconButton } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { useNavigate } from 'react-router';
 import { TaskNodeContext } from '../TaskNodeContext';
@@ -27,6 +25,7 @@ const ActionsCell: React.FC<{ node: TaskNode }> = ({ node }) => {
         if (node.getTask() && isTaskFinished) return true;
         return false;
     }, [node]);
+    const parent = node.getParent();
 
     const handleCreateSubtask = React.useCallback(
         (id) => () => {
@@ -44,6 +43,17 @@ const ActionsCell: React.FC<{ node: TaskNode }> = ({ node }) => {
                 disabled={isDisabled}
                 onClick={handleCreateSubtask(node.Id)}
             />
+            {!parent.getTask() && (
+                <IconButton
+                    className={
+                        styles['action-buttons-container__action-button']
+                    }
+                    iconProps={{ iconName: 'OneNoteLogo16' }}
+                    title="Notes"
+                    disabled={isDisabled}
+                    onClick={() => navigate(`/notes/${node.Id}`)}
+                />
+            )}
             <IconButton
                 className={styles['action-buttons-container__action-button']}
                 iconProps={{ iconName: 'CommentAdd' }}
@@ -148,7 +158,12 @@ const ActionsCell: React.FC<{ node: TaskNode }> = ({ node }) => {
                                     dialogProps: {
                                         title: 'Move task',
                                     },
-                                    content: (<MoveForm node={node} dialogId={DIALOG_ID} />),
+                                    content: (
+                                        <MoveForm
+                                            node={node}
+                                            dialogId={DIALOG_ID}
+                                        />
+                                    ),
                                 });
                             },
                         },

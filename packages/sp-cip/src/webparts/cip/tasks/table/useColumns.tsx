@@ -63,7 +63,7 @@ export const useColumns = (
                 key: 'Actions',
                 name: 'Actions',
                 fieldName: 'Actions',
-                minWidth: 150,
+                minWidth: 180,
                 onColumnContextMenu: (): void => null,
             },
             {

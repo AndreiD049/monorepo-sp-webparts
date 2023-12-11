@@ -3,6 +3,7 @@ import {
     AttachmentService,
     CommentService,
     TaskService,
+	NoteService
 } from '@service/sp-cip';
 import SPBuilder from 'sp-preset';
 import CipWebPart, { ICipWebPartProps } from '../CipWebPart';
@@ -20,6 +21,7 @@ export default class MainService {
     private static commentServices: Map<string, CommentService>;
     private static attachmentServices: Map<string, AttachmentService>;
     private static actionServices: Map<string, ActionService>;
+    private static noteServices: Map<string, NoteService>;
     private static builder: SPBuilder;
 
     public static InitServices(
@@ -32,6 +34,7 @@ export default class MainService {
         this.InitCommentService(defaultKey, properties);
         this.InitAttachmentService(defaultKey, properties);
         this.InitActionService(defaultKey, properties);
+		this.InitNotesService(defaultKey, properties);
     }
 
     private static InitTaskServices(
@@ -49,19 +52,24 @@ export default class MainService {
                 taskServiceProxyOptions(defaultKey)
             )
         );
-        properties.config.remotes.forEach((remote) =>
-            this.taskServices.set(
-                remote.Name,
-                createCacheProxy(
-                    new TaskService({
-                        sp: this.builder.getSP(remote.Name),
-                        listName: remote.ListTitle,
-                    }),
-                    taskServiceProxyOptions(remote.Name)
-                )
-            )
-        );
     }
+
+	private static InitNotesService(
+        defaultKey: string,
+        properties: ICipWebPartProps
+	): void {
+		this.noteServices = new Map();
+		if (!properties.config.notesRoot) {
+			return;
+		}
+		this.noteServices.set(
+			defaultKey,
+			new NoteService({
+				sp: this.builder.getSP(defaultKey),
+				listName: properties.config.notesRoot,
+			})
+		);
+	}
 
     private static InitUserServices(
         defaultKey: string,
@@ -73,15 +81,6 @@ export default class MainService {
             createCacheProxy(
                 new UserService(defaultKey, properties),
                 userServiceProxyOptions(defaultKey)
-            )
-        );
-        properties.config.remotes.forEach((remote) =>
-            this.userServices.set(
-                remote.Name,
-                createCacheProxy(
-                    new UserService(remote.Name, properties),
-                    userServiceProxyOptions(remote.Name)
-                )
             )
         );
     }
@@ -98,16 +97,6 @@ export default class MainService {
                 listName: properties.config.commentListName,
                 taskListName: properties.config.listName,
             })
-        );
-        properties.config.remotes.forEach((remote) =>
-            this.commentServices.set(
-                remote.Name,
-                new CommentService({
-                    sp: this.builder.getSP(remote.Name),
-                    listName: properties.config.commentListName,
-                    taskListName: properties.config.listName,
-                })
-            )
         );
     }
 
@@ -127,19 +116,6 @@ export default class MainService {
                 actionServiceProxyOptions(defaultKey)
             )
         );
-        properties.config.remotes.forEach((remote) =>
-            this.actionServices.set(
-                remote.Name,
-                createCacheProxy(
-                    new ActionService({
-                        sp: this.builder.getSP(remote.Name),
-                        listName: properties.config.commentListName,
-                        taskListName: properties.config.listName,
-                    }),
-                    actionServiceProxyOptions(remote.Name)
-                )
-            )
-        );
     }
 
     private static InitAttachmentService(
@@ -153,15 +129,6 @@ export default class MainService {
                 sp: this.builder.getSP(defaultKey),
                 listName: properties.config.attachmentsPath,
             })
-        );
-        properties.config.remotes.forEach((remote) =>
-            this.attachmentServices.set(
-                remote.Name,
-                new AttachmentService({
-                    sp: this.builder.getSP(remote.Name),
-                    listName: properties.config.attachmentsPath,
-                })
-            )
         );
     }
 
@@ -188,4 +155,8 @@ export default class MainService {
     public static getActionService(tennantKey: string = 'Data'): ActionService {
         return this.actionServices.get(tennantKey);
     }
+	
+	public static getNoteService(tennantKey: string = 'Data'): NoteService {
+		return this.noteServices.get(tennantKey);
+	}
 }

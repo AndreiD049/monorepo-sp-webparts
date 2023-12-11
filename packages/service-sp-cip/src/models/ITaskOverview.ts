@@ -19,7 +19,7 @@ export const LIST_SELECT = [
     'Subtasks',
     'FinishedSubtasks',
     'CommentsCount',
-    'AttachmentsCount'
+    'AttachmentsCount',
 ];
 
 export const LIST_EXPAND = ['Responsible'];
@@ -48,4 +48,9 @@ export interface ITaskOverview {
     FinishedSubtasks: number;
     CommentsCount?: number;
     AttachmentsCount?: number;
+}
+
+export interface ITaskNoteView {
+	Title: string;
+	NoteSectionName: string;
 }

@@ -210,6 +210,11 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps): Pro
             `<Field DisplayName='RemoteInfo' Format='Dropdown' IsModern='TRUE' MaxLength='255' Name='RemoteInfo' Title='RemoteInfo' Type='Text'></Field>`
         );
         notifyOnFieldCreation(remoteInfo);
+
+        const noteSectionName = await list.fields.createFieldAsXml(
+            `<Field DisplayName='NoteSectionName' Format='Dropdown' IsModern='TRUE' MaxLength='255' Name='NoteSectionName' Title='NoteSectionName' Type='Text'></Field>`
+        );
+        notifyOnFieldCreation(noteSectionName);
         
         /**
          * Adjust default view
@@ -250,6 +255,7 @@ export default async function setupLists(sp: SPFI, props: ICipWebPartProps): Pro
                         <FieldRef Name="${parent.data.InternalName}"/>
                         <FieldRef Name="${main.data.InternalName}"/>
                         <FieldRef Name="${remoteInfo.data.InternalName}"/>
+                        <FieldRef Name="${noteSectionName.data.InternalName}"/>
                     </ViewFields>
                     <RowLimit Paged="TRUE">30</RowLimit>
                     <JSLink>clienttemplates.js</JSLink>
