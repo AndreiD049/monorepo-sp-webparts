@@ -1,18 +1,18 @@
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { AssigneeSelected } from '../../../components/command-bar/CipAssigneeSelector';
 import { StatusSelected } from '../../../components/command-bar/StatusSelector';
-import { TaskNode } from '../../graph/TaskNode';
 import { getNewSorting, ISortedColumn } from './sorting';
 
 export interface ICipFilters {
     search: string;
     assignedTo?: AssigneeSelected;
     status?: StatusSelected;
-    facetFilters: { [key: string]: (node: TaskNode) => boolean };
+    facetFilters: { [key: string]: (node: ITaskOverview) => boolean };
     sorting?: ISortedColumn;
 }
 
 export interface IFilterAction {
-    value?: ((n: TaskNode) => boolean) | string | StatusSelected | AssigneeSelected | { [key: string]: (n: TaskNode) => boolean };
+    value?: ((n: ITaskOverview) => boolean) | string | StatusSelected | AssigneeSelected | { [key: string]: (t: ITaskOverview) => boolean };
     type: 'SEARCH' | 'STATUS' | 'ASSIGNED' | 'FACET' | 'FACET_UNSET' | 'SORT';
     column?: string;
 }
@@ -41,7 +41,7 @@ export const filtersReducer = (state: ICipFilters, action: IFilterAction): ICipF
                 facetFilters: {
                     ...state.facetFilters,
                     [action.column]: action.value,
-                } as { [key: string]: (n: TaskNode) => boolean },
+                } as { [key: string]: (t: ITaskOverview) => boolean },
             };
         case 'FACET_UNSET':
             delete filters[action.column];

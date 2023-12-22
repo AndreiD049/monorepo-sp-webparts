@@ -143,11 +143,11 @@ export class TaskNode implements IClonable<TaskNode> {
     }
 
     public hide(filters: ((node: TaskNode) => boolean)[]): TaskNode {
-        this.getChildren().forEach((n) => {
-            if (filters.every((filter) => filter(n))) {
-                n.Display = 'shown';
+        this.getChildren().forEach((child) => {
+            if (filters.every((filter) => filter(child))) {
+                child.Display = 'shown';
             } else {
-                n.Display = 'hidden';
+                child.Display = 'hidden';
             }
         })
         return this;

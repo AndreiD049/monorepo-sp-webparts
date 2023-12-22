@@ -7,7 +7,7 @@ import {
     LIST_EXPAND,
     LIST_SELECT,
 } from '../models/ITaskOverview';
-import { getAllPaged, isFinished } from '../utils';
+import { getAllPaged, isFinished, statusToFilter } from '../utils';
 
 /**
  * Tasks service
@@ -29,16 +29,26 @@ export class TaskService {
         return `Team eq '${team}'`;
     }
 
-    getAllRequest(team?: string) {
+    getAllRequest(filter?: string) {
         let request = this.list.items;
-        if (team) {
-            request = request.filter(this.teamFilter(team));
-        }
+		if (filter) {
+			request = request.filter(filter);
+		}
         return request.select(...LIST_SELECT).expand(...LIST_EXPAND);
     }
 
-    async getAll(team?: string): Promise<ITaskOverview[]> {
-        return getAllPaged(this.getAllRequest(team));
+    async getAll(team?: string, status?: 'Open' | 'Finished' | 'All'): Promise<ITaskOverview[]> {
+		let statusFilter: string[] = [];
+		if (team) {
+			statusFilter.push(this.teamFilter(team));
+		}
+		if (status) {
+			const s = statusToFilter(status);
+			if (s !== '') {
+				statusFilter.push(s);
+			}
+		}
+        return getAllPaged(this.getAllRequest(statusFilter.join(' and ')));
     }
 
     async getAllOpenByCategory(category?: string): Promise<ITaskOverview[]> {
@@ -113,6 +123,7 @@ export class TaskService {
         return this.getTaskRequest(id)();
     }
 
+	/*
     getMainsRequest(filter: string) {
         return this.list.items
             .filter(filter)
@@ -143,6 +154,8 @@ export class TaskService {
         }
         return getAllPaged(this.getMainsRequest(filter));
     }
+
+	*/
 
     getSubtasksRequest(id: number, team?: string) {
         let filter = `ParentId eq ${id}`;

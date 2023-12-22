@@ -14,9 +14,12 @@ import { useGroups } from './useGroups';
 import { useColumns } from './useColumns';
 import { filtersReducer } from './sort-filter/filters-reducer';
 import { useTasksFetch } from './useTasksFetch';
-import { useFilteredTree } from './sort-filter/useFilteredTree';
 import { useShowCategories } from './useShowCategories';
 import styles from './TasksTable.module.scss';
+import { createTaskTree } from '../graph/factory';
+import { TaskNode } from '../graph/TaskNode';
+import { applyFilters, applySearch } from './sort-filter/filtering';
+import { getColumnSortingFunc } from './sort-filter/sorting';
 
 export interface ITasksTableProps {
     onTeamSelect: (team: string) => void;
@@ -32,21 +35,26 @@ const TasksTable: React.FC<ITasksTableProps> = (props) => {
     });
     const { showCategories, handleToggleShowCategories } = useShowCategories();
 
-    const { tasks } = useTasksFetch(filters);
+    const { tasks } = useTasksFetch(filters.status, filters.assignedTo);
 
-    const { tree } = useFilteredTree(tasks, filters, showCategories);
+	const tree: TaskNode = React.useMemo(() => {
+		let result = applySearch(tasks, filters.search);
+		result = applyFilters(result, Object.values(filters.facetFilters));
+		return createTaskTree(result);
+	}, [tasks, filters])
 
     const items = React.useMemo(() => {
-        return tree
-            .getChildren()
-            .filter((n) => n.Display !== 'hidden')
+		const children = tree.getChildren();
+		// Don't remove sorting, it's important for grouping
+		children.sort(getColumnSortingFunc(filters.sorting, showCategories));
+        return children
             .map((n) => ({
                 key: n.Id,
                 data: n,
             }));
-    }, [tree]);
+    }, [tree, filters, showCategories]);
 
-    const { columns } = useColumns(tree, filters, dispatch);
+    const { columns } = useColumns(tasks, filters, dispatch);
 
     const { groups, groupProps } = useGroups(items, showCategories);
 

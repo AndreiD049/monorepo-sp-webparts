@@ -50,7 +50,6 @@ const ActionsCell: React.FC<{ node: TaskNode }> = ({ node }) => {
                     }
                     iconProps={{ iconName: 'OneNoteLogo16' }}
                     title="Notes"
-                    disabled={isDisabled}
                     onClick={() => navigate(`/notes/${node.Id}`)}
                 />
             )}

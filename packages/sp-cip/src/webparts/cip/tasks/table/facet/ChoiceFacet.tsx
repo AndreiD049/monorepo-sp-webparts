@@ -1,3 +1,5 @@
+import { uniq } from '@microsoft/sp-lodash-subset';
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import {
     Checkbox,
     IColumn,
@@ -6,20 +8,22 @@ import {
 } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { calloutVisibility } from '../../../utils/dom-events';
-import { TaskNode } from '../../graph/TaskNode';
+import { applyFilters, applySearch } from '../sort-filter/filtering';
+import { ICipFilters } from '../sort-filter/filters-reducer';
 import styles from './Facet.module.scss';
 
 export interface IChoiceFacetProps {
-    options: TaskNode[];
-    getValue: (t: TaskNode) => string;
+    options: ITaskOverview[];
+    getValue: (t: ITaskOverview) => string;
     onFacetSet: (facets: Set<string>) => void;
     onFacetUnset: () => void;
     column: IColumn;
+	filters: ICipFilters;
 }
 
 interface IFacetOption {
     label: string;
-    items: TaskNode[];
+    items: ITaskOverview[];
 }
 
 export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
@@ -32,37 +36,30 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
 
     const [search, setSearch] = React.useState('');
 
-    const options: IFacetOption[] = React.useMemo(() => {
-        const result: { [key: string]: { label: string; items: TaskNode[] } } =
-            {};
-        props.options.forEach((node) => {
-            const label = props.getValue(node);
-            if (!label) return;
-            if (!result[label] || !result[label].items) {
-                result[label] = {
-                    label,
-                    items: [node],
-                };
-            } else {
-                result[label].items.push(node);
-            }
-        });
-        return Object.values(result);
-    }, [props.options]);
+    const availableOptions: string[] = React.useMemo(() => {
+		let filtered = applySearch(props.options, props.filters.search);
+		// Get facets except for the current one
+		const otherColumnFacets = Object.keys(props.filters.facetFilters).filter((f) => f !== props.column.key);
+		const otherFacets = otherColumnFacets.map((f) => props.filters.facetFilters[f]);
+		filtered = applyFilters(filtered, otherFacets);
+		return uniq(filtered.map((o) => props.getValue(o)));
+    }, [props.options, props.filters]);
 
-    const shownOptions = React.useMemo(() => {
-        return options.filter((o) =>
-            o.items.some((n) => n.Display === 'shown')
-        );
-    }, [options]);
+	const selectedOptions = React.useMemo(() => {
+		let filtered = applySearch(props.options, props.filters.search);
+		if (props.filters.facetFilters[props.column.key]) {
+			filtered = applyFilters(filtered, [props.filters.facetFilters[props.column.key]]);
+		}
+		return uniq(filtered.map((o) => props.getValue(o)));
+	}, [props.options, props.filters]);
 
-    const filteredOptions = React.useMemo(() => {
+    const optionsAfterSearch = React.useMemo(() => {
         const nSearch = search.toLowerCase();
-        return options.filter((o) => o.label.toLowerCase().includes(nSearch));
-    }, [options, search]);
+        return availableOptions.filter((o) => o.toLowerCase().includes(nSearch));
+    }, [availableOptions, search]);
 
     const [selected, setSelected] = React.useState(
-        new Set(shownOptions.map((o) => o.label))
+        new Set(selectedOptions)
     );
 
     const handleSelectToggle = (label: string): () => void => () => {
@@ -78,26 +75,26 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
         const resultSet = selected;
         // If something is filtered, treat is as selected
         if (search !== '') {
-            const filtered = new Set(filteredOptions.map((o) => o.label));
+            const filtered = new Set(optionsAfterSearch);
             Array.from(resultSet).forEach((label) => {
                 if (!filtered.has(label)) {
                     resultSet.delete(label);
                 }
             });
         }
-        if (resultSet.size !== options.length) {
-            props.onFacetSet(resultSet);
-        } else {
+		if (resultSet.size === 0 || resultSet.size === availableOptions.length) {
             props.onFacetUnset();
-        }
+		} else {
+			props.onFacetSet(resultSet);
+		}
         calloutVisibility({ visible: false });
     };
 
     const handleSelectAllToggle = (): void => {
-        if (selected.size === options.length) {
+        if (selected.size >= optionsAfterSearch.length) {
             setSelected(new Set([]));
         } else {
-            setSelected(new Set(filteredOptions.map((o) => o.label)));
+            setSelected(new Set(optionsAfterSearch));
         }
         return;
     };
@@ -125,25 +122,27 @@ export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
             <div className={styles.facet__options}>
                 <Checkbox
                     label="Select all"
-                    checked={selected.size === options.length}
+                    checked={selected.size === availableOptions.length}
                     onChange={handleSelectAllToggle}
                 />
-                {Object.values(filteredOptions).map((opt) => (
+                {Object.values(optionsAfterSearch).map((opt) => (
                     <Checkbox
-                        key={opt.label}
+                        key={opt}
                         inputProps={{ tabIndex: -1 }}
-                        checked={selected.has(opt.label)}
-                        label={opt.label}
-                        onChange={handleSelectToggle(opt.label)}
+                        checked={selected.has(opt)}
+                        label={opt}
+                        onChange={handleSelectToggle(opt)}
                     />
                 ))}
             </div>
             <PrimaryButton
                 className={styles['facet__save-button']}
                 onClick={handleSave}
+				disabled={selected.size === 0}
             >
                 Save
             </PrimaryButton>
         </div>
     );
 };
+

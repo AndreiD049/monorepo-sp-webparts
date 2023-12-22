@@ -16,9 +16,8 @@ import {
     taskUpdatedHandler,
 } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
-import { ICipFilters } from './sort-filter/filters-reducer';
 
-export const useTasksFetch = (filters: ICipFilters): { tasks: ITaskOverview[] } => {
+export const useTasksFetch = (statusSelected: StatusSelected, assignedTo: AssigneeSelected): { tasks: ITaskOverview[] } => {
     const { selectedTeam, currentUser } = React.useContext(GlobalContext);
     const team = React.useMemo(
         () => (selectedTeam !== 'All' ? selectedTeam : null),
@@ -27,62 +26,30 @@ export const useTasksFetch = (filters: ICipFilters): { tasks: ITaskOverview[] } 
     const [tasks, setTasks] = React.useState<ITaskOverview[]>([]);
     const taskService = MainService.getTaskService();
 
-    const getAll = React.useCallback(
-        async (team: string) => {
-            if (filters.assignedTo === AssigneeSelected.Single) {
-                return taskService.getUserTasks(currentUser?.Id, 'All', team);
-            }
-            return taskService.getAllMains(team);
-        },
-        [filters, currentUser]
-    );
-
-    const getOpen = React.useCallback(
-        async (team: string) => {
-            if (filters.assignedTo === AssigneeSelected.Single) {
-                return taskService.getUserTasks(currentUser?.Id, 'Open', team);
-            }
-            return taskService.getNonFinishedMains(team);
-        },
-        [filters, currentUser]
-    );
-
-    const getFinished = React.useCallback(
-        async (team: string) => {
-            if (filters.assignedTo === AssigneeSelected.Single) {
-                return taskService.getUserTasks(
-                    currentUser?.Id,
-                    'Finished',
-                    team
-                );
-            }
-            return taskService.getFinishedMains(team);
-        },
-        [filters, currentUser]
-    );
+	const getTasks = React.useCallback(
+		async () => {
+			let status: 'All' | 'Open' | 'Finished' = 'All';
+			if (statusSelected === StatusSelected.Open) {
+				status = 'Open';
+			} else if (statusSelected === StatusSelected.Finished) {
+				status = 'Finished';
+			}
+			if (assignedTo === AssigneeSelected.Single) {
+				return taskService.getUserTasks(currentUser?.Id, status, team);
+			}
+			return taskService.getAll(team, status);
+		}, [statusSelected, assignedTo, team, currentUser]
+	);
 
     React.useEffect(() => {
         async function run(): Promise<void> {
             if (!currentUser) return;
             loadingStart('default');
-            switch (filters.status) {
-                case StatusSelected.All:
-                    setTasks(await getAll(team));
-                    break;
-                case StatusSelected.Open:
-                    setTasks(await getOpen(team));
-                    break;
-                case StatusSelected.Finished:
-                    setTasks(await getFinished(team));
-                    break;
-                default:
-                    setTasks([]);
-                    break;
-            }
+			setTasks(await getTasks());
             loadingStop('default');
         }
         run().catch((err) => console.error(err));
-    }, [filters.status, filters.assignedTo, team, currentUser]);
+    }, [ statusSelected, assignedTo, team, currentUser]);
 
     // Dom events
     React.useEffect(() => {

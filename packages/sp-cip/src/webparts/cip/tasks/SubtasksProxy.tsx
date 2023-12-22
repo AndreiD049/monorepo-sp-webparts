@@ -15,12 +15,16 @@ const SubtasksProxy: React.FC<ISubtaskProxyProps> = ({
     node,
     children,
 }) => {
+	React.useEffect(() => {
+		if (node.getType() === 'proxy') {
+			getSubtasks(node.getTask());
+		}
+	}, []);
 
-    if (node.getType() !== 'proxy') {
-        return <>{children}</>
-    } else {
-        getSubtasks(node.getTask());
-    }
+	if (node.getType() !== 'proxy') {
+		return <>{children}</>
+	}
+
     
     const shimmers = new Array(node.getTask().Subtasks).fill(<TaskShimmer rowProps={rowProps} parentNode={node} />);
 

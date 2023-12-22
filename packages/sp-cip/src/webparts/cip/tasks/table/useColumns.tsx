@@ -1,3 +1,4 @@
+import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { ColumnActionsMode, IColumn } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { calloutVisibility } from '../../utils/dom-events';
@@ -12,12 +13,10 @@ const isSortedDescending = (column: string, sorting: ISortedColumn): boolean =>
     isSorted(column, sorting) && sorting?.direction === SortDirection.Descending;
 
 export const useColumns = (
-    tree: TaskNode,
+	tasks: ITaskOverview[],
     filters: ICipFilters,
     dispatch: React.Dispatch<IFilterAction>
 ): { columns: IColumn[] } => {
-    const nodes = React.useMemo(() => tree.getChildren(), [tree]);
-
     const columns: IColumn[] = React.useMemo(
         () => [
             {
@@ -39,13 +38,13 @@ export const useColumns = (
                         gapSpace: 3,
                         RenderComponent: ChoiceFacet,
                         componentProps: {
-                            options: nodes,
-                            getValue: (n) => n.getTask().Title,
+                            options: tasks,
+                            getValue: (n) => n.Title,
                             onFacetSet: (options) =>
                                 dispatch({
                                     type: 'FACET',
-                                    value: (n: TaskNode) =>
-                                        options.has(n.getTask().Title),
+                                    value: (t: ITaskOverview) =>
+                                        options.has(t.Title),
                                     column: 'Title',
                                 }),
                             onFacetUnset: () =>
@@ -55,6 +54,7 @@ export const useColumns = (
                                     column: 'Title',
                                 }),
                             column: col,
+							filters,
                         },
                     });
                 },
@@ -84,13 +84,13 @@ export const useColumns = (
                         gapSpace: 3,
                         RenderComponent: ChoiceFacet,
                         componentProps: {
-                            options: nodes,
-                            getValue: (n) => n.getTask().Priority,
+                            options: tasks,
+                            getValue: (n) => n.Priority,
                             onFacetSet: (options) =>
                                 dispatch({
                                     type: 'FACET',
-                                    value: (n: TaskNode) =>
-                                        options.has(n.getTask().Priority),
+                                    value: (n: ITaskOverview) =>
+                                        options.has(n.Priority),
                                     column: 'Priority',
                                 }),
                             onFacetUnset: () =>
@@ -100,6 +100,7 @@ export const useColumns = (
                                     column: 'Priority',
                                 }),
                             column: col,
+							filters,
                         },
                     });
                 },
@@ -122,14 +123,14 @@ export const useColumns = (
                         gapSpace: 3,
                         RenderComponent: ChoiceFacet,
                         componentProps: {
-                            options: nodes,
-                            getValue: (n) => n.getTask().Responsible.Title,
+                            options: tasks,
+                            getValue: (t) => t.Responsible.Title,
                             onFacetSet: (options) =>
                                 dispatch({
                                     type: 'FACET',
-                                    value: (n: TaskNode) =>
+                                    value: (n: ITaskOverview) =>
                                         options.has(
-                                            n.getTask().Responsible.Title
+                                            n.Responsible.Title
                                         ),
                                     column: 'Responsible',
                                 }),
@@ -140,6 +141,7 @@ export const useColumns = (
                                     column: 'Responsible',
                                 }),
                             column: col,
+							filters,
                         },
                     });
                 },
@@ -161,13 +163,13 @@ export const useColumns = (
                         gapSpace: 3,
                         RenderComponent: ChoiceFacet,
                         componentProps: {
-                            options: nodes,
-                            getValue: (n) => n.getTask().Status,
+                            options: tasks,
+                            getValue: (n) => n.Status,
                             onFacetSet: (options) =>
                                 dispatch({
                                     type: 'FACET',
-                                    value: (n: TaskNode) =>
-                                        options.has(n.getTask().Status),
+                                    value: (n: ITaskOverview) =>
+                                        options.has(n.Status),
                                     column: 'Status',
                                 }),
                             onFacetUnset: () =>
@@ -177,6 +179,7 @@ export const useColumns = (
                                     column: 'Status',
                                 }),
                             column: col,
+							filters,
                         },
                     });
                 },
@@ -220,13 +223,13 @@ export const useColumns = (
                         gapSpace: 3,
                         RenderComponent: ChoiceFacet,
                         componentProps: {
-                            options: nodes,
-                            getValue: (n) => n.getTask().Team,
+                            options: tasks,
+                            getValue: (n) => n.Team,
                             onFacetSet: (options) =>
                                 dispatch({
                                     type: 'FACET',
-                                    value: (n: TaskNode) =>
-                                        options.has(n.getTask().Team),
+                                    value: (n: ITaskOverview) =>
+                                        options.has(n.Team),
                                     column: 'Team',
                                 }),
                             onFacetUnset: () =>
@@ -236,6 +239,7 @@ export const useColumns = (
                                     column: 'Team',
                                 }),
                             column: col,
+							filters,
                         },
                     });
                 },
@@ -252,7 +256,7 @@ export const useColumns = (
                 onColumnContextMenu: (): void => null,
             },
         ],
-        [tree, filters.sorting]
+        [tasks, filters]
     );
 
     return { columns };
