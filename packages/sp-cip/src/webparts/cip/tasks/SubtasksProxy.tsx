@@ -1,34 +1,34 @@
 import { IDetailsRowProps } from 'office-ui-fabric-react';
 import * as React from 'react';
-import { getSubtasks } from '../utils/dom-events';
 import { TaskNode } from './graph/TaskNode';
 import TaskShimmer from './TaskShimmer';
 
 export interface ISubtaskProxyProps {
     rowProps: IDetailsRowProps;
     node: TaskNode;
-    children?: React.ReactNode;
+	subtasks: TaskNode[];
+	onTaskRender: (node: TaskNode) => React.ReactNode;
 }
 
 const SubtasksProxy: React.FC<ISubtaskProxyProps> = ({
     rowProps,
     node,
-    children,
+	subtasks,
+	onTaskRender
 }) => {
-	React.useEffect(() => {
-		if (node.getType() === 'proxy') {
-			getSubtasks(node.getTask());
-		}
-	}, []);
+	const task = node.getTask();
+	const diff = task.Subtasks - subtasks.length;
+    
+	const content = subtasks.map((child) => onTaskRender(child));
 
-	if (node.getType() !== 'proxy') {
-		return <>{children}</>
+	if (diff > 0) {
+		const shimmers = new Array(diff).fill(<TaskShimmer rowProps={rowProps} parentNode={node} />);
+		content.push(...shimmers);
 	}
 
-    
-    const shimmers = new Array(node.getTask().Subtasks).fill(<TaskShimmer rowProps={rowProps} parentNode={node} />);
-
-    return (<>{shimmers.map((sh) => sh)}</>);
+    return (
+		<>{content}</>
+	);
 };
 
 export default SubtasksProxy;

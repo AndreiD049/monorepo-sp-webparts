@@ -41,6 +41,8 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
     React.useEffect(() => {
         async function run(): Promise<void> {
             try {
+				// If no attachments, do not call the API
+				if (props.task.AttachmentsCount === 0) return;
                 loadingStart('details');
                 const fullPath = path.join('/');
                 const result = await attachmentService.getAttachments(
@@ -64,7 +66,7 @@ export const AttachmentSection: React.FC<IAttachmentSectionProps> = (props) => {
             }
         }
         run().catch((err) => console.error(err));
-    }, [path]);
+    }, [path, props.task]);
 
     /**
      * Check if number of attachments changed

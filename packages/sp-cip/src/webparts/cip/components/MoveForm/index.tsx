@@ -8,7 +8,7 @@ import * as React from 'react';
 import { hideDialog, TaskPicker } from 'sp-components';
 import MainService from '../../services/main-service';
 import { TaskNode } from '../../tasks/graph/TaskNode';
-import { taskUpdated } from '../../utils/dom-events';
+import { taskAdded, taskDeleted, taskUpdated } from '../../utils/dom-events';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
 import styles from './MoveForm.module.scss';
 
@@ -105,6 +105,10 @@ export const MoveForm: React.FC<IMoveFormProps> = (props) => {
                         ...oldParent,
                         ...updatePayload,
                     });
+					taskDeleted({
+						...task,
+						...update,
+					});
                 }
                 if (parent) {
                     const newParent = await taskService.getTask(parent.Id);
@@ -119,6 +123,10 @@ export const MoveForm: React.FC<IMoveFormProps> = (props) => {
                         ...newParent,
                         ...updatePayload,
                     });
+					taskAdded({
+						...task,
+						...update,
+					});
                 } else {
                     update.ParentId = null;
                     update.MainTaskId = task.Id;

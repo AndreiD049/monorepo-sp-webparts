@@ -51,7 +51,7 @@ export const ActionLogTable: React.FC<IActionLogTableProps> = (props) => {
             );
             setActions(actions);
         }
-        run().catch((err) => console.log(err));
+        run().catch((err) => console.error(err));
     }, [props.dateFrom]);
 
     // Apply filters and sorting if necessary

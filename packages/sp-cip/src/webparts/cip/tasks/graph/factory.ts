@@ -2,12 +2,10 @@ import { ITaskOverview } from "@service/sp-cip/dist/models/ITaskOverview";
 import { TaskNode } from "./TaskNode";
 
 export function createTaskTree(tasks: ITaskOverview[]): TaskNode {
-    const roots: ITaskOverview[] = [];
     const taskMap: Map<number, TaskNode> = new Map();
     const rootNode = new TaskNode();
     tasks.forEach((task) => {
         if (!task.ParentId) {
-            roots.push(task);
             const node = new TaskNode(task);
             rootNode.setChild(node);
             taskMap.set(task.Id, node);
@@ -22,7 +20,7 @@ export function createTaskTree(tasks: ITaskOverview[]): TaskNode {
             taskMap.get(subtask.ParentId).setChild(subtaskNode);
         } else if (!taskMap.has(subtask.MainTaskId)) {
             // there is no direct parent in the Map
-            // just apprent the task to roots
+            // just append the task to root
             subtaskNode.isOrphan = true;
             rootNode.setChild(subtaskNode);
         }

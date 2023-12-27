@@ -56,11 +56,12 @@ export const Comments: React.FC<ICommentsProps> = (props) => {
     }
 
     React.useEffect(() => {
+		if (props.task.CommentsCount === 0) return;
         commentService.getByTaskPaged(props.task, 5).then((p) => {
             setTaskComments(p.results);
             setCommentPager(p)
-        }).catch((err) => console.log(err));
-    }, []);
+        }).catch((err) => console.error(err));
+    }, [props.task]);
 
     return (
         <div style={{ overflowX: 'hidden', wordBreak: 'break-all' }}>

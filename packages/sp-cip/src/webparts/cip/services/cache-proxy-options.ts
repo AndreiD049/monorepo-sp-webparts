@@ -51,10 +51,18 @@ export const taskServiceProxyOptions: (remote: string) => ICacheProxyOptions<Tas
             isCached: false,
             async after(db, _, args) {
                 const id = +args[0];
-                await removeCached(db, /TaskService\/getAll/);
+                await removeCached(db, /TaskService\/getAll.*/);
                 await removeCached(db, new RegExp(`TaskService/getTask/${id}`));
             },
         },
+		deleteTaskAndSubtasks: {
+			isCached: false,
+			async after(db, _, args) {
+                const id = +args[0].Id;
+				await removeCached(db, /TaskService\/getAll.*/);
+                await removeCached(db, new RegExp(`TaskService/getTask/${id}`));
+			},
+		},
         'createTask|createSubtask': {
             isPattern: true,
             isCached: false,

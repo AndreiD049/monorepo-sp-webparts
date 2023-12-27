@@ -184,6 +184,32 @@ export class TaskService {
         return subtasks;
     }
 
+	async recalculateSubtasks(parentId: number): Promise<ITaskOverview> {
+        let subtasks = await getAllPaged<ITaskOverview[]>(
+            this.getSubtasksRequest(parentId)
+        );
+		let parent = await this.getTask(parentId);
+
+		const updatePayload: Partial<ITaskOverview> = {};
+		if (parent.Subtasks !== subtasks.length) {
+			updatePayload['Subtasks'] = subtasks.length;
+		}
+
+		const finished = subtasks.filter(isFinished);
+		if (parent.FinishedSubtasks !== finished.length) {
+			updatePayload['FinishedSubtasks'] = finished.length;
+		}
+		
+		if (Object.keys(updatePayload).length > 0) {
+			await this.updateTask(parent.Id, updatePayload);
+			parent = {
+				...parent,
+				...updatePayload,
+			};
+		}
+		return parent;
+	}
+
     async deleteTaskAndSubtasks(task: ITaskOverview) {
         // All subtasks should be deleted because of this.list field setup (DeleteBehavior Cascade)
         await this.list.items.getById(task.Id).delete();

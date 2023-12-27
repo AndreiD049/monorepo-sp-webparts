@@ -2,23 +2,17 @@ import { IDetailsRowProps } from 'office-ui-fabric-react';
 import * as React from 'react';
 import styles from './Task.module.scss';
 import { TaskNode } from './graph/TaskNode';
-import { nodeToggleOpenHandler, relinkParent } from '../utils/dom-events';
+import { nodeToggleOpenHandler, relinkParent, subtasksAddedHandler, subtasksDeletedHandler, subtasksUpdatedHandler, taskDeletedHandler, taskUpdatedHandler } from '../utils/dom-events';
 import SubtasksProxy from './SubtasksProxy';
 import { RenderCell } from './cells/render-cells';
 import { TaskNodeContext } from './TaskNodeContext';
 import { isFinished } from '@service/sp-cip';
-
-function initialOpen(node: TaskNode, isFiltered: boolean): boolean {
-    if (!isFiltered) return false;
-    if (!node.hasChildren()) return false;
-    if (node.getChildren().some((c) => c.isFilterApplicable)) return true;
-    return node.getChildren().some((c) => initialOpen(c, isFiltered));
-}
+import MainService from '../services/main-service';
+import { uniqBy } from '@microsoft/sp-lodash-subset';
 
 export interface ITaskProps extends React.HTMLAttributes<HTMLDivElement> {
     rowProps: IDetailsRowProps;
     node: TaskNode;
-    isFiltered?: boolean;
 }
 
 /**
@@ -31,30 +25,25 @@ export interface ITaskProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 const Task: React.FC<ITaskProps> = (props) => {
     const [open, setOpen] = React.useState<boolean>(false);
-
-    React.useEffect(() => {
-        setOpen(initialOpen(props.node, props.isFiltered));
-    }, [props.isFiltered]);
+    const [subtasks, setSubtasks] = React.useState<TaskNode[]>([]);
 
     const subtasksNode = React.useMemo(() => {
-        if (!open) return null;
-        if (props.node.Display === 'hidden') return null;
         return (
-            <SubtasksProxy rowProps={props.rowProps} node={props.node}>
-                <div>
-                    {props.node.getChildren().map((child) => (
+            <SubtasksProxy 
+				rowProps={props.rowProps} 
+				node={props.node}
+				subtasks={subtasks}
+				onTaskRender={(child) => (
                         <Task
                             key={child.Id}
-                            isFiltered={props.isFiltered}
                             node={child}
                             rowProps={props.rowProps}
-                            style={{ ...props.style }}
+                            style={props.style}
                         />
-                    ))}
-                </div>
-            </SubtasksProxy>
+				)}
+            />
         );
-    }, [open, props.node, props.rowProps.columns]);
+    }, [subtasks]);
 
     const cells = React.useMemo(() => {
         const result: { [key: string]: JSX.Element } = {};
@@ -67,15 +56,57 @@ const Task: React.FC<ITaskProps> = (props) => {
     }, [props.node]);
 
     React.useEffect(() => {
-        const removeOpenHandler = nodeToggleOpenHandler(props.node.Id, (val) =>
-            setOpen((prev) => {
-                return val ? val : !prev;
-            })
+		const removeHandlers: (() => void)[] = [];
+		const nodeId = props.node.Id;
+        const removeOpenHandler = nodeToggleOpenHandler(
+			nodeId,
+            async (isOpen) => {
+                isOpen = isOpen ?? !open;
+                setOpen(isOpen);
+                if (!isOpen) return;
+
+                // Check if subtasks are all loaded
+                const task = props.node.getTask();
+                const loadedChildren = props.node.getChildren();
+                if (loadedChildren.length === task.Subtasks) {
+					setSubtasks([...loadedChildren]);
+					return;
+				}
+
+                // Load subtasks
+                const fetched = await MainService.getTaskService().getSubtasks(
+                    task
+                );
+				const subtaskNodes = fetched.map((s) => new TaskNode(s));
+				props.node.withChildren(subtaskNodes);
+                setSubtasks(subtaskNodes);
+            }
         );
-        return () => {
-            removeOpenHandler();
-        };
-    }, []);
+		removeHandlers.push(removeOpenHandler);
+
+		const removeSubtaskAdded = subtasksAddedHandler(props.node.Id, (task) => {
+			const newNode = new TaskNode(task).withParent(props.node);
+			
+			setSubtasks((prev) => uniqBy([...prev, newNode], (n) => n.Id));
+		});
+		removeHandlers.push(removeSubtaskAdded);
+
+		if (open) {
+			const removeSubtaskUpdated = subtasksUpdatedHandler(props.node.Id, (task) => {
+				const newNode = new TaskNode(task).withParent(props.node);
+				setSubtasks((prev) => {
+					return prev.map((n) => n.Id === newNode.Id ? newNode : n);
+				});
+			});
+			removeHandlers.push(removeSubtaskUpdated);
+
+			const removeTaskDeleted = subtasksDeletedHandler(props.node.Id, (taskId) => {
+				setSubtasks((prev) => prev.filter((n) => n.Id !== taskId));
+			});
+			removeHandlers.push(removeTaskDeleted);
+		}
+        return () => removeHandlers.forEach((r) => r());
+    }, [subtasks, open]);
 
     /**
      * Relink parents when node is open/closed
@@ -88,8 +119,6 @@ const Task: React.FC<ITaskProps> = (props) => {
         }
     }, [props.node, open]);
 
-    if (props.node.Display === 'hidden') return null;
-
     return (
         <TaskNodeContext.Provider
             value={{
@@ -98,12 +127,7 @@ const Task: React.FC<ITaskProps> = (props) => {
                 isTaskFinished: isFinished(props.node.getTask()),
             }}
         >
-            <div
-                className={`${styles.task} ${
-                    props.node.Display === 'disabled' ? styles.disabled : ''
-                }`}
-                style={{ ...props.style }}
-            >
+            <div className={styles.task} style={{ ...props.style }}>
                 {props.rowProps.columns.map((column) => {
                     return (
                         <div
@@ -118,7 +142,7 @@ const Task: React.FC<ITaskProps> = (props) => {
                     );
                 })}
             </div>
-            {subtasksNode}
+            {open && subtasksNode}
         </TaskNodeContext.Provider>
     );
 };

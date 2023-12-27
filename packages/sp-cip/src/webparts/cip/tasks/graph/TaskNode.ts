@@ -1,7 +1,7 @@
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IClonable } from '../../utils/IClonable';
 
-type NodeType = 'root' | 'normal' | 'proxy' | 'stub';
+type NodeType = 'root' | 'normal' | 'stub';
 
 export class TaskNode implements IClonable<TaskNode> {
     private type: NodeType;
@@ -12,8 +12,6 @@ export class TaskNode implements IClonable<TaskNode> {
     public Id: number;
     public level: number;
     public Category: string;
-    public Display: 'shown' | 'hidden' | 'disabled';
-    public isFilterApplicable: boolean;
     public isOrphan: boolean = false;
 
     constructor(private task?: ITaskOverview) {
@@ -21,12 +19,8 @@ export class TaskNode implements IClonable<TaskNode> {
         this.Id = this.task?.Id;
         this.Category = this.task?.Category || 'Other';
         this.level = -1;
-        this.Display = 'shown';
-        this.isFilterApplicable = true;
         if (!task) {
             this.type = 'root';
-        } else if (this.task.Subtasks > 0) {
-            this.type = 'proxy';
         } else {
             this.type = 'normal';
         }
@@ -34,9 +28,7 @@ export class TaskNode implements IClonable<TaskNode> {
 
     public withChildren(tasks: ITaskOverview[] | TaskNode[]): TaskNode {
         if (tasks.length > 0) {
-            if (this.type !== 'root') {
-                this.type = 'normal';
-            }
+			this.type = 'normal';
             this.children = new Map();
             this.childrenArray = [];
             for (const task of tasks) {
@@ -50,25 +42,31 @@ export class TaskNode implements IClonable<TaskNode> {
         return this;
     }
 
-    public withLevel(level: number): TaskNode {
+    private withLevel(level: number): TaskNode {
         this.level = level;
         this.children.forEach((child) => child.withLevel(this.level + 1));
         return this;
     }
 
-    public withIndex(idx: number): TaskNode {
+    private withIndex(idx: number): TaskNode {
         this.index = idx;
         return this;
     }
 
     public setChild(child: TaskNode): void {
         child.parent = this;
-        child.withIndex(this.children.size);
+		let index = this.childrenArray.length;
+		const found = this.childrenArray.findIndex((x) => x.task.Id === child.task.Id);
+		if (found !== -1) {
+			index = found;
+		}
+        child.withIndex(index);
         this.children.set(child.task.Id, child.withLevel(this.level + 1));
-        this.childrenArray.push(child);
-        if (this.type === 'proxy') {
-            this.type = 'normal';
-        }
+		if (index < this.childrenArray.length) {
+			this.childrenArray.splice(index, 1, child);
+		} else {
+			this.childrenArray.push(child);
+		}
     }
 
     public withParent(parent: TaskNode): TaskNode {
@@ -126,30 +124,21 @@ export class TaskNode implements IClonable<TaskNode> {
         if (parent.children.size <= this.index + 1) return null;
         return parent.getChildren()[this.index + 1];
     }
+	
+	public getDescendantsAndSelf(): TaskNode[] {
+		const descendants = this.getDescendants();
+		descendants.push(this);
+		return descendants;
+	}
 
-    public getAllDescendants(): TaskNode[] {
-        const result: TaskNode[] = [];
-        this.getChildren().forEach((child) => { 
-            result.push(child);
-            result.push(...child.getAllDescendants());
-        });
-        return result;
-    }
-
-    public filter(filter: ((node: TaskNode) => boolean)): TaskNode {
-        const filtered = this.getChildren().filter((c: TaskNode) => filter(c));
-        this.withChildren(filtered);
-        return this;
-    }
-
-    public hide(filters: ((node: TaskNode) => boolean)[]): TaskNode {
-        this.getChildren().forEach((child) => {
-            if (filters.every((filter) => filter(child))) {
-                child.Display = 'shown';
-            } else {
-                child.Display = 'hidden';
-            }
-        })
-        return this;
-    }
+	public getDescendants(): TaskNode[] {
+		const descendants: TaskNode[] = [];
+		for (const child of this.getChildren()) {
+			descendants.push(child);
+			if (child.hasChildren()) {
+				descendants.push(...child.getDescendants());
+			}
+		}
+		return descendants;
+	}
 }
