@@ -27,7 +27,6 @@ export const RenderCell: React.FC<IRenderCellProps> = (props) => {
             return (
                 <ResponsibleCell
                     task={props.node.getTask()}
-                    disabled={props.node.Display === 'disabled'}
                 />
             );
         case 'status':

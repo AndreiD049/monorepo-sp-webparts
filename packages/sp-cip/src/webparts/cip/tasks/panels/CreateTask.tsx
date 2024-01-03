@@ -22,7 +22,7 @@ import {
     loadingStart,
     loadingStop,
 } from '../../components/utils/LoadingAnimation';
-import { tasksAdded, taskUpdated } from '../../utils/dom-events';
+import { taskAdded, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { useChoiceFields } from '../../utils/useChoiceFields';
 import MainService from '../../services/main-service';
@@ -183,11 +183,12 @@ const CreateTaskPanel: React.FC = () => {
                     currentUser.Id,
                     new Date().toISOString()
                 );
-                parent.Subtasks += 1;
                 // Refresh the parent task
-                const subtasks = await taskService.getSubtasks(parent);
-                taskUpdated(parent);
-                tasksAdded(subtasks);
+                const updatedParent = await taskService.recalculateSubtasks(parent.Id);
+                taskUpdated(updatedParent);
+
+				const updatedSubtask = await taskService.getTask(subtaskId);
+                taskAdded(updatedSubtask);
             } else {
                 createdId = await taskService.createTask(data);
                 await actionService.addAction(
@@ -197,7 +198,7 @@ const CreateTaskPanel: React.FC = () => {
                     currentUser.Id,
                     new Date().toISOString()
                 );
-                tasksAdded([await taskService.getTask(createdId)]);
+                taskAdded(await taskService.getTask(createdId));
             }
             // Create new category
             const oldCategories = await taskService.getCategories();

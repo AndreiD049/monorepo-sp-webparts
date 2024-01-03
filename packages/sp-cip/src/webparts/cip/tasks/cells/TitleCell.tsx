@@ -83,7 +83,6 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
     const parentStroke = useParentStroke(node);
 
     const isButtonDisabled = React.useMemo(() => {
-        if (node.Display === 'disabled') return true;
         const parent = node.getParent();
         if (parent && parent.getTask()) {
             return isFinished(parent.getTask());
@@ -122,7 +121,9 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
         if (item.Subtasks > 0) {
             return (
                 <IconButton
-                    onClick={() => nodeSetOpen(item.Id)}
+                    onClick={() => {
+						nodeSetOpen(item.Id);
+					}}
                     iconProps={{
                         iconName: `${open ? 'ChevronDown' : 'ChevronRight'}`,
                     }}
@@ -284,6 +285,7 @@ export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
             }}
             itemType="button"
             onDoubleClick={() => {
+				console.log(node.getDescendantsAndSelf());
                 navigate(`task/${node.Id}`, { state: { node } });
                 // Empty the selection is text was selected while double clicking
                 document.getSelection().empty();

@@ -140,7 +140,7 @@ const Timing: React.FC<ITimingProps> = (props) => {
     return (
         <button
             className={styles.button}
-            disabled={props.node.Display === 'disabled' || isTaskFinished}
+            disabled={isTaskFinished}
             ref={elemRef}
             onClick={handleClick}
         >

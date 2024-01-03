@@ -55,7 +55,7 @@ export const TeamCell: React.FC<ITeamCellProps> = (props) => {
     );
 
     return (
-        <button disabled={props.node.Display === 'disabled' || isTaskFinished} ref={teamRef} onClick={handleClick} className={`${styles.teamCell} ${styles.button}`}>
+        <button disabled={isTaskFinished} ref={teamRef} onClick={handleClick} className={`${styles.teamCell} ${styles.button}`}>
             <Text variant="medium">{task.Team || ''}</Text>
         </button>
     );

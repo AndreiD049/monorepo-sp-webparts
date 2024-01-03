@@ -7,7 +7,7 @@ import {
     loadingStart,
     loadingStop,
 } from '../../components/utils/LoadingAnimation';
-import { taskDeleted, addTimer } from '../../utils/dom-events';
+import { taskDeleted, addTimer, taskUpdated } from '../../utils/dom-events';
 import { AddCommentDialog } from '../dialogs/AddCommentDialog';
 import { TaskNode } from '../graph/TaskNode';
 import MainService from '../../services/main-service';
@@ -21,7 +21,6 @@ const ActionsCell: React.FC<{ node: TaskNode }> = ({ node }) => {
     const navigate = useNavigate();
     const taskService = MainService.getTaskService();
     const isDisabled = React.useMemo(() => {
-        if (node.Display === 'disabled') return true;
         if (node.getTask() && isTaskFinished) return true;
         return false;
     }, [node]);
@@ -134,7 +133,15 @@ const ActionsCell: React.FC<{ node: TaskNode }> = ({ node }) => {
                                                 await taskService.deleteTaskAndSubtasks(
                                                     node.getTask()
                                                 );
-                                                taskDeleted(node.Id);
+
+												// Check if parent exists
+												const parent = node.getParent()?.getTask();
+												if (parent) {
+													// Update the number of subtasks
+													const updatedParent = await taskService.recalculateSubtasks(parent.Id);
+													taskUpdated(updatedParent);
+												}
+												taskDeleted(node.getTask());
                                                 loadingStop('default');
                                             }}
                                             onNo={() => {

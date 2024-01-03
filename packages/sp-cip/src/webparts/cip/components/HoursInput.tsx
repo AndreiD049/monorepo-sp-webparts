@@ -37,7 +37,6 @@ export const HoursInput: React.FC<IHoursInputProps> = (props) => {
 
     const handleValidate = (val: string): string => {
         const valNumber = validateHours(val);
-        console.log(valNumber);
         props.onChange(valNumber);
         return val;
     }

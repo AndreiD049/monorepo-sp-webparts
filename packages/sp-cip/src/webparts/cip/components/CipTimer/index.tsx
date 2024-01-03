@@ -66,7 +66,6 @@ export const CipTimer: React.FC<ICipTimerProps> = (props) => {
         const removeAddHandler = timerAddHandler((options) => {
             const addedTimer = newTimer(options.task);
             setTimers((prev) => {
-                console.log(prev);
                 return [addedTimer, ...prev.map((t) => pauseTimerItem(t))];
             });
         });

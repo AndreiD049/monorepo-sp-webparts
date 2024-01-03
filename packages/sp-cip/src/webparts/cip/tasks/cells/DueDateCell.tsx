@@ -183,7 +183,7 @@ export const DueDateCell = ({ node }: { node: TaskNode }): JSX.Element => {
         <button
             ref={textRef}
             onClick={handleClick}
-            disabled={node.Display === 'disabled' || isTaskFinished}
+            disabled={isTaskFinished}
             className={styles.button}
             title={dueDuration}
         >

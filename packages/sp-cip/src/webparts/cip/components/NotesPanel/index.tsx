@@ -29,7 +29,6 @@ export const NotesPanel: React.FC = () => {
 			isLightDismiss
 			onDismiss={() => {
 				const from = searchParams.get('from');
-				console.log(from);
 				if (from) {
 					navigate(from);
 					return;

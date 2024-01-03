@@ -93,7 +93,7 @@ const PriorityCell: React.FC<IPriorityCellProps> = (props) => {
                     borderRadius: '5px',
                 }}
                 value={task.Priority}
-                disabled={props.node.Display === 'disabled' || isTaskFinished}
+                disabled={isTaskFinished}
             />
         </div>
     );

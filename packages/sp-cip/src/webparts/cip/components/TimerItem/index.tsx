@@ -195,7 +195,6 @@ export function TimerItem<T>(props: ITimerItemProps<T>): JSX.Element {
                         return val;
                     }}
                     onChange={(items) => {
-                        console.log(items);
                         let task = null;
                         if (items.length > 0) {
                             task = props.tasks.find(

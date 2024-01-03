@@ -98,7 +98,7 @@ export const ProgressCell: React.FC<IProgressCellProps> = (props) => {
         });
     }, [props.node, progressRef]);
     const isDisabled = React.useMemo(() => {
-        return props.node.Display === 'disabled' || isTaskFinished;
+        return isTaskFinished;
     }, [props.node, isTaskFinished]);
 
     return (

@@ -15,11 +15,10 @@ import { useColumns } from './useColumns';
 import { filtersReducer } from './sort-filter/filters-reducer';
 import { useTasksFetch } from './useTasksFetch';
 import { useShowCategories } from './useShowCategories';
-import styles from './TasksTable.module.scss';
 import { createTaskTree } from '../graph/factory';
-import { TaskNode } from '../graph/TaskNode';
 import { applyFilters, applySearch } from './sort-filter/filtering';
 import { getColumnSortingFunc } from './sort-filter/sorting';
+import styles from './TasksTable.module.scss';
 
 export interface ITasksTableProps {
     onTeamSelect: (team: string) => void;
@@ -37,11 +36,11 @@ const TasksTable: React.FC<ITasksTableProps> = (props) => {
 
     const { tasks } = useTasksFetch(filters.status, filters.assignedTo);
 
-	const tree: TaskNode = React.useMemo(() => {
+	const tree = React.useMemo(() => {
 		let result = applySearch(tasks, filters.search);
 		result = applyFilters(result, Object.values(filters.facetFilters));
 		return createTaskTree(result);
-	}, [tasks, filters])
+	}, [tasks, filters]);
 
     const items = React.useMemo(() => {
 		const children = tree.getChildren();
@@ -106,7 +105,7 @@ const TasksTable: React.FC<ITasksTableProps> = (props) => {
                         items={items}
                         onRenderRow={(props) => (
                             <Task
-                                isFiltered={filters.search !== ''}
+								key={props.item.data.Id}
                                 rowProps={props}
                                 node={props.item.data}
                                 style={{

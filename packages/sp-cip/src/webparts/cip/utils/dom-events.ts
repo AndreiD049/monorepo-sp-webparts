@@ -11,12 +11,14 @@ import {
     NODE_OPEN_EVT,
     PANEL_OPEN_EVT,
     RELINK_PARENT_EVT,
-    TASKS_ADDED_EVT,
+    TASK_ADDED_EVT,
     TASK_UPDATED_EVT,
-    GET_SUBTASKS_EVT,
     TASKS_DELETED_EVT,
     TIMER_EVT,
     TIMER_ADD_EVT,
+    SUBTASK_ADDED_EVT,
+    SUBTASK_UPDATED_EVT,
+    SUBTASK_DELETED_EVT,
 } from './constants';
 
 /**
@@ -67,36 +69,127 @@ export const relinkParentHandler = (id: number, func: () => void): () => void =>
 };
 
 /**
+ *	 Subtasks handling events
+ */
+// Subtask added
+const SUBTASK_ADDED_EVT_ID = (parentId: number): string => `${SUBTASK_ADDED_EVT}${parentId}`;
+
+const subtaskAdded = (task: ITaskOverview): void => {
+	if (!task.ParentId) return;
+
+	const eventId = SUBTASK_ADDED_EVT_ID(task.ParentId);
+
+    document.dispatchEvent(
+        new CustomEvent(eventId, {
+            detail: {
+                task,
+            },
+        })
+    );
+};
+export const subtasksAddedHandler = (parentId: number, func: (task: ITaskOverview) => void): () => void => {
+	const handler = (evt: CustomEvent): void => {
+		if (evt.detail && evt.detail.task) {
+			func(evt.detail.task);
+		}
+	}
+	const eventId = SUBTASK_ADDED_EVT_ID(parentId);
+	document.addEventListener(eventId, handler);
+	return () => document.removeEventListener(eventId, handler);
+}
+
+// Subtask updated
+const SUBTASK_UPDATED_EVT_ID = (parentId: number): string => `${SUBTASK_UPDATED_EVT}${parentId}`;
+
+const subtaskUpdated = (task: ITaskOverview): void => {
+	if (!task.ParentId) return;
+
+	const eventId = SUBTASK_UPDATED_EVT_ID(task.ParentId);
+
+	document.dispatchEvent(
+		new CustomEvent(eventId, {
+			detail: {
+				task,
+			},
+		})
+	);
+};
+
+export const subtasksUpdatedHandler = (parentId: number, func: (task: ITaskOverview) => void): () => void => {
+	const handler = (evt: CustomEvent): void => {
+		if (evt.detail && evt.detail.task) {
+			func(evt.detail.task);
+		}
+	}
+	const eventId = SUBTASK_UPDATED_EVT_ID(parentId);
+	document.addEventListener(eventId, handler);
+	return () => document.removeEventListener(eventId, handler);
+}
+
+// Subtask deleted
+const SUBTASK_DELETED_EVT_ID = (parentId: number): string => `${SUBTASK_DELETED_EVT}${parentId}`;
+
+const subtaskDeleted = (parentId: number, taskId: number): void => {
+	const eventId = SUBTASK_DELETED_EVT_ID(parentId);
+
+	document.dispatchEvent(
+		new CustomEvent(eventId, {
+			detail: {
+				taskId,
+			},
+		})
+	);
+};
+
+export const subtasksDeletedHandler = (parentId: number, func: (taskId: number) => void): () => void => {
+	const handler = (evt: CustomEvent): void => {
+		if (evt.detail && evt.detail.taskId) {
+			func(evt.detail.taskId);
+		}
+	}
+	const eventId = SUBTASK_DELETED_EVT_ID(parentId);
+	document.addEventListener(eventId, handler);
+	return () => document.removeEventListener(eventId, handler);
+}
+
+/**
  * Handle new tasks added
  */
-export const tasksAdded = (tasks: ITaskOverview[]): void => {
+export const taskAdded = (task: ITaskOverview): void => {
+	if (task.ParentId) {
+		subtaskAdded(task);
+	}
     document.dispatchEvent(
-        new CustomEvent(TASKS_ADDED_EVT, {
+        new CustomEvent(TASK_ADDED_EVT, {
             detail: {
-                tasks,
+                task: task,
             },
         })
     );
 };
 
-export const taskAddedHandler = (func: (tasks: ITaskOverview[]) => void): () => void => {
+export const taskAddedHandler = (func: (task: ITaskOverview) => void): () => void => {
     const handler = (evt: CustomEvent): void => {
-        if (evt.detail && evt.detail.tasks.length > 0) {
-            func(evt.detail.tasks);
+        if (evt.detail && evt.detail.task) {
+            func(evt.detail.task);
         }
     };
-    document.addEventListener(TASKS_ADDED_EVT, handler);
-    return () => document.removeEventListener(TASKS_ADDED_EVT, handler);
+    document.addEventListener(TASK_ADDED_EVT, handler);
+    return () => document.removeEventListener(TASK_ADDED_EVT, handler);
 };
 
 /**
- * Handle new tasks added
+ * Handle tasks deleted
  */
-export const taskDeleted = (taskId: number): void => {
+export const taskDeleted = (task: ITaskOverview): void => {
+	if (task.ParentId) {
+		subtaskDeleted(task.ParentId, task.Id);
+	}
+
     document.dispatchEvent(
         new CustomEvent(TASKS_DELETED_EVT, {
             detail: {
-                taskId: taskId,
+                taskId: task.Id,
             },
         })
     );
@@ -109,13 +202,16 @@ export const taskDeletedHandler = (func: (taskId: number) => void): () => void =
         }
     };
     document.addEventListener(TASKS_DELETED_EVT, handler);
-    return () => document.removeEventListener(TASKS_ADDED_EVT, handler);
+    return () => document.removeEventListener(TASK_ADDED_EVT, handler);
 };
 
 /**
  * Handle task details updated
  */
 export const taskUpdated = (task: ITaskOverview): void => {
+	if (task.ParentId) {
+		subtaskUpdated(task);
+	}
     document.dispatchEvent(
         new CustomEvent(TASK_UPDATED_EVT, {
             detail: {
@@ -139,25 +235,6 @@ export interface IGetSubtasksProps {
     parent: ITaskOverview;
 }
 
-export const getSubtasks = (parent: ITaskOverview): void => {
-    document.dispatchEvent(
-        new CustomEvent<IGetSubtasksProps>(GET_SUBTASKS_EVT, {
-            detail: {
-                parent,
-            }
-        })
-    );
-};
-
-export const getSubtasksHandler = (func: (parent: ITaskOverview) => void): () => void => {
-    const handler = (evt: CustomEvent<IGetSubtasksProps>): void => {
-        if (evt.detail && evt.detail.parent) {
-            func(evt.detail.parent);
-        }
-    };
-    document.addEventListener(GET_SUBTASKS_EVT, handler);
-    return () => document.removeEventListener(GET_SUBTASKS_EVT, handler);
-};
 
 /**
  * Handle panel opened

@@ -102,7 +102,7 @@ export const StatusCell: React.FC<IStatusCellProps> = (props) => {
             onClick={handleClick}
             value={props.node.getTask()?.Status}
             style={{ lineHeight: '12px' }}
-            disabled={props.node.Display === 'disabled' || isTaskFinished}
+            disabled={isTaskFinished}
         />
     );
 };
