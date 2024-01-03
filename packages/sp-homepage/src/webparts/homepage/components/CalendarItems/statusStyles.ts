@@ -5,6 +5,10 @@ const statusColors: {[status: string]: CSSProperties} = {
         color: '#0068b8',
         backgroundColor: '#d4e7f6'
     },
+	"open": {
+        color: '#0068b8',
+        backgroundColor: '#d4e7f6'
+    },
     'on-hold': {
         color: '#8f6200',
         backgroundColor: '#ffebc0'

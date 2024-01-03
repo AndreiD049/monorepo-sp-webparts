@@ -15,6 +15,7 @@ import { LoadingSpinner, showSpinner, hideSpinner } from 'sp-components';
 import { CALENDAR_SPINNER_ID } from '../../constants';
 import { CalendarContext, ICalendarContext } from '../../context/CalendarContext/CalendarContext';
 import styles from './CalendarSection.module.scss';
+import useWebStorage from 'use-web-storage-api';
 
 interface IHeaderProps {
     calendarType: ChoiceDisplayType;
@@ -43,7 +44,7 @@ export interface ICalendarSectionProps extends ISectionProps {
 
 export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
     const [selectedDate, setSelectedDate] = React.useState(new Date());
-    const [choice, setChoice] = React.useState<ChoiceDisplayType>('week');
+    const [choice, setChoice] = useWebStorage<ChoiceDisplayType>('week', { key: 'calendarView' });
     const [items, setItems] = React.useState<IWrappedCalendarItem[]>([]);
     const [reload, setReload] = React.useState(false);
 
