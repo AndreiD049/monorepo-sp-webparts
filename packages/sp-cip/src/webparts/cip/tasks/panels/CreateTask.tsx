@@ -183,10 +183,9 @@ const CreateTaskPanel: React.FC = () => {
                     currentUser.Id,
                     new Date().toISOString()
                 );
-				// Update the effective times
-				const updatedTimes = await taskService.updateParentTasksTime(parent.Id, {EffectiveTime: 0, EstimatedTime: data.EstimatedTime});
-				console.log(updatedTimes);
-				updatedTimes.forEach((t) => taskUpdated(t));
+                // Refresh the parent task
+                const updatedParent = await taskService.recalculateSubtasks(parent.Id);
+                taskUpdated(updatedParent);
 
 				const updatedSubtask = await taskService.getTask(subtaskId);
                 taskAdded(updatedSubtask);
