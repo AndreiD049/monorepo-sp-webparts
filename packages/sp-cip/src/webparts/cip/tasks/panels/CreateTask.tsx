@@ -173,7 +173,6 @@ const CreateTaskPanel: React.FC = () => {
             }
             handleDismissPanel();
             if (params.parentId) {
-                const parent = await taskService.getTask(+params.parentId);
                 const subtaskId = await taskService.createSubtask(data, parent);
                 createdId = subtaskId;
                 await actionService.addAction(
@@ -184,8 +183,7 @@ const CreateTaskPanel: React.FC = () => {
                     new Date().toISOString()
                 );
                 // Refresh the parent task
-                const updatedParent = await taskService.recalculateSubtasks(parent.Id);
-                taskUpdated(updatedParent);
+                taskUpdated({...parent, Subtasks: parent.Subtasks + 1});
 
 				const updatedSubtask = await taskService.getTask(subtaskId);
                 taskAdded(updatedSubtask);
@@ -214,7 +212,7 @@ const CreateTaskPanel: React.FC = () => {
             }
             loadingStop('default');
         },
-        [data, validateData, attachments, groupLabels]
+        [data, validateData, attachments, groupLabels, parent]
     );
 
     return (

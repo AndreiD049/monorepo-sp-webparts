@@ -56,18 +56,33 @@ export const useTasksFetch = (
         // When task is added
         const removeTaskAdded = taskAddedHandler((task) => {
             setTasks((prev) => {
-				const found = prev.findIndex((x) => x.Id === task.Id);
-				if (found === -1) {
-					return prev;
+				// Not a subtask, just append it to the list
+				if (!task.ParentId) {
+					return [...prev, task];
 				}
-                return prev.splice(found, 1, task);
+                return prev.map((t) => t.Id === task.Id ? task : t);
             });
             // relink all tasks
             relinkParent('all');
         });
         // When task is updated
         const removeTaskUpdated = taskUpdatedHandler((task) => {
-            setTasks((prev) => prev.map((t) => (t.Id === task.Id ? task : t)));
+			if (task.ParentId) {
+				setTasks((prev) => prev.filter((t) => t.Id !== task.Id));
+				return;
+			}
+            setTasks((prev) => {
+				const result = [...prev]
+				
+				// if task not yet in the list, it probably was a subtaska and was moved
+				// to main level
+				const foundIdx = result.findIndex((t) => t.Id === task.Id);
+				if (foundIdx === -1) {
+					result.push(task);
+					return result;
+				}
+				return result.map((t) => (t.Id === task.Id ? task : t));
+			});
         });
 
         const removeTaskDeleted = taskDeletedHandler(async (taskId: number) => {

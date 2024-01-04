@@ -8,7 +8,7 @@ import * as React from 'react';
 import { hideDialog, TaskPicker } from 'sp-components';
 import MainService from '../../services/main-service';
 import { TaskNode } from '../../tasks/graph/TaskNode';
-import { taskAdded, taskDeleted, taskUpdated } from '../../utils/dom-events';
+import { nodeSetOpen, taskAdded, taskDeleted, taskUpdated } from '../../utils/dom-events';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
 import styles from './MoveForm.module.scss';
 
