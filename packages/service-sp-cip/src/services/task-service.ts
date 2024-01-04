@@ -3,7 +3,7 @@ import { ICreateTask } from '../models/ICreateTask';
 import { IServiceProps } from '../models/IServiceProps';
 import {
     ITaskOverview,
-	ITaskNoteView,
+    ITaskNoteView,
     LIST_EXPAND,
     LIST_SELECT,
 } from '../models/ITaskOverview';
@@ -31,23 +31,26 @@ export class TaskService {
 
     getAllRequest(filter?: string) {
         let request = this.list.items;
-		if (filter) {
-			request = request.filter(filter);
-		}
+        if (filter) {
+            request = request.filter(filter);
+        }
         return request.select(...LIST_SELECT).expand(...LIST_EXPAND);
     }
 
-    async getAll(team?: string, status?: 'Open' | 'Finished' | 'All'): Promise<ITaskOverview[]> {
-		let statusFilter: string[] = [];
-		if (team) {
-			statusFilter.push(this.teamFilter(team));
-		}
-		if (status) {
-			const s = statusToFilter(status);
-			if (s !== '') {
-				statusFilter.push(s);
-			}
-		}
+    async getAll(
+        team?: string,
+        status?: 'Open' | 'Finished' | 'All'
+    ): Promise<ITaskOverview[]> {
+        let statusFilter: string[] = [];
+        if (team) {
+            statusFilter.push(this.teamFilter(team));
+        }
+        if (status) {
+            const s = statusToFilter(status);
+            if (s !== '') {
+                statusFilter.push(s);
+            }
+        }
         return getAllPaged(this.getAllRequest(statusFilter.join(' and ')));
     }
 
@@ -123,7 +126,7 @@ export class TaskService {
         return this.getTaskRequest(id)();
     }
 
-	/*
+    /*
     getMainsRequest(filter: string) {
         return this.list.items
             .filter(filter)
@@ -184,31 +187,31 @@ export class TaskService {
         return subtasks;
     }
 
-	async recalculateSubtasks(parentId: number): Promise<ITaskOverview> {
+    async recalculateSubtasks(parentId: number): Promise<ITaskOverview> {
         let subtasks = await getAllPaged<ITaskOverview[]>(
             this.getSubtasksRequest(parentId)
         );
-		let parent = await this.getTask(parentId);
+        let parent = await this.getTask(parentId);
 
-		const updatePayload: Partial<ITaskOverview> = {};
-		if (parent.Subtasks !== subtasks.length) {
-			updatePayload['Subtasks'] = subtasks.length;
-		}
+        const updatePayload: Partial<ITaskOverview> = {};
+        if (parent.Subtasks !== subtasks.length) {
+            updatePayload['Subtasks'] = subtasks.length;
+        }
 
-		const finished = subtasks.filter(isFinished);
-		if (parent.FinishedSubtasks !== finished.length) {
-			updatePayload['FinishedSubtasks'] = finished.length;
-		}
-		
-		if (Object.keys(updatePayload).length > 0) {
-			await this.updateTask(parent.Id, updatePayload);
-			parent = {
-				...parent,
-				...updatePayload,
-			};
-		}
-		return parent;
-	}
+        const finished = subtasks.filter(isFinished);
+        if (parent.FinishedSubtasks !== finished.length) {
+            updatePayload['FinishedSubtasks'] = finished.length;
+        }
+
+        if (Object.keys(updatePayload).length > 0) {
+            await this.updateTask(parent.Id, updatePayload);
+            parent = {
+                ...parent,
+                ...updatePayload,
+            };
+        }
+        return parent;
+    }
 
     async deleteTaskAndSubtasks(task: ITaskOverview) {
         // All subtasks should be deleted because of this.list field setup (DeleteBehavior Cascade)
@@ -324,16 +327,47 @@ export class TaskService {
         }
     }
 
-	// Notes
-	// ------
-	async getNoteSectionName(id: number) {
-		const q = this.list.items.getById(id);
-		const item: ITaskNoteView = await q.select('Title, NoteSectionName')();
-		if (!item.NoteSectionName) {
-			const NoteSectionName = id.toString() + ' - ' + item.Title;
-			await q.update({ NoteSectionName });
-			return NoteSectionName;
-		}
-		return item.NoteSectionName;
-	}
+    async updateParentTasksTime(
+        id: number,
+        payload: Pick<ITaskOverview, 'EffectiveTime' | 'EstimatedTime'>,
+        previous: ITaskOverview[] = []
+    ): Promise<ITaskOverview[]> {
+        if (previous.find((t) => t.Id === id)) {
+            return previous;
+        }
+        const parent = await this.getTask(id);
+        const update: typeof payload = {
+            EstimatedTime: parent.EstimatedTime,
+            EffectiveTime: parent.EffectiveTime,
+        };
+        if (payload.EffectiveTime) {
+            update.EffectiveTime += payload.EffectiveTime;
+        }
+        if (payload.EstimatedTime) {
+            update.EstimatedTime += payload.EstimatedTime;
+        }
+        await this.updateTask(parent.Id, update);
+        const newPrevious = [{ ...parent, ...update }, ...previous];
+        if (parent.ParentId) {
+            return await this.updateParentTasksTime(
+                parent.ParentId,
+                payload,
+                newPrevious
+            );
+        }
+        return newPrevious;
+    }
+
+    // Notes
+    // ------
+    async getNoteSectionName(id: number) {
+        const q = this.list.items.getById(id);
+        const item: ITaskNoteView = await q.select('Title, NoteSectionName')();
+        if (!item.NoteSectionName) {
+            const NoteSectionName = id.toString() + ' - ' + item.Title;
+            await q.update({ NoteSectionName });
+            return NoteSectionName;
+        }
+        return item.NoteSectionName;
+    }
 }
