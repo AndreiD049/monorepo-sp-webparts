@@ -41,6 +41,10 @@ export const taskServiceProxyOptions: (remote: string) => ICacheProxyOptions<Tas
             isCached: true,
             expiresIn: 8 * HOUR,
         },
+		getTaskTimingInfo: {
+			// isCached: true,
+			expiresIn: MINUTE * 15,
+		},
         addCategory: {
             isCached: false,
             async after(db) {
@@ -51,8 +55,12 @@ export const taskServiceProxyOptions: (remote: string) => ICacheProxyOptions<Tas
             isCached: false,
             async after(db, _, args) {
                 const id = +args[0];
+				const payload = args[1];
                 await removeCached(db, /TaskService\/getAll.*/);
                 await removeCached(db, new RegExp(`TaskService/getTask/${id}`));
+				if (payload.EstimatedTime || payload.EffectiveTime) {
+					await removeCached(db, /TaskService\/getTaskTimingInfo.*/);
+				}
             },
         },
 		deleteTaskAndSubtasks: {

@@ -1,6 +1,7 @@
 import { IconButton } from 'office-ui-fabric-react';
 import * as React from 'react';
 import useWebStorage from 'use-web-storage-api';
+import { assignedChangeHandler } from '../../utils/dom-events';
 import styles from './CommandBar.module.scss';
 
 export enum AssigneeSelected {
@@ -31,15 +32,23 @@ export const CipAssigneeSelector: React.FC<ICipAssigneeSelectorProps> = (props) 
         AssigneeSelected.Single,
         { key: 'sp-cip-assigned-to' }
     );
+	
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    const handleClick = (value: AssigneeSelected) => () => {
+        setSelected(value);
+    };
+
+	React.useEffect(() => {
+		const removeHandler = assignedChangeHandler((val) => {
+			handleClick(val)();
+		});
+		return () => removeHandler();
+	}, []);
 
     React.useEffect(() => {
         props.onAssignedToChange(selected);
     }, [selected]);
 
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    const handleClick = (value: AssigneeSelected) => () => {
-        setSelected(value);
-    };
 
     return (
         <div className={styles['asignee-selector']} data-task-asignee={selected}>

@@ -1,4 +1,5 @@
 import { IReadonlyTheme } from "@microsoft/sp-component-base";
+import { ITaskTimingDict } from "@service/sp-cip/dist/models/ITaskOverview";
 import * as React from "react";
 import { ISiteUserInfo } from "sp-preset";
 import { ICipWebPartProps } from "../CipWebPart";
@@ -9,7 +10,8 @@ export interface IGlobalContext {
     teams: string[];
     users: ISiteUserInfo[];
     selectedTeam: string;
-    currentUser: ISiteUserInfo
+    currentUser: ISiteUserInfo;
+	timingInfo: ITaskTimingDict;
 }
 
 export const GlobalContext = React.createContext<IGlobalContext>({
@@ -19,4 +21,5 @@ export const GlobalContext = React.createContext<IGlobalContext>({
     users: [],
     selectedTeam: 'All',
     currentUser: null,
+	timingInfo: {},
 });

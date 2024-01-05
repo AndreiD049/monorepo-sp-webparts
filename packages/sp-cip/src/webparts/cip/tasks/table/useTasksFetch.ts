@@ -18,14 +18,14 @@ import { GlobalContext } from '../../utils/GlobalContext';
 export const useTasksFetch = (
     statusSelected: StatusSelected,
     assignedTo: AssigneeSelected
-): { tasks: ITaskOverview[] } => {
+): { tasks: ITaskOverview[]; finished: boolean } => {
     const { selectedTeam, currentUser } = React.useContext(GlobalContext);
     const team = React.useMemo(
         () => (selectedTeam !== 'All' ? selectedTeam : null),
         [selectedTeam]
     );
     const [tasks, setTasks] = React.useState<ITaskOverview[]>([]);
-    const [reload, setReload] = React.useState<boolean>(false);
+	const [finished, setFinished] = React.useState<boolean>(false);
     const taskService = MainService.getTaskService();
 
     const getTasks = React.useCallback(async () => {
@@ -46,10 +46,11 @@ export const useTasksFetch = (
             if (!currentUser) return;
             loadingStart('default');
             setTasks(await getTasks());
+			setFinished(true);
             loadingStop('default');
         }
         run().catch((err) => console.error(err));
-    }, [statusSelected, assignedTo, team, currentUser, reload]);
+    }, [statusSelected, assignedTo, team, currentUser]);
 
     // Dom events
     React.useEffect(() => {
@@ -86,7 +87,7 @@ export const useTasksFetch = (
         });
 
         const removeTaskDeleted = taskDeletedHandler(async (taskId: number) => {
-            setTasks((prev) => prev.filter((x) => x.Id !== taskId));
+            setTasks((prev) => prev.filter((x) => x.MainTaskId !== taskId && x.Id !== taskId));
         });
 
         return () => {
@@ -98,5 +99,6 @@ export const useTasksFetch = (
 
     return {
         tasks,
+		finished
     };
 };

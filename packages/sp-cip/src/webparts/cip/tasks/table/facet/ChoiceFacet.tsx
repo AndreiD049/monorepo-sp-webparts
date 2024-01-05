@@ -21,11 +21,6 @@ export interface IChoiceFacetProps {
 	filters: ICipFilters;
 }
 
-interface IFacetOption {
-    label: string;
-    items: ITaskOverview[];
-}
-
 export const ChoiceFacet: React.FC<IChoiceFacetProps> = (props) => {
     const searchRef = React.useRef(null);
     React.useEffect(() => {

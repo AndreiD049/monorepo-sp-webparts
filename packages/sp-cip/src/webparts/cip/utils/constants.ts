@@ -32,6 +32,7 @@ export const TIMER_RIGHT_POSITION = 'sp-cip-timer-right-pos';
 export const TIMERS_KEY = (root: string): string =>
     `${root}/cip-timers/${VERSION}`;
 export const FILTERS_ASSIGNED = 'sp-cip-filter-assigned-to';
+export const ASSIGNED_CHANGE_EVT = 'sp-cip-assigned-change-event';
 
 export const DB_NAME = 'SPFx_CIP_' + location.pathname;
 export const STORE_NAME = location.origin + location.pathname + `/${VERSION}`;

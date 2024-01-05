@@ -122,11 +122,16 @@ export interface ITimingProps {
 
 const Timing: React.FC<ITimingProps> = (props) => {
     const { isTaskFinished } = React.useContext(TaskNodeContext);
+	const { timingInfo } = React.useContext(GlobalContext);
     const task = props.node.getTask();
     const elemRef = React.useRef(null);
+	
+	// Get the timing info of subtasks
+	const additionalTimingEst = timingInfo[task.Id]?.EstimatedTime || 0;
+	const additionalTimingEff = timingInfo[task.Id]?.EffectiveTime || 0;
 
     const handleClick = React.useCallback(
-        (evt) => {
+        () => {
             calloutVisibility({
                 target: elemRef,
                 visible: true,
@@ -144,9 +149,9 @@ const Timing: React.FC<ITimingProps> = (props) => {
             ref={elemRef}
             onClick={handleClick}
         >
-            <div>Estimated: {formatHours(task.EstimatedTime)} hour(s)</div>
+            <div>Estimated: {formatHours(task.EstimatedTime + additionalTimingEst)} hour(s)</div>
             <div style={{ fontWeight: 'bold' }}>
-                Effective: {formatHours(task.EffectiveTime)} hour(s)
+                Effective: {formatHours(task.EffectiveTime + additionalTimingEff)} hour(s)
             </div>
         </button>
     );

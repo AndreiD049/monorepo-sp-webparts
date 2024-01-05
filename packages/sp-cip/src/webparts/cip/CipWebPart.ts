@@ -59,6 +59,9 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                 .withAdditionalTimelines([
                     InjectHeaders({
                         UserAgent: `NONISV|Katoen Natie|Cip/${this.dataVersion.toString()}`,
+						// Do not uncomment below; metadata is required by
+						// pnp-js to properly work with attachments and files
+						// Accept: 'application/json;odata=minimal',
                     }),
                 ]);
 
@@ -168,7 +171,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                                             './utils/setup-lists'
                                         );
                                         const sp =
-                                            await CipWebPart.SPBuilder.getSP(
+                                            CipWebPart.SPBuilder.getSP(
                                                 'Data'
                                             );
                                         await setup.default(

@@ -51,6 +51,21 @@ export interface ITaskOverview {
 }
 
 export interface ITaskNoteView {
-	Title: string;
-	NoteSectionName: string;
+    Title: string;
+    NoteSectionName: string;
 }
+
+export interface ITaskTimingView {
+    Id: number;
+    ParentId: number;
+    EstimatedTime: number; // number of hours
+    EffectiveTime: number; // number of hours
+}
+
+export type ITaskTimingDict = {
+    [parentId: number]: {
+		Ids: number[];
+        EstimatedTime: number;
+        EffectiveTime: number;
+    };
+};

@@ -1,7 +1,8 @@
-import { IFile, IFileInfo, SPFI } from "sp-preset";
+import { IFileInfo, SPFI } from "sp-preset";
 import { IServiceProps } from "../models/IServiceProps";
 
 const TEMPLATE = 'Template.one';
+const UNTITLED = 'Untitled Section.one';
 
 export class NoteService {
 	private sp: SPFI;
@@ -32,35 +33,42 @@ export class NoteService {
 	public async getSection(title: string): Promise<IFileInfo | null> {
 		const hasNotes = await this.hasNotes(title);
 		if (!hasNotes) {
-			await this.createSection(title);
+			const created = await this.createSection(title);
+			console.log(created);
 		}
 		return this.sp.web.getFileByServerRelativePath(this.getSectionPath(title + '.one'))();
 	}
 
 	private async createSection(title: string): Promise<string | null> {
-		const hasTemplate = await this.hasTemplate();
-		if (!hasTemplate) {
+		const templatePath = await this.getTemplate();
+		if (!templatePath) {
+			console.error('createSection: No template found. Returning null');
 			return null;
 		}
 		try {
-			const template = this.sp.web.getFileByServerRelativePath(this.getSectionPath(TEMPLATE));
+			const template = this.sp.web.getFileByServerRelativePath(templatePath);
 			const destPath = this.getSectionPath(title + '.one');
 			await template.copyByPath(destPath, false);
 			return destPath;
-		} catch {
+		} catch (err) {
+			console.error(err);
 			return null;
 		}
 	}
 
-	private async hasTemplate(): Promise<boolean> {
+	private async getTemplate(): Promise<string | null> {
 		try {
 			await this.sp.web.getFileByServerRelativePath(this.getSectionPath(TEMPLATE))();
-			return true;
+			return this.getSectionPath(TEMPLATE);
 		} catch {
-			console.error('Template not found');
-			const folder = await this.sp.web.getFolderByServerRelativePath(this.notesRoot).expand('Files')();
-			console.error('Folder', folder);
-			return false;
+			console.error(`Template '${TEMPLATE}' not found`);
 		}
+		try {
+			await this.sp.web.getFileByServerRelativePath(this.getSectionPath(UNTITLED))();
+			return this.getSectionPath(UNTITLED);
+		} catch {
+			console.error(`Template '${UNTITLED}' not found`);
+		}
+		return null;
 	}
 }

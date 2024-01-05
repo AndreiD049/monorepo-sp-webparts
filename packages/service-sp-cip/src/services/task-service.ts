@@ -6,6 +6,8 @@ import {
 	ITaskNoteView,
     LIST_EXPAND,
     LIST_SELECT,
+    ITaskTimingView,
+    ITaskTimingDict,
 } from '../models/ITaskOverview';
 import { getAllPaged, isFinished, statusToFilter } from '../utils';
 
@@ -324,8 +326,52 @@ export class TaskService {
         }
     }
 
+
+	// Task timings
+	// ------------
+	async getTaskTimingInfo(): Promise<ITaskTimingDict> {
+		const q = this.list.items;
+		const tasks: ITaskTimingView[] = await getAllPaged(q.filter('ParentId ne null').select('Id', 'ParentId', 'EstimatedTime', 'EffectiveTime'));
+		const result: ITaskTimingDict = {};
+		
+		// Pass 1: Calculate totals of direct children
+		tasks.forEach(t => {
+			if (!result[t.ParentId]) {
+				result[t.ParentId] = {
+					Ids: [],
+					EstimatedTime: 0,
+					EffectiveTime: 0,
+				};
+			}
+			result[t.ParentId].EstimatedTime += t.EstimatedTime;
+			result[t.ParentId].EffectiveTime += t.EffectiveTime;
+			result[t.ParentId].Ids.push(t.Id);
+		});
+
+		// Pass 2: Add totals of subtasks
+		for (const id in result) {
+			const total = {
+				EstimatedTime: 0,
+				EffectiveTime: 0,
+			};
+			const parent = result[id];
+			const idStack = [...parent.Ids];
+			while (idStack.length > 0) {
+				const childId = idStack.pop();
+				if (childId && result[childId]) {
+					idStack.push(...result[childId].Ids);
+					total.EstimatedTime += result[childId].EstimatedTime;
+					total.EffectiveTime += result[childId].EffectiveTime;
+				}
+			}
+			parent.EstimatedTime += total.EstimatedTime;
+			parent.EffectiveTime += total.EffectiveTime;
+		}
+		return result;
+	}
+
 	// Notes
-	// ------
+	// ------------
 	async getNoteSectionName(id: number) {
 		const q = this.list.items.getById(id);
 		const item: ITaskNoteView = await q.select('Title, NoteSectionName')();

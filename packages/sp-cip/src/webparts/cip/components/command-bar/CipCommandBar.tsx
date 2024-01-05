@@ -18,6 +18,7 @@ import { showDialog } from 'sp-components';
 import { TimeLog } from '../TimeLog';
 
 interface ICipCommandBarProps {
+	search: string;
     onSearch: (val: string) => void;
     onTeamSelect: (team: string) => void;
     onStatusSelectedChange: (newStatus: StatusSelected) => void;
@@ -150,6 +151,7 @@ const CipCommandBar: React.FC<ICipCommandBarProps> = (props) => {
                                 onChange={handleSearch}
                                 id="sp-cip-quick-search"
                                 placeholder="Quick search..."
+								value={props.search}
                             />
                         ),
                     },

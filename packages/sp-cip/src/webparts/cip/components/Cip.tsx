@@ -27,23 +27,27 @@ const Cip: React.FC<ICipProps> = (props) => {
         teams: [],
         users: [],
         currentUser: null,
+		timingInfo: {},
     });
     const [selectedTeam, setSelectedTeam] = useWebStorage('All', {
         key: location.origin + SELECTED_TEAM_KEY,
     });
 
     const userService = MainService.getUserService();
+    const taskService = MainService.getTaskService();
 
     React.useEffect(() => {
         async function run(): Promise<void> {
             const teams = await userService.getTeams();
             const currentUser = await userService.getCurrentUser();
             const users = await userService.getAll();
+			const timingInfo = await taskService.getTaskTimingInfo();
             setInfo((prev) => ({
                 ...prev,
                 teams,
                 users,
                 currentUser,
+				timingInfo,
             }));
         }
         run().catch((err) => console.error(err));
@@ -58,6 +62,7 @@ const Cip: React.FC<ICipProps> = (props) => {
                 users: info.users,
                 selectedTeam: selectedTeam,
                 currentUser: info.currentUser,
+				timingInfo: info.timingInfo,
             }}
         >
             <HashRouter>

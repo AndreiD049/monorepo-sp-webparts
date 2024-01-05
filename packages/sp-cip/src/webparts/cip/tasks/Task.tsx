@@ -2,7 +2,7 @@ import { IDetailsRowProps } from 'office-ui-fabric-react';
 import * as React from 'react';
 import styles from './Task.module.scss';
 import { TaskNode } from './graph/TaskNode';
-import { nodeToggleOpenHandler, relinkParent, subtasksAddedHandler, subtasksDeletedHandler, subtasksUpdatedHandler, taskDeletedHandler, taskUpdatedHandler } from '../utils/dom-events';
+import { nodeToggleOpenHandler, relinkParent, subtasksAddedHandler, subtasksDeletedHandler, subtasksUpdatedHandler } from '../utils/dom-events';
 import SubtasksProxy from './SubtasksProxy';
 import { RenderCell } from './cells/render-cells';
 import { TaskNodeContext } from './TaskNodeContext';

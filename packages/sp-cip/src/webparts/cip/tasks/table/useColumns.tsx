@@ -2,7 +2,6 @@ import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { ColumnActionsMode, IColumn } from 'office-ui-fabric-react';
 import * as React from 'react';
 import { calloutVisibility } from '../../utils/dom-events';
-import { TaskNode } from '../graph/TaskNode';
 import { ChoiceFacet, IChoiceFacetProps } from './facet/ChoiceFacet';
 import { ICipFilters, IFilterAction } from './sort-filter/filters-reducer';
 import { ISortedColumn, SortDirection } from './sort-filter/sorting';

@@ -19,7 +19,9 @@ import {
     SUBTASK_ADDED_EVT,
     SUBTASK_UPDATED_EVT,
     SUBTASK_DELETED_EVT,
+    ASSIGNED_CHANGE_EVT,
 } from './constants';
+import { AssigneeSelected } from '../components/command-bar/CipAssigneeSelector';
 
 /**
  *  Open/Close toggle
@@ -379,3 +381,23 @@ export const timerAddHandler = (func: (options: ITimerAddEventOptions) => void):
     document.addEventListener(TIMER_ADD_EVT, handler);
     return () => document.removeEventListener(TIMER_ADD_EVT, handler);
 };
+
+/**
+ *  Assigned change
+ */
+export const assignedChange = (value: AssigneeSelected): void => {
+    document.dispatchEvent(
+        new CustomEvent<AssigneeSelected>(ASSIGNED_CHANGE_EVT, {
+            detail: value,
+        })
+    );
+}
+
+export const assignedChangeHandler = (func: (options: AssigneeSelected) => void): () => void => {
+    const handler = (evt: CustomEvent): void => {
+		func(evt.detail);
+    };
+    document.addEventListener(ASSIGNED_CHANGE_EVT, handler);
+    return () => document.removeEventListener(ASSIGNED_CHANGE_EVT, handler);
+};
+

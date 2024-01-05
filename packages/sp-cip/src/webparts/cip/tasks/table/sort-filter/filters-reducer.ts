@@ -33,6 +33,8 @@ export const filtersReducer = (state: ICipFilters, action: IFilterAction): ICipF
         case 'ASSIGNED':
             return {
                 ...state,
+				search: '',
+				facetFilters: {},
                 assignedTo: action.value as AssigneeSelected,
             };
         case 'FACET':
