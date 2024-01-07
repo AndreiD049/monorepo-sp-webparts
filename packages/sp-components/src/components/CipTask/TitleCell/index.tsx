@@ -1,4 +1,4 @@
-import { Icon, Text } from 'office-ui-fabric-react';
+import { Icon, Text } from '@fluentui/react';
 import * as React from 'react';
 import { Pill } from '../../Pill';
 import { CheckExpandButton } from '../CheckExpandButton';

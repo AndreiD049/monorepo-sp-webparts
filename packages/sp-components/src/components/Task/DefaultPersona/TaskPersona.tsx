@@ -1,4 +1,4 @@
-import { Persona, PersonaSize } from 'office-ui-fabric-react';
+import { Persona, PersonaSize } from '@fluentui/react';
 import * as React from 'react';
 import styles from './TaskPersona.module.scss';
 

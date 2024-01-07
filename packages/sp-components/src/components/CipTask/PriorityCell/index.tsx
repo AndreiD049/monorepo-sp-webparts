@@ -3,7 +3,7 @@ import { Pill } from '../../Pill';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import styles from './PriorityCell.module.scss';
 import { Callout, hideCallout, showCallout } from '../../Callout';
-import { DirectionalHint } from 'office-ui-fabric-react';
+import { DirectionalHint } from '@fluentui/react';
 
 const CALLOUT_ID = 'sp-components-priority';
 

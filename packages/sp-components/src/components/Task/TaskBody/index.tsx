@@ -1,4 +1,4 @@
-import { Text } from 'office-ui-fabric-react';
+import { Text } from '@fluentui/react';
 import * as React from 'react';
 import { CopyOnClickText } from '../../CopyOnClickText';
 import styles from './TaskBody.module.scss';

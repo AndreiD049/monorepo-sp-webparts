@@ -2,7 +2,7 @@ import { Editor } from '@tiptap/react';
 import styles from './MentionList.module.scss';
 import * as React from 'react';
 import { ISiteUserInfo } from 'sp-preset';
-import { Persona, PersonaSize } from 'office-ui-fabric-react';
+import { Persona, PersonaSize } from '@fluentui/react';
 
 export interface IMentionListProps {
     items: ISiteUserInfo[];

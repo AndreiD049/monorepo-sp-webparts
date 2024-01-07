@@ -1,4 +1,4 @@
-import { Icon, Text, Dropdown, IconButton, IDropdownOption } from 'office-ui-fabric-react';
+import { Icon, Text, Dropdown, IconButton, IDropdownOption } from '@fluentui/react';
 import styles from './Task.module.scss';
 import colors from './Colors.module.scss';
 import { IUser } from '../../models';
