@@ -26,6 +26,7 @@
     }
   },
   "localizedResources": {
-    "CipWebPartStrings": "lib/webparts/cip/loc/{locale}.js"
+    "CipWebPartStrings": "lib/webparts/cip/loc/{locale}.js",
+	"PropertyControlStrings": "node_modules/@pnp/spfx-property-controls/lib/loc/{locale}.js"
   }
 }

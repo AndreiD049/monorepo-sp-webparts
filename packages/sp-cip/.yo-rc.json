@@ -3,11 +3,11 @@
     "nodeVersion": "14.18.3",
     "sdkVersions": {
       "@microsoft/microsoft-graph-client": "3.0.2",
-      "@microsoft/teams-js": "2.4.1"
+      "@microsoft/teams-js": "2.12.0"
     },
     "plusBeta": false,
     "isCreatingSolution": true,
-    "version": "1.16.1",
+    "version": "1.18.2",
     "libraryName": "sp-cip",
     "libraryId": "891d1fa3-3c22-4fce-ae0a-2268c0616094",
     "environment": "spo",
