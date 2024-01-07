@@ -6,7 +6,7 @@ import {
     DayOfWeek,
     Panel,
     PanelType,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DAY, DIALOG_ID_ACTIONLOG_PANEL, SELECTED_USERS_KEY } from '../../utils/constants';

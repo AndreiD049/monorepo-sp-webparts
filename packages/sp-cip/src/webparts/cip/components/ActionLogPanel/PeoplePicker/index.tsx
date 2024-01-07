@@ -1,4 +1,4 @@
-import { CompactPeoplePicker, IPersonaProps, Label, Stack } from 'office-ui-fabric-react';
+import { CompactPeoplePicker, IPersonaProps, Label, Stack } from '@fluentui/react';
 import * as React from 'react';
 import MainService from '../../../services/main-service';
 

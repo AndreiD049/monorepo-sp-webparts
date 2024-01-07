@@ -5,7 +5,7 @@ import {
     IconButton,
     PrimaryButton,
     Text,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { Draggable } from '@rast999/drag-and-drop';
 import { GlobalContext } from '../../../utils/GlobalContext';
@@ -16,7 +16,7 @@ import styles from './AttachmentFile.module.scss';
 import { taskUpdated } from '../../../utils/dom-events';
 import { hideDialog, showDialog } from 'sp-components';
 import { DIALOG_ID_PANEL } from '../../../utils/constants';
-import { Stack } from 'office-ui-fabric-react/lib/Stack';
+import { Stack } from '@fluentui/react/lib/Stack';
 import { getFileTypeIconProps } from '@fluentui/react-file-type-icons';
 
 export interface IAttachmentFileProps {

@@ -1,4 +1,4 @@
-import { IPersonaProps, PersonaSize } from 'office-ui-fabric-react';
+import { IPersonaProps, PersonaSize } from '@fluentui/react';
 import { IList, ISiteUserInfo, SPFI } from 'sp-preset';
 import CipWebPart, { ICipWebPartProps } from '../CipWebPart';
 

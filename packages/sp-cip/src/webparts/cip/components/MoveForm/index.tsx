@@ -3,7 +3,7 @@ import {
     ComboBox,
     IComboBoxOption,
     PrimaryButton,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { hideDialog, TaskPicker } from 'sp-components';
 import MainService from '../../services/main-service';

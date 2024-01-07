@@ -1,4 +1,4 @@
-import { IconButton } from 'office-ui-fabric-react';
+import { IconButton } from '@fluentui/react';
 import * as React from 'react';
 import useWebStorage from 'use-web-storage-api';
 import { assignedChangeHandler } from '../../utils/dom-events';

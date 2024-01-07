@@ -7,7 +7,7 @@ import {
     Sticky,
     StickyPositionType,
     Text,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import CipCommandBar from '../../components/command-bar/CipCommandBar';
 import { useCallout } from '../../components/useCallout';
@@ -113,7 +113,6 @@ const TasksTable: React.FC<ITasksTableProps> = (props) => {
     return (
         <>
             <CipCommandBar
-				search={filters.search}
                 onSearch={(val) => dispatch({ type: 'SEARCH', value: val })}
                 onTeamSelect={props.onTeamSelect}
                 onStatusSelectedChange={(val) =>

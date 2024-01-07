@@ -1,5 +1,5 @@
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { IconButton, TextField } from 'office-ui-fabric-react';
+import { IconButton, TextField } from '@fluentui/react';
 import * as React from 'react';
 import styles from './NewFolder.module.scss';
 

@@ -1,4 +1,4 @@
-import { ActionButton, Slider, StackItem, Text } from 'office-ui-fabric-react';
+import { ActionButton, Slider, StackItem, Text } from '@fluentui/react';
 import * as React from 'react';
 import {
     loadingStart,

@@ -9,7 +9,7 @@ import {
     IPositionStyles,
 } from '@rast999/react-movable';
 import { NoData } from './NoData';
-import { IconButton, Text } from 'office-ui-fabric-react';
+import { IconButton, Text } from '@fluentui/react';
 import styles from './Timer.module.scss';
 
 export interface ITimerProps<T> {
@@ -159,7 +159,7 @@ export const Timer = <T,>(props: React.PropsWithChildren<ITimerProps<T>>): JSX.E
             <div className={`${styles.timer} ${styles.timerBox}`}>
                 <MoveHandle className={styles.timerHeaderMoveHandle}>
                     <div className={styles.timerHeader}>
-                        <Text variant="medium">Timers</Text>
+                        <Text variant="medium" className={styles.timerHeaderText}>Timers</Text>
                         <div>
                             <IconButton
                                 iconProps={{

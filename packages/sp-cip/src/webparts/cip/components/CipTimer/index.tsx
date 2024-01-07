@@ -17,7 +17,7 @@ import useWebStorage from 'use-web-storage-api';
 import MainService from '../../services/main-service';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
-import { DefaultButton, PrimaryButton, Stack } from 'office-ui-fabric-react';
+import { DefaultButton, PrimaryButton, Stack } from '@fluentui/react';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { hideDialog, showDialog } from 'sp-components';
 import { TimeLog } from '../TimeLog';

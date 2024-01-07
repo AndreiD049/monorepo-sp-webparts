@@ -6,7 +6,7 @@ import {
     IconButton,
     Persona,
     PersonaSize,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import styles from './ActionLogTable.module.scss';
 import { getActionIconName } from '../../../actionlog/ActionLogItem';
 import { GlobalContext } from '../../../utils/GlobalContext';

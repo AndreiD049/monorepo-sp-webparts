@@ -6,7 +6,7 @@ import {
     PrimaryButton,
     Stack,
     Text,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { useNavigate } from 'react-router';
 import { hideDialog, showDialog } from 'sp-components';

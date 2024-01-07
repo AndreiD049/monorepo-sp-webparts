@@ -1,5 +1,5 @@
 import { ActionType } from '@service/sp-cip/dist/services/action-service';
-import { Dropdown, IDropdownOption, SelectableOptionMenuItemType } from 'office-ui-fabric-react';
+import { Dropdown, IDropdownOption, SelectableOptionMenuItemType } from '@fluentui/react';
 import * as React from 'react';
 import { ActionDropdownOption } from '..';
 import styles from '../ActionLogPanel.module.scss';

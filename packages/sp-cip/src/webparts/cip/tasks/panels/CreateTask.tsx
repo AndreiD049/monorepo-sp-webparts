@@ -14,7 +14,7 @@ import {
     Stack,
     StackItem,
     TextField,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { HoursInput } from '../../components/HoursInput';

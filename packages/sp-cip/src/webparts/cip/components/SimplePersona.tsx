@@ -3,7 +3,7 @@ import {
     Persona,
     PersonaSize,
     IPersonaProps,
-} from 'office-ui-fabric-react/lib/Persona';
+} from '@fluentui/react/lib/Persona';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 
 export interface ISimplePersonaProps {

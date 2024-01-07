@@ -1,4 +1,4 @@
-import { Text } from 'office-ui-fabric-react';
+import { Text } from '@fluentui/react';
 import * as React from 'react';
 import { GlobalContext } from '../utils/GlobalContext';
 import TasksTable from '../tasks/table/TasksTable';

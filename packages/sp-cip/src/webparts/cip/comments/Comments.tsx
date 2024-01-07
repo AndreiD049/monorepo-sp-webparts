@@ -1,7 +1,7 @@
 import {
     ActionButton,
     Separator,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import { IComment } from 'sp-components/dist/editor';
 import * as React from 'react';
 import { Comment } from './Comment';

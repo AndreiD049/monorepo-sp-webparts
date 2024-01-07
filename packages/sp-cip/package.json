@@ -10,7 +10,7 @@
     "build": "gulp bundle --ship && gulp package-solution --ship",
     "clean": "gulp clean",
     "test": "jest",
-    "serve": "gulp bundle --custom-serve --max_old_space_size=4096 && fast-serve"
+    "serve": "fast-serve"
   },
   "dependencies": {
     "@fluentui/react": "8.106.4",

@@ -1,7 +1,7 @@
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import MainService from '../services/main-service';
 import { SPnotify } from 'sp-react-notifications';
-import { MessageBarType } from "office-ui-fabric-react";
+import { MessageBarType } from "@fluentui/react";
 
 export async function finishTask(task: ITaskOverview, currentUserId: number, status: string = 'Finished'): Promise<ITaskOverview> {
     /* user should first register some time */

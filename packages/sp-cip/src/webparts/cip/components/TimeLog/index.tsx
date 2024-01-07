@@ -1,6 +1,3 @@
-import {
-    IPersonaProps,
-} from 'office-ui-fabric-react';
 import * as React from 'react';
 import { actionUpdated } from '../../actionlog/ActionLog';
 import { taskUpdated } from '../../utils/dom-events';
@@ -10,9 +7,10 @@ import { IAction } from '@service/sp-cip/dist/services/action-service';
 import { GlobalContext } from '../../utils/GlobalContext';
 import {
     hideDialog,
-    TimeLogGeneral,
+    TimeLogGeneral
 } from 'sp-components';
 import { loadingStart, loadingStop } from '../utils/LoadingAnimation';
+import { IPersonaProps } from '@fluentui/react';
 
 export interface ITimeLogGeneralProps {
     dialogId: string;

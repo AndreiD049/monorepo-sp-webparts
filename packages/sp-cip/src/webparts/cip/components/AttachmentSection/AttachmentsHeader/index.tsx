@@ -1,6 +1,6 @@
 import { debounce } from '@microsoft/sp-lodash-subset';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { ActionButton, SearchBox } from 'office-ui-fabric-react';
+import { ActionButton, SearchBox } from '@fluentui/react';
 import * as React from 'react';
 import MainService from '../../../services/main-service';
 import styles from './AttachmentsHeader.module.scss';

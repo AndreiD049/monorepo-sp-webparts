@@ -2,7 +2,7 @@ import {
     IDetailsRowProps,
     Shimmer,
     ShimmerElementType,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { TaskNode } from './graph/TaskNode';
 import styles from './Task.module.scss';

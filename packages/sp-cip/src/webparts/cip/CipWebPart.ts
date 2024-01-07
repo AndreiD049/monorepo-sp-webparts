@@ -15,7 +15,7 @@ import Cip from './components/Cip';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { initNotifications, SPnotify } from 'sp-react-notifications';
 import { ListUtilsService } from './services/list-utils';
-import { MessageBarType } from 'office-ui-fabric-react';
+import { MessageBarType } from '@fluentui/react';
 import MainService from './services/main-service';
 import { initializeFileTypeIcons } from '@fluentui/react-file-type-icons';
 import { openDatabase, removeExpired } from 'idb-proxy';
@@ -135,11 +135,11 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
         return Version.parse('1.0');
     }
 
-	protected onAfterDeserialize(deserializedObject: any, dataVersion: Version): ICipWebPartProps { 
+	protected onAfterDeserialize(deserializedObject: ICipWebPartProps, dataVersion: Version): ICipWebPartProps { 
 		try {
 			deserializedObject.config = JSON.parse(deserializedObject.strConfig);
 		} catch {
-			deserializedObject.config = {};
+			deserializedObject.config = null
 		}
 		return deserializedObject;
 	}
