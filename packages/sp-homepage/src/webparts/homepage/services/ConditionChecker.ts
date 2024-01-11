@@ -78,7 +78,7 @@ export class ConditionChecker {
             return this.compareLists(configValue, userValue);
         } else if (typeof configValue === 'string' && typeof userValue === 'string') {
             return this.compareString(configValue, userValue);
-        } else if (userValue === null) {
+        } else if (userValue === null || userValue === undefined) {
             return typeof configValue === 'string' ? this.compareString(configValue, 'null') : this.compareLists(configValue, ['null']);
         } else {
             this.error(

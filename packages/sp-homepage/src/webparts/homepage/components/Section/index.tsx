@@ -22,6 +22,7 @@ const SectionHeader: React.FC<{
             controls.push(
                 <IconButton
                     onClick={() => dispatchSectionHandler(section.name, 'REFRESH')}
+                    className={styles.openNewTabButton}
                     iconProps={{ iconName: 'Refresh' }}
                 />
             );

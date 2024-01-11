@@ -31,7 +31,7 @@ export const useLayout = (
             Other: config.defaultLayouts,
         },
         {
-            key: config.layoutsLocalStorageKey,
+            key: `${location.host}${location.pathname}/${config.layoutsLocalStorageKey}`,
         }
     );
 

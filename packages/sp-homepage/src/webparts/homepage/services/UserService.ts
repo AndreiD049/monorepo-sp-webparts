@@ -31,7 +31,7 @@ export default class UserService {
 
         // Cache for an hour
         this.db = new IndexedDbCache('Homepage_Cache', location.host + location.pathname, {
-            expiresIn: MINUTE * 60,
+            expiresIn: MINUTE * 10,
         });
         this.cache = {
             userByTeam: (team: string) => this.db.key(`getCustomUsersByTeam${team}`),
@@ -78,7 +78,7 @@ export default class UserService {
      * @param id
      * @returns
      */
-    private static async getCustomUser(id: number): Promise<IUserCustom | null> {
+    static async getCustomUser(id: number): Promise<IUserCustom | undefined> {
         const list = this.rootSp.web.lists.getByTitle(this.config.users?.listName);
         const users = await this.cache
             .customUser(id)
@@ -86,7 +86,8 @@ export default class UserService {
                 async () =>
                     await list.items
                         .filter(`UserId eq ${id}`)
-                        .select('Role', this.config.users?.teamsColumn)()
+                        .select('User/Id', 'User/Title', 'Role', this.config.users?.teamsColumn)
+						.expand('User')()
             );
         const result: IUserCustom = users[0] || null;
         if (result) {

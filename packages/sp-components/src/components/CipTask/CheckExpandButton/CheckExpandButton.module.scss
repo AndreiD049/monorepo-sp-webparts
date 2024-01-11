@@ -18,6 +18,7 @@ $buttonSide: 30px;
     transition: background-color .2s ease-out;
     font-size: 1.2em;
     position: relative;
+	padding: 0;
 
     &:hover {
         background-color: $ms-color-neutralTertiary;
@@ -49,6 +50,7 @@ $buttonSide: 30px;
 }
 
 .subtaskCounter {
+	color: "[theme: themePrimary, default: #0078d4]";
     line-height: $buttonSide;
     display: flex;
     flex-flow: row nowrap;
@@ -57,4 +59,8 @@ $buttonSide: 30px;
 
 .subtaskCounterDelimiter {
     margin: 0 2px;
+}
+
+.circle {
+	stroke: var(--link);
 }

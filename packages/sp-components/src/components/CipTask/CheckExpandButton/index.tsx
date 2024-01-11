@@ -3,12 +3,44 @@ import * as React from 'react';
 import styles from './CheckExpandButton.module.scss';
 
 const SubtaskCounter: React.FC<{ subtasks: number, finishedSubtasks: number }> = ({ subtasks, finishedSubtasks }) => {
+    const radius = 47;
+    const circumference = 2 * Math.PI * radius;
+    const progress = finishedSubtasks / subtasks;
+    const strokeDashoffset = circumference * (1 - progress);
+
     return (
-        <div className={styles.subtaskCounter}>
-            <span>{finishedSubtasks}</span>
-            <span className={styles.subtaskCounterDelimiter}>|</span>
-            <span>{subtasks}</span>
-        </div>
+        <svg viewBox="0 0 100 100" height="100%" style={{ overflow: 'visible' }}>
+            <circle
+                cx="50"
+                cy="50"
+                r={radius}
+                fill="none"
+                stroke="#ddd"
+                strokeWidth="10"
+                transform="rotate(-90 50 50)"
+            />
+            <circle
+                cx="50"
+                cy="50"
+                r={radius}
+                fill="none"
+				className={styles.circle}
+                strokeWidth="10"
+                strokeDasharray={`${circumference} ${circumference}`}
+                strokeDashoffset={strokeDashoffset}
+                transform="rotate(-90 50 50)"
+            />
+            <text
+                x="50"
+                y="50"
+                textAnchor="middle"
+                dominantBaseline="central"
+                fontWeight="bold"
+                fontSize="2em"
+            >
+                {`${finishedSubtasks}/${subtasks}`}
+            </text>
+        </svg>
     );
 };
 

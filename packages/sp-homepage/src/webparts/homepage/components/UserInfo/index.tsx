@@ -21,16 +21,25 @@ export const UserInfo: React.FC<IUserInfoProps> = (props) => {
                     size={PersonaSize.size120}
                     text={context.selectedUser.Title}
                     secondaryText={context.selectedUser.Email}
-                    onRenderSecondaryText={(props, defaultRender) => (<a href={`mailto:${context.selectedUser.Email}`}>{defaultRender()}</a>)}
+                    onRenderSecondaryText={(props, defaultRender) => (
+                        <a href={`mailto:${context.selectedUser.Email}`}>{defaultRender()}</a>
+                    )}
                     onRenderTertiaryText={() => {
+                        if (!context.selectedUser) {
+                            return null;
+                        }
                         return (
                             <div>
-                                <Text block variant="medium">
-                                    {context.selectedUser.role}
-                                </Text>
-                                <Text block variant="medium">
-                                    {context.selectedUser.teams.join(', ')}
-                                </Text>
+                                {context.selectedUser.role && (
+                                    <Text block variant="medium">
+                                        {context.selectedUser.role}
+                                    </Text>
+                                )}
+                                {context.selectedUser.teams && (
+                                    <Text block variant="medium">
+                                        {context.selectedUser.teams.join(', ')}
+                                    </Text>
+                                )}
                             </div>
                         );
                     }}

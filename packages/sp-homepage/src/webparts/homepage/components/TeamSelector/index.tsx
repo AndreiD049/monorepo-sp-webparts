@@ -10,7 +10,7 @@ export interface ITeamSelectorProps {
 export const TeamSelector: React.FC<ITeamSelectorProps> = (props) => {
     const dropdownRef = React.useRef<IDropdown>(null);
     const options: IDropdownOption[] = React.useMemo(() => {
-        return props.teams.map((team) => ({
+        return props.teams?.map((team) => ({
             key: team,
             text: team,
         }));
@@ -39,7 +39,7 @@ export const TeamSelector: React.FC<ITeamSelectorProps> = (props) => {
             <Dropdown
                 componentRef={dropdownRef}
                 id="sp-homepage-team-selector"
-                disabled={props.teams.length < 1}
+                disabled={props.teams?.length < 1}
                 options={options}
                 selectedKey={props.selectedTeam}
                 onChange={(_ev, option) => {

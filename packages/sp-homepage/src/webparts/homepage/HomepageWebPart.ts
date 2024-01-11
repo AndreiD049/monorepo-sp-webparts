@@ -14,7 +14,7 @@ import IConfig from './models/IConfig';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
 import { getTheme } from 'office-ui-fabric-react';
 import PropertyPaneAccessControl, { IUserGroupPermissions, setupAccessControl } from 'property-pane-access-control';
-import { SEE_ALL_TEAMS } from './constants';
+import { SEE_ALL_TEAMS, SEE_THEIR_TEAM_MEMBERS } from './constants';
 
 export interface IHomepageWebPartProps {
     config: IJsonConfig<IConfig>;
@@ -110,7 +110,7 @@ export default class HomepageWebPart extends BaseClientSideWebPart<IHomepageWebP
                                 PropertyPaneAccessControl('permissions', {
                                     key: 'access',
                                     context: this.context,
-                                    permissions: [SEE_ALL_TEAMS],
+                                    permissions: [SEE_ALL_TEAMS, SEE_THEIR_TEAM_MEMBERS],
                                     selectedUserGroups: this.properties.permissions,
                                 }),
                             ],

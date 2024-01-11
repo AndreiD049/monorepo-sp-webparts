@@ -2,7 +2,7 @@
 
 .container {
     border: 1px solid;
-    border-color: '[theme: themeLighter, default: #eaeaea]';
+    border-color: '[theme: themePrimary, default: #eaeaea]';
     overflow: hidden;
     background-color: '[theme: white, default: #000000]';
 
@@ -38,7 +38,7 @@
 }
 
 .header {
-    background-color: '[theme: themeLighter, default: #eaeaea]';
+    background-color: '[theme: themePrimary, default: #eaeaea]';
     color: '[theme: white, default: #eaeaea]';
     padding: 0.2em 0;
     height: 32px;
@@ -52,6 +52,11 @@
     }
 
     .openNewTabButton {
+		color: '[theme: white, default: #eaeaea]';
         min-height: 1px;
+
+		&:hover {
+			color: '[theme: black, default: #000000]';
+		}
     }
 }
