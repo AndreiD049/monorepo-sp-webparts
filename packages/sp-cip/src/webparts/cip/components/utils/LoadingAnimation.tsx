@@ -1,4 +1,4 @@
-import { Spinner, SpinnerSize } from 'office-ui-fabric-react';
+import { Spinner, SpinnerSize } from '@fluentui/react';
 import * as React from 'react';
 
 const LOADING_ANIMATION_EVENT: string = 'SP_CIP_LOADING_ANIMATION';

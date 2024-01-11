@@ -7,7 +7,7 @@ import {
     Text,
     TextField,
     Checkbox,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import { useVisibility } from 'react-visibility-hook';
 import styles from './TimerItem.module.scss';
 

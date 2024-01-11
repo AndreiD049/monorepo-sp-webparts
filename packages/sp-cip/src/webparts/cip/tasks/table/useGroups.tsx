@@ -1,4 +1,4 @@
-import { IDetailsGroupRenderProps, IGroup } from 'office-ui-fabric-react';
+import { IDetailsGroupRenderProps, IGroup } from '@fluentui/react';
 import * as React from 'react';
 import { useState } from 'react';
 import useWebStorage from 'use-web-storage-api';

@@ -1,5 +1,5 @@
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { ColumnActionsMode, IColumn } from 'office-ui-fabric-react';
+import { ColumnActionsMode, IColumn } from '@fluentui/react';
 import * as React from 'react';
 import { calloutVisibility } from '../../utils/dom-events';
 import { ChoiceFacet, IChoiceFacetProps } from './facet/ChoiceFacet';

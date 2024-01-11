@@ -1,4 +1,4 @@
-import { Position, SpinButton } from 'office-ui-fabric-react';
+import { Position, SpinButton } from '@fluentui/react';
 import * as React from 'react';
 import styles from './HoursInput.module.scss';
 import { formatHours, validateHours } from './utils';

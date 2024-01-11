@@ -4,7 +4,7 @@ import { Mention } from '@tiptap/extension-mention';
 import { ICommentInfo, ISiteUserInfo } from 'sp-preset';
 import Suggestion from './suggestion';
 import StarterKit from '@tiptap/starter-kit';
-import { IconButton } from 'office-ui-fabric-react';
+import { IconButton } from '@fluentui/react';
 import styles from './CommentEditor.module.scss';
 import { Callout } from '../Callout';
 

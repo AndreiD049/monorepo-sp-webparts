@@ -1,4 +1,4 @@
-@import '~@fluentui/react/dist/sass/References.scss';
+@import '~@fluentui/react/dist/sass/_References.scss';
 
 .timer {
     min-width: 300px;
@@ -16,6 +16,10 @@
     gap: .5em;
     min-height: 1.3em;
     padding: .3em 0 .3em .5em;
+}
+
+.timerHeaderText {
+    color: "[theme: white, default: #ffffff]";
 }
 
 .timerHeaderMoveHandle {

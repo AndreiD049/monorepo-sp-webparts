@@ -1,5 +1,5 @@
 import { IAttachmentFolder } from '@service/sp-cip/dist/models/IAttachmentFolder';
-import { Icon, Text } from 'office-ui-fabric-react';
+import { Icon, Text } from '@fluentui/react';
 import * as React from 'react';
 import styles from './AttachmentFolder.module.scss';
 import dropzoneStyles from '../AttachmentSection.module.scss';

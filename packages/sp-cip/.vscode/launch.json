@@ -4,22 +4,22 @@
     {
       "name": "Launch Chrome",
       "request": "launch",
-      "type": "chrome",
-      "url": "https://devadmintools.sharepoint.com/sites/Admin-tools/SitePages/CIP.aspx?debug=true&noredir=true&debugManifestsFile=https://localhost:4321/temp/manifests.js",
+      "type": "msedge",
+      "url": "https://{tenantDomain}/_layouts/workbench.aspx",
       "webRoot": "${workspaceFolder}/lib"
     },
     {
       "name": "Attach to Chrome",
       "port": 9222,
       "request": "attach",
-      "type": "chrome",
+      "type": "msedge",
       "webRoot": "${workspaceFolder}"
     },
     {
       "name": "Hosted workbench",
       "type": "pwa-chrome",
       "request": "launch",
-      "url": "https://enter-your-SharePoint-site/_layouts/workbench.aspx",
+      "url": "https://{tenantDomain}/_layouts/workbench.aspx",
       "webRoot": "${workspaceRoot}",
       "sourceMaps": true,
       "sourceMapPathOverrides": {

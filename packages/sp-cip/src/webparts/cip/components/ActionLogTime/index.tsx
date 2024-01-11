@@ -1,6 +1,6 @@
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { IAction } from '@service/sp-cip/dist/services/action-service';
-import { IconButton, Text } from 'office-ui-fabric-react';
+import { IconButton, Text } from '@fluentui/react';
 import * as React from 'react';
 import { showDialog } from 'sp-components';
 import { DIALOG_ID_PANEL } from '../../utils/constants';

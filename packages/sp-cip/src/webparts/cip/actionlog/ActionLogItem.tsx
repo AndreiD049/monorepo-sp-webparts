@@ -1,4 +1,4 @@
-import { Icon, Text } from 'office-ui-fabric-react';
+import { Icon, Text } from '@fluentui/react';
 import * as React from 'react';
 import { ActionLogTime } from '../components/ActionLogTime';
 import { formatHours } from '../utils/hours-duration';

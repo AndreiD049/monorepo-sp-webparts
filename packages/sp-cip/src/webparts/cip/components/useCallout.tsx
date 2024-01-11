@@ -1,4 +1,4 @@
-import { Callout, DirectionalHint } from "office-ui-fabric-react";
+import { Callout, DirectionalHint } from "@fluentui/react";
 import * as React from "react";
 import { calloutVisibilityHandler, ICalloutEventProps } from "../utils/dom-events";
 

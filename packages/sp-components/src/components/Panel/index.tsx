@@ -5,7 +5,7 @@ const EVENT_PREFIX = 'sp-panel-visibility';
 const CLICK_EVENT_PREFIX = 'sp-panel-button';
 const getEventName = (id: string) => `${EVENT_PREFIX}/${id}`;
 
-import { IPanelProps, Panel as FabricPanel } from 'office-ui-fabric-react';
+import { IPanelProps, Panel as FabricPanel } from '@fluentui/react';
 
 export interface ICustomPanelProps {
     id: string;

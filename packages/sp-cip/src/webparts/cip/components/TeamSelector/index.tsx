@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Dropdown } from 'office-ui-fabric-react';
+import { Dropdown } from '@fluentui/react';
 
 export interface ITeamSelectorProps<T>
     extends React.HTMLAttributes<HTMLElement> {

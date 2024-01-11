@@ -1,4 +1,4 @@
-import { Panel, PanelType } from 'office-ui-fabric-react';
+import { Panel, PanelType } from '@fluentui/react';
 import * as React from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { IFileInfo } from 'sp-preset';

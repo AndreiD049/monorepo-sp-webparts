@@ -1,6 +1,6 @@
 import { isFinished } from '@service/sp-cip';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { Icon, Label, Link, PersonaSize } from 'office-ui-fabric-react';
+import { Icon, Label, Link, PersonaSize } from '@fluentui/react';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainService from '../../services/main-service';

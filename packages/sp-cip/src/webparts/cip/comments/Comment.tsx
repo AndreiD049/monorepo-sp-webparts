@@ -5,7 +5,7 @@ import {
     IconButton,
     Link,
     Text,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import { GlobalContext } from '../utils/GlobalContext';
 import MainService from '../services/main-service';
 import { ITaskComment } from '@service/sp-cip/dist/models/ITaskComment';

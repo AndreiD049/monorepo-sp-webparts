@@ -1,4 +1,4 @@
-import { IPersonaProps, PersonaSize } from 'office-ui-fabric-react';
+import { IPersonaProps, PersonaSize } from '@fluentui/react';
 import { ISiteUserInfo } from 'sp-preset';
 
 export function userToPersonaProps(users: ISiteUserInfo[]): IPersonaProps[] {

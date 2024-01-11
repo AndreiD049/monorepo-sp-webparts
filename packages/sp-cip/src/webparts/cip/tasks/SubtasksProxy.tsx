@@ -1,4 +1,4 @@
-import { IDetailsRowProps } from 'office-ui-fabric-react';
+import { IDetailsRowProps } from '@fluentui/react';
 import * as React from 'react';
 import { TaskNode } from './graph/TaskNode';
 import TaskShimmer from './TaskShimmer';

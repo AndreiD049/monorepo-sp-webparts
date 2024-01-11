@@ -5,7 +5,7 @@ import {
     IColumn,
     PrimaryButton,
     SearchBox,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { calloutVisibility } from '../../../utils/dom-events';
 import { applyFilters, applySearch } from '../sort-filter/filtering';

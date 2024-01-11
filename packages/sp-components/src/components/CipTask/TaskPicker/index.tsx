@@ -1,5 +1,5 @@
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { ITag, Label, TagPicker } from 'office-ui-fabric-react';
+import { ITag, Label, TagPicker } from '@fluentui/react';
 import * as React from 'react';
 
 export interface ITaskPickerProps {

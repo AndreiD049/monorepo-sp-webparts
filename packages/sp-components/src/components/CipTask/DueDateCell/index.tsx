@@ -1,4 +1,4 @@
-import { ActionButton, Calendar, DirectionalHint, Stack, Text } from 'office-ui-fabric-react';
+import { ActionButton, Calendar, DirectionalHint, Stack, Text } from '@fluentui/react';
 import * as React from 'react';
 import { Callout, hideCallout, showCallout } from '../../Callout';
 import styles from './DueDateCell.module.scss';

@@ -1,6 +1,6 @@
 import { IAttachmentFile } from '@service/sp-cip/dist/models/IAttachmentFile';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
-import { Separator, Text } from 'office-ui-fabric-react';
+import { Separator, Text } from '@fluentui/react';
 import * as React from 'react';
 import { ISearchResult } from 'sp-preset';
 import { getFileName } from '../../../utils/path';

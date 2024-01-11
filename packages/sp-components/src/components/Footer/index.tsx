@@ -1,4 +1,4 @@
-import { Icon, Link, Separator, Text } from 'office-ui-fabric-react';
+import { Icon, Link, Separator, Text } from '@fluentui/react';
 import * as React from 'react';
 import styles from './Footer.module.scss';
 

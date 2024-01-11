@@ -1,7 +1,7 @@
 import * as React from "react";
 import styles from './CommandBar.module.scss';
 import useWebStorage from "use-web-storage-api";
-import { Dropdown, IDropdownOption } from "office-ui-fabric-react";
+import { Dropdown, IDropdownOption } from "@fluentui/react";
 
 export enum StatusSelected {
     Open,

@@ -1,4 +1,4 @@
-import { ActivityItem, Icon, Link, Stack, Text } from 'office-ui-fabric-react';
+import { ActivityItem, Icon, Link, Stack, Text } from '@fluentui/react';
 import * as React from 'react';
 import styles from '../../comments/Comments.module.scss';
 import MainService from '../../services/main-service';

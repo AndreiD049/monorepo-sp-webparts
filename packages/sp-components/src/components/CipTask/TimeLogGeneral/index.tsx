@@ -10,7 +10,7 @@ import {
     MessageBarType,
     PrimaryButton,
     TextField,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { HoursInput } from '../../HoursInput';
 import { TaskPicker } from '../TaskPicker';

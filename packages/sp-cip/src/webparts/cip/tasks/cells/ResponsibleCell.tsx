@@ -6,7 +6,7 @@ import {
     SearchBox,
     Separator,
     Text,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { hideCallout, showCallout } from 'sp-components';
 import { SimplePersona } from '../../components/SimplePersona';

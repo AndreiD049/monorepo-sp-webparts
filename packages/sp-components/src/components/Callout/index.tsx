@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Callout as FluentCallout, DirectionalHint, ICalloutProps } from 'office-ui-fabric-react';
+import { Callout as FluentCallout, DirectionalHint, ICalloutProps } from '@fluentui/react';
 
 const EVENT_PREFIX = 'sp-callout-visibility';
 

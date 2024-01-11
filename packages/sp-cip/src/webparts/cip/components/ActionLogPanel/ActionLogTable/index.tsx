@@ -9,7 +9,7 @@ import {
     IColumn,
     IGroup,
     SelectionMode,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { showDialog } from 'sp-components';
 import { ActionDropdownOption } from '..';

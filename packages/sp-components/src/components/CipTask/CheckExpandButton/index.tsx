@@ -1,4 +1,4 @@
-import { Icon, IconButton } from 'office-ui-fabric-react';
+import { Icon, IconButton } from '@fluentui/react';
 import * as React from 'react';
 import styles from './CheckExpandButton.module.scss';
 
