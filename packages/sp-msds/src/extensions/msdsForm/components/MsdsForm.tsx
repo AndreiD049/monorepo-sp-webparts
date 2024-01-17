@@ -11,7 +11,7 @@ import { useCustomers } from '../hooks/useCustomers';
 import { useDatabases } from '../hooks/useDatabases';
 import { useSites } from '../hooks/useSites';
 import { IMSDSRequest } from '../services/IMSDSRequest';
-import { ITag, Text } from 'office-ui-fabric-react';
+import { ITag, Text } from '@fluentui/react';
 import { useMaterialTypes } from '../hooks/useMaterialTypes';
 import { useFormShape } from '../hooks/useFormShape';
 import { useColors } from '../hooks/useColor';
@@ -41,7 +41,7 @@ import { Logo } from './Logo';
 import KTNLogo from './KTNLogo';
 import { ICommentSectionProps } from './CommentSection';
 import styles from './MsdsForm.module.scss';
-import { decodeXML, encodeXML } from '../utils';
+import { decodeXML, encodeXML, getPermittedYearsPerSite } from '../utils';
 
 export interface IMsdsFormProps {
     context: FormCustomizerContext;
@@ -136,6 +136,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
     });
 
     const site = watch('Site');
+	const msdsPermittedYears = getPermittedYearsPerSite(site);
     const database = watch('Database');
     console.log(database);
     const materialType = watch('MaterialType');
@@ -358,8 +359,8 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                 <div className="width-25p">
                                     <MSDSCheckbox
                                         id="HasMsds"
-                                        label="4.Do you have an SDS? / Not older than 3 years"
-                                        title="16 sections / guidelines / Max 3 years old"
+                                        label={`4.Do you have an SDS? / Not older than ${msdsPermittedYears} years`}
+                                        title={`16 sections / guidelines / Max ${msdsPermittedYears} years old`}
                                         control={control}
                                         rules={{
                                             disabled:
@@ -391,19 +392,23 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                             disabled:
                                                 field.MSDSDate === 'Disabled',
                                             validate: (value) => {
-                                                const todayMinusThreeYears =
+                                                const todayMinusYears =
                                                     new Date(
                                                         new Date().setFullYear(
-                                                            new Date().getFullYear() -
-                                                                3
+                                                            new Date().getFullYear() - msdsPermittedYears
                                                         )
                                                     );
                                                 const date = new Date(value);
                                                 if (
                                                     hasSDS &&
-                                                    date < todayMinusThreeYears
+                                                    date < todayMinusYears
                                                 ) {
-                                                    return 'SDS Date must be within the last 3 years';
+													document.getElementById("MSDSDate")?.scrollIntoView({
+														behavior: 'smooth',
+														block: 'center',
+														inline: 'center'
+													});
+                                                    return `SDS Date must be within the last ${msdsPermittedYears} years`;
                                                 }
                                                 return true;
                                             },

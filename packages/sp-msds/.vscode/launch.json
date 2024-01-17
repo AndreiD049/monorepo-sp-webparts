@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "Hosted workbench",
-      "type": "pwa-chrome",
+      "type": "msedge",
       "request": "launch",
       "url": "https://devadmintools.sharepoint.com/sites/BSG/_layouts/15/SPListForm.aspx?debugManifestsFile=https%3A%2F%2Flocalhost%3A4321%2Ftemp%2Fmanifests.js&loadSPFX=true&componentId=a7fdea8a-6086-4094-b22e-04981e1cdbd6&PageType=8&RootFolder=%2Fsites%2FBSG%2FLists%2FWeb+application+form&properties=%7B%22approverListName%22%3A%22Contact+person+Petrochemicals%22%7D",
       "webRoot": "${workspaceRoot}",

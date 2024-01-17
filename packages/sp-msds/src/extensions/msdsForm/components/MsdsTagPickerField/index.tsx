@@ -1,4 +1,4 @@
-import { Icon, ITag, Label, TagPicker } from 'office-ui-fabric-react';
+import { Icon, ITag, Label, TagPicker } from '@fluentui/react';
 import * as React from 'react';
 import { Controller } from 'react-hook-form';
 import { IMSDSRequest } from '../../services/IMSDSRequest';

@@ -1,5 +1,5 @@
 import { FormDisplayMode } from '@microsoft/sp-core-library';
-import { DefaultButton, PrimaryButton } from 'office-ui-fabric-react';
+import { DefaultButton, PrimaryButton } from '@fluentui/react';
 import * as React from 'react';
 import styles from './Buttons.module.scss';
 

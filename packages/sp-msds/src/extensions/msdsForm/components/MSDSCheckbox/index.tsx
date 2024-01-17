@@ -1,4 +1,4 @@
-import { Checkbox, Icon, Label, Text } from 'office-ui-fabric-react';
+import { Checkbox, Icon, Label, Text } from '@fluentui/react';
 import * as React from 'react';
 import { Controller } from 'react-hook-form';
 import { IMSDSRequest } from '../../services/IMSDSRequest';

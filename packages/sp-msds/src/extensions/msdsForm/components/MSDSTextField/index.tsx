@@ -3,7 +3,7 @@ import {
     ITextFieldProps,
     Label,
     TextField,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { Controller } from 'react-hook-form';
 import { Control, RegisterOptions } from 'react-hook-form/dist/types';

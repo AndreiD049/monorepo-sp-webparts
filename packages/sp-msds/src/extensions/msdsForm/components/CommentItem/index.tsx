@@ -3,7 +3,7 @@ import {
     IconButton,
     PersonaSize,
     Text,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import {
     FooterYesNo,

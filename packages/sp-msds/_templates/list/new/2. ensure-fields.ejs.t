@@ -2,7 +2,7 @@
 to: src/setup/tables/<%= name %>-list.ts
 unless_exists: true
 ---
-import { MessageBarType } from 'office-ui-fabric-react';
+import { MessageBarType } from '@fluentui/react';
 import { SPnotify } from 'sp-react-notifications';
 import { IFieldAddResult, IList } from "sp-preset";
 

@@ -1,4 +1,4 @@
-import { ITag } from "office-ui-fabric-react";
+import { ITag } from "@fluentui/react";
 
 export interface ITagWithData<T> extends ITag {
     data: T;

@@ -37,10 +37,10 @@ build.configureWebpack.mergeConfig({
         );
         generatedConfiguration.resolve.alias = {
             ...generatedConfiguration.resolve.alias,
-            'office-ui-fabric-react': path.resolve(
+            '@fluentui/react': path.resolve(
                 // eslint-disable-next-line no-undef
                 __dirname,
-                'node_modules/office-ui-fabric-react/'
+                'node_modules/@fluentui/react/'
             ),
             '@microsoft/load-themed-styles': path.resolve(
                 // eslint-disable-next-line no-undef
@@ -51,6 +51,21 @@ build.configureWebpack.mergeConfig({
                 // eslint-disable-next-line no-undef
                 __dirname,
                 'node_modules/tslib/'
+            ),
+            '@fluentui/date-time-utilities': path.resolve(
+                // eslint-disable-next-line no-undef
+                __dirname,
+                'node_modules/@fluentui/date-time-utilities'
+            ),
+            '@fluentui/react-focus': path.resolve(
+                // eslint-disable-next-line no-undef
+                __dirname,
+                'node_modules/@fluentui/react-focus'
+            ),
+            '@fluentui/react-window-provider': path.resolve(
+                // eslint-disable-next-line no-undef
+                __dirname,
+                'node_modules/@fluentui/react-window-provider'
             ),
         };
         return generatedConfiguration;

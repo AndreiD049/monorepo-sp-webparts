@@ -3,7 +3,7 @@ import {
     IMaskedTextFieldProps,
     Label,
     MaskedTextField,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { Controller } from 'react-hook-form';
 import { IMSDSRequest } from '../../services/IMSDSRequest';

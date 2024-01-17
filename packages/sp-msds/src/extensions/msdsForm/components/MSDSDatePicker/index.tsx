@@ -3,7 +3,7 @@ import {
     Icon,
     IDatePickerProps,
     Label,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { Controller } from 'react-hook-form';
 import { IMSDSRequest } from '../../services/IMSDSRequest';
@@ -38,8 +38,8 @@ export const MSDSDatePicker: React.FC<IMSDSDatePickerProps> = (props) => {
                 render={({ field, fieldState }) => (
                     <>
                         <DatePicker
-                            id={props.id}
                             {...props.pickerProps}
+							id={props.id}
                             value={field.value ? new Date(field.value) : null}
                             formatDate={(date) => date.toLocaleDateString()}
                             onSelectDate={(date) =>

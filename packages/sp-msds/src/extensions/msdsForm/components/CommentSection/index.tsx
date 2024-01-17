@@ -1,4 +1,4 @@
-import { Stack, Text } from 'office-ui-fabric-react';
+import { Stack, Text } from '@fluentui/react';
 import * as React from 'react';
 import { hideSpinner, LoadingSpinner, showSpinner } from 'sp-components';
 import { ICommentInfo, ISiteUserInfo } from 'sp-preset';
