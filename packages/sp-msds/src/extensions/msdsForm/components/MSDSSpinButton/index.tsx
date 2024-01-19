@@ -1,9 +1,4 @@
-import {
-    Icon,
-    ISpinButtonProps,
-    Label,
-    SpinButton,
-} from '@fluentui/react';
+import { Icon, ISpinButtonProps, Label, SpinButton } from '@fluentui/react';
 import * as React from 'react';
 import { Controller } from 'react-hook-form';
 import { IMSDSRequest } from '../../services/IMSDSRequest';
@@ -76,19 +71,23 @@ export const MSDSSpinButton: React.FC<IMSDSSpinButtonProps> = (props) => {
                 control={props.control}
                 render={({ field, fieldState }) => (
                     <SpinButton
+                        inputProps={{ ...field }}
                         defaultValue="0"
                         min={0}
                         max={1}
                         disabled={props.rules?.disabled}
                         step={STEP}
-                        onValidate={(value) =>
-                            field.onChange(+handleValidate(value))
-                        }
-                        onIncrement={(value) => {
-                            field.onChange(+handleButtons(1)(value));
+                        onValidate={(value) => {
+                            const result = handleValidate(value);
+                            field.onChange(+result);
                         }}
-                        onDecrement={(value) => {
-                            field.onChange(+handleButtons(-1)(value));
+                        onIncrement={(_value) => {
+                            const result = handleButtons(1)(field.value);
+                            field.onChange(+result);
+                        }}
+                        onDecrement={(_value) => {
+                            const result = handleButtons(-1)(field.value);
+                            field.onChange(+result);
                         }}
                         value={field.value}
                     />

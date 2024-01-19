@@ -35,39 +35,6 @@ build.configureWebpack.mergeConfig({
                 },
             })
         );
-        generatedConfiguration.resolve.alias = {
-            ...generatedConfiguration.resolve.alias,
-            '@fluentui/react': path.resolve(
-                // eslint-disable-next-line no-undef
-                __dirname,
-                'node_modules/@fluentui/react/'
-            ),
-            '@microsoft/load-themed-styles': path.resolve(
-                // eslint-disable-next-line no-undef
-                __dirname,
-                'node_modules/@microsoft/load-themed-styles/'
-            ),
-            'tslib': path.resolve(
-                // eslint-disable-next-line no-undef
-                __dirname,
-                'node_modules/tslib/'
-            ),
-            '@fluentui/date-time-utilities': path.resolve(
-                // eslint-disable-next-line no-undef
-                __dirname,
-                'node_modules/@fluentui/date-time-utilities'
-            ),
-            '@fluentui/react-focus': path.resolve(
-                // eslint-disable-next-line no-undef
-                __dirname,
-                'node_modules/@fluentui/react-focus'
-            ),
-            '@fluentui/react-window-provider': path.resolve(
-                // eslint-disable-next-line no-undef
-                __dirname,
-                'node_modules/@fluentui/react-window-provider'
-            ),
-        };
         return generatedConfiguration;
     },
 });

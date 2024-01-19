@@ -138,7 +138,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
     const site = watch('Site');
 	const msdsPermittedYears = getPermittedYearsPerSite(site);
     const database = watch('Database');
-    console.log(database);
     const materialType = watch('MaterialType');
     const hasSDS = watch('HasMsds');
     const field = useFields(site);
