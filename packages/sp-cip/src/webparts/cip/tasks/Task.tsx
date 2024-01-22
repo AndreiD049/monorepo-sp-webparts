@@ -2,7 +2,13 @@ import { IDetailsRowProps } from '@fluentui/react';
 import * as React from 'react';
 import styles from './Task.module.scss';
 import { TaskNode } from './graph/TaskNode';
-import { nodeToggleOpenHandler, relinkParent, subtasksAddedHandler, subtasksDeletedHandler, subtasksUpdatedHandler } from '../utils/dom-events';
+import {
+    nodeToggleOpenHandler,
+    relinkParent,
+    subtasksAddedHandler,
+    subtasksDeletedHandler,
+    subtasksUpdatedHandler,
+} from '../utils/dom-events';
 import SubtasksProxy from './SubtasksProxy';
 import { RenderCell } from './cells/render-cells';
 import { TaskNodeContext } from './TaskNodeContext';
@@ -29,18 +35,18 @@ const Task: React.FC<ITaskProps> = (props) => {
 
     const subtasksNode = React.useMemo(() => {
         return (
-            <SubtasksProxy 
-				rowProps={props.rowProps} 
-				node={props.node}
-				subtasks={subtasks}
-				onTaskRender={(child) => (
-                        <Task
-                            key={child.Id}
-                            node={child}
-                            rowProps={props.rowProps}
-                            style={props.style}
-                        />
-				)}
+            <SubtasksProxy
+                rowProps={props.rowProps}
+                node={props.node}
+                subtasks={subtasks}
+                onTaskRender={(child) => (
+                    <Task
+                        key={child.Id}
+                        node={child}
+                        rowProps={props.rowProps}
+                        style={props.style}
+                    />
+                )}
             />
         );
     }, [subtasks]);
@@ -56,10 +62,10 @@ const Task: React.FC<ITaskProps> = (props) => {
     }, [props.node]);
 
     React.useEffect(() => {
-		const removeHandlers: (() => void)[] = [];
-		const nodeId = props.node.Id;
+        const removeHandlers: (() => void)[] = [];
+        const nodeId = props.node.Id;
         const removeOpenHandler = nodeToggleOpenHandler(
-			nodeId,
+            nodeId,
             async (isOpen) => {
                 isOpen = isOpen ?? !open;
                 setOpen(isOpen);
@@ -69,42 +75,52 @@ const Task: React.FC<ITaskProps> = (props) => {
                 const task = props.node.getTask();
                 const loadedChildren = props.node.getChildren();
                 if (loadedChildren.length === task.Subtasks) {
-					setSubtasks([...loadedChildren]);
-					return;
-				}
+                    setSubtasks([...loadedChildren]);
+                    return;
+                }
 
                 // Load subtasks
-                const fetched = await MainService.getTaskService().getSubtasks(
-                    task
-                );
-				const subtaskNodes = fetched.map((s) => new TaskNode(s));
-				props.node.withChildren(subtaskNodes);
+                const fetched =
+                    await MainService.getTaskService().getSubtasks(task);
+                const subtaskNodes = fetched.map((s) => new TaskNode(s));
+                props.node.withChildren(subtaskNodes);
                 setSubtasks(subtaskNodes);
             }
         );
-		removeHandlers.push(removeOpenHandler);
+        removeHandlers.push(removeOpenHandler);
 
-		const removeSubtaskAdded = subtasksAddedHandler(props.node.Id, (task) => {
-			const newNode = new TaskNode(task).withParent(props.node);
-			
-			setSubtasks((prev) => uniqBy([...prev, newNode], (n) => n.Id));
-		});
-		removeHandlers.push(removeSubtaskAdded);
+        const removeSubtaskAdded = subtasksAddedHandler(
+            props.node.Id,
+            (task) => {
+                const newNode = new TaskNode(task).withParent(props.node);
 
-		if (open) {
-			const removeSubtaskUpdated = subtasksUpdatedHandler(props.node.Id, (task) => {
-				const newNode = new TaskNode(task).withParent(props.node);
-				setSubtasks((prev) => {
-					return prev.map((n) => n.Id === newNode.Id ? newNode : n);
-				});
-			});
-			removeHandlers.push(removeSubtaskUpdated);
+                setSubtasks((prev) => uniqBy([...prev, newNode], (n) => n.Id));
+            }
+        );
+        removeHandlers.push(removeSubtaskAdded);
 
-			const removeTaskDeleted = subtasksDeletedHandler(props.node.Id, (taskId) => {
-				setSubtasks((prev) => prev.filter((n) => n.Id !== taskId));
-			});
-			removeHandlers.push(removeTaskDeleted);
-		}
+        if (open) {
+            const removeSubtaskUpdated = subtasksUpdatedHandler(
+                props.node.Id,
+                (task) => {
+                    const newNode = new TaskNode(task).withParent(props.node);
+                    setSubtasks((prev) => {
+                        return prev.map((n) =>
+                            n.Id === newNode.Id ? newNode : n
+                        );
+                    });
+                }
+            );
+            removeHandlers.push(removeSubtaskUpdated);
+
+            const removeTaskDeleted = subtasksDeletedHandler(
+                props.node.Id,
+                (taskId) => {
+                    setSubtasks((prev) => prev.filter((n) => n.Id !== taskId));
+                }
+            );
+            removeHandlers.push(removeTaskDeleted);
+        }
         return () => removeHandlers.forEach((r) => r());
     }, [subtasks, open]);
 
@@ -112,11 +128,7 @@ const Task: React.FC<ITaskProps> = (props) => {
      * Relink parents when node is open/closed
      */
     React.useEffect(() => {
-        let next = props.node;
-        while (next.getParent()) {
-            relinkParent(next.getNextSibling()?.Id);
-            next = next.getParent();
-        }
+		relinkParent('all');
     }, [props.node, open]);
 
     return (
@@ -127,7 +139,13 @@ const Task: React.FC<ITaskProps> = (props) => {
                 isTaskFinished: isFinished(props.node.getTask()),
             }}
         >
-            <div className={styles.task} style={{ ...props.style }}>
+            <div
+                className={styles.task}
+                style={{ ...props.style }}
+                id={`cip-task-${props.node.Id}`}
+                data-parentId={props.node.getTask().ParentId}
+				data-id={props.node.Id}
+            >
                 {props.rowProps.columns.map((column) => {
                     return (
                         <div

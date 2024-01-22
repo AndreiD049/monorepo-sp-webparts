@@ -18,7 +18,7 @@ import {
 } from '../../components/utils/LoadingAnimation';
 import MainService from '../../services/main-service';
 import { DIALOG_ID } from '../../utils/constants';
-import { nodeSetOpen, taskUpdated } from '../../utils/dom-events';
+import { nodeSetOpen, relinkParent, taskUpdated } from '../../utils/dom-events';
 import { GlobalContext } from '../../utils/GlobalContext';
 import { finishTask } from '../../utils/task';
 import { TaskNode } from '../graph/TaskNode';
@@ -146,6 +146,7 @@ const CheckExpandButton: React.FC<ICheckExpandButtonProps> = (props) => {
                 disabled={isButtonDisabled}
                 ref={button}
                 id={`task-${item.Id}`}
+				data-type="task-button"
                 data-taskid={item.Id}
                 onClick={props.onClick}
                 className={classNames}
@@ -175,6 +176,7 @@ export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
             const newItem = await finishTask(node.getTask(), currentUser.Id);
             if (newItem) {
                 taskUpdated(newItem);
+				relinkParent('all');
                 if (newItem.ParentId) {
                     taskUpdated(await taskService.getTask(newItem.ParentId));
                 }
@@ -228,6 +230,7 @@ export const TitleCell: React.FC<{ node: TaskNode; nestLevel: number }> = ({
             await taskService.reopenTask(node.Id);
             const newItem = await taskService.getTask(node.Id);
             taskUpdated(newItem);
+			relinkParent('all');
             if (newItem.ParentId) {
                 taskUpdated(await taskService.getTask(newItem.ParentId));
             }

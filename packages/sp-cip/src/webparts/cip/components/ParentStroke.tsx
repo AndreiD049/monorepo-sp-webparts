@@ -3,7 +3,11 @@ import { TaskNode } from '../tasks/graph/TaskNode';
 import { relinkParentHandler } from '../utils/dom-events';
 import styles from './Cip.module.scss';
 
-const getConnectingStroke = (from: HTMLElement, to: HTMLElement, prev :HTMLElement): JSX.Element => {
+const getConnectingStroke = (
+    from: HTMLElement,
+    to: HTMLElement,
+    prev: HTMLElement
+): JSX.Element => {
     const hasPrev = prev !== from;
     const fromRect = from.getBoundingClientRect();
     const toRect = to.getBoundingClientRect();
@@ -33,6 +37,32 @@ const getConnectingStroke = (from: HTMLElement, to: HTMLElement, prev :HTMLEleme
     );
 };
 
+// Get the previous sibling in the DOM, if any
+export function getPrevSibling(id: number): HTMLElement | undefined {
+    const elem = document.getElementById(`cip-task-${id}`);
+    if (!elem) return null;
+
+    const parentId = elem.dataset.parentid;
+    if (!parentId) return null;
+
+    let prev = elem.previousElementSibling as HTMLElement;
+	while (prev && prev.dataset?.parentid !== parentId) {
+		prev = prev.previousElementSibling as HTMLElement;
+	}
+    if (!prev) return null;
+
+    const prevParentId = prev.dataset.parentid;
+    if (!prevParentId) return null;
+    if (prevParentId !== parentId) return null;
+
+    return prev;
+}
+
+function getTaskButton(elem: HTMLElement): HTMLElement | undefined {
+    if (!elem) return null;
+    return elem.querySelector('button[data-type="task-button"]');
+}
+
 const useParentStroke = (node: TaskNode): JSX.Element => {
     const task = node.getTask();
     const [elem, setElem] = React.useState(null);
@@ -42,23 +72,21 @@ const useParentStroke = (node: TaskNode): JSX.Element => {
             setElem(null);
             setTimeout(() => {
                 if (task.ParentId) {
-                    const prevSibling = node.getPreviousSibling();
-                    const parent = document.getElementById(
+                    const prevSibling = getPrevSibling(task.Id);
+                    const prevButton = getTaskButton(prevSibling);
+                    const parentButton = document.getElementById(
                         `task-${task.ParentId}`
                     );
                     const self = document.getElementById(`task-${task.Id}`);
-                    const prev = prevSibling && document.getElementById(`task-${prevSibling.Id}`) ? document.getElementById(`task-${prevSibling.Id}`) : parent;
-                    if (parent && self) {
-                        setElem(getConnectingStroke(parent, self, prev));
+                    const prev = prevButton ? prevButton : parentButton;
+                    if (parentButton && self) {
+                        setElem(getConnectingStroke(parentButton, self, prev));
                     }
                 }
             }, 0);
         }
         linkElements();
-        const removeRelinkHanler = relinkParentHandler(
-            node.Id,
-            linkElements
-        );
+        const removeRelinkHanler = relinkParentHandler(node.Id, linkElements);
         return () => removeRelinkHanler();
     }, []);
 
