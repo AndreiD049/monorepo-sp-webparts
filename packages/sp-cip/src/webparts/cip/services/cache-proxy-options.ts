@@ -42,8 +42,8 @@ export const taskServiceProxyOptions: (remote: string) => ICacheProxyOptions<Tas
             expiresIn: 8 * HOUR,
         },
 		getTaskTimingInfo: {
-			// isCached: true,
-			expiresIn: MINUTE * 15,
+			isCached: true,
+			expiresIn: MINUTE * 10,
 		},
         addCategory: {
             isCached: false,

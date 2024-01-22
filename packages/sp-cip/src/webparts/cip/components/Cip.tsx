@@ -7,7 +7,7 @@ import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import { HashRouter, Outlet, Route, Routes } from 'react-router-dom';
 import CreateTaskPanel from '../tasks/panels/CreateTask';
 import { TaskDetails } from '../tasks/panels/TaskDetails';
-import { LoadingAnimation } from './utils/LoadingAnimation';
+import { LoadingAnimation, loadingStart, loadingStop } from './utils/LoadingAnimation';
 import MainService from '../services/main-service';
 import styles from './Cip.module.scss';
 import { CALLOUT_ID, DIALOG_ID, SELECTED_TEAM_KEY } from '../utils/constants';
@@ -38,17 +38,22 @@ const Cip: React.FC<ICipProps> = (props) => {
 
     React.useEffect(() => {
         async function run(): Promise<void> {
-            const teams = await userService.getTeams();
-            const currentUser = await userService.getCurrentUser();
-            const users = await userService.getAll();
-			const timingInfo = await taskService.getTaskTimingInfo();
-            setInfo((prev) => ({
-                ...prev,
-                teams,
-                users,
-                currentUser,
-				timingInfo,
-            }));
+			try {
+				loadingStart();
+				const teams = await userService.getTeams();
+				const currentUser = await userService.getCurrentUser();
+				const users = await userService.getAll();
+				const timingInfo = await taskService.getTaskTimingInfo();
+				setInfo((prev) => ({
+					...prev,
+					teams,
+					users,
+					currentUser,
+					timingInfo,
+				}));
+			} finally {
+				loadingStop();
+			}
         }
         run().catch((err) => console.error(err));
     }, []);
