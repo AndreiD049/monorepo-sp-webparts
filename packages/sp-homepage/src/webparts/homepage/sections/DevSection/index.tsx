@@ -1,4 +1,4 @@
-import { ActionButton } from 'office-ui-fabric-react';
+import { ActionButton } from '@fluentui/react';
 import * as React from 'react';
 import { ISectionProps } from '../../components/Section';
 import { copyLayoutsToClipboard } from '../../hooks/useLayout';

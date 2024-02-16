@@ -1,5 +1,5 @@
 import {v4 as uuidv4} from 'uuid';
-import { MessageBarType, Stylesheet } from "office-ui-fabric-react";
+import { MessageBarType } from "@fluentui/react";
 import * as React from "react";
 import { useEffect } from "react";
 import { useRef } from "react";

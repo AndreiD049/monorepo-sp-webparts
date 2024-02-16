@@ -1,4 +1,4 @@
-import { Checkbox, MessageBarType, Text } from 'office-ui-fabric-react';
+import { Checkbox, MessageBarType, Text } from '@fluentui/react';
 import * as React from 'react';
 import { LoadingSpinner } from 'sp-components';
 import { SPnotify } from 'sp-react-notifications';

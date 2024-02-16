@@ -24,19 +24,18 @@ build.configureWebpack.mergeConfig({
             emitError: true,
             exclude: (instance) => {
                 // Sometimes different dependencies use the same package with different versions, if there is no possibility to avoid it, we can skip
-                if (instance.name === '@microsoft/load-themed-styles') return true;
-                if (instance.name === 'react-is') return true;
+				if (instance.name.startsWith('@fluentui')) return true;
+				if (instance.name === '@microsoft/load-themed-styles') return true;
                 return false;
             },
         })
     );
 
-    /** Do not bundle office-ui twice */
-    generatedConfiguration.resolve.alias = {
-        ...generatedConfiguration.resolve.alias,
-        'office-ui-fabric-react': path.resolve(__dirname, 'node_modules/office-ui-fabric-react/'),
-        '@microsoft/load-themed-styles': path.resolve(__dirname, 'node_modules/@microsoft/load-themed-styles/'),
-    }
+    // generatedConfiguration.resolve.alias = {
+    //     ...generatedConfiguration.resolve.alias,
+    //     'office-ui-fabric-react': path.resolve(__dirname, 'node_modules/office-ui-fabric-react/'),
+    //     '@microsoft/load-themed-styles': path.resolve(__dirname, 'node_modules/@microsoft/load-themed-styles/'),
+    // }
 
     return generatedConfiguration;
   }

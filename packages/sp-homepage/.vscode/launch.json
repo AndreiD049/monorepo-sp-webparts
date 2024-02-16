@@ -4,7 +4,7 @@
   {
     "name": "Launch Chrome",
     "request": "launch",
-    "type": "chrome",
+    "type": "msedge",
     "url": "https://devadmintools.sharepoint.com/sites/Admin-tools?debug=true&noredir=true&debugManifestsFile=https://localhost:4321/temp/manifests.js",
     "webRoot": "${workspaceFolder}/lib"
   },

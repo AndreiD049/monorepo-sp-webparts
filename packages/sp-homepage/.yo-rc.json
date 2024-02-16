@@ -5,9 +5,9 @@
     "nodeVersion": "14.18.3",
     "sdkVersions": {
       "@microsoft/microsoft-graph-client": "3.0.2",
-      "@microsoft/teams-js": "2.4.1"
+      "@microsoft/teams-js": "2.12.0"
     },
-    "version": "1.16.1",
+    "version": "1.18.2",
     "libraryName": "sp-homepage",
     "libraryId": "fc6d3c6e-60eb-47f2-9bd1-152c1fada30c",
     "environment": "spo",

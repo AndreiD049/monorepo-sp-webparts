@@ -1,4 +1,4 @@
-import { MessageBar, MessageBarButton, MessageBarType } from "office-ui-fabric-react";
+import { MessageBar, MessageBarButton, MessageBarType } from "@fluentui/react";
 import * as React from "react";
 import { FC } from "react";
 import { INotificationAction } from "./INotificationOptions";
@@ -28,7 +28,6 @@ const SPNotification: FC<ISPNotificationProps> = (props) => {
                 dismissButtonAriaLabel="Close"
                 truncated={true}
                 onDismiss={props.onDismiss}
-                overflowButtonAriaLabel="See more"
                 actions={
                     <div>
                         {props.actions.map(action => (

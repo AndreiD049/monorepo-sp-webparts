@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { MessageBarType } from 'office-ui-fabric-react';
+import { MessageBarType } from '@fluentui/react';
 import { SPnotify } from 'sp-react-notifications';
 import ISection from './models/ISection';
 import ISource from './models/ISource';

@@ -17,7 +17,7 @@ import {
 } from 'sp-components';
 import { CALLOUT_ID, CIP_SPINNER_ID, DIALOG_ID } from '../../constants';
 import { CipSectionContext } from '../../sections/CipSection/CipSectionContext';
-import { DialogType, IColumn, IDetailsRowProps, MessageBarType } from 'office-ui-fabric-react';
+import { DialogType, IColumn, IDetailsRowProps, MessageBarType } from '@fluentui/react';
 import { ITaskOverviewWithSource } from '../../sections/CipSection';
 import { TaskNode } from '@service/sp-cip';
 import { convertTask } from './utils';

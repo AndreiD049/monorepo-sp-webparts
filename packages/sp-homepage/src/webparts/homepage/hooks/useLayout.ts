@@ -1,4 +1,4 @@
-import { MessageBarType } from 'office-ui-fabric-react';
+import { MessageBarType } from '@fluentui/react';
 import React from 'react';
 import { Layout, Layouts } from 'react-grid-layout';
 import { SPnotify } from 'sp-react-notifications';

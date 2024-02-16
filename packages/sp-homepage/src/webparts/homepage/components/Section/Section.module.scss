@@ -1,4 +1,4 @@
-@import '~@fluentui/react/dist/sass/References.scss';
+@import '~@fluentui/react/dist/sass/_References.scss';
 
 .container {
     border: 1px solid;
@@ -50,6 +50,10 @@
         align-items: center;
         justify-content: space-between;
     }
+
+	.text {
+		color: '[theme: white, default: #ffffff]';
+	}
 
     .openNewTabButton {
 		color: '[theme: white, default: #eaeaea]';

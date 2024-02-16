@@ -1,4 +1,4 @@
-import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react';
+import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react';
 import * as React from 'react';
 
 export type ChoiceDisplayType = 'week' | 'month';

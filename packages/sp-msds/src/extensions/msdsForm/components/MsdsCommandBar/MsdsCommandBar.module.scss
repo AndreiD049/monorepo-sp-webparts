@@ -1,0 +1,7 @@
+@import '~@fluentui/react/dist/sass/_References.scss';
+
+.container {
+	background-color: "[theme: themePrimary, default: #0078d4]";
+	color: "[theme: white, default: #ffffff]";
+	border-top: 1px solid "[theme: neutralLighterAlt, default: #f8f8f8]";
+}

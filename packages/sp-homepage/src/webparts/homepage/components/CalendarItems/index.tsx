@@ -1,7 +1,7 @@
 import { groupBy } from '@microsoft/sp-lodash-subset';
 import { Dictionary } from 'lodash';
 import { DateTime } from 'luxon';
-import { Text } from 'office-ui-fabric-react';
+import { Text } from '@fluentui/react';
 import * as React from 'react';
 import { IWrappedCalendarItem } from '../../sections/CalendarSection/ICalendarItem';
 import { CalendarItemCip } from './CalendarItemCip';

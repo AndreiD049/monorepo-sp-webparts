@@ -1,5 +1,5 @@
 import { textColor } from 'colored-text';
-import { IconButton, Persona, PersonaSize, Text } from 'office-ui-fabric-react';
+import { IconButton, Persona, PersonaSize, Text } from '@fluentui/react';
 import * as React from 'react';
 import { Pill } from 'sp-components';
 import { CalendarContext } from '../../../context/CalendarContext/CalendarContext';

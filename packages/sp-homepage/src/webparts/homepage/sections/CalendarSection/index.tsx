@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react';
 import SourceService from '../../services/SourceService';
-import { Calendar, Separator, Text } from 'office-ui-fabric-react';
+import { Calendar, Separator, Text } from '@fluentui/react';
 import { CalendarChoiceGroup, ChoiceDisplayType } from '../../components/CalendarChoiceGroup';
 import { CalendarItemTypes, CalendarTypes, IWrappedCalendarItem } from './ICalendarItem';
 import { CalendarItems } from '../../components/CalendarItems';

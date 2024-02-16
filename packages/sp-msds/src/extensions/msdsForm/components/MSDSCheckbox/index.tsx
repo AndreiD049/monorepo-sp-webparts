@@ -44,7 +44,7 @@ export const MSDSCheckbox: React.FC<IMSDSCheckboxProps> = (props) => {
                             <Checkbox
                                 id={props.id}
                                 {...field}
-                                checked={field.value}
+                                checked={Boolean(field.value)}
                                 disabled={props.rules?.disabled}
                                 className={field.value ? styles.checkboxChecked : styles.checkboxUnhecked}
                             />

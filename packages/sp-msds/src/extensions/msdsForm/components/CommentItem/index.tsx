@@ -17,6 +17,7 @@ import { DIALOG_ID } from '../../constants';
 import { ItemService } from '../../services/item-service';
 import { COMMENT_SPINNER } from '../CommentSection';
 import styles from './CommentItem.module.scss';
+import * as DOMPurify from 'dompurify';
 
 export interface ICommentItemProps {
     comment: ICommentInfo;
@@ -25,9 +26,15 @@ export interface ICommentItemProps {
 }
 
 const CommentText: React.FC<ICommentItemProps> = (props) => {
+	const decodedText = React.useMemo(() => {
+		const txt = document.createElement('textarea');
+		txt.innerHTML = props.comment.text;
+		return DOMPurify.sanitize(txt.value);
+	}, [props.comment.text]);
+
     return (
         <div className={styles.commentText}>
-            <Text variant="small">{props.comment.text}</Text>
+            <Text variant="small"><span dangerouslySetInnerHTML={{ __html: decodedText }} /></Text>
         </div>
     );
 };

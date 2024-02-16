@@ -12,7 +12,7 @@ import { GlobalContext } from '../../context/GlobalContext';
 import ITaskLog, { TaskStatus } from '@service/sp-tasks/dist/models/ITaskLog';
 import { LoadingSpinner, Task } from 'sp-components';
 import styles from './TaskSection.module.scss';
-import { IDropdownOption, Text } from 'office-ui-fabric-react';
+import { IDropdownOption, Text } from '@fluentui/react';
 import { IndexedDbCache } from 'indexeddb-manual-cache';
 import { listenSectionEvent } from '../../components/Section/section-events';
 import { NoData } from '../../components/NoData';

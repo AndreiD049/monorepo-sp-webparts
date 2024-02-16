@@ -7,7 +7,7 @@ import { FC } from 'react';
 import { IAccessControlProps } from './IAccessControlProps';
 import SiteService from '../dal/site';
 import PermissionField from './PermissionField';
-import { IPersonaProps } from 'office-ui-fabric-react';
+import { IPersonaProps } from '@fluentui/react';
 import PropertyPaneAccessControlBuilder, { PropertyPaneAccessControl } from './PropertyPaneAccessControl';
 
 export interface IUserGroupInfo {

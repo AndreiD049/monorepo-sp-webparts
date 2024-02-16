@@ -1,4 +1,4 @@
-import { IconButton, Text } from 'office-ui-fabric-react';
+import { IconButton, Text } from '@fluentui/react';
 import * as React from 'react';
 import ISection from '../../models/ISection';
 import { dispatchSectionHandler } from './section-events';
@@ -49,7 +49,7 @@ const SectionHeader: React.FC<{
             <div className={styles.headerContent}>
                 {/* Near items */}
                 <div>
-                    <Text variant="mediumPlus">{section.name}</Text>
+                    <Text variant="mediumPlus" className={styles.text}>{section.name}</Text>
                 </div>
                 {/* Far items */}
                 <div>

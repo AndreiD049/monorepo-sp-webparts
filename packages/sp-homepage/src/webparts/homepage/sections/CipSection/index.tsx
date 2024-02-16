@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { CipTask } from '../../components/CipTask';
 import { GlobalContext } from '../../context/GlobalContext';
-import { IColumn, DetailsList, SelectionMode, DetailsListLayoutMode } from 'office-ui-fabric-react';
+import { IColumn, DetailsList, SelectionMode, DetailsListLayoutMode } from '@fluentui/react';
 import { ISectionProps } from '../../components/Section';
 import { ITaskOverview } from '@service/sp-cip/dist/models/ITaskOverview';
 import { createTaskTree } from '@service/sp-cip';

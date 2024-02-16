@@ -42,6 +42,7 @@ import KTNLogo from './KTNLogo';
 import { ICommentSectionProps } from './CommentSection';
 import styles from './MsdsForm.module.scss';
 import { decodeXML, encodeXML, getPermittedYearsPerSite } from '../utils';
+import { MsdsCommandBar } from './MsdsCommandBar';
 
 export interface IMsdsFormProps {
     context: FormCustomizerContext;
@@ -232,21 +233,26 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 
     return (
         <div className={styles.formContainer}>
-            <div
-                className="backgroundPrimaryColor"
-                style={{
-                    height: '120px',
-                    display: 'flex',
-                    flexFlow: 'row nowrap',
-                    alignItems: 'center',
-                    gap: '1em',
-                }}
-            >
-                <KTNLogo style={{ height: '100px', marginLeft: '1em' }} />
-                <Text variant="xxLargePlus" className={styles.headerText}>
-                    Web application form
-                </Text>
-            </div>
+			<div>
+				<div
+					className="backgroundPrimaryColor"
+					style={{
+						height: '120px',
+						display: 'flex',
+						flexFlow: 'row nowrap',
+						alignItems: 'center',
+						gap: '1em',
+					}}
+				>
+					<KTNLogo style={{ height: '100px', marginLeft: '1em' }} />
+					<Text variant="xxLargePlus" className={styles.headerText}>
+						Web application form
+					</Text>
+
+				</div>
+				<MsdsCommandBar item={props.item} onClose={props.onClose} displayMode={props.displayMode} />
+			</div>
+			
             <form
                 className={styles.msdsForm}
                 onSubmit={handleSubmit(CreateOrSave)}

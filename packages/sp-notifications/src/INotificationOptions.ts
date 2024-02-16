@@ -1,4 +1,4 @@
-import { MessageBarType } from "office-ui-fabric-react";
+import { MessageBarType } from "@fluentui/react";
 import * as React from "react";
 
 type IMessage = string | React.ReactElement;

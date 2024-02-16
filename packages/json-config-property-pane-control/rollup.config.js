@@ -1,7 +1,6 @@
 import { defineConfig } from 'rollup';
 import typescript from 'rollup-plugin-typescript2';
 import { terser } from 'rollup-plugin-terser';
-import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 import visualizer from 'rollup-plugin-visualizer';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
@@ -28,7 +27,6 @@ export default defineConfig({
         typescript({ tsconfig: 'tsconfig.json' }),
         peerDepsExternal(),
         nodeResolve(),
-        sizeSnapshot(),
         terser(),
         visualizer(),
     ],

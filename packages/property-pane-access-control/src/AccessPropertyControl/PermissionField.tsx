@@ -1,4 +1,4 @@
-import { NormalPeoplePicker, Stack, StackItem } from 'office-ui-fabric-react';
+import { NormalPeoplePicker, Stack, StackItem } from '@fluentui/react';
 import * as React from 'react';
 import { FC } from 'react';
 import { IPersonaPropsWithType, IUserGroupPermissions } from './AccessControl';

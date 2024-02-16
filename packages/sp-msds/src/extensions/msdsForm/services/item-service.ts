@@ -1,5 +1,19 @@
-import { IAttachmentInfo, ICommentInfo, IComments, IItemAddResult, IList, SPFI } from 'sp-preset';
+import {
+    IAttachmentInfo,
+    ICommentInfo,
+    IComments,
+    IItemAddResult,
+    IList,
+    SPFI,
+} from 'sp-preset';
 import { IMSDSRequest } from './IMSDSRequest';
+
+const approvalToValue = {
+    Approved: { value: '0', approvalNeeded: '0' },
+    Rejected: { value: '1', approvalNeeded: '0' },
+    Pending: { value: '2', approvalNeeded: '1' },
+    Draft: { value: '3', approvalNeeded: '0' },
+};
 
 export class ItemService {
     private static sp: SPFI;
@@ -12,6 +26,18 @@ export class ItemService {
         );
     }
 
+    public static async getItem(
+        customerId: number,
+        site: string,
+        database: string,
+        product: string
+    ): Promise<IMSDSRequest[]> {
+        const items = this.applicationList.items;
+        return items.filter(
+            `CustomerNameId eq ${customerId} and Site eq '${site}' and Database eq '${database}' and ProductName eq '${product}'`
+        )();
+    }
+
     public static async createItem(
         payload: Partial<IMSDSRequest & { Attachments: File[] }>
     ): Promise<IItemAddResult> {
@@ -19,6 +45,28 @@ export class ItemService {
         delete cleanedPayload.CustomerName;
         delete cleanedPayload.Attachments;
         return this.applicationList.items.add(cleanedPayload);
+    }
+
+    public static async setApprovalStatus(
+        id: number,
+        value: keyof typeof approvalToValue
+    ): Promise<void> {
+        const item = this.applicationList.items.getById(id);
+        const translation = approvalToValue[value];
+        if (!translation) return;
+        await item.validateUpdateListItem(
+            [
+                {
+                    FieldName: '_ModerationStatus',
+                    FieldValue: translation.value,
+                },
+                {
+                    FieldName: 'IsApprovalNeeded',
+                    FieldValue: translation.approvalNeeded,
+                },
+            ],
+            true
+        );
     }
 
     public static async updateItem(
@@ -57,12 +105,26 @@ export class ItemService {
         return this.applicationList.items.getById(itemId).attachmentFiles();
     }
 
+    public static async copyAttachments(
+        fromId: number,
+        toId: number
+    ): Promise<void> {
+        const from = await this.applicationList.items
+            .getById(fromId)
+            .attachmentFiles();
+        for (const a of from) {
+			const content = await this.sp.web.getFileByUrl(a.ServerRelativeUrl).getBlob();
+            await this.applicationList.items
+                .getById(toId)
+                .attachmentFiles.add(a.FileName, content);
+        }
+    }
+
     public static async getAttachmentUrl(
         relativePath: string
     ): Promise<string> {
-        const link = await this.sp.web.getFileByServerRelativePath(
-            relativePath
-        )();
+        const link =
+            await this.sp.web.getFileByServerRelativePath(relativePath)();
         return link.LinkingUrl || link.ServerRelativeUrl;
     }
 
@@ -70,7 +132,10 @@ export class ItemService {
         await this.sp.web.getFileByServerRelativePath(relativePath).recycle();
     }
 
-    public static async addComment(itemId: number, comment: Partial<ICommentInfo>): Promise<ICommentInfo> {
+    public static async addComment(
+        itemId: number,
+        comment: Partial<ICommentInfo>
+    ): Promise<ICommentInfo> {
         const item = this.applicationList.items.getById(itemId);
         return item.comments.add(comment as ICommentInfo);
     }
@@ -79,7 +144,13 @@ export class ItemService {
         return this.applicationList.items.getById(itemId).comments();
     }
 
-    public static async deleteComment(itemId: number, commentId: number): Promise<void> {
-        await this.applicationList.items.getById(itemId).comments.getById(commentId).delete();
+    public static async deleteComment(
+        itemId: number,
+        commentId: number
+    ): Promise<void> {
+        await this.applicationList.items
+            .getById(itemId)
+            .comments.getById(commentId)
+            .delete();
     }
 }

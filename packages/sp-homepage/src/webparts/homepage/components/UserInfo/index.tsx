@@ -1,4 +1,4 @@
-import { Persona, PersonaSize, Text } from 'office-ui-fabric-react';
+import { Persona, PersonaSize, Text } from '@fluentui/react';
 import * as React from 'react';
 import { LoadingSpinner } from 'sp-components';
 import { GlobalContext } from '../../context/GlobalContext';

@@ -1,4 +1,4 @@
-import { IconButton, Separator, Text } from 'office-ui-fabric-react';
+import { IconButton, Separator, Text } from '@fluentui/react';
 import * as React from 'react';
 import { Footer } from 'sp-components';
 import { GlobalContext } from '../../context/GlobalContext';

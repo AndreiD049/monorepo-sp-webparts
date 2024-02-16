@@ -12,7 +12,7 @@ import { IHomepageProps } from './components/Homepage/IHomepageProps';
 import { IJsonConfig, PropertyPaneJsonConfiguration } from 'json-configuration';
 import IConfig from './models/IConfig';
 import SPBuilder, { InjectHeaders } from 'sp-preset';
-import { getTheme } from 'office-ui-fabric-react';
+import { getTheme } from '@fluentui/react';
 import PropertyPaneAccessControl, { IUserGroupPermissions, setupAccessControl } from 'property-pane-access-control';
 import { SEE_ALL_TEAMS, SEE_THEIR_TEAM_MEMBERS } from './constants';
 

@@ -5,7 +5,7 @@ import {
 } from '../../../sections/CalendarSection/ICalendarItem';
 import { textColor } from 'colored-text';
 import { Pill } from 'sp-components';
-import { IconButton, Persona, PersonaSize, Text } from 'office-ui-fabric-react';
+import { IconButton, Persona, PersonaSize, Text } from '@fluentui/react';
 import tableStyles from '../CalendarItems.module.scss';
 import { getStatusStyles } from '../statusStyles';
 import { CalendarContext } from '../../../context/CalendarContext/CalendarContext';

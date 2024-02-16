@@ -1,5 +1,5 @@
 import { textColor } from 'colored-text';
-import { IconButton, Persona, PersonaSize, Text } from 'office-ui-fabric-react';
+import { IconButton, Persona, PersonaSize, Text } from '@fluentui/react';
 import * as React from 'react';
 import { CalendarContext } from '../../../context/CalendarContext/CalendarContext';
 import { ICalendarRotationsItem, IWrappedCalendarItem } from '../../../sections/CalendarSection/ICalendarItem';
@@ -67,9 +67,9 @@ export const CalendarItemRotations: React.FC<ICalendarItemRotationsProps> = (pro
 
 	const additionalInfo = React.useMemo(() => {
 		if (!showUser && item.Personinvolved.Id !== selectedUser.Id) {
-			return `(involved: ${item.Personinvolved.Title}; go to: ${item.Persontogo.Title})`;
+			return `(involved: ${item.Personinvolved.Title}; go to: ${item.Persontogo?.Title || 'N/A'})`;
 		}
-		return `(go to: ${item.Persontogo.Title})`;
+		return `(go to: ${item.Persontogo?.Title || 'N/A'})`;
 		}, [showUser, item]);
 
     return (

@@ -1,4 +1,4 @@
-import { Dropdown, Icon, IDropdown, IDropdownOption } from 'office-ui-fabric-react';
+import { Dropdown, Icon, IDropdown, IDropdownOption } from '@fluentui/react';
 import * as React from 'react';
 
 export interface ITeamSelectorProps {

@@ -1,7 +1,6 @@
 import { defineConfig } from "rollup";
 import typescript from "rollup-plugin-typescript2";
 import visualizer from "rollup-plugin-visualizer";
-import { sizeSnapshot } from "rollup-plugin-size-snapshot";
 import { terser } from "rollup-plugin-terser";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
@@ -15,13 +14,10 @@ export default defineConfig([
     output: [
       {
         file: "dist/index.js",
-        format: "es"
-      }
+        format: "es",
+      },
     ],
-    external: [
-        "office-ui-fabric-react",
-        "uuid",
-    ],
+    external: ["office-ui-fabric-react", "uuid"],
     plugins: [
       peerDepsExternal(),
       nodeResolve({ browser: true }),
@@ -30,7 +26,6 @@ export default defineConfig([
         plugins: [autoprefixer],
         minimize: true,
       }),
-      sizeSnapshot(),
       terser(),
       visualizer(),
     ],
@@ -43,7 +38,7 @@ export default defineConfig([
         format: "amd",
         name: "spReactNotifications",
         globals: {
-          "react": "React",
+          react: "React",
           "react-dom": "ReactDOM",
         },
       },
@@ -60,7 +55,6 @@ export default defineConfig([
         plugins: [autoprefixer],
         minimize: true,
       }),
-      sizeSnapshot(),
       terser(),
       visualizer(),
     ],

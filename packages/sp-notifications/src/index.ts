@@ -4,7 +4,7 @@ import { CONTAINER_ID, EVENT_NAME } from './constants';
 import SPNotificationContainer from './SPNotificationContainer';
 import styles from './Notification.module.scss';
 import { INotificationOptions } from './INotificationOptions';
-import { MessageBarType } from 'office-ui-fabric-react';
+import { MessageBarType } from '@fluentui/react';
 
 
 export function initNotifications() {

@@ -14,30 +14,30 @@
     "build": "rollup -c --environment INCLUDE_DEPS,BUILD:production"
   },
   "dependencies": {
-    "tslib": "2.3.1"
+    "tslib": "^2.6.2"
   },
   "peerDependencies": {
-    "@microsoft/sp-core-library": "1.16.1",
-    "@microsoft/sp-http": "1.16.1",
-    "@microsoft/sp-lodash-subset": "1.16.1",
-    "@microsoft/sp-page-context": "1.16.1",
-    "@microsoft/sp-property-pane": "1.16.1",
-    "@microsoft/sp-webpart-base": "1.16.1",
-    "office-ui-fabric-react": "7.185.7",
+    "@microsoft/sp-core-library": "1.18.2",
+    "@microsoft/sp-http": "1.18.2",
+    "@microsoft/sp-lodash-subset": "1.18.2",
+    "@microsoft/sp-page-context": "1.18.2",
+    "@microsoft/sp-property-pane": "1.18.2",
+    "@microsoft/sp-webpart-base": "1.18.2",
+    "@fluentui/react": "8.106.4",
     "react": "*",
     "react-dom": "*"
   },
   "devDependencies": {
-    "@microsoft/sp-adaptive-card-extension-base": "1.16.1",
-    "@microsoft/eslint-config-spfx": "1.16.1",
-    "@microsoft/eslint-plugin-spfx": "1.16.1",
+    "@microsoft/sp-adaptive-card-extension-base": "1.18.2",
+    "@microsoft/eslint-config-spfx": "1.18.2",
+    "@microsoft/eslint-plugin-spfx": "1.18.2",
     "@microsoft/rush-stack-compiler-4.5": "0.2.2",
-    "@microsoft/sp-build-web": "1.16.1",
-    "@microsoft/sp-core-library": "1.16.1",
-    "@microsoft/sp-lodash-subset": "1.16.1",
-    "@microsoft/sp-module-interfaces": "1.16.1",
-    "@microsoft/sp-property-pane": "1.16.1",
-    "@microsoft/sp-webpart-base": "1.16.1",
+    "@microsoft/sp-build-web": "1.18.2",
+    "@microsoft/sp-core-library": "1.18.2",
+    "@microsoft/sp-lodash-subset": "1.18.2",
+    "@microsoft/sp-module-interfaces": "1.18.2",
+    "@microsoft/sp-property-pane": "1.18.2",
+    "@microsoft/sp-webpart-base": "1.18.2",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rushstack/eslint-config": "2.5.1",
     "@types/react": "17.0.45",
@@ -47,8 +47,7 @@
     "autoprefixer": "^10.4.8",
     "eslint-plugin-react-hooks": "4.3.0",
     "gulp": "4.0.2",
-    "node-sass": "^7.0.1",
-    "office-ui-fabric-react": "7.185.7",
+    "@fluentui/react": "8.106.4",
     "postcss": "^8.4.16",
     "react": "16.13.1",
     "react-dom": "16.13.1",
@@ -57,11 +56,10 @@
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-scss": "^3.0.0",
-    "rollup-plugin-size-snapshot": "^0.12.0",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.33.0",
     "rollup-plugin-visualizer": "^5.8.0",
-    "spfx-fast-serve-helpers": "~1.15.0",
-    "typescript": "4.5.5"
+    "spfx-fast-serve-helpers": "~1.18.0",
+    "typescript": "4.7.4"
   }
 }

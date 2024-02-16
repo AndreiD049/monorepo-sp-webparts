@@ -1,5 +1,5 @@
 import { groupBy } from '@microsoft/sp-lodash-subset';
-import { IGroup } from 'office-ui-fabric-react';
+import { IGroup } from '@fluentui/react';
 import * as React from 'react';
 
 export interface IGroupInfo {
