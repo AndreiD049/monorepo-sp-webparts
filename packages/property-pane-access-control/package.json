@@ -16,8 +16,8 @@
     "@microsoft/sp-property-pane": "*",
     "@microsoft/sp-webpart-base": "*",
     "@fluentui/react": "8.106.4",
-    "react": "^16.13.1 || ^17.0.1",
-    "react-dom": "^16.13.1 || ^17.0.1",
+    "react": "*",
+    "react-dom": "*",
     "sp-preset": "^2.0.19"
   },
   "devDependencies": {
