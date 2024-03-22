@@ -1,4 +1,4 @@
-import { Persona, PersonaSize, IconButton, DirectionalHint, PanelType } from 'office-ui-fabric-react';
+import { Persona, PersonaSize, IconButton, DirectionalHint, PanelType } from '@fluentui/react';
 import * as React from 'react';
 import { createPanel } from '../../../hooks/usePanel';
 import GlobalContext from '../../../utils/GlobalContext';

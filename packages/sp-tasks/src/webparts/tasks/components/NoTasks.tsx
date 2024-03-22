@@ -1,4 +1,4 @@
-import { Text } from "office-ui-fabric-react";
+import { Text } from "@fluentui/react";
 import * as React from "react";
 import { FC } from "react";
 import styles from './Tasks.module.scss';

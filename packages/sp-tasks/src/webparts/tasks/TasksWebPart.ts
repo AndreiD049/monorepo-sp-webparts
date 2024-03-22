@@ -23,7 +23,7 @@ import PropertyPaneAccessControl, {
     setupAccessControl,
 } from 'property-pane-access-control';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
-import { getTheme } from 'office-ui-fabric-react';
+import { getTheme } from '@fluentui/react';
 import { TaskLogsService, TaskService } from '@service/sp-tasks';
 import { TaskSync } from './services/taskSync';
 

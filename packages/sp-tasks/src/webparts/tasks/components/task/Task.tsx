@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { IDropdownOption, MessageBarType } from 'office-ui-fabric-react';
+import { IDropdownOption, MessageBarType } from '@fluentui/react';
 import * as React from 'react';
 import { FC } from 'react';
 import { Draggable } from 'react-beautiful-dnd';

@@ -1,4 +1,4 @@
-import { IPanelProps, Panel } from 'office-ui-fabric-react';
+import { IPanelProps, Panel } from '@fluentui/react';
 import * as React from 'react';
 
 export const EVENT_NAME = (id: string) => `USE_PANEL_EVENT_${id}`;

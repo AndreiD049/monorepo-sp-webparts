@@ -15,7 +15,7 @@ import {
     SpinButton,
     TagPicker,
     TextField,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { SPnotify } from 'sp-react-notifications';
 import { closePanel, setPanelProperties } from '../../hooks/usePanel';

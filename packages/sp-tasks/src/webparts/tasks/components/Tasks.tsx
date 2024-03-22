@@ -11,7 +11,7 @@ import Header from './Header';
 import styles from './Tasks.module.scss';
 import UserColumn from './UserColumn';
 import { SPnotify } from 'sp-react-notifications';
-import { MessageBarType, Spinner, SpinnerSize } from 'office-ui-fabric-react';
+import { MessageBarType, Spinner, SpinnerSize } from '@fluentui/react';
 import useWebStorage from 'use-web-storage-api';
 import { HOUR, MAIN_CALLOUT } from '../utils/constants';
 import { usePanel } from '../hooks/usePanel';

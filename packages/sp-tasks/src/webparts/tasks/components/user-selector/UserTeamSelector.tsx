@@ -5,7 +5,7 @@ import {
     IComboBoxOption,
     ISelectableOption,
     SelectableOptionMenuItemType,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { IUser } from '../../models/IUser';
 import GlobalContext from '../../utils/GlobalContext';

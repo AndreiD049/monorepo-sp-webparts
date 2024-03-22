@@ -1,5 +1,5 @@
 import { debounce } from '@microsoft/sp-lodash-subset';
-import { ActionButton, PanelType, SearchBox } from 'office-ui-fabric-react';
+import { ActionButton, PanelType, SearchBox } from '@fluentui/react';
 import * as React from 'react';
 import { FC } from 'react';
 import { createPanel } from '../hooks/usePanel';

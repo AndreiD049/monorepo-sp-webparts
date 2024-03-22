@@ -1,5 +1,5 @@
 import ITaskLog from "@service/sp-tasks/dist/models/ITaskLog";
-import { DefaultButton, PrimaryButton, TextField } from "office-ui-fabric-react";
+import { DefaultButton, PrimaryButton, TextField } from "@fluentui/react";
 import * as React from "react"
 import { closePanel, setPanelProperties } from "../../hooks/usePanel";
 import { updateTaskLog } from "../../hooks/useTasks";

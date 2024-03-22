@@ -1,7 +1,7 @@
 import ITask from '@service/sp-tasks/dist/models/ITask';
 import ITaskLog from '@service/sp-tasks/dist/models/ITaskLog';
 import { DateTime, Interval } from 'luxon';
-import { IPersonaProps, PersonaSize } from 'office-ui-fabric-react';
+import { IPersonaProps, PersonaSize } from '@fluentui/react';
 import { IUser } from '../models/IUser';
 import { CHANGE_DELETE_RE, CHANGE_ROW_RE, CHANGE_TOKEN_RE } from './constants';
 

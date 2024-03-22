@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { ActionButton, ComboBox, IComboBoxOption } from 'office-ui-fabric-react';
+import { ActionButton, ComboBox, IComboBoxOption } from '@fluentui/react';
 import * as React from 'react';
 import styles from './TimePicker.module.scss';
 

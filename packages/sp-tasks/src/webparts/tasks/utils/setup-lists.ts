@@ -3,7 +3,7 @@ import {
     DateTimeFieldFormatType,
     IListInfo,
 } from 'sp-preset';
-import { MessageBarType } from 'office-ui-fabric-react';
+import { MessageBarType } from '@fluentui/react';
 import { SPnotify } from 'sp-react-notifications';
 import TasksWebPart, { ITasksWebPartProps } from '../TasksWebPart';
 

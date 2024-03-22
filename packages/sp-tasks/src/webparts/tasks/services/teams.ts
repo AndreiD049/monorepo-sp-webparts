@@ -1,7 +1,7 @@
 import { SPFI, IItems, IList, Caching } from 'sp-preset';
 import { convertToUser, IUser } from '../models/IUser';
 import TasksWebPart from '../TasksWebPart';
-import { HOUR } from '../utils/constants';
+import { MINUTE } from '../utils/constants';
 import ITeams from '../utils/ITeams';
 import UserService from './users';
 
@@ -24,7 +24,7 @@ export default class TeamService {
         this.usersSP = TasksWebPart.SPBuilder.getSP('Users').using(
             Caching({
                 expireFunc: () =>
-                    new Date(new Date().getTime() + HOUR),
+                    new Date(new Date().getTime() + (15 * MINUTE)),
             })
         );
         const listName = url?.match(LIST_NAME_RE)[2];

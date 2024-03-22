@@ -1,4 +1,4 @@
-import { Persona } from 'office-ui-fabric-react';
+import { Persona } from '@fluentui/react';
 import * as React from 'react';
 import { FC } from 'react';
 import { Droppable } from 'react-beautiful-dnd';

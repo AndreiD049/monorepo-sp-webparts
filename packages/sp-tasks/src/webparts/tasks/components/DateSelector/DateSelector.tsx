@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { DateTime } from 'luxon';
-import { Calendar, DirectionalHint, IconButton, Text } from 'office-ui-fabric-react';
+import { Calendar, DirectionalHint, IconButton, Text } from '@fluentui/react';
 import styles from './DateSelector.module.scss';
 import { hideCallout, showCallout } from 'sp-components';
 import { MAIN_CALLOUT } from '../../utils/constants';

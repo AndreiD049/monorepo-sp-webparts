@@ -1,4 +1,4 @@
-import { CompactPeoplePicker, IPersonaProps, Label } from 'office-ui-fabric-react';
+import { CompactPeoplePicker, IPersonaProps, Label } from '@fluentui/react';
 import * as React from 'react';
 import GlobalContext from '../../utils/GlobalContext';
 import { userToPeoplePickerOption } from '../../utils/utils';
