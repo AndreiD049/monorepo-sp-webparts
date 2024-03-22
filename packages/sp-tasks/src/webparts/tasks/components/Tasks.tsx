@@ -23,14 +23,14 @@ const Tasks: React.FC = () => {
     const [search, setSearch] = React.useState<string>('');
 
     const [date, setDate] = useWebStorage<Date>(new Date(), {
-        key: 'selectedDate',
+        key: 'selectedDate-' + location.pathname,
         serialize: (val) => val.toISOString(),
         deserialize: (val) => new Date(val),
         expiresIn: HOUR * 8,
     });
 
     const [selectedUsers, setSelectedUsers] = useWebStorage<IUser[]>([], {
-        key: 'selectedUsers',
+        key: 'selectedUsers' + location.pathname,
     });
 
     const userIds = React.useMemo(
