@@ -198,9 +198,6 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                 if (props.displayMode === FormDisplayMode.New) {
                     const payload = encodeItem(data);
                     payload.IsApprovalNeeded = true;
-					if (payload.MaterialType === 'Packaging material') {
-						payload.IsApprovalNeeded = false;
-					}
                     const addedItem = await ItemService.createItem(payload);
                     await ItemService.addAttachments(
                         addedItem.data.Id,
