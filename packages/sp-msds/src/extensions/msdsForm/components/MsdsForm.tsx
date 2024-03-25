@@ -146,10 +146,22 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
     const databases = useDatabases(site);
     const approvers = useApprovers(site);
     const currentUser = useCurrentUser();
+	
+	// WARNING: whether current user is an approver will be decided based
+	// on the first approver in the list. 
+	// It is possible that there are multiple lines for a single site,
+	// so that user will not be considered and approver.
+	// TODO: check possibility to also take Database into consideration
     const isCurrentUserApprover = React.useMemo(() => {
-        if (currentUser && approvers.options.length > 0) {
+		if (currentUser && approvers.options.length > 0) {
+			const nonEmptyApprovers = approvers.options.filter(
+				(a) => a.HSEQresponsable !== undefined && a.HSEQresponsable.length > 0
+			);
+			if (nonEmptyApprovers.length === 0) {
+				return false;
+			}
             return (
-                approvers.options[0].HSEQresponsable.find(
+                nonEmptyApprovers[0].HSEQresponsable.find(
                     (a) => a.Id === currentUser.Id
                 ) !== undefined
             );
