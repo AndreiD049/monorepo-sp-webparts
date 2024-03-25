@@ -31,6 +31,7 @@ export function useFieldEffects(
     const siloOperations = watch('SiloOperations');
     const debagOperations = watch('DebaggingOperations');
     const packedOperations = watch('PackedOperations');
+	const site = watch('Site');
 
     const setValueIfAllowed = React.useMemo(() => {
         if (!isDirty) return (() => null) as typeof setValue;
@@ -150,4 +151,16 @@ export function useFieldEffects(
             });
         }
     });
+
+	// Request 03-19-2024 from Dmitri Gusan
+	// If site is 'Packaging Material', then:
+	// - MaterialType is 'Packaging material'
+	// - ProductType is 'PM'
+	useSingleFieldEffect(site, (site) => {
+		if (typeof site !== 'string') return;
+		if (site.toLowerCase() === 'packaging material') {
+			setValueIfAllowed('MaterialType', 'Packaging material');
+			setValueIfAllowed('ProductType', 'PM');
+		}
+	});
 }
