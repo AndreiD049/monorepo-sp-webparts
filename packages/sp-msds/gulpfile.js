@@ -35,6 +35,15 @@ build.configureWebpack.mergeConfig({
                 },
             })
         );
+
+        /** Do not bundle fluent-ui twice */
+        generatedConfiguration.resolve.alias = {
+            ...generatedConfiguration.resolve.alias,
+            '@fluentui/react': path.resolve(
+                __dirname,
+                'node_modules/@fluentui/react/'
+            ),
+        };
         return generatedConfiguration;
     },
 });
