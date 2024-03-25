@@ -1088,8 +1088,10 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                             control={control}
                                             title="Add SDS PDF and customer confirmation mail. "
                                             rules={{
-                                                required:
-                                                    'Attachments are required',
+												required:
+													materialType !== 'Packaging material'
+														? 'Attachments are required'
+														: false,
                                             }}
                                         />
                                     ) : (
