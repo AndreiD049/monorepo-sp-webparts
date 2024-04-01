@@ -134,14 +134,13 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
         return result;
     }, [teamUsers, searchParams]);
 
-	const responsibles = React.useMemo(() => {
-		const responsibleParam = searchParams.get('responsible');
-		debugger;
-		if (!responsibleParam) {
-			return [];
-		}
-		return responsibleParam.split(',').map((r) => parseInt(r));
-	}, [searchParams]);
+    const responsibles = React.useMemo(() => {
+        const responsibleParam = searchParams.get('responsible');
+        if (!responsibleParam) {
+            return [];
+        }
+        return responsibleParam.split(',').map((r) => parseInt(r));
+    }, [searchParams]);
 
     const locations = React.useMemo(
         () => uniq(flowLocations.map((l) => l.Title)),
@@ -182,15 +181,19 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 : processes.filter((p) =>
                       p.Title.toLowerCase().includes(searchVal)
                   );
-		// Show only processes that have responsibles
-		if (responsibles.length > 0) {
-			const noone = responsibles.indexOf(-1) > -1;
-			if (noone) {
-				filteredProcesses = filteredProcesses.filter((p) => !p.ResponsibleId);
-			} else {
-				filteredProcesses = filteredProcesses.filter((p) => responsibles.indexOf(p.ResponsibleId) > -1);
-			}
-		}
+        // Show only processes that have responsibles
+        if (responsibles.length > 0) {
+            const noone = responsibles.indexOf(-1) > -1;
+            if (noone) {
+                filteredProcesses = filteredProcesses.filter(
+                    (p) => !p.ResponsibleId
+                );
+            } else {
+                filteredProcesses = filteredProcesses.filter(
+                    (p) => responsibles.indexOf(p.ResponsibleId) > -1
+                );
+            }
+        }
         return filteredProcesses.map((p) => {
             let locations: IProcessFlowRow['locations'] = {};
             if (locationsByProcess[p.Id]) {
@@ -410,7 +413,8 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                                 i.process.Category ===
                                 draggedItem.process.Category
                         );
-                        const draggedIndex = sortedInCategory.indexOf(draggedItem);
+                        const draggedIndex =
+                            sortedInCategory.indexOf(draggedItem);
                         const targetIndex = sortedInCategory.indexOf(item);
 
                         if (draggedIndex === -1 || targetIndex === -1) {
@@ -442,7 +446,7 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                 styles={listStyles(ProcessFlowWebPart.currentTheme)}
                 onItemInvoked={(item) => {
                     navigate(
-                        `/team/${selectedTeam}/flow/${
+                        `/team/${encodeURIComponent(selectedTeam)}/flow/${
                             selectedFlow.Id
                         }/process/${item.process.Id}?${searchParams.toString()}`
                     );

@@ -56,18 +56,17 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
     const handleFlowSelected = React.useCallback(
         (flow: ICustomerFlow) => {
             props.onFlowSelected(flow);
-            navigate(`/team/${selectedTeam}/flow/${flow.Id}?${searchParams.toString()}`);
+            navigate(
+                `/team/${encodeURIComponent(selectedTeam)}/flow/${flow.Id}?${searchParams.toString()}`
+            );
         },
         [selectedTeam, searchParams]
     );
 
-    const handleTeamSelected = React.useCallback(
-        (team: string) => {
-            props.onTeamSelected(team);
-            navigate(`/team/${team}`);
-        },
-        []
-    );
+    const handleTeamSelected = React.useCallback((team: string) => {
+        props.onTeamSelected(team);
+        navigate(`/team/${encodeURIComponent(team)}`);
+    }, []);
 
     React.useEffect(() => {
         async function run(): Promise<void> {
@@ -79,9 +78,11 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                     if (flowId && Number.isInteger(+flowId)) {
                         const foundFlow = result.find((f) => f.Id === +flowId);
                         const selectedFlow = foundFlow || result[0];
-                        props.onFlowSelected(selectedFlow)
+                        props.onFlowSelected(selectedFlow);
                     } else if (result[0].Id) {
-                        navigate(`/team/${selectedTeam}/flow/${result[0].Id}?${searchParams.toString()}`);
+                        navigate(
+                            `/team/${encodeURIComponent(selectedTeam)}/flow/${result[0].Id}?${searchParams.toString()}`
+                        );
                     }
                 }
             } else {
@@ -96,10 +97,12 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
 
     const teamOptions: IComboBoxOption[] = React.useMemo(
         () =>
-            teams.filter((t) => t !== 'NA').map((team) => ({
-                key: team,
-                text: team,
-            })),
+            teams
+                .filter((t) => t !== 'NA')
+                .map((team) => ({
+                    key: team,
+                    text: team,
+                })),
         [teams]
     );
 
@@ -167,7 +170,9 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
     }, [selectedFlow]);
 
     const handleGoToOverview = React.useCallback(() => {
-        navigate(`/team/${selectedTeam}/flow/${selectedFlow.Id}/overview`);
+        navigate(
+            `/team/${encodeURIComponent(selectedTeam)}/flow/${selectedFlow.Id}/overview`
+        );
     }, [selectedTeam, selectedFlow]);
 
     const menuProps: IContextualMenuProps = React.useMemo(

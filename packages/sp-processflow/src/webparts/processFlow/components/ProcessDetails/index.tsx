@@ -223,13 +223,16 @@ const ResponsiblePicker: React.FC<{
             <NormalPeoplePicker
                 inputProps={{
                     id: 'details-responsible',
-					readOnly: !editable,
+                    readOnly: !editable,
                 }}
                 onResolveSuggestions={(filter, selected) => {
                     if (!editable) return selected;
                     return teamUsersOptions.filter((u) => {
-						return u.text.toLowerCase().indexOf(filter.toLowerCase()) > -1
-					});
+                        return (
+                            u.text.toLowerCase().indexOf(filter.toLowerCase()) >
+                            -1
+                        );
+                    });
                 }}
                 onEmptyResolveSuggestions={(selected) => {
                     if (!editable) return selected;
@@ -238,12 +241,12 @@ const ResponsiblePicker: React.FC<{
                 onChange={(items) => {
                     if (!editable) return;
                     if (items.length > 0) {
-						const id = (items[0] as { data: number }).data;
+                        const id = (items[0] as { data: number }).data;
                         props.onChange(id);
                     }
-					if (items.length === 0) {
+                    if (items.length === 0) {
                         props.onChange(null);
-					}
+                    }
                 }}
                 selectedItems={selectedPerson}
                 itemLimit={1}
@@ -277,8 +280,8 @@ const Details: React.FC<{ processId: number }> = (props) => {
                 Category: process.Category,
                 Allocation: process.Allocation,
                 UOM: process.UOM,
-				Responsible: process.Responsible,
-				ResponsibleId: process.Responsible?.Id,
+                Responsible: process.Responsible,
+                ResponsibleId: process.Responsible?.Id,
             });
         }
     }, [editable, process]);
@@ -348,12 +351,12 @@ const Details: React.FC<{ processId: number }> = (props) => {
         const keys = Object.keys(data);
         let changed = false;
         keys.forEach((k: keyof IProcess) => {
-			console.log(k);
+            console.log(k);
             if (data[k] !== process[k]) changed = true;
         });
-		console.log(changed);
+        console.log(changed);
         if (changed) {
-			delete data.Responsible;
+            delete data.Responsible;
             await ProcessService.updateProcess(process.Id, data);
         }
         setEditable(false);
@@ -374,7 +377,7 @@ const Details: React.FC<{ processId: number }> = (props) => {
                         try {
                             hideDialog(PANEL_DIALOG);
                             navigate(
-                                `/team/${selectedTeam}/flow/${selectedFlow.Id}`
+                                `/team/${encodeURIComponent(selectedTeam)}/flow/${selectedFlow.Id}`
                             );
                             showSpinner(LOADING_SPINNER);
                             for (const up of userProcesses) {
@@ -504,7 +507,9 @@ const Details: React.FC<{ processId: number }> = (props) => {
             />
             <ResponsiblePicker
                 editable={editable}
-                selectedId={editable ? data.Responsible?.Id : process.Responsible?.Id}
+                selectedId={
+                    editable ? data.Responsible?.Id : process.Responsible?.Id
+                }
                 onChange={(id) =>
                     setData((prev) => ({
                         ...prev,
@@ -583,7 +588,7 @@ export const ProcessDetails: React.FC<IProcessDetailsProps> = (props) => {
             isLightDismiss
             onDismiss={() => {
                 navigate(
-                    `/team/${selectedTeam}/flow/${
+                    `/team/${encodeURIComponent(selectedTeam)}/flow/${
                         selectedFlow.Id
                     }?${searchParams.toString()}`
                 );

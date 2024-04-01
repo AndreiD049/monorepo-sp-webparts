@@ -50,7 +50,7 @@ export const TeamPlannedOverview: React.FC = () => {
                 key: 'Flow',
                 name: 'Flow',
                 minWidth: 150,
-                onRender: (item) => (<Link to={`/team/${selectedTeam}/flow/${item.FlowId}/process/${item.ProcessId}`}>{item.Flow.Title}</Link>),
+                onRender: (item) => (<Link to={`/team/${encodeURIComponent(selectedTeam)}/flow/${item.FlowId}/process/${item.ProcessId}`}>{item.Flow.Title}</Link>),
                 isResizable: true,
             },
         ]
