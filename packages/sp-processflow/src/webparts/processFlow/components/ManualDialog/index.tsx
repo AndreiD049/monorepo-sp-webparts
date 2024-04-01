@@ -4,7 +4,7 @@ import {
     MessageBarType,
     PrimaryButton,
     TextField,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { hideDialog, hideSpinner, showDialog, showSpinner } from 'sp-components';
 import { MainService } from '../../services/main-service';

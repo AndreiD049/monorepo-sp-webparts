@@ -1,4 +1,4 @@
-import { ITextFieldProps } from 'office-ui-fabric-react';
+import { ITextFieldProps } from '@fluentui/react';
 import * as React from 'react';
 import { MainService } from '../../services/main-service';
 import { GenericTextField } from '../GenericTextField';

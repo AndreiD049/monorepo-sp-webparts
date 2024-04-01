@@ -15,7 +15,7 @@ import { ProcessFlow } from './components/ProcessFlow';
 import { IJsonConfig, PropertyPaneJsonConfiguration } from 'json-configuration';
 import { IProcessFlowConfig } from './IProcessFlowConfig';
 import { SPnotify } from 'sp-react-notifications';
-import { MessageBarType } from 'office-ui-fabric-react';
+import { MessageBarType } from '@fluentui/react';
 import { setupLists } from './utils/setup-lists';
 import { MainService } from './services/main-service';
 import './styles.css';

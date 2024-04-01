@@ -4,7 +4,7 @@ import {
     IconButton,
     MessageBarType,
     TextField,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { hidePanel, hideSpinner, showSpinner } from 'sp-components';
 import { IItemAddResult } from 'sp-preset';

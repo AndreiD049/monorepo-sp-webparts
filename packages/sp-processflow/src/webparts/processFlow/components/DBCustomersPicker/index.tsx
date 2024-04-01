@@ -3,7 +3,7 @@ import {
     Label,
     TagPicker,
     ValidationState,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import styles from './DBCustomersPicker.module.scss';
 

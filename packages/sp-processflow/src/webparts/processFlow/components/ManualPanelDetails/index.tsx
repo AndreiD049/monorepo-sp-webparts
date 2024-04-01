@@ -1,6 +1,6 @@
 import { getDocIcon } from '@service/process-flow';
 import { IManualJson } from '@service/process-flow/dist/models';
-import { ActionButton } from 'office-ui-fabric-react';
+import { ActionButton } from '@fluentui/react';
 import * as React from 'react';
 import { MainService } from '../../services/main-service';
 import styles from './ManualPanelDetails.module.scss';

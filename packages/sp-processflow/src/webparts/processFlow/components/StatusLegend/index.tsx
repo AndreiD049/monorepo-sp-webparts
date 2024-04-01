@@ -1,4 +1,4 @@
-import { Icon, Separator, Text } from 'office-ui-fabric-react';
+import { Icon, Separator, Text } from '@fluentui/react';
 import * as React from 'react';
 import cellStyles from '../ProcessFlowTable/UserCell/UserCell.module.scss';
 import styles from './StatusLegend.module.scss';

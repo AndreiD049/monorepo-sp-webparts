@@ -20,7 +20,7 @@ import {
     Separator,
     Text,
     TextField,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {

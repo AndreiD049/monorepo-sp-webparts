@@ -2,7 +2,7 @@ import { groupBy } from '@microsoft/sp-lodash-subset';
 import * as React from 'react';
 import { IProcessFlowRow } from '../../models/IProcessFlowRow';
 import { ICustomerFlow } from '@service/process-flow';
-import { IGroup } from 'office-ui-fabric-react';
+import { IGroup } from '@fluentui/react';
 import { headerProps, renderHeader } from './header';
 import ProcessFlowWebPart from '../../ProcessFlowWebPart';
 

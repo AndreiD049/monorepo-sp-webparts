@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { getTheme, IColumn } from 'office-ui-fabric-react';
+import { getTheme, IColumn } from '@fluentui/react';
 import { IUserListInfo } from '@service/users';
 import { UserColumnHeader } from './UserColumnHeader';
 import { UserCell } from './UserCell';

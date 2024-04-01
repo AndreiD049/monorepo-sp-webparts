@@ -1,4 +1,4 @@
-import { ITextFieldProps, TextField } from 'office-ui-fabric-react';
+import { ITextFieldProps, TextField } from '@fluentui/react';
 import * as React from 'react';
 
 export interface IGenericTextFieldProps extends ITextFieldProps {

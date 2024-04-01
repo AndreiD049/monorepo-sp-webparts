@@ -1,4 +1,4 @@
-import { IPersonaProps } from 'office-ui-fabric-react';
+import { IPersonaProps } from '@fluentui/react';
 
 type ITeamUser = { User: { Title: string; EMail: string; Id: number } };
 
@@ -14,3 +14,4 @@ export const getTeamPersonaProps: (t: ITeamUser[]) => (IPersonaProps & { data: n
         };
     });
 };
+

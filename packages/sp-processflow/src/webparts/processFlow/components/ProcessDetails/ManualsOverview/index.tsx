@@ -1,6 +1,6 @@
 import { getDocIcon } from '@service/process-flow';
 import { IManualJson } from '@service/process-flow/dist/models';
-import { ActionButton, DefaultButton, Icon, IContextualMenuProps, PanelType, Text } from 'office-ui-fabric-react';
+import { ActionButton, DefaultButton, Icon, IContextualMenuProps, PanelType, Text } from '@fluentui/react';
 import * as React from 'react';
 import {
 	FooterYesNo,

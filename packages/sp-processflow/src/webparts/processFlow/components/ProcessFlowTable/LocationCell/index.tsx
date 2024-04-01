@@ -1,5 +1,5 @@
 import { IFlowLocation } from '@service/process-flow';
-import { ActionButton, Stack } from 'office-ui-fabric-react';
+import { ActionButton, Stack } from '@fluentui/react';
 import * as React from 'react';
 import {
     hideCallout,

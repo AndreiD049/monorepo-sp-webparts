@@ -1,6 +1,6 @@
 import { IProcess, readManualJson } from '@service/process-flow';
 import { IManualJson } from '@service/process-flow/dist/models';
-import { ActionButton, IconButton } from 'office-ui-fabric-react';
+import { ActionButton, IconButton } from '@fluentui/react';
 import * as React from 'react';
 import { hideCallout, showCallout, showPanel } from 'sp-components';
 import { MAIN_CALLOUT, PANEL_MANUALS } from '../../../utils/constants';

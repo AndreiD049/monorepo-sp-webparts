@@ -1,6 +1,6 @@
 import { groupBy } from '@microsoft/sp-lodash-subset';
 import { IUserProcessDetailed } from '@service/process-flow';
-import { DetailsList, DetailsListLayoutMode, IColumn, IGroup, Panel, PanelType, SelectionMode } from 'office-ui-fabric-react';
+import { DetailsList, DetailsListLayoutMode, IColumn, IGroup, Panel, PanelType, SelectionMode } from '@fluentui/react';
 import * as React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MainService } from '../../services/main-service';

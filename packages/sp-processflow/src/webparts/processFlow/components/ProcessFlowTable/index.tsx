@@ -14,7 +14,7 @@ import {
     IGroup,
     IStyleFunctionOrObject,
     SelectionMode,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import * as React from 'react';
 import useWebStorage from 'use-web-storage-api';

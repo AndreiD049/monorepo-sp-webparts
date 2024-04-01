@@ -3,7 +3,7 @@ import {
     GroupHeader,
     IconButton,
     IDetailsGroupDividerProps,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import { swap } from '../../services/array-service';
 import styles from './ProcessFlowTable.module.scss';

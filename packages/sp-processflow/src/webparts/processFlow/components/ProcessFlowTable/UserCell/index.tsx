@@ -3,7 +3,7 @@ import {
     IUserProcess,
 } from '@service/process-flow';
 import { IUserProps } from '@service/users';
-import { MessageBarType } from 'office-ui-fabric-react';
+import { MessageBarType } from '@fluentui/react';
 import * as React from 'react';
 import { FooterYesNo, hideDialog, showDialog } from 'sp-components';
 import { SPnotify } from 'sp-react-notifications';

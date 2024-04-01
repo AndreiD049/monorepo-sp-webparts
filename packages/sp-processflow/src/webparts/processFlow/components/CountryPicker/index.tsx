@@ -5,7 +5,7 @@ import {
     TagPicker,
     Text,
     ValidationState,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import styles from './CountryPicker.module.scss';
 

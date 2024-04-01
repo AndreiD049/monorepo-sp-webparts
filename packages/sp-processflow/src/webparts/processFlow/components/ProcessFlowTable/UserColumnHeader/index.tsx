@@ -3,7 +3,7 @@ import {
     IDetailsColumnProps,
     PersonaCoin,
     PersonaSize,
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 import * as React from 'react';
 import styles from './UserColumnHeader.module.scss';
 

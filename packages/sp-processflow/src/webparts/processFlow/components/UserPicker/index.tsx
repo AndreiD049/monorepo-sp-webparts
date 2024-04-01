@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styles from './UserPicker.module.scss';
-import { IPersonaProps, NormalPeoplePicker } from 'office-ui-fabric-react';
+import { IPersonaProps, NormalPeoplePicker } from '@fluentui/react';
 import { GlobalContext } from '../../utils/globalContext';
 import { Label } from '@fluentui/react';
 import { getTeamPersonaProps } from '../../utils/varia';

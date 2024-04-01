@@ -1,6 +1,6 @@
 import { IFlowLocation } from '@service/process-flow';
 import { uniq } from 'lodash';
-import { PrimaryButton, TextField } from 'office-ui-fabric-react';
+import { PrimaryButton, TextField } from '@fluentui/react';
 import * as React from 'react';
 import {
     FooterYesNo,

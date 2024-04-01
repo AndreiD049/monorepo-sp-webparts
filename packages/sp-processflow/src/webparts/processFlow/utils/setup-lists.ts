@@ -3,7 +3,7 @@ import { IProcessFlowConfig } from "../IProcessFlowConfig";
 import { IJsonConfig } from "json-configuration";
 import ProcessFlowWebPart from "../ProcessFlowWebPart";
 import { SPnotify } from "sp-react-notifications";
-import { MessageBarType } from "office-ui-fabric-react";
+import { MessageBarType } from "@fluentui/react";
 import { COUNTRIES } from "./constants";
 
 const notify = (message: string): void => {

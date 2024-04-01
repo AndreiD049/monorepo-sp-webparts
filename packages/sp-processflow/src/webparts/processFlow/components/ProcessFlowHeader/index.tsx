@@ -1,6 +1,6 @@
 import { ICustomerFlow } from '@service/process-flow';
 import { isNaN } from 'lodash';
-import { IconButton } from 'office-ui-fabric-react';
+import { IconButton } from '@fluentui/react';
 import * as React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { MainService } from '../../services/main-service';

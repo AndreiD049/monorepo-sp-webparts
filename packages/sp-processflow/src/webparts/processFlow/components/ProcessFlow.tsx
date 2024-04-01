@@ -10,7 +10,7 @@ import {
 import { MAIN_CALLOUT, LOADING_SPINNER, MAIN_DIALOG, MAIN_PANEL, PANEL_MANUALS } from '../utils/constants';
 import { CommandBar } from './CommandBar';
 import { Callout, Dialog, Footer, LoadingSpinner, Panel } from 'sp-components';
-import { PanelType, Separator } from 'office-ui-fabric-react';
+import { PanelType, Separator } from '@fluentui/react';
 import { ProcessFlowContent } from './ProcessFlowContent';
 import { ProcessFlowHeader } from './ProcessFlowHeader';
 import { HashRouter, Routes, Route, Outlet } from 'react-router-dom';
