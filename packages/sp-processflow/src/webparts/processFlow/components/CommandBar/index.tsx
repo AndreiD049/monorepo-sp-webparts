@@ -79,11 +79,16 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                         const foundFlow = result.find((f) => f.Id === +flowId);
                         const selectedFlow = foundFlow || result[0];
                         props.onFlowSelected(selectedFlow);
-                    } else if (result[0].Id) {
+                    } else if (result[0]?.Id) {
                         navigate(
                             `/team/${encodeURIComponent(selectedTeam)}/flow/${result[0].Id}?${searchParams.toString()}`
                         );
-                    }
+						props.onFlowSelected(result[0])
+                    } else {
+                        navigate(
+                            `/team/${encodeURIComponent(selectedTeam)}`
+                        );
+					}
                 }
             } else {
                 const { team } = params;
@@ -93,7 +98,7 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
             }
         }
         run().catch((err) => console.error(err));
-    }, [selectedTeam, searchParams, params.flowId]);
+    }, [selectedTeam, searchParams]);
 
     const teamOptions: IComboBoxOption[] = React.useMemo(
         () =>
