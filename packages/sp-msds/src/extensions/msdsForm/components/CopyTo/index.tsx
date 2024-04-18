@@ -166,9 +166,9 @@ export const CopyTo: React.FC<ICopyToProps> = (props) => {
 
 			// if same site, no approval needed
 			if (data.Site === props.item.Site) {
-				await ItemService.setApprovalStatus(result.data.Id, payload.OData__ModerationStatus === 0 ? 'Approved' : 'Pending');
+				await ItemService.setApprovalStatus(result.data.Id, 'Pending', false);
 			} else {
-				await ItemService.setApprovalStatus(result.data.Id, 'Pending');
+				await ItemService.setApprovalStatus(result.data.Id, 'Pending', true);
 			}
 
 			hideSpinner(SPINNER_ID);

@@ -9,10 +9,10 @@ import {
 import { IMSDSRequest } from './IMSDSRequest';
 
 const approvalToValue = {
-    Approved: { value: '0', approvalNeeded: '0' },
-    Rejected: { value: '1', approvalNeeded: '0' },
-    Pending: { value: '2', approvalNeeded: '1' },
-    Draft: { value: '3', approvalNeeded: '0' },
+    Approved: { value: '0', },
+    Rejected: { value: '1', },
+    Pending: { value: '2', },
+    Draft: { value: '3', },
 };
 
 export class ItemService {
@@ -49,7 +49,8 @@ export class ItemService {
 
     public static async setApprovalStatus(
         id: number,
-        value: keyof typeof approvalToValue
+        value: keyof typeof approvalToValue,
+		isApprovalNeeded: boolean
     ): Promise<void> {
         const item = this.applicationList.items.getById(id);
         const translation = approvalToValue[value];
@@ -62,7 +63,7 @@ export class ItemService {
                 },
                 {
                     FieldName: 'IsApprovalNeeded',
-                    FieldValue: translation.approvalNeeded,
+                    FieldValue: isApprovalNeeded ? '1' : '0',
                 },
             ],
             true
