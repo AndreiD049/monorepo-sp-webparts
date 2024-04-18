@@ -199,10 +199,12 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                     const payload = encodeItem(data);
                     payload.IsApprovalNeeded = true;
                     const addedItem = await ItemService.createItem(payload);
-                    await ItemService.addAttachments(
-                        addedItem.data.Id,
-                        data.Attachments
-                    );
+					if (data.Attachments && data.Attachments.length > 0) {
+						await ItemService.addAttachments(
+							addedItem.data.Id,
+							data.Attachments
+						);
+					}
                     props.onSave();
                 } else {
                     let payload: Partial<IMSDSRequest> = {};
