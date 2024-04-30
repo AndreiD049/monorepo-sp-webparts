@@ -261,7 +261,6 @@ export const CommandBar: React.FC<ICommandBarProps> = (props) => {
                 </ActionButton>
                 <SearchBox
                     placeholder="Search..."
-                    value={searchParams.get('search') || ''}
                     onChange={debounce((_ev, newValue) => {
                         setSearchParams((prev) => {
                             prev.set('search', newValue);
