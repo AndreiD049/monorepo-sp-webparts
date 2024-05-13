@@ -1,9 +1,9 @@
-export type CalendarTypes = "cip" | "processflow" | "rotations";
+export type CalendarTypes = 'cip' | 'processflow' | 'rotations' | 'evaluations';
 
 interface UserExanded {
     Id: number;
     Title: string;
-    EMail: string;    
+    EMail: string;
 }
 
 export interface ICalendarCipItem {
@@ -26,19 +26,32 @@ export interface ICalendarProcessFlowItem {
     Process: {
         Id: number;
         Title: string;
-    }
+    };
 }
 
 export interface ICalendarRotationsItem {
-	Id: number;
-	Personinvolved: UserExanded;
-	Persontogo: UserExanded;
-	Dateplanned: string;
-	Status: string;
-	Activityrecommended: string;
+    Id: number;
+    Personinvolved: UserExanded;
+    Persontogo: UserExanded;
+    Dateplanned: string;
+    Status: string;
+    Activityrecommended: string;
 }
 
-export type CalendarItemTypes = ICalendarCipItem | ICalendarProcessFlowItem | ICalendarRotationsItem;
+export interface ICalendarEvaluationItem {
+    Id: number;
+	Team: string;
+    Status: string;
+	CurrentLevel: string;
+	DatePlanned: string;
+	Employee: UserExanded;
+}
+
+export type CalendarItemTypes =
+    | ICalendarCipItem
+    | ICalendarProcessFlowItem
+    | ICalendarRotationsItem
+	| ICalendarEvaluationItem;
 
 export interface IWrappedCalendarItem {
     type: CalendarTypes;

@@ -8,6 +8,7 @@ import { CalendarItemCip } from './CalendarItemCip';
 import { CalendarItemProcessFlow } from './CalendarItemProcessFlow';
 import { CalendarItemRotations } from './CalendarItemRotations';
 import styles from './CalendarItems.module.scss';
+import { CalendarItemEvaluations } from './CalendarItemEvaluations';
 
 export interface ICalendarItemsProps {
     items: IWrappedCalendarItem[];
@@ -21,6 +22,8 @@ const CalendarItem: React.FC<{ wrapped: IWrappedCalendarItem }> = (props) => {
             return <CalendarItemProcessFlow wrapped={props.wrapped} />;
         case 'rotations':
             return <CalendarItemRotations wrapped={props.wrapped} />;
+		case 'evaluations':
+			return <CalendarItemEvaluations wrapped={props.wrapped} />
         default:
             return <div>Unknwon item type. Check with Support.</div>;
     }
