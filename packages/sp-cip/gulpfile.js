@@ -19,28 +19,19 @@ build.configureWebpack.mergeConfig({
             new DuplicatePackageCheckerPlugin({
                 emitError: true,
                 exclude: (instance) => {
-                    // Sometimes different dependencies use the same package with different versions, if there is no possibility to avoid it, we can skip
-                    const ignoredDuplicates = new Set([
-                        '@microsoft/load-themed-styles',
-                        '@fluentui/dom-utilities',
-                        '@fluentui/theme',
-                    ]);
-                    if (ignoredDuplicates.has(instance.name)) return true;
+					if (instance.name.includes('@fluentui') || instance.name.includes('@microsoft')) {
+						return true
+					}
                     return false;
                 },
             })
         );
         generatedConfiguration.resolve.alias = {
             ...generatedConfiguration.resolve.alias,
-            'office-ui-fabric-react': path.resolve(
+            '@fluentui': path.resolve(
                 // eslint-disable-next-line no-undef
                 __dirname,
-                'node_modules/office-ui-fabric-react/'
-            ),
-            '@microsoft/load-themed-styles': path.resolve(
-                // eslint-disable-next-line no-undef
-                __dirname,
-                'node_modules/@microsoft/load-themed-styles/'
+                'node_modules/@fluentui/'
             ),
             tslib: path.resolve(
                 // eslint-disable-next-line no-undef

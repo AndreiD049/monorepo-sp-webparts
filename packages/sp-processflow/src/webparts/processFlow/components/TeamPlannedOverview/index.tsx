@@ -9,7 +9,7 @@ import styles from './TeamPlannedOverview.module.scss';
 
 export const TeamPlannedOverview: React.FC = () => {
     const { UserProcessService } = MainService;
-    const { selectedTeam, selectedFlow } = React.useContext(GlobalContext);
+    const { selectedTeam, selectedFlow, teamUsers } = React.useContext(GlobalContext);
     const [userProcesses, setUserProcesses] = React.useState<
         IUserProcessDetailed[]
     >([]);
@@ -18,11 +18,14 @@ export const TeamPlannedOverview: React.FC = () => {
     React.useEffect(() => {
         async function run(): Promise<void> {
             if (!selectedTeam) return;
-            const result = await UserProcessService.getByTeamAndStatus(
+            let result = await UserProcessService.getByTeamAndStatus(
                 selectedTeam,
                 'Planned'
             );
-            setUserProcesses(result.filter((i) => i.Date !== null));
+			const teamUserIds = teamUsers.map((u) => u.User.Id)
+			result = result.filter((i) => i.Date !== null)
+			result = result.filter((i) => teamUserIds.indexOf(i.User.Id) > -1)
+            setUserProcesses(result);
         }
         run().catch((err) => console.error(err));
     }, [selectedTeam]);

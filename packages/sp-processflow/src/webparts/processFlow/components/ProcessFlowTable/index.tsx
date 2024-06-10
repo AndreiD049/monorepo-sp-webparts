@@ -40,6 +40,7 @@ import { useColumns } from './useColumns';
 import { useGroups } from './useGroups';
 import { useCopyPaste } from './useCopyPaste';
 import { hideSpinner, showSpinner } from 'sp-components';
+import { sortUsers } from '../../utils/varia';
 
 export interface IProcessFlowTableProps {
     flow?: ICustomerFlow;
@@ -118,7 +119,8 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
     }, [searchParams, search]);
 
     const columnUsers = React.useMemo(() => {
-        let result = teamUsers.map((u) => u.User);
+		const sortedTeamUsers = sortUsers(teamUsers);
+        let result = sortedTeamUsers.map((u) => u.User);
         const usersParam = searchParams.get('users');
         const selectedUserIds = usersParam
             ? searchParams

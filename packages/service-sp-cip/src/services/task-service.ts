@@ -36,7 +36,7 @@ export class TaskService {
 		if (filter) {
 			request = request.filter(filter);
 		}
-        return request.select(...LIST_SELECT).expand(...LIST_EXPAND);
+        return request.select(...LIST_SELECT).expand(...LIST_EXPAND).orderBy('Created', false)
     }
 
     async getAll(team?: string, status?: 'Open' | 'Finished' | 'All'): Promise<ITaskOverview[]> {
