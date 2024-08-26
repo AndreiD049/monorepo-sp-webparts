@@ -37,10 +37,6 @@ export const taskServiceProxyOptions: (remote: string) => ICacheProxyOptions<Tas
     storeName: STORE_NAME,
     prefix: `${remote}/TaskService`,
     props: {
-        getAll: {
-            isCached: true,
-            expiresIn: 8 * HOUR,
-        },
 		getTaskTimingInfo: {
 			isCached: true,
 			expiresIn: MINUTE * 10,
