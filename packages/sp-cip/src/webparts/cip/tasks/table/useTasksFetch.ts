@@ -72,7 +72,7 @@ export const useTasksFetch = (
 				setTasks((prev) => {
                     const isSubtaskOrphan = prev.find((t) => t.Id === task.ParentId) === undefined
                     // If parent is not in our list, we just replace the subtask
-                    if (isSubtaskOrphan) return prev.filter((t) => t.Id === task.Id ? task : t)
+                    if (isSubtaskOrphan) return prev.map((t) => t.Id === task.Id ? task : t)
                     return prev.filter((t) => t.Id !== task.Id)
                 });
 				return;
