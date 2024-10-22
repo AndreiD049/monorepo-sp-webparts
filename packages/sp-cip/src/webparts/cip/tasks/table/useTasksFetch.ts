@@ -69,7 +69,12 @@ export const useTasksFetch = (
         // When task is updated
         const removeTaskUpdated = taskUpdatedHandler((task) => {
 			if (task.ParentId) {
-				setTasks((prev) => prev.filter((t) => t.Id !== task.Id));
+				setTasks((prev) => {
+                    const isSubtaskOrphan = prev.find((t) => t.Id === task.ParentId) === undefined
+                    // If parent is not in our list, we just replace the subtask
+                    if (isSubtaskOrphan) return prev.filter((t) => t.Id === task.Id ? task : t)
+                    return prev.filter((t) => t.Id !== task.Id)
+                });
 				return;
 			}
             setTasks((prev) => {
