@@ -95,6 +95,9 @@ const Root: React.FC<IRootProps> = ({ properties }) => {
                                         ID={searchParams.get(
                                             constants.periodId
                                         )}
+                                        UserID={searchParams.get(
+                                            constants.userId
+                                        )}
                                     />
                                     );
                             } else {

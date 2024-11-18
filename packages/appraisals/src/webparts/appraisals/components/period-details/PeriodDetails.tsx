@@ -12,9 +12,12 @@ import ObjectiveItems from '../items/ObjectiveItems';
 import TrainingItems from '../items/TrainingItems';
 import SwotItems from '../items/SwotItems';
 import Feedback from '../items/Feedback';
+import constants from '../../utils/constants';
+import { useHistory } from 'react-router-dom';
 
 export interface IPeriodDetailsProps {
     ID: string;
+    UserID?: string;
 }
 
 const theme = getTheme();
@@ -28,6 +31,7 @@ const theme = getTheme();
  */
 const PeriodDetails: React.FC<IPeriodDetailsProps> = (props) => {
     const context = React.useContext(UserContext);
+    const history = useHistory();
     const forceUpdate = useForceUpdate();
     const [period, setPeriod] = React.useState<IPeriod>(null);
     const [currentUser, setCurrentUser] = React.useState<IUser>(null);
@@ -42,7 +46,12 @@ const PeriodDetails: React.FC<IPeriodDetailsProps> = (props) => {
 
     React.useEffect(() => {
         async function run() {
-            const cu = await context.UserService.getCurrentUser();
+            let cu: IUser;
+            if (props.UserID) {
+                cu = await context.UserService.getUserById(props.UserID);
+            } else {
+                cu = await context.UserService.getCurrentUser();
+            }
             setCurrentUser(cu);
             if (!(await context.FolderService.getCurrentUserFolder())) {
                 SPnotify({
@@ -60,6 +69,13 @@ const PeriodDetails: React.FC<IPeriodDetailsProps> = (props) => {
         }
         run();
     }, []);
+
+    const onUserSelected = (user: IUser) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set(constants.userId, user.Id);
+        history.push(url.pathname + url.search);
+        setCurrentUser(user);
+    }
 
     return (
         <Stack horizontalAlign="center" tokens={{ childrenGap: 12 }}>
@@ -89,7 +105,7 @@ const PeriodDetails: React.FC<IPeriodDetailsProps> = (props) => {
                 <PeoplePicker
                     people={context.teamUsers}
                     selected={currentUser}
-                    setSelected={setCurrentUser}
+                    setSelected={onUserSelected}
                 />
             </StackItem>
             {/* My Objectives */}
