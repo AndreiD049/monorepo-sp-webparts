@@ -117,6 +117,14 @@ export const Task: React.FC<ITaskProps> = ({
                 borderLeftColor: props.theme ? props.theme.palette.themePrimary : 'inherit',
                 ...style,
             }}
+            tabIndex={0}
+            onClick={(ev) => {
+                const target = ev.target as HTMLDivElement
+                const closestFocusable = target.closest("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])") as HTMLElement
+                if (closestFocusable) {
+                    closestFocusable.focus();
+                }
+            }}
         >
             <div className={styles.header}>
                 {info.remark && (
@@ -194,3 +202,39 @@ export const Task: React.FC<ITaskProps> = ({
         </div>
     );
 };
+
+export interface ITaskGroupsProps {
+    groupName: string;
+    statusMap: { [status: string]: number };
+}
+
+export const TaskGroup: React.FC<ITaskGroupsProps> = (props) => {
+    const [open, setOpen] = React.useState(false);
+
+    const handleClick = () => {
+        setOpen((prev) => !prev);
+    };
+
+    return (
+        <div className={styles.taskGroup}>
+            <Text block variant="mediumPlus" onClick={handleClick} styles={{
+                root: {
+                    display: 'flex',
+                    flexFlow: 'row nowrap',
+                    alignItems: 'center',
+                    gap: '1em',
+                }
+            }}>
+                {props.groupName}
+                <Icon iconName={open ? 'ChevronDown' : 'ChevronRight'} />
+            </Text>
+            <div className={styles.statusLine}>
+                <div className={styles.open}>{props.statusMap.Open ?? 0}</div>
+                <div className={styles.pending}>{props.statusMap.Pending ?? 0}</div>
+                <div className={styles.finished}>{props.statusMap.Finished ?? 0}</div>
+                <div className={styles.cancelled}>{props.statusMap.Cancelled ?? 0}</div>
+            </div>
+            {open && props.children}
+        </div>
+    );
+}

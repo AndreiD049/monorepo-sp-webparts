@@ -75,3 +75,51 @@
 .Task_person {
     align-self: end;
 }
+
+.statusLine {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 1em;
+
+    & > div {
+        border: 1px solid;
+        border-color: $ms-color-neutralSecondaryAlt;
+        border-radius: 100%;
+        width: 1.5em;
+        height: 1.5em;
+        text-align: center;
+    }
+
+    & .pending {
+        background-color: #fff1cc;
+    }
+
+    & .open {
+        background-color: #edebe9;
+    }
+
+    & .finished {
+        background-color: #ddfbdd;
+    }
+
+    & .cancelled {
+        background-color: #fde2e4;
+    }
+}
+
+.taskGroup {
+    border: 1px solid;
+    border-color: $ms-color-neutralTertiaryAlt;
+    padding: 0 .3em 1em .3em;
+    width: 100%;
+    
+    & > span {
+        cursor: pointer;
+        font-weight: bold;
+        padding: .5em 0;
+    }
+
+    & > div + div {
+        margin-top: 0.7em;
+    }
+}
