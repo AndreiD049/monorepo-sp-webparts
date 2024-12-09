@@ -206,6 +206,7 @@ export const Task: React.FC<ITaskProps> = ({
 export interface ITaskGroupsProps {
     groupName: string;
     statusMap: { [status: string]: number };
+    style?: React.CSSProperties
 }
 
 export const TaskGroup: React.FC<ITaskGroupsProps> = (props) => {
@@ -216,7 +217,7 @@ export const TaskGroup: React.FC<ITaskGroupsProps> = (props) => {
     };
 
     return (
-        <div className={styles.taskGroup}>
+        <div className={styles.taskGroup} style={props.style}>
             <Text block variant="mediumPlus" onClick={handleClick} styles={{
                 root: {
                     display: 'flex',
