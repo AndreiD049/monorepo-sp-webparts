@@ -70,15 +70,17 @@ $break: 750px;
         flex-flow: column;
         min-width: 333px;
         align-items: stretch;
-        padding: 1em;
         border-left-color: '[theme: themePrimary, default: #0078d7]';
         background-color: '[theme: neutralLighterAlt, default: #fbf4f4]';
         align-self: stretch;
+        align-items: center;
+        padding: 0px 1em;        
 
         & > * + * {
             margin-top: 0.7em;
         }
     }
+
 
     .noTasks {
         height: 6em;

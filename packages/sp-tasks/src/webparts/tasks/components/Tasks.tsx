@@ -84,6 +84,7 @@ const Tasks: React.FC = () => {
      */
     const handleTaskDropped = async ({ destination, source, draggableId }: DropResult) => {
         if (!source || !destination) return;
+        if (destination.droppableId === source.droppableId && destination.index === source.index) return;
         /**
          * Reassign to another user.
          * When reassigning to another user, the field user is updated
