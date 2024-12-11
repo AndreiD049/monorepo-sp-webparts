@@ -137,7 +137,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
     });
 
     const site = watch('Site');
-	const msdsPermittedYears = getPermittedYearsPerSite(site);
+    const msdsPermittedYears = getPermittedYearsPerSite(site);
     const database = watch('Database');
     const materialType = watch('MaterialType');
     const hasSDS = watch('HasMsds');
@@ -146,20 +146,22 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
     const databases = useDatabases(site);
     const approvers = useApprovers(site);
     const currentUser = useCurrentUser();
-	
-	// WARNING: whether current user is an approver will be decided based
-	// on the first approver in the list. 
-	// It is possible that there are multiple lines for a single site,
-	// so that user will not be considered and approver.
-	// TODO: check possibility to also take Database into consideration
+
+    // WARNING: whether current user is an approver will be decided based
+    // on the first approver in the list.
+    // It is possible that there are multiple lines for a single site,
+    // so that user will not be considered and approver.
+    // TODO: check possibility to also take Database into consideration
     const isCurrentUserApprover = React.useMemo(() => {
-		if (currentUser && approvers.options.length > 0) {
-			const nonEmptyApprovers = approvers.options.filter(
-				(a) => a.HSEQresponsable !== undefined && a.HSEQresponsable.length > 0
-			);
-			if (nonEmptyApprovers.length === 0) {
-				return false;
-			}
+        if (currentUser && approvers.options.length > 0) {
+            const nonEmptyApprovers = approvers.options.filter(
+                (a) =>
+                    a.HSEQresponsable !== undefined &&
+                    a.HSEQresponsable.length > 0
+            );
+            if (nonEmptyApprovers.length === 0) {
+                return false;
+            }
             return (
                 nonEmptyApprovers[0].HSEQresponsable.find(
                     (a) => a.Id === currentUser.Id
@@ -199,12 +201,12 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                     const payload = encodeItem(data);
                     payload.IsApprovalNeeded = true;
                     const addedItem = await ItemService.createItem(payload);
-					if (data.Attachments && data.Attachments.length > 0) {
-						await ItemService.addAttachments(
-							addedItem.data.Id,
-							data.Attachments
-						);
-					}
+                    if (data.Attachments && data.Attachments.length > 0) {
+                        await ItemService.addAttachments(
+                            addedItem.data.Id,
+                            data.Attachments
+                        );
+                    }
                     props.onSave();
                 } else {
                     let payload: Partial<IMSDSRequest> = {};
@@ -247,26 +249,29 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
 
     return (
         <div className={styles.formContainer}>
-			<div>
-				<div
-					className="backgroundPrimaryColor"
-					style={{
-						height: '120px',
-						display: 'flex',
-						flexFlow: 'row nowrap',
-						alignItems: 'center',
-						gap: '1em',
-					}}
-				>
-					<KTNLogo style={{ height: '100px', marginLeft: '1em' }} />
-					<Text variant="xxLargePlus" className={styles.headerText}>
-						Web application form
-					</Text>
+            <div>
+                <div
+                    className="backgroundPrimaryColor"
+                    style={{
+                        height: '120px',
+                        display: 'flex',
+                        flexFlow: 'row nowrap',
+                        alignItems: 'center',
+                        gap: '1em',
+                    }}
+                >
+                    <KTNLogo style={{ height: '100px', marginLeft: '1em' }} />
+                    <Text variant="xxLargePlus" className={styles.headerText}>
+                        Web application form
+                    </Text>
+                </div>
+                <MsdsCommandBar
+                    item={props.item}
+                    onClose={props.onClose}
+                    displayMode={props.displayMode}
+                />
+            </div>
 
-				</div>
-				<MsdsCommandBar item={props.item} onClose={props.onClose} displayMode={props.displayMode} />
-			</div>
-			
             <form
                 className={styles.msdsForm}
                 onSubmit={handleSubmit(CreateOrSave)}
@@ -414,7 +419,8 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                                 const todayMinusYears =
                                                     new Date(
                                                         new Date().setFullYear(
-                                                            new Date().getFullYear() - msdsPermittedYears
+                                                            new Date().getFullYear() -
+                                                                msdsPermittedYears
                                                         )
                                                     );
                                                 const date = new Date(value);
@@ -422,11 +428,15 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                                     hasSDS &&
                                                     date < todayMinusYears
                                                 ) {
-													document.getElementById("MSDSDate")?.scrollIntoView({
-														behavior: 'smooth',
-														block: 'center',
-														inline: 'center'
-													});
+                                                    document
+                                                        .getElementById(
+                                                            'MSDSDate'
+                                                        )
+                                                        ?.scrollIntoView({
+                                                            behavior: 'smooth',
+                                                            block: 'center',
+                                                            inline: 'center',
+                                                        });
                                                     return `SDS Date must be within the last ${msdsPermittedYears} years`;
                                                 }
                                                 return true;
@@ -918,11 +928,12 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                                 );
                                             return customerItems.map((c) => ({
                                                 name: c.Title,
-                                                key: c.Title,
+                                                key: c.Id,
                                             }));
                                         }}
                                         handleSelect={async (tag) => {
                                             if (tag) {
+                                                console.log(tag)
                                                 const customer =
                                                     await LookupServiceCached.getCustomer(
                                                         +tag.key
@@ -944,12 +955,15 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                                 });
                                             }
                                         }}
-										getValue={(option) => option.name}
+                                        getValue={(option) => option.name}
                                         control={control}
                                         rules={{
-                                            required: 'SDS Publisher is required',
+                                            required:
+                                                'SDS Publisher is required',
                                             disabled:
-                                                field.SDSPublisher === 'Disabled' || Boolean(database) === false,
+                                                field.SDSPublisher ===
+                                                    'Disabled' ||
+                                                Boolean(database) === false,
                                         }}
                                         icon={
                                             <Logo
@@ -981,7 +995,8 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                                 message:
                                                     'Special characters are not allowed',
                                             },
-											required: 'Product name on SDS is required',
+                                            required:
+                                                'Product name on SDS is required',
                                         }}
                                         icon={
                                             <Logo
@@ -1012,7 +1027,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                                 message:
                                                     'Special characters are not allowed',
                                             },
-											required: 'SDS Version is required'
+                                            required: 'SDS Version is required',
                                         }}
                                         icon={
                                             <Logo
@@ -1090,10 +1105,11 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                             control={control}
                                             title="Add SDS PDF and customer confirmation mail. "
                                             rules={{
-												required:
-													materialType !== 'Packaging material'
-														? 'Attachments are required'
-														: false,
+                                                required:
+                                                    materialType !==
+                                                    'Packaging material'
+                                                        ? 'Attachments are required'
+                                                        : false,
                                             }}
                                         />
                                     ) : (
