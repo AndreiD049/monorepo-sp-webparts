@@ -17,6 +17,10 @@ const statusColors: {[status: string]: CSSProperties} = {
         color: '#004e8c',
         backgroundColor: '#80c6ff'
     },
+    'on-going': {
+        color: '#004e8c',
+        backgroundColor: '#80c6ff'
+    },
     'planned': {
         color: '#004e8c',
         backgroundColor: '#80c6ff'

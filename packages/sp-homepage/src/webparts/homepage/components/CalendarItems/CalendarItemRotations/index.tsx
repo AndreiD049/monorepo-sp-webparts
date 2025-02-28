@@ -86,7 +86,7 @@ export const CalendarItemRotations: React.FC<ICalendarItemRotationsProps> = (pro
                 />
             </td>
             {statusCell}
-            <td className={`${tableStyles.paddedCell} ${tableStyles.paddedl5}`}>
+            <td title={`${item.Activityrecommended}\n${additionalInfo}`} className={`${tableStyles.paddedCell} ${tableStyles.cellMin200} ${tableStyles.paddedl5}`}>
                 <Text variant="medium">{item.Activityrecommended} {additionalInfo}</Text>
             </td>
             <td className={tableStyles.cell5}>

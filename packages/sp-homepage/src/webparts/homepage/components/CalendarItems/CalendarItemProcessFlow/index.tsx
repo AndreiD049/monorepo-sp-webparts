@@ -18,9 +18,12 @@ export const CalendarItemProcessFlow: React.FC<ICalendarItemProcessFlowProps> = 
     const { showUser, showStatus } = React.useContext(CalendarContext);
     const item = props.wrapped.item as ICalendarProcessFlowItem;
     const type = 'PF';
-    const typeColor = React.useMemo(() => textColor(type), [item]);
+    const typeColor = textColor('Process-flow/' + item.Status);
 
     const statusStyles: React.CSSProperties = React.useMemo(() => {
+        if (!showStatus) {
+            return {};
+        }
         return {
             ...getStatusStyles(item.Status),
             display: 'block',
@@ -30,7 +33,7 @@ export const CalendarItemProcessFlow: React.FC<ICalendarItemProcessFlowProps> = 
             width: '80px',
             justifyContent: 'flex-start',
         };
-    }, [item.Status]);
+    }, [item.Status, showStatus]);
 
     const handleGotoClick = React.useCallback(() => {
         window.open(
@@ -74,13 +77,21 @@ export const CalendarItemProcessFlow: React.FC<ICalendarItemProcessFlowProps> = 
             {userCell}
             <td className={`${tableStyles.cell10} ${tableStyles.paddedl5}`}>
                 <Pill
-                    title="Process-flow"
+                    title={`Process-flow (${item.Status})`}
                     value={type}
-                    style={{ color: typeColor.fg, backgroundColor: typeColor.bg, minWidth: 60 }}
+                    style={{
+                        color: typeColor.fg,
+                        backgroundColor: typeColor.bg,
+						width: 80,
+                        textOverflow: 'ellipsis',
+                        display: 'block',
+						whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                    }}
                 />
             </td>
             {statusCell}
-            <td className={`${tableStyles.paddedCell} ${tableStyles.paddedl5}`}>
+            <td title={item.Process.Title} className={`${tableStyles.paddedCell} ${tableStyles.cellMin200} ${tableStyles.paddedl5}`}>
                 <Text variant="medium">{item.Process.Title}</Text>
             </td>
             <td className={tableStyles.cell5}>

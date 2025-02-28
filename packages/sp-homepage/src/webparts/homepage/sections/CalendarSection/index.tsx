@@ -16,6 +16,7 @@ import { CALENDAR_SPINNER_ID } from '../../constants';
 import { CalendarContext, ICalendarContext } from '../../context/CalendarContext/CalendarContext';
 import styles from './CalendarSection.module.scss';
 import useWebStorage from 'use-web-storage-api';
+import { Collapsible } from '../../components/Collapsible';
 
 interface IHeaderProps {
     calendarType: ChoiceDisplayType;
@@ -45,6 +46,11 @@ export interface ICalendarSectionProps extends ISectionProps {
 export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
     const [selectedDate, setSelectedDate] = React.useState(new Date());
     const [choice, setChoice] = useWebStorage<ChoiceDisplayType>('week', { key: 'calendarView' });
+	/*
+    const [groupSimilarItems, setGroupSimilarItems] = useWebStorage<boolean>(true, {
+        key: 'homepageGroupSimilar',
+    });
+	*/
     const [items, setItems] = React.useState<IWrappedCalendarItem[]>([]);
     const [reload, setReload] = React.useState(false);
 
@@ -136,10 +142,18 @@ export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
         const startMillis = startDate.toUnixInteger();
         const endMillis = endDate.toUnixInteger();
         return items.filter((item) => {
-            const date = DateTime.fromJSDate(new Date(item.date)).toUnixInteger();
+            const date = item.date.getTime() / 1000;
             return date >= startMillis && date <= endMillis;
         });
     }, [selectedDate, items, startDate, endDate]);
+
+    const overdueItems = React.useMemo(() => {
+        const startMillis = startDate.toUnixInteger();
+        return items.filter((item) => {
+            const date = item.date.getTime() / 1000;
+            return date < startMillis;
+        });
+    }, [selectedDate, items, startDate]);
 
     /**
      * handle what happens when user presses 'refresh' icon on the top of the section
@@ -193,9 +207,30 @@ export const CalendarSection: React.FC<ICalendarSectionProps> = (props) => {
                     {calendar}
                 </div>
 
+				{ /*
+                <div className={styles.options}>
+                    <Checkbox
+                        title="Grouping items for the same person/type under a single row"
+                        label="Group similar items"
+                        checked={groupSimilarItems}
+                        onChange={(_, c) => setGroupSimilarItems(c)}
+                    />
+                </div>
+				*/ }
+
                 <Separator />
 
-                {filteredItems.length > 0 ? <CalendarItems items={filteredItems} /> : <NoData />}
+                {overdueItems.length > 0 && (
+                    <Collapsible
+                        key={overdueItems.length}
+                        header={`Overdue (${overdueItems.length} items)`}
+						className={styles.overdue}
+                    >
+                        <CalendarItems items={overdueItems} />
+                    </Collapsible>
+                )}
+                {filteredItems.length > 0 && <CalendarItems items={filteredItems} />}
+                {overdueItems.length === 0 && filteredItems.length === 0 && <NoData />}
                 <LoadingSpinner id={CALENDAR_SPINNER_ID} />
             </div>
         </CalendarContext.Provider>
