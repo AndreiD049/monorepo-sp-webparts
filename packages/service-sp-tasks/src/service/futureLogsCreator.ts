@@ -40,7 +40,7 @@ export function getNextLogDate(task: ITask): DateTime | null {
     switch (task.Type) {
         case 'Monthly':
             if (!task.MonthlyDay) return null;
-            if (task.MonthlyDay <= today.day) {
+            if (task.MonthlyDay <= today.day || task.MonthlyDay > today.daysInMonth) {
                 let date = setDay(DateTime.now().plus({ month: 1 }), task.MonthlyDay);
                 return date <= activeToDate ? date : null;
             }
