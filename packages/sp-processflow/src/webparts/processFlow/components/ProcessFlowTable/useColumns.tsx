@@ -7,6 +7,7 @@ import { IProcessFlowRow } from '../../models/IProcessFlowRow';
 import styles from './ProcessFlowTable.module.scss';
 import { ProcessCell } from './ProcessCell';
 import { LocationCell } from './LocationCell';
+import { PROCESS_COLUMN_WIDTH, LOCATION_COLUMN_WIDTH } from '../../utils/constants';
 
 interface IProcessColumnProps {
     locations: string[];
@@ -32,12 +33,16 @@ const defaultColumns: IColumn[] = [
     },
     {
         key: 'Process',
-        minWidth: 350,
+        minWidth: 400,
         name: 'Process',
-        isResizable: true,
+        isResizable: false,
         styles: {
             root: {
                 borderRight: '1px solid ' + theme.palette.neutralLighter,
+                position: 'sticky',
+                zIndex: 100,
+                left: 0,
+                backgroundColor: 'white',
             },
         },
         onRender(item) {
@@ -65,17 +70,27 @@ const allocationColumns: IColumn = {
 
 export const useColumns = (props: IProcessColumnProps): IColumn[] => {
     const columns = React.useMemo(() => {
-        const locations: IColumn[] = props.locations.map((l) => ({
+        const locations: IColumn[] = props.locations.map((l, i) => ({
             key: l,
             name: l.toUpperCase(),
-            isResizable: true,
+            isResizable: false,
             minWidth: 50,
+            styles: {
+                root: {
+                    position: 'sticky',
+                    zIndex: 100,
+                    left: PROCESS_COLUMN_WIDTH + (i * LOCATION_COLUMN_WIDTH),
+                    backgroundColor: 'white',
+                },
+            },
             onRender(item, _index, column) {
                 return (
                     <LocationCell
                         location={item.locations[column.name]}
                         processId={item.process.Id}
                         title={l}
+                        index={i}
+                        key={column.name + String(i)} // re-render the column when team changes; Needed for sticky column
                     />
                 );
             },

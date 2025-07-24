@@ -9,6 +9,8 @@ import { MainService } from '../../../services/main-service';
 import {
     MAIN_CALLOUT,
     MAIN_DIALOG,
+    PROCESS_COLUMN_WIDTH,
+    LOCATION_COLUMN_WIDTH
 } from '../../../utils/constants';
 import { copyLocation, pasteLocation } from '../../../utils/events';
 import { addLocation, deleteLocation, editLocation } from '../../LocationDialog';
@@ -18,6 +20,7 @@ export interface ILocationCellProps {
     location: IFlowLocation | undefined;
     processId: number;
     title: string;
+    index: number;
 }
 
 const LocationCallout: React.FC<ILocationCellProps> = (
@@ -116,6 +119,17 @@ export const LocationCell: React.FC<ILocationCellProps> = (props) => {
             ),
         });
     }, [props.location]);
+
+    React.useEffect(() => {
+        if (cellRef.current) {
+            const parent = cellRef.current.parentElement;
+            if (!parent) {
+                return
+            }
+            parent.classList.add(styles.stickyCol);
+            parent.style.left = `${PROCESS_COLUMN_WIDTH + (props.index * LOCATION_COLUMN_WIDTH)}px`;
+        }
+    }, [cellRef]);
 
     return (
         <div

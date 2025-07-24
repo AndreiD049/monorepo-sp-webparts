@@ -62,8 +62,15 @@ export const ProcessCell: React.FC<IProcessCellProps> = (props) => {
 		}
     }, [props.process, buttonRef]);
 
+    React.useEffect(() => {
+        if (containerRef.current) {
+            const parent = containerRef.current.parentElement;
+            parent.classList.add(styles.stickyCol);
+        }
+    }, [containerRef])
+
     return (
-        <div ref={containerRef} className={styles.container}>
+        <div ref={containerRef} className={styles.container} title={props.process.Title}>
             <span>{props.process.Title}</span>
             {props.process.Manual && props.process.Manual !== '[]' && (
                 <IconButton

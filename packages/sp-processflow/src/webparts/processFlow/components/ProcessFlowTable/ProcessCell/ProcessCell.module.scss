@@ -19,3 +19,10 @@
     align-items: flex-start;
     justify-content: flex-start;
 }
+
+.stickyCol {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 3;
+}

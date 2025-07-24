@@ -14,3 +14,9 @@
 .callout {
     padding: .5em;
 }
+
+.stickyCol {
+    position: sticky;
+    background: white;
+    z-index: 3;
+}

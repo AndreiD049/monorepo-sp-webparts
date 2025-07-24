@@ -351,10 +351,8 @@ const Details: React.FC<{ processId: number }> = (props) => {
         const keys = Object.keys(data);
         let changed = false;
         keys.forEach((k: keyof IProcess) => {
-            console.log(k);
             if (data[k] !== process[k]) changed = true;
         });
-        console.log(changed);
         if (changed) {
             delete data.Responsible;
             await ProcessService.updateProcess(process.Id, data);

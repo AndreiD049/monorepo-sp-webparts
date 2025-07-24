@@ -37,6 +37,8 @@ export const TEAM_USERS = (team: string): string => `sp-processflow-team-users/$
 
 export const MINUTE = 1000 * 60;
 export const HOUR = MINUTE * 60;
+export const PROCESS_COLUMN_WIDTH = 420;
+export const LOCATION_COLUMN_WIDTH = 70;
 
 export const COUNTRIES = [
   { name: "Afghanistan", code: "AF" },
