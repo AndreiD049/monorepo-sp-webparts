@@ -66,9 +66,12 @@ const listStyles: (
             left: 0,
             zIndex: 100,
         },
-        "& [role=row]:hover [role=gridcell][aria-colindex='3'], & [role=columnheader][aria-colindex='2']:hover":
+        "& [role=rowgroup] [role=gridcell]": {
+            backgroundColor: currentTheme.palette.white,
+        },
+        "& [role=row]:hover [role=gridcell], & [role=columnheader][aria-colindex='2']:hover":
             {
-                backgroundColor: currentTheme.palette.neutralLighter,
+                backgroundColor: currentTheme.palette.neutralLighter + " !important",
             },
         overflow: 'visible',
     },
