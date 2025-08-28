@@ -69,7 +69,7 @@ const listStyles: (
         "& [role=rowgroup] [role=gridcell]": {
             backgroundColor: currentTheme.palette.white,
         },
-        "& [role=row]:hover [role=gridcell], & [role=columnheader][aria-colindex='2']:hover":
+        "& [role=row]:not(.ms-GroupHeader):hover [role=gridcell], & [role=columnheader][aria-colindex='2']:hover":
             {
                 backgroundColor: currentTheme.palette.neutralLighter + " !important",
             },
@@ -449,7 +449,12 @@ export const ProcessFlowTable: React.FC<IProcessFlowTableProps> = (props) => {
                     },
                 }}
                 styles={listStyles(ProcessFlowWebPart.currentTheme)}
-                onItemInvoked={(item) => {
+                onItemInvoked={(item, _, ev) => {
+                    const target = ev.target as HTMLElement
+                    if (target && target.closest("div.ms-GroupHeader") !== null) {
+                        // Double click on a group header
+                        return
+                    }
                     navigate(
                         `/team/${encodeURIComponent(selectedTeam)}/flow/${
                             selectedFlow.Id
