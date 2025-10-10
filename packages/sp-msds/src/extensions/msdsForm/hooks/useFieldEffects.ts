@@ -27,11 +27,13 @@ export function useFieldEffects(
 ): void {
     const productRemarks = watch('ProductRemarks');
     const siloRemarks = watch('SiloRemarks');
+    const materialType = watch('MaterialType');
     const forbiddenForBulk = watch('ForbiddenForBulk');
     const siloOperations = watch('SiloOperations');
     const debagOperations = watch('DebaggingOperations');
     const packedOperations = watch('PackedOperations');
 	const site = watch('Site');
+    console.log(materialType);
 
     const setValueIfAllowed = React.useMemo(() => {
         if (!isDirty) return (() => null) as typeof setValue;
@@ -163,4 +165,17 @@ export function useFieldEffects(
 			setValueIfAllowed('ProductType', 'PM');
 		}
 	});
+
+    // Change 2025-10-10
+    // if Material type is <> Packaging material
+    // Set "Do you have an SDS" to true
+    // otherwise set it to false
+    useSingleFieldEffect(materialType, (mT) => {
+        if (typeof mT !== 'string') return;
+        if (mT.toLowerCase() !== 'packaging material') {
+            setValueIfAllowed('HasMsds', true);
+        } else {
+            setValueIfAllowed('HasMsds', false);
+        }
+    });
 }
