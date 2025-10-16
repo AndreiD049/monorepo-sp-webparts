@@ -553,7 +553,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                                 field.ProductName ===
                                                 'Disabled',
                                             pattern: {
-                                                value: /^[a-zA-Z0-9\s_.-]+$/,
+                                                value: /^[a-zA-Z0-9\s.-]+$/,
                                                 message:
                                                     "PLATO doesn't allow special characters in product names. Please adjust the product name accordingly.",
                                             },
