@@ -161,7 +161,7 @@ export const CopyTo: React.FC<ICopyToProps> = (props) => {
 			
 			// Add comment
 			const customer = await LookupService.getCustomer(props.item.CustomerNameId);
-			const comment = `Coied from: <a href="${location.href}" target="_blank">${props.item.Site} - ${customer.Title} - ${props.item.ProductName}</a>`
+			const comment = `Copied from: <a href="${location.href}" target="_blank">${props.item.Site} - ${customer.Title} - ${props.item.ProductName}</a>`
 			await ItemService.addComment(result.data.Id, { text: comment });
 
 			// if same site, no approval needed
