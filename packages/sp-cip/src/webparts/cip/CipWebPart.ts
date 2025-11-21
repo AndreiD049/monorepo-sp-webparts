@@ -72,7 +72,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
                 })
                 .withAdditionalTimelines([
                     InjectHeaders({
-                        UserAgent: `NONISV|Katoen Natie|Cip/${this.dataVersion.toString()}`,
+                        UserAgent: `NONISV|Katoen Natie|Cip/${this.dataVersion?.toString()}`,
                         // Do not uncomment below; metadata is required by
                         // pnp-js to properly work with attachments and files
                         // Accept: 'application/json;odata=minimal',
@@ -91,7 +91,7 @@ export default class CipWebPart extends BaseClientSideWebPart<ICipWebPartProps> 
             await removeExpired(db);
         } catch (err) {
             SPnotify({
-                message: err.toString(),
+                message: err?.toString(),
                 messageType: MessageBarType.severeWarning,
             });
         }

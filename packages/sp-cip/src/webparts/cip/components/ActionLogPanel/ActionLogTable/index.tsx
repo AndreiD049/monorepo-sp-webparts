@@ -62,7 +62,7 @@ export const ActionLogTable: React.FC<IActionLogTableProps> = (props) => {
         }
         if (props.selectedUsersIds?.length > 0) {
             const set = new Set(props.selectedUsersIds);
-            result = result.filter((a) => set.has(a.User.Id.toString()));
+            result = result.filter((a) => set.has(a.User.Id?.toString()));
         }
         result.sort((a, b) => (a.Date < b.Date ? 1 : -1));
         setFilteredActions(result);

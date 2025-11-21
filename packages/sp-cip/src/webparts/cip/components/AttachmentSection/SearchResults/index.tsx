@@ -16,11 +16,11 @@ export interface ISearchResultsProps {
 const convertResultToFile = (result: ISearchResult): IAttachmentFile => {
     const fileName = getFileName(result.Path || result.OriginalPath, result.FileType);
     return {
-        Length: result.Size.toString(),
+        Length: result.Size?.toString(),
         Name: `${fileName}`,
         ServerRelativeUrl: result.ParentLink.replace(location.origin, '') + `/${fileName}`,
-        TimeCreated: result.LastModifiedTime.toString(),
-        TimeLastModified: result.LastModifiedTime.toString(),
+        TimeCreated: result.LastModifiedTime?.toString(),
+        TimeLastModified: result.LastModifiedTime?.toString(),
         UniqueId: result.UniqueId,
     }
 }

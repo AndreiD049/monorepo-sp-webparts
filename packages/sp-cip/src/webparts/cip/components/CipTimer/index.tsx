@@ -28,7 +28,7 @@ export interface ICipTimerProps {
 }
 
 const newTimer = (task?: ITaskOverview): ITimer<ITaskOverview> => ({
-    id: Guid.newGuid().toString(),
+    id: Guid.newGuid()?.toString(),
     task,
     spot: Boolean(task) === false,
     description: '',

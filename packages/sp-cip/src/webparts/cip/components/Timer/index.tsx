@@ -50,7 +50,7 @@ export const Timer = <T,>(props: React.PropsWithChildren<ITimerProps<T>>): JSX.E
 
     const handleAddTimer = (): void => {
         const timer = {
-            id: Guid.newGuid().toString(),
+            id: Guid.newGuid()?.toString(),
             duration: 0,
             spot: true,
             active: true,

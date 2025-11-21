@@ -90,7 +90,7 @@ export const getActionComment = (action: IAction): JSX.Element => {
         case 'Time log':
             content = (
                 <div>
-                    <div>{formatToken(timeLogTokens.time.toString(), action.ActivityType)}</div>
+                    <div>{formatToken(timeLogTokens.time?.toString(), action.ActivityType)}</div>
                     <p>{timeLogTokens.comment}</p>
                 </div>
             );

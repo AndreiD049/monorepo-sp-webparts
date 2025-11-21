@@ -48,7 +48,7 @@ export class UserService {
         const users = await this.getCustomListUsers();
         let result = users.map((user) => {
             return {
-                id: user.User.Id.toString(),
+                id: user.User.Id?.toString(),
                 text: user.User.Title,
                 secondaryText: user.User.EMail,
                 size: PersonaSize.size24,
@@ -57,7 +57,7 @@ export class UserService {
         });
         if (withEveryone) {
             result = result.concat({
-                id: everyone[0].Id.toString(),
+                id: everyone[0].Id?.toString(),
                 text: everyone[0].Title,
                 secondaryText: everyone[0].Email,
                 size: PersonaSize.size24,

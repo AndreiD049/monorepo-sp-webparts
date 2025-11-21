@@ -103,7 +103,7 @@ export function TimerItem<T>(props: ITimerItemProps<T>): JSX.Element {
     });
     const [pickerValue, setPickerValue] = React.useState<string>('');
     const timerRef = React.useRef<number>(0);
-    const getTaskText = props.getTaskText || ((task: T) => task.toString());
+    const getTaskText = props.getTaskText || ((task: T) => task?.toString());
     const visibility = useVisibility();
 
     const createTagFromTask = (
