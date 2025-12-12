@@ -3,7 +3,7 @@
   "solution": {
     "name": "tasks-client-side-solution",
     "id": "5d3c9d67-8e60-4b78-a6d3-b542890a372e",
-    "version": "1.0.4.1",
+    "version": "1.0.5.2",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
@@ -27,7 +27,7 @@
     },
     "features": [
       {
-        "title": "tasks Feature",
+        "title": "tasks webpart Feature",
         "description": "The feature that activates elements of the tasks solution.",
         "id": "bef466c3-fe07-48d0-a29c-9db4dd81c175",
         "version": "1.0.0.17"
@@ -35,6 +35,6 @@
     ]
   },
   "paths": {
-    "zippedPackage": "solution/tasks.sppkg"
+    "zippedPackage": "solution/sp-tasks.sppkg"
   }
 }
