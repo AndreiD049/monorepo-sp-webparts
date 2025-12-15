@@ -3,8 +3,8 @@ import { UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { IMSDSRequest } from '../services/IMSDSRequest';
 
 function useSingleFieldEffect(
-    fieldValue: string | boolean | (string | boolean)[],
-    effect: (value: string | boolean | (string | boolean)[]) => void
+    fieldValue: string | boolean | string[] | boolean[],
+    effect: (value: string | boolean | string[] | boolean[]) => void
 ): void {
     React.useEffect(
         () => {
@@ -41,8 +41,11 @@ export function useFieldEffects(
     }, [isDirty]);
 
     useSingleFieldEffect(
-        [siloOperations, debagOperations],
-        (operations: boolean[]) => {
+        [siloOperations ?? false, debagOperations ?? false],
+        (operations) => {
+            if (!Array.isArray(operations)) {
+                return
+            }
             const [siloOperations, debagOperations] = operations;
             const fields: (keyof IMSDSRequest)[] = [
                 'MeltingPoint',
@@ -98,7 +101,7 @@ export function useFieldEffects(
         }
     );
 
-    useSingleFieldEffect(forbiddenForBulk, (forbidden) => {
+    useSingleFieldEffect(forbiddenForBulk ?? false, (forbidden) => {
         if (forbidden) {
             setValueIfAllowed('SiloOperations', false);
             setValueIfAllowed('BulkDensity', 0);
@@ -142,7 +145,7 @@ export function useFieldEffects(
         }
     });
 
-    useSingleFieldEffect(packedOperations, (packed) => {
+    useSingleFieldEffect(packedOperations ?? false, (packed) => {
         if (packed === false) {
             setDisabled((prev) => [...prev, 'WarehouseType']);
             if (packed === undefined) return;
@@ -158,7 +161,7 @@ export function useFieldEffects(
 	// If site is 'Packaging Material', then:
 	// - MaterialType is 'Packaging material'
 	// - ProductType is 'PM'
-	useSingleFieldEffect(site, (site) => {
+	useSingleFieldEffect(site ?? "", (site) => {
 		if (typeof site !== 'string') return;
 		if (site.toLowerCase() === 'packaging material') {
 			setValueIfAllowed('MaterialType', 'Packaging material');
@@ -170,7 +173,7 @@ export function useFieldEffects(
     // if Material type is <> Packaging material
     // Set "Do you have an SDS" to true
     // otherwise set it to false
-    useSingleFieldEffect(materialType, (mT) => {
+    useSingleFieldEffect(materialType ?? "", (mT) => {
         if (typeof mT !== 'string') return;
         if (mT.toLowerCase() !== 'packaging material') {
             setValueIfAllowed('HasMsds', true);

@@ -57,55 +57,58 @@ export interface IMsdsFormProps {
 function encodeItem(item: Partial<IMSDSRequest>): Partial<IMSDSRequest> {
     const result = { ...item };
     if (result.ProductRemarks) {
-        result.ProductRemarks = encodeXML(item.ProductRemarks);
+        result.ProductRemarks = encodeXML(item.ProductRemarks ?? "");
     }
     if (result.SiloRemarks) {
-        result.SiloRemarks = encodeXML(item.SiloRemarks);
+        result.SiloRemarks = encodeXML(item.SiloRemarks ?? "");
     }
     if (result.DescriptionOnLabel) {
-        result.DescriptionOnLabel = encodeXML(item.DescriptionOnLabel);
+        result.DescriptionOnLabel = encodeXML(item.DescriptionOnLabel ?? "");
     }
     if (result.SafetyRemarks) {
-        result.SafetyRemarks = encodeXML(item.SafetyRemarks);
+        result.SafetyRemarks = encodeXML(item.SafetyRemarks ?? "");
     }
     if (result.ProductName) {
-        result.ProductName = encodeXML(item.ProductName);
+        result.ProductName = encodeXML(item.ProductName ?? "");
     }
     if (result.DedicatedFlexiblesValves) {
         result.DedicatedFlexiblesValves = encodeXML(
-            item.DedicatedFlexiblesValves
+            item.DedicatedFlexiblesValves ?? ""
         );
     }
     if (result.MOC) {
-        result.MOC = encodeXML(item.MOC);
+        result.MOC = encodeXML(item.MOC ?? "");
     }
     return result;
 }
 
-function decodeItem(item: Partial<IMSDSRequest>): Partial<IMSDSRequest> {
+function decodeItem(item: Partial<IMSDSRequest> | undefined): Partial<IMSDSRequest> {
+    if (!item) {
+        return {} as IMSDSRequest
+    }
     const result = { ...item };
     if (result.ProductRemarks) {
-        result.ProductRemarks = decodeXML(item.ProductRemarks);
+        result.ProductRemarks = decodeXML(item.ProductRemarks ?? "");
     }
     if (result.SafetyRemarks) {
-        result.SafetyRemarks = decodeXML(item.SafetyRemarks);
+        result.SafetyRemarks = decodeXML(item.SafetyRemarks ?? "");
     }
     if (result.SiloRemarks) {
-        result.SiloRemarks = decodeXML(item.SiloRemarks);
+        result.SiloRemarks = decodeXML(item.SiloRemarks ?? "");
     }
     if (result.DescriptionOnLabel) {
-        result.DescriptionOnLabel = decodeXML(item.DescriptionOnLabel);
+        result.DescriptionOnLabel = decodeXML(item.DescriptionOnLabel ?? "");
     }
     if (result.ProductName) {
-        result.ProductName = decodeXML(item.ProductName);
+        result.ProductName = decodeXML(item.ProductName ?? "");
     }
     if (result.DedicatedFlexiblesValves) {
         result.DedicatedFlexiblesValves = decodeXML(
-            item.DedicatedFlexiblesValves
+            item.DedicatedFlexiblesValves ?? ""
         );
     }
     if (result.MOC) {
-        result.MOC = decodeXML(item.MOC);
+        result.MOC = decodeXML(item.MOC ?? "");
     }
     return result;
 }
@@ -133,16 +136,16 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
             Urgency: 'Medium',
             WarehouseType: 'Default (non-hazardous)',
         },
-        values: decodeItem(props.item) || {},
+        values: decodeItem(props.item),
     });
 
-    const site = watch('Site');
-    const msdsPermittedYears = getPermittedYearsPerSite(site);
+    const site = watch('Site') ?? "";
+    const msdsPermittedYears = getPermittedYearsPerSite(site ?? "");
     const database = watch('Database');
     const materialType = watch('MaterialType');
     const hasSDS = watch('HasMsds');
     const field = useFields(site);
-    const customers = useCustomers(database, props.item?.CustomerNameId);
+    const customers = useCustomers(database ?? "", props.item?.CustomerNameId);
     const databases = useDatabases(site);
     const approvers = useApprovers(site);
     const currentUser = useCurrentUser();
@@ -181,7 +184,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
     }));
     const productTypes = useProductTypes();
     const hazardousGoodsCodes = useHazardousGoodsCodes();
-    const attachments = useAttachments(props.item?.Id);
+    const attachments = useAttachments(props.item?.Id || -1);
 
     const handleFilter = React.useCallback(
         async (tags: ITag[], filter: string): Promise<ITag[]> => {
@@ -229,7 +232,9 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                     if (approvers.options.length > 0) {
                         payload.IsApprovalNeeded = !isCurrentUserApprover;
                     }
-                    await ItemService.updateItem(props.item.Id, payload);
+                    if (props.item) {
+                        await ItemService.updateItem(props.item.Id, payload);
+                    }
                     props.onSave();
                 }
             } finally {
@@ -265,11 +270,13 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                         Web application form
                     </Text>
                 </div>
-                <MsdsCommandBar
-                    item={props.item}
-                    onClose={props.onClose}
-                    displayMode={props.displayMode}
-                />
+                {props.item && (
+                    <MsdsCommandBar
+                        item={props.item}
+                        onClose={props.onClose}
+                        displayMode={props.displayMode}
+                    />
+                )}
             </div>
 
             <form
@@ -933,7 +940,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                         }}
                                         handleSelect={async (tag) => {
                                             if (tag) {
-                                                console.log(tag)
+                                                console.log(tag);
                                                 const customer =
                                                     await LookupServiceCached.getCustomer(
                                                         +tag.key
@@ -1113,15 +1120,17 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                                             }}
                                         />
                                     ) : (
-                                        <MsdsAttachmentsDetails
-                                            id="Attachments"
-                                            label="23.Attachments (NOTE: Name SDS PDF as product name)"
-                                            title="Add SDS PDF and customer confirmation mail. NOTE: Rename the SDS file to the product name before uploading."
-                                            displayMode={props.displayMode}
-                                            attachments={attachments}
-                                            required
-                                            itemId={props.item.Id}
-                                        />
+                                        props.item && (
+                                            <MsdsAttachmentsDetails
+                                                id="Attachments"
+                                                label="23.Attachments (NOTE: Name SDS PDF as product name)"
+                                                title="Add SDS PDF and customer confirmation mail. NOTE: Rename the SDS file to the product name before uploading."
+                                                displayMode={props.displayMode}
+                                                attachments={attachments}
+                                                required
+                                                itemId={props.item.Id}
+                                            />
+                                        )
                                     )}
                                 </div>
                             </div>
@@ -1510,7 +1519,7 @@ export const MsdsForm: React.FC<IMsdsFormProps> = ({
                             onSave={props.onSave}
                         />
                     </div>
-                    {CommentSection && (
+                    {CommentSection && props.item && (
                         <CommentSection
                             className={styles.commentSection}
                             item={props.item}

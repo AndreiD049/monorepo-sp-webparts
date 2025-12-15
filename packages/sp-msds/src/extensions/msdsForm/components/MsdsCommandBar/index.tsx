@@ -36,42 +36,41 @@ export const MsdsCommandBar: React.FC<IMsdsCommandBarProps> = (props) => {
                     LookupService.getAllSites(),
                     LookupService.getDatabases(props.item.Site),
                     LookupService.getAllCustomers(props.item.Database),
-                    LookupService.getCustomer(props.item.CustomerNameId),
+                    LookupService.getCustomer(props.item.CustomerNameId ?? -1),
                 ];
                 Promise.all(requests)
-                    .then(
-                        ([sites, dbs, customers, customer]: [
-                            sites: string[],
-                            dbs: string[],
-                            customers: ICustomer[],
-                            customer: ICustomer,
-                        ]) => {
-                            const exists =
-                                customers.filter(
-                                    (c) => c.Id === props.item.CustomerNameId
-                                ).length > 0;
-                            if (!exists) {
-                                customers.push(customer);
-                            }
-                            showDialog({
-                                id: DIALOG_ID,
-                                content: (
-                                    <CopyTo
-                                        item={props.item}
-                                        sites={sites}
-                                        databasesInit={dbs}
-                                        customersInit={customers}
-										onClose={props.onClose}
-                                    />
-                                ),
-                                dialogProps: {
-                                    dialogContentProps: {
-                                        title: 'Copy to',
-                                    },
-                                },
-                            });
+                    .then((result) => {
+                        const [sites, dbs, customers, customer] = [
+                            result[0] as string[],
+                            result[1] as string[],
+                            result[2] as ICustomer[],
+                            result[3] as ICustomer,
+                        ];
+                        const exists =
+                            customers.filter(
+                                (c) => c.Id === props.item.CustomerNameId
+                            ).length > 0;
+                        if (!exists) {
+                            customers.push(customer);
                         }
-                    )
+                        showDialog({
+                            id: DIALOG_ID,
+                            content: (
+                                <CopyTo
+                                    item={props.item}
+                                    sites={sites}
+                                    databasesInit={dbs}
+                                    customersInit={customers}
+                                    onClose={props.onClose}
+                                />
+                            ),
+                            dialogProps: {
+                                dialogContentProps: {
+                                    title: 'Copy to',
+                                },
+                            },
+                        });
+                    })
                     .catch((error) => {
                         console.log(error);
                     });

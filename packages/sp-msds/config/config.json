@@ -9,6 +9,14 @@
           "manifest": "./src/extensions/msdsForm/MsdsFormFormCustomizer.manifest.json"
         }
       ]
+    },
+    "configuration-form-form-customizer": {
+      "components": [
+        {
+          "entrypoint": "./lib/extensions/configurationForm/ConfigurationFormFormCustomizer.js",
+          "manifest": "./src/extensions/configurationForm/ConfigurationFormFormCustomizer.manifest.json"
+        }
+      ]
     }
   },
   "externals": {
@@ -16,12 +24,13 @@
       "path": "https://cdn.jsdelivr.net/npm/sp-preset@2.0.21/dist/index.amd.js",
       "globalName": "spPreset"
     },
-	"dompurify": {
-		"path": "https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js",
-		"globalName": "DOMPurify"
-	}
+    "dompurify": {
+      "path": "https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js",
+      "globalName": "DOMPurify"
+    }
   },
   "localizedResources": {
-    "MsdsFormFormCustomizerStrings": "lib/extensions/msdsForm/loc/{locale}.js"
+    "MsdsFormFormCustomizerStrings": "lib/extensions/msdsForm/loc/{locale}.js",
+    "ConfigurationFormFormCustomizerStrings": "lib/extensions/configurationForm/loc/{locale}.js"
   }
 }

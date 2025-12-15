@@ -32,7 +32,7 @@ export function removeFile(files: File[], fileToRemove: string): File[] {
 }
 
 export const MSDSAttachmentsNew: React.FC<IMSDSAttachmentsProps> = (props) => {
-    const input = React.useRef(null);
+    const input = React.useRef<HTMLInputElement>(null);
 
     return (
         <div className={styles.container}>
@@ -58,7 +58,7 @@ export const MSDSAttachmentsNew: React.FC<IMSDSAttachmentsProps> = (props) => {
                                 ref={input}
                                 value={''}
                                 onChange={async (ev) => {
-                                    const files = Array.from(ev.target.files);
+                                    const files = Array.from(ev.target.files || []);
                                     field.onChange(mergeFiles(field.value, files));
                                 }}
                             />
@@ -69,7 +69,7 @@ export const MSDSAttachmentsNew: React.FC<IMSDSAttachmentsProps> = (props) => {
                             >
                                 <PrimaryButton
                                     iconProps={{ iconName: 'Attach' }}
-                                    onClick={() => input.current.click()}
+                                    onClick={() => input.current && input.current.click()}
                                 >
                                     Add attachments
                                 </PrimaryButton>
@@ -94,7 +94,7 @@ export const MSDSAttachmentsNew: React.FC<IMSDSAttachmentsProps> = (props) => {
                             </Stack>
                             <TextError
                                 error={
-                                    fieldState.error && fieldState.error.message
+                                    fieldState.error && fieldState.error.message || ""
                                 }
                             />
                         </>

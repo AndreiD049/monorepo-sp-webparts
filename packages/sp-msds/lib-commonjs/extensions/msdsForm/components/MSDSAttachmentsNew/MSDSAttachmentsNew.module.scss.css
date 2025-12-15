@@ -1,0 +1,22 @@
+/*
+  Your use of the content in the files referenced here is subject to the terms of the license at http://aka.ms/fabric-assets-license
+*/
+.container input[type=file] {
+  display: none;
+}
+
+.fileList {
+  margin-top: 1em;
+  margin-left: 1em;
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 0.4em;
+}
+
+.fileDeleteButton {
+  width: 1.1em;
+  height: 1.1em;
+}
+.fileDeleteButton i {
+  font-size: 0.9em;
+}

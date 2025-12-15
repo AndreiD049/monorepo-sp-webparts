@@ -12,6 +12,7 @@ import { ItemService } from './services/item-service';
 import './styles.scss';
 import { IMSDSRequest } from './services/IMSDSRequest';
 import { FieldService } from './services/field-service';
+import { ICommentSectionProps } from './components/CommentSection';
 
 /**
  * If your form customizer uses the ClientSideComponentProperties JSON input,
@@ -22,17 +23,17 @@ export interface IMsdsFormFormCustomizerProperties {
     // This is an example; replace with your own property
     rootSite: string;
     approverListName: string;
-    CommentSection?: React.FC;
+    CommentSection?: React.FC<ICommentSectionProps>;
 }
 
 const LOG_SOURCE: string = 'MsdsFormFormCustomizer';
 
 export default class MsdsFormFormCustomizer extends BaseFormCustomizer<IMsdsFormFormCustomizerProperties> {
-    public static SPBuilder: SPBuilder = null;
+    public static SPBuilder: SPBuilder | null = null;
     // Added for the item to show in the form; use with edit and view form
-    private _item: IMSDSRequest = null;
+    private _item: IMSDSRequest | null = null;
     // Added for item's etag to ensure integrity of the update; used with edit form
-    private _etag?: string = null;
+    private _etag?: string | null = null;
 
     public async onInit(): Promise<void> {
         // Add your custom initialization to this method. The framework will wait

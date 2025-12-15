@@ -41,7 +41,7 @@ export const CustomsCodeField: React.FC<ICustomsCodeFieldProps> = (props) => {
                         {...field}
                         value={field.value || ''}
                         disabled={props.rules?.disabled}
-                        onChange={(ev, value) => field.onChange(value.replace('_', ''))}
+                        onChange={(ev, value) => field.onChange(value?.replace('_', ''))}
                         errorMessage={fieldState.error && fieldState.error.message}
                     />
                 )}

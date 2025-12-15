@@ -1,0 +1,1 @@
+{"version":3,"file":"styles.scss.js","sourceRoot":"","sources":["../../../src/extensions/msdsForm/styles.scss.ts"],"names":[],"mappings":";;AACA,OAAO,CAAC,cAAc,CAAC,CAAC;AACxB,IAAM,MAAM,GAAG,EAEd,CAAC;AAEF,kBAAe,MAAM,CAAC","sourcesContent":["\r\nrequire(\"./styles.css\");\r\nconst styles = {\r\n\r\n};\r\n\r\nexport default styles;\r\n"]}

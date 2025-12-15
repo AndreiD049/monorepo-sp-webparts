@@ -1,0 +1,46 @@
+.formContainer {
+  background-color: "[theme:neutralLighterAlt, default:#f8f8f8]";
+}
+
+@media (min-width: 768px) {
+  .msdsForm > div:first-child {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+}
+.msdsForm > div > div:first-child {
+  padding-top: 0.5em;
+  flex-basis: 80%;
+}
+
+.commentSection {
+  flex-basis: 20%;
+  padding-top: 1.5em;
+}
+@media (max-width: 768px) {
+  .commentSection {
+    display: none;
+  }
+}
+
+.headerText {
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.msdsRow {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.msdsGap1 {
+  gap: 2em;
+}
+
+.padLeft {
+  padding-left: 2.5em;
+}

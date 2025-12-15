@@ -12,7 +12,7 @@ export function useAttachments(itemId: number): IAttachmentInfo[] {
     const [attachments, setAttachments] = React.useState<IAttachmentInfo[]>([]);
 
     React.useEffect(() => {
-        if (itemId) {
+        if (itemId && itemId > 0) {
             ItemService.getAttachments(itemId)
                 .then((att) => setAttachments(att))
                 .catch((err) => console.error(err));

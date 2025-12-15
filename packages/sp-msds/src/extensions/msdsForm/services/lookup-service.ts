@@ -77,28 +77,28 @@ export class LookupService {
     }
 
     public static async getAllSites(): Promise<string[]> {
-        return (await this.applicationList.fields.getByTitle('Site')()).Choices;
+        return (await this.applicationList.fields.getByTitle('Site')()).Choices ?? [];
     }
 
     public static async getAllFormShapes(): Promise<string[]> {
         return (await this.applicationList.fields.getByTitle('Form or Shape')())
-            .Choices;
+            .Choices ?? [];
     }
 
     public static async getAllColors(): Promise<string[]> {
         return (await this.applicationList.fields.getByTitle('Color')())
-            .Choices;
+            .Choices ?? [];
     }
 
     public static async getAllWarehouseTypes(): Promise<string[]> {
         return (
             await this.applicationList.fields.getByTitle('Warehouse type')()
-        ).Choices;
+        ).Choices ?? [];
     }
 
     public static async getAllProductTypes(): Promise<string[]> {
         return (await this.applicationList.fields.getByTitle('Product type')())
-            .Choices;
+            .Choices ?? [];
     }
 
     public static async getAllHazardousGoodsCode(): Promise<string[]> {
@@ -106,7 +106,7 @@ export class LookupService {
             await this.applicationList.fields.getByTitle(
                 'HAZARDOUS GOODS products code'
             )()
-        ).Choices;
+        ).Choices ?? [];
     }
 
     public static async getApproversByLocation(

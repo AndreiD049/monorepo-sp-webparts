@@ -94,11 +94,14 @@ const AttachmentPill: React.FC<{
 export const MsdsAttachmentsDetails: React.FC<IMsdsAttachmentsDetailsProps> = (
     props
 ) => {
-    const input = React.useRef(null);
+    const input = React.useRef<HTMLInputElement>(null);
     const hasAttachments = props.attachments?.length > 0;
 
     const handleAddAttachment = React.useCallback(
-        async (file: File) => {
+        async (file: File | null) => {
+            if (file === null) {
+                return
+            }
             showSpinner(SPINNER_ID);
             await ItemService.addAttachment(props.itemId, file);
             reloadAttachments();
@@ -117,11 +120,11 @@ export const MsdsAttachmentsDetails: React.FC<IMsdsAttachmentsDetailsProps> = (
                 id={props.id}
                 type="file"
                 ref={input}
-                onChange={async (ev) => handleAddAttachment(ev.target.files[0])}
+                onChange={async (ev) => handleAddAttachment(ev.target.files && ev.target.files[0])}
             />
             <PrimaryButton
                 iconProps={{ iconName: 'Attach' }}
-                onClick={() => input.current.click()}
+                onClick={() => input.current && input.current.click()}
             >
                 Add attachments
             </PrimaryButton>

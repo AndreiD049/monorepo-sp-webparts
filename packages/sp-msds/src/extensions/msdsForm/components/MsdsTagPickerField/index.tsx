@@ -14,8 +14,8 @@ export interface IMsdsTagPickerFieldProps extends MSDSFormProps {
     style?: React.CSSProperties;
     className?: string;
     handleFilter: (filter: string) => Promise<ITag[]>;
-    handleSelect?: (tag: ITag) => void;
-	getValue?: (value: ITag) => string|number;
+    handleSelect?: (tag: ITag | null) => void;
+    getValue?: (value: ITag) => string | number;
     icon?: JSX.Element;
 }
 
@@ -29,7 +29,7 @@ export const MsdsTagPickerField: React.FC<IMsdsTagPickerFieldProps> = (
         [props.tags]
     );
 
-	const getValue = props.getValue	|| ((value: ITag) => value.key);
+    const getValue = props.getValue || ((value: ITag) => value.key);
 
     return (
         <div
@@ -84,10 +84,12 @@ export const MsdsTagPickerField: React.FC<IMsdsTagPickerFieldProps> = (
                                 selectedItems={selected}
                                 onChange={(selected) => {
                                     const value =
-                                        selected.length > 0
+                                        selected && selected.length > 0
                                             ? selected[0]
                                             : null;
-                                    field.onChange(value ? getValue(value) : null);
+                                    field.onChange(
+                                        value ? getValue(value) : null
+                                    );
                                     if (props.handleSelect) {
                                         props.handleSelect(value);
                                     }
@@ -97,7 +99,9 @@ export const MsdsTagPickerField: React.FC<IMsdsTagPickerFieldProps> = (
                             />
                             <TextError
                                 error={
-                                    fieldState.error && fieldState.error.message
+                                    (fieldState.error &&
+                                        fieldState.error.message) ||
+                                    ''
                                 }
                             />
                         </>

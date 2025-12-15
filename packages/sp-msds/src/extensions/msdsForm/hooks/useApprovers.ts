@@ -19,6 +19,6 @@ export function useApprovers(site: string | undefined): LookupOptions<IApprovers
     return {
         options: approvers,
         set: setApprovers,
-        tags: null,
+        tags: [],
     };
 }

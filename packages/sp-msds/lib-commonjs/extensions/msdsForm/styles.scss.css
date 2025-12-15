@@ -1,0 +1,53 @@
+.margin-top-1 {
+  margin-top: 1em;
+}
+
+.margin-top-2 {
+  margin-top: 2em;
+}
+
+.margin-top-3 {
+  margin-top: 3em;
+}
+
+@media (min-width: 768px) {
+  .width-10p {
+    width: 10%;
+  }
+}
+
+@media (min-width: 768px) {
+  .width-15p {
+    width: 15%;
+  }
+}
+
+@media (min-width: 768px) {
+  .width-20p {
+    width: 20%;
+  }
+}
+
+@media (min-width: 768px) {
+  .width-25p {
+    width: 25%;
+  }
+}
+
+.backgroundPrimaryColor {
+  background-color: "[theme: themePrimary, default: #a4262c]";
+}
+
+.backgroundPrimaryFill {
+  fill: "[theme: themePrimary, default: #a4262c]";
+}
+
+.labelFlex {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+}
+
+.platoRequiredLabel {
+  font-weight: bold;
+}

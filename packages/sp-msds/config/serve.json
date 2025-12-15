@@ -4,13 +4,13 @@
   "https": true,
   "serveConfigurations": {
     "default": {
-      "pageUrl": "https://devadmintools.sharepoint.com/sites/BSG/_layouts/15/SPListForm.aspx?debugManifestsFile=https%3A%2F%2Flocalhost%3A4321%2Ftemp%2Fmanifests.js&loadSPFX=true&componentId=a7fdea8a-6086-4094-b22e-04981e1cdbd6&PageType=8&RootFolder=%2Fsites%2FBSG%2FLists%2FWeb+application+form&properties=%7B%22approverListName%22%3A%22Contact+person+Petrochemicals%22%7D",
+      "pageUrl": "https://katoennatie.sharepoint.com/teams/MSDS-MaterialSafetyDataSheets/_layouts/15/SPListForm.aspx?debug=true&debugManifestsFile=https%3A%2F%2Flocalhost%3A4321%2Ftemp%2Fbuild%2Fmanifests.js&PageType=8&List=dec4f14b%2Ddf4c%2D41d4%2Db2bd%2D0ea6a959d515&Source=https%3A%2F%2Fkatoennatie%2Esharepoint%2Ecom%2Fteams%2FMSDS%2DMaterialSafetyDataSheets%2FLists%2FWeb%2520application%2520form%2FAllItems%2Easpx&RootFolder=%2Fteams%2FMSDS%2DMaterialSafetyDataSheets%2FLists%2FWeb%20application%20form&Web=3bc68e63%2D07c6%2D4425%2Da25c%2D97cdf5ae496c",
       "formCustomizer": {
         "componentId": "a7fdea8a-6086-4094-b22e-04981e1cdbd6",
         "PageType": 8,
-        "RootFolder": "/sites/BSG/Lists/Web application form",
+        "RootFolder": "/teams/MSDS-MaterialSafetyDataSheets/Lists/Web application form",
         "properties": {
-          "approverListName": "Contact person Petrochemicals"
+          "approverListName": "Contact person Petrochemical"
         }
       }
     },
@@ -44,6 +44,41 @@
         "PageType": 4,
         "RootFolder": "/sites/BSG/Lists/Web application form",
         "ID": 18,
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "configurationForm_NewForm": {
+      "pageUrl": "https://{tenantDomain}/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "fc4377f2-31d2-4aa7-b2c8-68320f965d5a",
+        "PageType": 8,
+        "RootFolder": "/sites/mySite/Lists/MyList",
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "configurationForm_EditForm": {
+      "pageUrl": "https://{tenantDomain}/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "fc4377f2-31d2-4aa7-b2c8-68320f965d5a",
+        "PageType": 6,
+        "RootFolder": "/sites/mySite/Lists/MyList",
+        "ID": 1,
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "configurationForm_ViewForm": {
+      "pageUrl": "https://{tenantDomain}/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "fc4377f2-31d2-4aa7-b2c8-68320f965d5a",
+        "PageType": 4,
+        "RootFolder": "/sites/mySite/Lists/MyList",
+        "ID": 1,
         "properties": {
           "sampleText": "Value"
         }

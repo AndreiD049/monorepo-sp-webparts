@@ -1,0 +1,15 @@
+/*
+  Your use of the content in the files referenced here is subject to the terms of the license at http://aka.ms/fabric-assets-license
+*/
+.container {
+  min-width: 1px;
+}
+
+.msdsFormButtons {
+  padding: 3em 0;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5em;
+}

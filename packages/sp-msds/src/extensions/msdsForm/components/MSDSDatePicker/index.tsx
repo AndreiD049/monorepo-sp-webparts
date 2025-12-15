@@ -40,15 +40,18 @@ export const MSDSDatePicker: React.FC<IMSDSDatePickerProps> = (props) => {
                         <DatePicker
                             {...props.pickerProps}
 							id={props.id}
-                            value={field.value ? new Date(field.value) : null}
-                            formatDate={(date) => date.toLocaleDateString()}
-                            onSelectDate={(date) =>
-                                field.onChange(formatDate(date))
-                            }
+                            value={field.value ? new Date(field.value) : undefined}
+                            formatDate={(date) => date?.toLocaleDateString() ?? ""}
+                            onSelectDate={(date) => {
+                                if (date === null || date === undefined) {
+                                    return ""
+                                }
+                                return field.onChange(formatDate(date))
+                            }}
                             disabled={props.rules?.disabled}
                         />
                         <TextError
-                            error={fieldState.error && fieldState.error.message}
+                            error={fieldState.error && fieldState.error.message || ""}
                         />
                     </>
                 )}

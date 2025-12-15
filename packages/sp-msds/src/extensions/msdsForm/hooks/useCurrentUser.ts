@@ -3,7 +3,7 @@ import { ISiteUserInfo } from 'sp-preset';
 import { LookupServiceCached } from '../services/lookup-service';
 
 export function useCurrentUser(): ISiteUserInfo {
-    const [user, setUser] = React.useState<ISiteUserInfo>();
+    const [user, setUser] = React.useState<ISiteUserInfo>({} as ISiteUserInfo);
 
     React.useEffect(() => {
         async function run(): Promise<void> {

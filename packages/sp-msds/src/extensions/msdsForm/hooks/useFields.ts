@@ -3,7 +3,7 @@ import { FieldService } from "../services/field-service";
 import { IMSDSFields } from "../services/IMSDSFields";
 
 export function useFields(site: string | undefined): IMSDSFields {
-    const [fields, setFields] = React.useState([]);
+    const [fields, setFields] = React.useState<IMSDSFields[]>([]);
     
     React.useEffect(() => {
         if (site) {
@@ -11,5 +11,5 @@ export function useFields(site: string | undefined): IMSDSFields {
         }       
     }, [site]);
     
-    return fields.length > 0 ? fields[0] : {};
+    return fields.length > 0 ? fields[0] : ({} as IMSDSFields);
 }
