@@ -13,7 +13,7 @@
   },
   "externals": {
     "luxon": {
-      "path": "https://cdn.jsdelivr.net/npm/luxon@2.3.1/build/global/luxon.min.js",
+      "path": "https://cdnjs.cloudflare.com/ajax/libs/luxon/2.3.1/luxon.min.js",
       "globalName": "luxon"
     }
   },
