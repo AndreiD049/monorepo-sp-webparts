@@ -12,16 +12,8 @@
     }
   },
   "externals": {
-    "sp-preset": {
-      "path": "https://cdn.jsdelivr.net/npm/sp-preset@2.0.21/dist/index.amd.js",
-      "globalName": "spPreset"
-    },
-    "sp-react-notifications": {
-      "path": "https://cdn.jsdelivr.net/npm/sp-react-notifications@1.0.23/dist/index.amd.js",
-      "globalName": "spReactNotifications"
-    },
     "luxon": {
-      "path": "https://cdn.jsdelivr.net/npm/luxon@2.3.1/build/global/luxon.min.js",
+      "path": "https://cdnjs.cloudflare.com/ajax/libs/luxon/2.3.1/luxon.min.js",        
       "globalName": "luxon"
     }
   },
